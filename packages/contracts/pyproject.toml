@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alfalab-contracts"
+version = "1.0.0"
+description = "Executable Pydantic contracts for the AlfaBank hackathon framework."
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic>=2.12,<3"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

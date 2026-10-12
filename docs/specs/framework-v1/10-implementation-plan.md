@@ -1,13 +1,13 @@
 # План реализации и параллельная разработка
 
-Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01–T18 ещё не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт с утверждёнными требованиями поднимается в spec review.
+Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. Код T01 реализован в ветке `codex/t01-pydantic-contracts`, но её приёмка ожидает уточнения фразы «допустимое основание» для `confirmed` Statement в `02-contracts.md`. T02–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
 
 ## Этапы и блокировки
 
 | Задача | Результат / рекомендуемый владелец | Blocked by | Проверяемая приёмка |
 |---|---|---|---|
 | T00 Toolchain и чистый checkout — выполнено | Root README, exact runtime manifest, uv/npm locks, Compose PostgreSQL, базовые bootstrap/doctor CLI; platform | подтверждение spec | Windows и Linux userland в WSL создают окружение и подключаются к изолированной DB без model keys; повтор не разрушает state; versions/digest pinned. Native Linux и полный clean-room bootstrap/doctor повторно проверяются в T18 |
-| T01 Pydantic и schemas | 215 моделей/типов, semantic validators, OpenAPI export, 25 descriptors; contracts owner | T00 | export diff с нормативным снимком; refs/extra/scalars/unions; 25 IDs; positive/negative wire cases |
+| T01 Pydantic и schemas | 215 моделей/типов, semantic validators, OpenAPI export, 25 descriptors; contracts owner | T00 | Реализовано; review pending до уточнения правила основания для подтверждённого Statement. Structural conformance, operation bindings, refs/extra/scalars/unions и положительные/отрицательные wire cases проверены |
 | T02 Shared fixtures и public Protocol | approved radio/steel datasets, operation fixtures, input/output hash rules, Protocol/context stubs; contracts + QA | T01 | каждый mock operation имеет достаточный воспроизводимый сценарий; versions/hashes; consumer bindings валидируются |
 | T03 Минимальный execution slice | Documents.prepare real/mock → typed HTTP → trace → общий UI editor; platform + frontend | T01 | одно выполнение через HTTP/CLI/Playground, actual execution metadata, schema errors sanitized |
 | T04 Owner storage и receipts | migrations, DB-role isolation, artifacts, generic owner transaction helper, Documents.register/read; storage | T01 | roundtrip command/read, concurrent duplicate/conflict/crash, artifact hashes, scope isolation |
@@ -19,7 +19,7 @@
 | T10 Business | profile/questions/apply/read; business owner | T02,T04,T05 | sparse/conflicting profile, skips/declines, stateful commands, independent tests/UI |
 | T11 Evidence | register/read, anchor verification и owner source ports; evidence owner | T02,T04,T05 | wrong hash/span rejected; Documents/Business/Runs sources; scope access; proof readback |
 | T12 Graph | build/publish/query, projection manifest/freshness; graph owner | T02,T04,T05 | canonical statements unchanged; alternate ontology fixture; fresh/stale/history/unknown; scoped invalidation |
-| T13 Matching/Impact/Recommendations | 3 operations, mocks и shared invariant suite; analytics owner | T02,T03,T05 | no business DB dependencies; no made-up quantities; action allowlist/approval; compare mock variants |
+| T13 Matching/Impact/Recommendations | 3 operations, mocks и shared invariant suite; analytics owner | T02,T03,T05 | no business DB dependencies; no made-up quantities; action allowlist/approval; compare mock variants; no-path Impact remains unknown unless separate supplied evidence supports a conclusion, and `none_found` is never silently mapped to neutral/no risk |
 | T14 Cases/Evaluation | save/query + evaluate; experiment owner | T02,T04,T05 | replayable draft roundtrip, exact/property/facts rules, noncomparable mismatched input, no automatic gold |
 | T15 Playground завершение | catalog, parameters, history, evidence, save/load/replay/compare/transfer; frontend | T03,T05,T06 | common UI all controls; тестовые endpoint fixtures до готовности модулей; 25-operation E2E после интеграции |
 | T16 Scenarios и checkpoints | document-business-impact v1, CLI stop/resume, typed bindings; integration owner | T06–T14 | full mock/mixed, stop after each step, no duplicate command, resume conflict rules |

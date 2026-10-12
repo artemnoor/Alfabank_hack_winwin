@@ -21,7 +21,7 @@ from alfalab_contracts.registry import (
     load_operation_registry,
 )
 
-from alfalab.execution.context import OperationContext
+from alfalab.common.protocols import OperationContext
 from alfalab.modules.documents.implementations.prepare import BaselineMockPrepare, RealPrepare
 
 

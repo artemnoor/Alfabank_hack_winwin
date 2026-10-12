@@ -6,7 +6,7 @@ from typing import Protocol
 
 from alfalab_contracts import PrepareInput, PrepareOutput
 
-from alfalab.execution.context import OperationContext
+from alfalab.common.protocols import OperationContext
 
 
 class PrepareOperation(Protocol):

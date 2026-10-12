@@ -9,6 +9,7 @@ from threading import Event
 from typing import Literal, NoReturn, Protocol
 
 from alfalab_contracts import ArtifactRef, ArtifactView, EvidenceRecord, ObjectRef
+from alfalab.common.protocols import TraceRecorder as SafeTraceRecorder
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,20 +46,12 @@ class FixedAnalyticalClock:
         return self.value
 
 
-class TraceRecorder(Protocol):
+class TraceRecorder(SafeTraceRecorder, Protocol):
     """Safe metadata-only trace sink used by an operation invocation."""
 
     def start(self, name: str, kind: str, parent_span_id: str | None = None) -> str: ...
 
     def finish(self, span_id: str, *, status: str, safe_detail: str) -> None: ...
-
-    def record_safe_event(
-        self,
-        event_name: str,
-        attributes: dict[str, str | int | float | bool | None],
-        /,
-    ) -> None: ...
-
 
 class ArtifactReader(Protocol):
     """Typed artifact read boundary; no implementation is wired in T03."""

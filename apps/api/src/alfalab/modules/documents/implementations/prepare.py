@@ -6,7 +6,7 @@ import hashlib
 
 from alfalab_contracts import PrepareInput, PrepareOutput, PreparedMaterial, RawMaterial, SpanMap
 
-from alfalab.execution.context import OperationContext
+from alfalab.common.protocols import OperationContext
 
 
 def _sha256_text(value: str) -> str:

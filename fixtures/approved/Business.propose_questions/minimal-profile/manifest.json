@@ -1,0 +1,143 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "minimal-profile",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Business_propose_questionsResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Business_propose_questionsResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Business.propose_questions",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:080e8c0c14113e5f667a514eb8b54320215770a9bf30b8a4548dadbd2b8806cd",
+    "expected_result": "sha256:8fe148e39664ef0665b28f6bcc935463f8d5d89c270bb72cd84a2f128e1d2b1d",
+    "request": "sha256:c20e9f16bd43a98ed131e9ac8dea3c7b688bd9b118df6798185ee8dc44f6bb86"
+  },
+  "operation_id": "Business.propose_questions",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "budget": 0,
+      "event": null,
+      "profile": {
+        "answers": [],
+        "as_of": {
+          "known_as_of": "2026-10-12T00:00:00Z",
+          "valid_as_of": "2026-10-12T00:00:00Z"
+        },
+        "company": {
+          "display_name": "synthetic-example",
+          "entity_id": "synthetic-example",
+          "kind": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          }
+        },
+        "contradictions": [],
+        "missing_data": [],
+        "preferences": {
+          "allow_event_prompts": false,
+          "max_questions": 0,
+          "suppressed_targets": []
+        },
+        "ref": {
+          "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "object_id": "synthetic-example",
+          "owner": "Business",
+          "revision": 1
+        },
+        "slice": {
+          "owner": "Events",
+          "partition_id": "synthetic-example",
+          "revision": 0,
+          "selection_key": "synthetic-example"
+        },
+        "statements": []
+      },
+      "question_history": []
+    },
+    "request_id": "fixture-11-minimal-profile",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Business_propose_questionsRequest",
+  "response_model": "Business_propose_questionsResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:c0263ff8c9dd8d7ab2a2dbfdea357b01c210d9e0cefdf0321808706558e0b20d",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

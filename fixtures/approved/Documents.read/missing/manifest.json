@@ -1,0 +1,106 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "missing",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Documents_readResponse",
+    "rules": [
+      {
+        "id": "missing-target-is-explicitly-reported",
+        "operation_id": "Documents.read"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      },
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Documents_readResponse"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:6d4ad9f542857733cd2ca458d1644b3696e7f4ab06b1393ad34cb24f48c03947",
+    "expected_result": "sha256:6d22a4194a6c993788bac0f81f2225b1faa91997cf25bbd2db162dbd69ba9f48",
+    "request": "sha256:bfb749d7e9de4523a723a52aea9798c331844b47fc167f868577c32623f466c8"
+  },
+  "operation_id": "Documents.read",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "as_of": null,
+        "document_ids": [
+          "fixture-object-that-does-not-exist"
+        ],
+        "kind": "documents",
+        "revision": null
+      }
+    },
+    "request_id": "fixture-04-missing",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Documents_readRequest",
+  "response_model": "Documents_readResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:7a9d77599a358fe128f7d79b603f622cc42604bb029bf963894a4aafbc84f1d2",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

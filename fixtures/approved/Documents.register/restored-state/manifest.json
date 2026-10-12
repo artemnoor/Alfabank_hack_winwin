@@ -1,0 +1,121 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "restored-state",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Documents_registerResponse",
+    "rules": [
+      {
+        "id": "restore-before-state-into-an-isolated-sandbox"
+      },
+      {
+        "id": "semantic-after-state-and-receipt-are-repeatable"
+      },
+      {
+        "id": "exclude-committed-at-and-current-run-id-from-semantic-equality"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:a7f145c9659f310f1886d1c50d43699b06afffa5a88b156dc3fda09e567edb69",
+    "expected_result": "sha256:a597d278ab9da5f63ee9e245e81dd499c78f59359a52bb40ee873a24e4171499",
+    "request": "sha256:4592a87173f8567274dfe65223261f3f398cd3f39cb15a19572449ceea4608c1"
+  },
+  "operation_id": "Documents.register",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-3",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "document_id": "synthetic-example",
+      "expected_revision": 0,
+      "prepared": null,
+      "raw": {
+        "collected_at": "2026-10-12T00:00:00Z",
+        "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+        "language": "ru",
+        "material_id": "fixture-radio-news",
+        "provenance": {
+          "derivation_method": null,
+          "evidence_refs": [],
+          "input_statement_refs": [],
+          "origin": "synthetic",
+          "origin_verified": false,
+          "producer_run_id": null,
+          "source_refs": []
+        },
+        "published_at": null,
+        "source_id": null,
+        "source_url": null,
+        "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+        "title": "Синтетический пример ограничения экспорта"
+      }
+    },
+    "request_id": "fixture-03-create",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Documents_registerRequest",
+  "response_model": "Documents_registerResponse",
+  "restore_before_each_call": true,
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:50c7c32badcd098ef1877bbfc98e0d40b6fccb739a38f701baa7aabba71cbda6",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

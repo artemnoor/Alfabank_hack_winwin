@@ -1,0 +1,124 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    },
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f",
+      "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+      "dataset_id": "steel-buffer-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "controlled-failure",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "mock-failure-is-deterministic",
+        "mock_scenario": "fatal_error"
+      },
+      {
+        "id": "error-does-not-echo-request-or-provider-body"
+      },
+      {
+        "applies_to": false,
+        "id": "command-state-not-applied-or-outcome-explicit"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:3cde46a5efac8cbfcdf2a57a557507ffff29266433f81b89dd65a3aa665b0947",
+    "expected_result": "sha256:d1c67b47f2e4d6abe59ec8359801d7bd5ad706a017b18735e2e62710f62152ec",
+    "request": "sha256:81c7650cfe95c3df72ea9ad336704d3d24d70f2b83fc52ad130082777b52611a"
+  },
+  "operation_id": "Graph.build",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "fatal_error"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "graph_id": "synthetic-example",
+      "knowledge": {
+        "as_of": {
+          "known_as_of": "2026-10-12T00:00:00Z",
+          "valid_as_of": "2026-10-12T00:00:00Z"
+        },
+        "entities": [],
+        "evidence": [],
+        "slices": [],
+        "statements": []
+      },
+      "ontology": {
+        "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "id": "synthetic-example",
+        "version": "1.0.0"
+      },
+      "rules": {
+        "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "id": "synthetic-example",
+        "version": "1.0.0"
+      }
+    },
+    "request_id": "fixture-14-controlled-failure",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Graph_buildRequest",
+  "response_model": "Graph_buildResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:58a8f9718abc8afb097baafa43670cc84fc51947fd1fa586e75411377806f46f",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

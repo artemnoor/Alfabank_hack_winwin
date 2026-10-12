@@ -1,0 +1,13 @@
+{
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "classification": "synthetic",
+  "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+  "dataset_id": "steel-buffer-v1",
+  "hashes": {
+    "data": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f"
+  },
+  "retention_class": "approved_fixture",
+  "schema": "alfalab.approved-synthetic-dataset/v1",
+  "synthetic_only": true,
+  "version": "1.0.0"
+}

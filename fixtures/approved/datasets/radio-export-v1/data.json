@@ -1,0 +1,176 @@
+{
+  "classification": "synthetic",
+  "dataset_id": "radio-export-v1",
+  "records": {
+    "case_ids": [
+      "synthetic-example",
+      "foreign-case-1"
+    ],
+    "company": {
+      "company_id": "synthetic-example",
+      "display_name": "Учебная компания «Радио»",
+      "known_facts": [
+        {
+          "predicate": "business_activity",
+          "statement_id": "radio-activity-1",
+          "value": "учебный пример: радиодетали"
+        }
+      ],
+      "synthetic_entity": true,
+      "unknowns": [
+        "supplier_country",
+        "procurement_volume",
+        "revenue"
+      ]
+    },
+    "documents": [
+      "synthetic-example",
+      "fixture-radio-news"
+    ],
+    "events": [
+      {
+        "confirmed": false,
+        "event_id": "radio-event-1",
+        "source_material_id": "fixture-radio-news",
+        "statement_id": "radio-event-claim-1",
+        "status": "reported",
+        "text": "предложено ограничение экспорта"
+      },
+      {
+        "confirmed": false,
+        "event_id": "radio-event-1",
+        "source_material_id": "fixture-radio-duplicate",
+        "statement_id": "radio-event-claim-duplicate",
+        "status": "reported",
+        "text": "повтор сообщения об ограничении экспорта"
+      },
+      {
+        "confirmed": false,
+        "event_id": "radio-event-1",
+        "source_material_id": "fixture-radio-contradiction",
+        "statement_id": "radio-event-claim-conflict",
+        "status": "conflicting",
+        "text": "ограничение пока не вступило в силу"
+      },
+      {
+        "confirmed": false,
+        "event_id": "foreign-event-1",
+        "source_material_id": "fixture-radio-news",
+        "statement_id": "foreign-event-claim-1",
+        "status": "reported",
+        "text": "synthetic foreign-scope access target"
+      }
+    ],
+    "evidence": [
+      {
+        "classification": "synthetic",
+        "object_id": "synthetic-example",
+        "owner": "Evidence",
+        "revision": 1
+      }
+    ],
+    "foreign_scope_examples": [
+      {
+        "object_id": "synthetic-example",
+        "owner": "Documents",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "foreign-event-1",
+        "owner": "Events",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "synthetic-example",
+        "owner": "Business",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "foreign-graph-1",
+        "owner": "Graph",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "synthetic-example",
+        "owner": "Evidence",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "foreign-run-1",
+        "owner": "Runs",
+        "sandbox_id": "foreign-sandbox"
+      },
+      {
+        "object_id": "foreign-case-1",
+        "owner": "Cases",
+        "sandbox_id": "foreign-sandbox"
+      }
+    ],
+    "graph": {
+      "edges": [
+        {
+          "edge_id": "radio-edge-potential",
+          "from": "synthetic-supplier-radio",
+          "status": "potential",
+          "to": "synthetic-example"
+        }
+      ],
+      "graph_id": "synthetic-example",
+      "nodes": [
+        "synthetic-example",
+        "synthetic-supplier-radio",
+        "foreign-graph-1"
+      ]
+    },
+    "materials": [
+      {
+        "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+        "language": "ru",
+        "material_id": "fixture-radio-news",
+        "published_at": null,
+        "source_id": "synthetic-example",
+        "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+        "title": "Учебное сообщение об экспорте радиодеталей"
+      },
+      {
+        "content_hash": "sha256:3c1d54dd510094ecda3e3c66e8426d5347cba414549dacc7cb5fb87d9105deda",
+        "language": "ru",
+        "material_id": "fixture-radio-duplicate",
+        "published_at": null,
+        "source_id": "synthetic-example",
+        "text": "Учебный материал повторяет сообщение об ограничении экспорта радиодеталей.",
+        "title": "Повтор учебного сообщения"
+      },
+      {
+        "content_hash": "sha256:3e7104bf2b3a099845be1401d2d435ad0a4d40d3cc2cc5ff3ec42efc6b021dc1",
+        "language": "ru",
+        "material_id": "fixture-radio-contradiction",
+        "published_at": null,
+        "source_id": "synthetic-example",
+        "text": "Учебный материал сообщает, что ограничение экспорта радиодеталей пока не вступило в силу.",
+        "title": "Противоречащее учебное сообщение"
+      }
+    ],
+    "run_ids": [
+      "synthetic-example",
+      "foreign-run-1"
+    ],
+    "source": {
+      "adapter": "local-fixture",
+      "network_required": false,
+      "source_id": "synthetic-example"
+    }
+  },
+  "snapshots": {
+    "baseline": {
+      "sandbox_id": "fixtures-t02",
+      "state": "approved synthetic baseline"
+    },
+    "foreign-scope": {
+      "sandbox_id": "foreign-sandbox",
+      "state": "access-denial test targets only"
+    }
+  },
+  "synthetic_only": true,
+  "version": "1.0.0"
+}

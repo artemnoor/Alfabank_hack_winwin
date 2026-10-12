@@ -1,0 +1,134 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "create-apply",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Events_applyResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Events_applyResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Events.apply",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      },
+      {
+        "id": "command-returns-owner-receipt"
+      },
+      {
+        "id": "state-change-is-scoped-to-request-sandbox"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:21f5f3f90ebbb116f63ad2e4f5c0fb8af6f6fee60645201a7d683f29d8423c78",
+    "expected_result": "sha256:1dba733bb5db3ccb7dc4f05beae6d7dd66b9b1f8c8ed5272f6b41a0edb87b6b3",
+    "request": "sha256:c2dc2ea89df1e8de21806628bba92f59184883103bd256ea2f00c36ace5e9e3b"
+  },
+  "operation_id": "Events.apply",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-8",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "evidence": [],
+      "expected_revisions": [],
+      "proposal": {
+        "decisions": [],
+        "missing_data": [],
+        "proposal_id": "synthetic-example",
+        "provenance": {
+          "derivation_method": null,
+          "evidence_refs": [],
+          "input_statement_refs": [],
+          "origin": "public_source",
+          "origin_verified": false,
+          "producer_run_id": null,
+          "source_refs": []
+        },
+        "source_snapshot": {
+          "owner": "Events",
+          "partition_id": "synthetic-example",
+          "revision": 0,
+          "selection_key": "synthetic-example"
+        },
+        "unresolved_mentions": []
+      }
+    },
+    "request_id": "fixture-08-create-apply",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Events_applyRequest",
+  "response_model": "Events_applyResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:4b89b007c3bbb6b9d801c28e5d42dd576e521002918b894e8e52f3a2c71f7ba4",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

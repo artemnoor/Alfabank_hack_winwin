@@ -1,0 +1,97 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    },
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f",
+      "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+      "dataset_id": "steel-buffer-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "invalid-request",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "schema_rejection",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "request-schema-rejects-before-invocation"
+      },
+      {
+        "id": "error-does-not-echo-rejected-values"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:189f503c538b8ec9ef92e76a9ecad338d1745077793d743d3efa3f39628c9278",
+    "expected_result": "sha256:8d7ee7a92c6f1bba45827d9c6811b3fcb072495e75df3b65018e7595d57ca959",
+    "request": "sha256:cc75d9291094f2ebf693defda33030ae49cb94e83675940ec6ffc184e484e758"
+  },
+  "operation_id": "Graph.publish",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-15",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "request_id": "fixture-15-invalid-request",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Graph_publishRequest",
+  "response_model": "Graph_publishResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:8f95f4f711296b3c028d436fe829b659df37cfbca2f51bb02b9ff58e2d1cf844",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

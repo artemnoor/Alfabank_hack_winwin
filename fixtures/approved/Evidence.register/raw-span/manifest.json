@@ -1,0 +1,125 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "raw-span",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Evidence_registerResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Evidence_registerResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Evidence.register",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      },
+      {
+        "id": "command-returns-owner-receipt"
+      },
+      {
+        "id": "state-change-is-scoped-to-request-sandbox"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:f01fab626696625494881f05b97688d4085d245b230e9a206451c117d402ca2b",
+    "expected_result": "sha256:766f339d2c392e7263173a2800dca81474d9175f96c7cce08fba99e8407b59fa",
+    "request": "sha256:2b8bb6c2baa279a25f4ca259f8dd98de64da50e63d008c457c34dc96921fb893"
+  },
+  "operation_id": "Evidence.register",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-20",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "evidence_id": "synthetic-example",
+      "expected_revision": 0,
+      "locator": {
+        "end": 0,
+        "kind": "text_span",
+        "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "start": 0
+      },
+      "source_ref": {
+        "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "object_id": "synthetic-example",
+        "owner": "Documents",
+        "revision": 1
+      }
+    },
+    "request_id": "fixture-20-raw-span",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Evidence_registerRequest",
+  "response_model": "Evidence_registerResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:f3f0696c0156d121c3e20a9b4e0d429229d848a7c467b479c609971e64305c7b",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

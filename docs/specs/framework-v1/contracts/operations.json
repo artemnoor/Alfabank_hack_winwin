@@ -218,7 +218,7 @@
       "domain_dependencies": "EventSchemaRegistry, опциональный ModelPort; classification не является зависимостью.",
       "reads_state": "Только material, hints, known_entities.",
       "writes_state": "Нет.",
-      "semantic_invariants": "hints=[] допустим. Один документ может дать несколько mentions. Unknown event type сохраняется согласованным other/unknown code и исходным evidence. Нет сетевой entity resolution. Evidence spans ссылаются на prepared_hash; binding переводит их в raw spans по span_map перед Evidence.register. Утверждение без основания не становится confirmed.",
+      "semantic_invariants": "hints=[] допустим. Один документ может дать несколько mentions. Unknown event type сохраняется согласованным other/unknown code и исходным evidence. Нет сетевой entity resolution. Evidence spans ссылаются на prepared_hash; binding переводит их в raw spans по span_map перед Evidence.register. Extraction не авторизует confirmed: для этого нужны Evidence-ссылка, проверенные Evidence owner hash/anchor и явно разрешающая Events/Business owner policy при применении.",
       "fixture_recipes": "two-events: ограничение экспорта и изменение цены; no-event: mentions=[]; contradictory: два утверждения с источниками; unknown-actor: unresolved_entities; invalid-span: output validation failure."
     },
     {
@@ -293,7 +293,7 @@
       "domain_dependencies": "EventsRepository/transaction, EvidenceReadPort для проверки ссылок, scope policy.",
       "reads_state": "Указанные Events aggregates/receipts и immutable Evidence refs.",
       "writes_state": "events versions/statements/lifecycle/lineage, audit/receipt.",
-      "semantic_invariants": "Проверяются source_snapshot и expected_revisions всех targets. Для новых IDs expected_revision=0. merge/split создают successors и сохраняют predecessors c lifecycle; lineage ациклична. Несогласованная одна из правок откатывает всю команду владельца. Выходной snapshot содержит затронутые события и новую revision partition.",
+      "semantic_invariants": "Проверяются source_snapshot и expected_revisions всех targets. Для новых IDs expected_revision=0. Перед сохранением confirmed Statement Events разрешает его Evidence refs через Evidence owner, проверяет scope/hash/anchor и требует явной Events owner policy. Anchor verification не доказывает истинность; без разрешающей policy утверждение остаётся unknown/unverified. merge/split создают successors и сохраняют predecessors с lifecycle; lineage ациклична. Несогласованная правка откатывает всю команду. Выходной snapshot содержит затронутые события и новую revision partition.",
       "fixture_recipes": "create/apply; merge с историей; split; duplicate-key; competing-revision: VERSION_CONFLICT; missing-evidence: rollback; crash-after-commit: recovery по Events.read receipt."
     },
     {
@@ -440,7 +440,7 @@
       "domain_dependencies": "BusinessRepository/transaction, EvidenceReadPort, scope policy.",
       "reads_state": "Состояние компании/receipts и Evidence refs.",
       "writes_state": "business versions/statements/answers/preferences, audit/receipt.",
-      "semantic_invariants": "proposal.expected_revision проверяется на company ID. Supersede сохраняет историю, не удаляет conflicting original. Ответы имеют явные статусы. Nullable preferences означает сохранить прежние; для новой компании defaults max_questions=3, allow_event_prompts=true, suppressed_targets=[]. Заявленные confirmed facts без допустимого источника отклоняются.",
+      "semantic_invariants": "proposal.expected_revision проверяется на company ID. Supersede сохраняет историю, не удаляет conflicting original. Ответы имеют явные статусы. Nullable preferences означает сохранить прежние; для новой компании defaults max_questions=3, allow_event_prompts=true, suppressed_targets=[]. Перед сохранением confirmed Business разрешает Evidence refs, проверяет scope/hash/anchor и требует явно разрешающую Business owner policy. Anchor verification не доказывает истинность; без policy статус остаётся unknown/unverified. Универсальный порог source reliability не задаётся.",
       "fixture_recipes": "create-minimal; add-answer; supersede-conflict; skipped-answer; duplicate-key; stale-revision; foreign-statement: rollback; crash receipt recovery."
     },
     {

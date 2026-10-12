@@ -19,7 +19,7 @@
 | business.versions | company_id + revision, BusinessSnapshot | immutable snapshots |
 | business.statements | statement_id + revision, Statement, company_id | conflicts сохраняются |
 | business.answers | question_id + answer_revision, answer status/value/source | skipped/declined не создают отрицательного факта |
-| evidence.records | evidence_id + revision, SourceRef, anchor, source_hash, locator_status | цитата соответствует версии источника |
+| evidence.records | evidence_id + revision, SourceRef, anchor, source_hash, locator_status | `EvidenceRecord.ref.owner=Evidence`; source ref разрешён и anchor относится к immutable версии источника |
 | graph.projections | graph_id + revision, ontology/rules/input manifest, graph artifact refs | graph immutable, replace by new version |
 | graph.nodes / edges | projection revision + node/edge ID, typed JSON attributes, statement/evidence refs | references замкнуты внутри snapshot |
 | runs.runs | run_id, parent/scenario IDs, status, input/output refs, versions, policy decisions, trace_status | фактическая история, не LLM narrative |
@@ -55,9 +55,9 @@ Receipt scope: tenant + sandbox + operation_id + contract_major + idempotency_ke
 
 ## Evidence
 
-SourceRef: owner Documents|Business|Runs, object ID, revision, hash. Evidence.register получает SourceRef и locator, читает источник через разрешённый read port и проверяет hash/anchor. TextSpan использует Unicode code point offsets [start,end), исходную строку до нормализации и quote_hash. Для подготовленного текста обязателен parent raw ref; восстановимость mapping определяется Documents.prepare.
+SourceRef: owner Documents|Business|Runs, object ID, revision, hash. `EvidenceRecord.ref` принадлежит Evidence; `EvidenceRecord.source_ref` и `Evidence.register.source_ref` указывают только на Documents, Business или Runs. Evidence.register получает SourceRef и locator, читает источник через разрешённый read port и проверяет его существование, scope, immutable hash и anchor. TextSpan использует Unicode code point offsets [start,end), исходную строку до нормализации и quote_hash. Для подготовленного текста обязателен parent raw ref; восстановимость mapping определяется Documents.prepare.
 
-Первый этап поддерживает text spans и whole-artifact anchors. PDF pages/coordinates остаются future locator variant: чтение PDF не требуется каркасу. Утверждение без проверяемого evidence имеет explicit unknown/unverified; его нельзя повысить до confirmed.
+Первый этап поддерживает text spans и whole-artifact anchors. PDF pages/coordinates остаются future locator variant: чтение PDF не требуется каркасу. `verified_anchor` означает целостность ссылки на источник, но не доказывает истинность утверждения. Для `Statement.epistemic_status=confirmed` DTO требует одну или более ссылок с owner Evidence; существование ссылки и целостность hash/anchor проверяет Evidence owner. После этого соответствующая owner policy должна явно разрешить подтверждение. Без такой policy Events/Business не сохраняют `confirmed`, и статус остаётся `unknown`/unverified. Универсальный порог reliability не вводится; policy может учитывать конкретные источники и обстоятельства. Клиентская метка `confirmed`, verified anchor или `source_reliability` отдельно не заменяют разрешение policy.
 
 В v1 TextSpan имеет ровно один адресуемый текст: Documents version.raw.text. Для Business/Runs допускается WholeArtifact; неоднозначный поиск строки внутри произвольного JSON запрещён. GraphNode/GraphEdge и derived provenance используют StatementRef с aggregate revision и точным statement ID/revision/hash.
 

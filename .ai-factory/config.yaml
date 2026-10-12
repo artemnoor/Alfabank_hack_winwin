@@ -1,0 +1,35 @@
+language:
+  ui: ru
+  artifacts: ru
+  technical_terms: mixed
+
+git:
+  enabled: true
+  base_branch: main
+  create_branches: true
+  branch_prefix: codex/
+  skip_push_after_commit: true
+
+workflow:
+  plan_id_format: slug
+  verify_mode: strict
+
+paths:
+  description: .ai-factory/DESCRIPTION.md
+  architecture: docs/specs/framework-v1/01-architecture.md
+  roadmap: docs/specs/framework-v1/10-implementation-plan.md
+  rules_file: .ai-factory/RULES.md
+  rules: .ai-factory/rules/
+  plan: .ai-factory/PLAN.md
+  plans: .ai-factory/plans/
+  patches: .ai-factory/patches/
+  archive: .ai-factory/archive/
+  specs: docs/specs/framework-v1/
+
+rules:
+  base: .ai-factory/rules/base.md
+
+warmup:
+  paths:
+    - docs/specs/framework-v1/README.md
+    - docs/specs/framework-v1/10-implementation-plan.md

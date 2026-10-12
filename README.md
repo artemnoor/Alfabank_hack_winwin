@@ -1,6 +1,6 @@
 # Alfabank_hack_winwin
 
-[![Статус: T00 выполнена, T01 следующая](https://img.shields.io/badge/status-T00%20complete%20%7C%20T01%20next-orange)](docs/specs/framework-v1/10-implementation-plan.md)
+[![Статус: T01 audit pass](https://img.shields.io/badge/status-T01%20audit%20pass-brightgreen)](docs/specs/framework-v1/10-implementation-plan.md)
 [![Последний тег: v0.1.0-bootstrap](https://img.shields.io/badge/latest%20tag-v0.1.0--bootstrap-blue)](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap)
 [![Релиз: пока не опубликован](https://img.shields.io/badge/GitHub%20Release-not%20published-lightgrey)](https://github.com/artemnoor/Alfabank_hack_winwin/releases)
 [![Python 3.12.15](https://img.shields.io/badge/Python-3.12.15-3776AB?logo=python&logoColor=white)](toolchain.lock.json)
@@ -9,13 +9,13 @@
 
 > Модульный AI-каркас для хакатона Альфа-Банка: строгие контракты операций, заменяемые реализации, контролируемые моки и воспроизводимые запуски.
 
-Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. Сейчас выполнен этап **T00 — toolchain и локальная среда**. Backend-операции, API и Playground ещё не реализованы.
+Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. **T00 завершена; независимый технический аудит T01 пройден, исправления подготовлены к PR review.** Правило для `confirmed` согласовано и зафиксировано. Backend-операции, API и Playground ещё не реализованы.
 
 ## Состояние проекта
 
 | Показатель | Состояние |
 |---|---|
-| Текущий этап | **T00 завершён; T01 следующий** |
+| Текущий этап | **T01 реализована и аудит пройден; изменения ожидают PR review** |
 | Последний Git-тег | [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) |
 | GitHub Release | Пока не опубликован; тег отмечает bootstrap-снимок |
 | Framework Ready | Нет — запланирована приёмка T18 после реализации каркаса |
@@ -93,14 +93,27 @@ python3.12 tools/dev.py doctor --profile all
 
 Bootstrap ставит точный CPython через закреплённый uv, проверяет SHA-256 архивов uv и Node.js/npm, синхронизирует lock-файлы и запускает только PostgreSQL. Он создаёт раздельные `development` и `testing` базы с отдельными ролями. Пароли и состояние остаются в игнорируемом `.local/`; повторный bootstrap сохраняет credentials и данные.
 
-Успешный `doctor` завершает вывод строкой `Проверки T00 пройдены. Это ещё не Framework Ready.` Сейчас эта команда проверяет toolchain и базу. Она не запускает API или Playground — их ещё нет.
+Успешный `doctor` завершает вывод строкой `Проверки T00 пройдены. Это ещё не Framework Ready.` Эта команда проверяет toolchain и базу. Она не запускает API или Playground — их ещё нет.
+
+### Проверка контрактов T01
+
+После bootstrap синхронизируйте закреплённое Python-окружение, проверьте генерацию Pydantic-моделей и запустите контрактные тесты:
+
+```powershell
+& .local/toolchain/bin/uv.exe sync --all-groups --locked --python 3.12.15
+& .local/toolchain/bin/uv.exe run --locked --python 3.12.15 python tools/contracts_codegen.py --check
+& .local/toolchain/bin/uv.exe run --locked --python 3.12.15 pytest tests/contracts -q
+```
+
+Инструкции для Linux/WSL и описание публичной поверхности контрактов — в [packages/contracts/README.md](packages/contracts/README.md). Эти проверки не требуют PostgreSQL или ключей моделей.
 
 ## План работ
 
 | Этап | Результат | Статус |
 |---|---|---|
 | T00 | Toolchain, PostgreSQL, bootstrap и doctor | ✅ Выполнено |
-| T01–T02 | Строгие схемы 25 операций, общие fixtures и публичные интерфейсы | Следом — T01 |
+| T01 | Pydantic v2-модели, семантические валидаторы и типизированные descriptors 25 операций | Аудит PASS; исправления ожидают PR review |
+| T02 | Общие fixtures и публичные Protocol | После приёмки T01 |
 | T03–T06 | Исполнитель, хранилище запусков, политики данных и replay | Запланировано |
 | T07–T14 | Sources/Documents, Understanding/Events, Business, Evidence, Graph и аналитические операции | Запланировано |
 | T15–T17 | Playground, сценарии и CI readiness matrix | Запланировано |
@@ -119,12 +132,12 @@ Bootstrap ставит точный CPython через закреплённый 
 | [Сценарии и replay](docs/specs/framework-v1/06-replay-scenarios.md) · [Playground](docs/specs/framework-v1/07-playground.md) | Остановка, воспроизведение и ручные эксперименты |
 | [Проверки](docs/specs/framework-v1/08-verification.md) · [локальные данные](docs/specs/framework-v1/09-local-data.md) | CI, уровни готовности, секреты и политика данных |
 | [Риски и решения](docs/specs/framework-v1/11-decisions-risks.md) | Принятые компромиссы и открытые вопросы |
-| [OpenAPI](docs/specs/framework-v1/contracts/openapi.json) · [примеры контрактов](docs/specs/framework-v1/contracts/examples.json) | Нормативные снимки схем и примеров |
+| [OpenAPI](docs/specs/framework-v1/contracts/openapi.json) · [примеры контрактов](docs/specs/framework-v1/contracts/examples.json) · [исполняемый пакет контрактов](packages/contracts/README.md) | Нормативные снимки схем, примеры и Pydantic API |
 
 ## Релизы и участие
 
 Последний тег [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) фиксирует базовую среду T00. Отдельный [GitHub Release](https://github.com/artemnoor/Alfabank_hack_winwin/releases) пока не опубликован; этот тег не обозначает готовность приложения.
 
-Для разработки выберите задачу из плана и её критерии приёмки. Изменения контрактов требуют проверки затронутых потребителей; секреты, `.local/`, `.venv/` и `node_modules/` в коммиты не добавляются. В проекте пока нет CI-конфигурации или набора прикладных тестов — они появятся в запланированных задачах.
+Для разработки выберите незаблокированную задачу из плана и её критерии приёмки. Изменения контрактов требуют проверки затронутых потребителей; секреты, `.local/`, `.venv/` и `node_modules/` в коммиты не добавляются. CI-конфигурации пока нет; контрактные тесты T01 запускаются локально, а общая CI-матрица предусмотрена T17.
 
 **Лицензия:** пока не выбрана. Публичная видимость репозитория не задаёт условия повторного использования кода.

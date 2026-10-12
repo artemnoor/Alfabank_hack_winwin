@@ -3,11 +3,12 @@ name = "alfabank-architecture-framework"
 version = "1.0.0"
 description = "Toolchain and local development environment for the AlfaBank hackathon framework."
 requires-python = ">=3.12,<3.13"
-dependencies = ["alfalab-contracts==1.0.0"]
+dependencies = ["alfalab-api==1.0.0", "alfalab-contracts==1.0.0"]
 
 [dependency-groups]
 dev = [
     "datamodel-code-generator==0.83.0",
+    "httpx==0.28.1",
     "jsonschema>=4.24,<5",
     "pytest>=8.3,<9",
     "setuptools==80.9.0",
@@ -18,4 +19,5 @@ required-version = "==0.13.0"
 package = false
 
 [tool.uv.sources]
+alfalab-api = { path = "apps/api", editable = true }
 alfalab-contracts = { path = "packages/contracts", editable = true }

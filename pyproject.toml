@@ -3,10 +3,16 @@ name = "alfabank-architecture-framework"
 version = "1.0.0"
 description = "Toolchain and local development environment for the AlfaBank hackathon framework."
 requires-python = ">=3.12,<3.13"
-dependencies = ["alfalab-api==1.0.0", "alfalab-contracts==1.0.0"]
+dependencies = [
+    "alfalab-api==1.0.0",
+    "alfalab-contracts==1.0.0",
+    "psycopg[binary]==3.3.6",
+    "sqlalchemy==2.0.54",
+]
 
 [dependency-groups]
 dev = [
+    "alembic==1.20.0",
     "datamodel-code-generator==0.83.0",
     "httpx==0.28.1",
     "jsonschema>=4.24,<5",

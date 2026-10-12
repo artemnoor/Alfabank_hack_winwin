@@ -10,13 +10,17 @@ For each development or testing database, provision the roles as a PostgreSQL
 administrator, then apply the migration:
 
 ```powershell
-psql $env:ALFALAB_MIGRATION_DATABASE_URL -v ON_ERROR_STOP=1 -f infra/bootstrap/documents_roles.sql
+$admin = [Uri]($env:ALFALAB_MIGRATION_DATABASE_URL -replace '^postgresql\+psycopg://', 'postgresql://')
+$adminUser = [Uri]::UnescapeDataString($admin.UserInfo.Split(':', 2)[0])
+$database = [Uri]::UnescapeDataString($admin.AbsolutePath.TrimStart('/'))
+psql -h $admin.Host -p $admin.Port -U $adminUser -d $database -W -v ON_ERROR_STOP=1 -f infra/bootstrap/documents_roles.sql
 uv run --locked alembic -c infra/alembic.ini upgrade head
 ```
 
 `ALFALAB_MIGRATION_DATABASE_URL` must come from the local administrator
-credential in `.local`; do not put it in a tracked profile, command transcript,
-or process log. The Alembic environment requires that variable, sets the
+credential in `.local`. `psql -W` prompts for its password so the URL and
+password are not placed in the process argument list or command transcript.
+Do not put the URL in a tracked profile or process log. The Alembic environment requires that variable, sets the
 session role to `documents_migrator`, and does not print the connection URL.
 The runtime engine uses the separately configured development/testing profile
 and issues `SET ROLE documents_owner` when opening each pooled connection. The

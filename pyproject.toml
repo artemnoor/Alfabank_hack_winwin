@@ -1,0 +1,10 @@
+[project]
+name = "alfabank-architecture-framework"
+version = "1.0.0"
+description = "Toolchain and local development environment for the AlfaBank hackathon framework."
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+required-version = "==0.13.0"
+package = false

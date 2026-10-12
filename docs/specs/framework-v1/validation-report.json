@@ -1,0 +1,209 @@
+{
+  "specification_version": "1.0.0",
+  "checked_at_utc": "2026-10-12T17:27:21.979517+00:00",
+  "scope": "Documentation/schema consistency only. No application implemented or executed. Not Framework Ready, Algorithm Ready or Product Ready.",
+  "checks": [
+    {
+      "check": "json_schema_meta_validation",
+      "status": "passed",
+      "details": {
+        "schemas": 215,
+        "dialect": "2020-12"
+      }
+    },
+    {
+      "check": "reference_resolution",
+      "status": "passed",
+      "details": {
+        "references": 974
+      }
+    },
+    {
+      "check": "operation_examples",
+      "status": "passed",
+      "details": {
+        "request_response_pairs": 25,
+        "positive_instances": 50,
+        "extra_field_negative_instances": 25,
+        "scope": "shape and format only"
+      }
+    },
+    {
+      "check": "closed_catalog",
+      "status": "passed",
+      "details": {
+        "operations": 25,
+        "system_paths": 3,
+        "schema_closure_hashes": 25,
+        "counts_by_kind": {
+          "compute": 11,
+          "command": 6,
+          "read": 7,
+          "source": 1
+        }
+      }
+    },
+    {
+      "check": "strict_object_schemas",
+      "status": "passed",
+      "details": {
+        "objects": 192
+      }
+    },
+    {
+      "check": "local_document_links",
+      "status": "passed",
+      "details": {
+        "resolved_links": 18
+      }
+    },
+    {
+      "check": "operation_cards",
+      "status": "passed",
+      "details": {
+        "complete_cards": 25
+      }
+    },
+    {
+      "check": "implementation_plan_dag",
+      "status": "passed",
+      "details": {
+        "tasks": 19,
+        "acyclic": true,
+        "dependencies": {
+          "T00": [],
+          "T01": [
+            "T00"
+          ],
+          "T02": [
+            "T01"
+          ],
+          "T03": [
+            "T01"
+          ],
+          "T04": [
+            "T01"
+          ],
+          "T05": [
+            "T03",
+            "T04"
+          ],
+          "T06": [
+            "T02",
+            "T05"
+          ],
+          "T07": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T08": [
+            "T02",
+            "T03",
+            "T05"
+          ],
+          "T09": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T10": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T11": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T12": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T13": [
+            "T02",
+            "T03",
+            "T05"
+          ],
+          "T14": [
+            "T02",
+            "T04",
+            "T05"
+          ],
+          "T15": [
+            "T03",
+            "T05",
+            "T06"
+          ],
+          "T16": [
+            "T06",
+            "T07",
+            "T08",
+            "T09",
+            "T10",
+            "T11",
+            "T12",
+            "T13",
+            "T14"
+          ],
+          "T17": [
+            "T01",
+            "T07",
+            "T08",
+            "T09",
+            "T10",
+            "T11",
+            "T12",
+            "T13",
+            "T14",
+            "T15",
+            "T16"
+          ],
+          "T18": [
+            "T15",
+            "T16",
+            "T17"
+          ]
+        }
+      }
+    },
+    {
+      "check": "openapi_document_validation",
+      "status": "passed",
+      "details": {
+        "validator": "openapi-spec-validator",
+        "openapi": "3.1.0"
+      }
+    }
+  ],
+  "artifact_hashes": {
+    "01-architecture.md": "sha256:0dfa8d706b25740d3952d85a94cad256c86d4826fb4c260660b29b046baff7f7",
+    "02-contracts.md": "sha256:7fd257c9b5cbe9ac14abe23f561f879e53ba0a97a7d6b295063205ec4053f53d",
+    "03-operations.md": "sha256:967c7ae25a0d744982633535bd4a878fafd7bd66bb77dbc8a4d80d770ab1c44d",
+    "04-execution.md": "sha256:e5318cbf53551ab0ff4074d17dc100f09962b7dd229178bc7a4a24fef7ab4b44",
+    "05-storage.md": "sha256:330ab1582653072fdda8b9b3b487f2d369715ff863e4d60cfd8407d36ec23f9f",
+    "06-replay-scenarios.md": "sha256:e2b43be5eca686e3fc4989b8521460b0505ed852d26eaee57db66ac2f8fdf493",
+    "07-playground.md": "sha256:62ef1c45d038f72612487ea2955a8a58d7f27b17cfeda7f6ade7a06f8f13971f",
+    "08-verification.md": "sha256:998758f2011e5e4e8e8f300e3d09533952811934fa2ce671488748d6c27aaffb",
+    "09-local-data.md": "sha256:dfb45fb15c553c58b97b744d1ea99d75667df67b46e7704d84b154667c3f47d1",
+    "10-implementation-plan.md": "sha256:b3e73b8f1c3eea499376c84f2dc20755e5dcdaa6600cb32335ef514b77df9eb7",
+    "11-decisions-risks.md": "sha256:ab8bdcf45c83f07bada3dce4e500209b8573cd434e2fb6c1944fd47159b640a1",
+    "contracts/examples.json": "sha256:5be9574fe6b3969c8124a3575d4871db5c02bc733b1bd6d3e0dcf0e8d0f70e3d",
+    "contracts/openapi.json": "sha256:cbee3b90018c5838db7887cd4bdf640760d93d7d0cdb5bdd0a6d86bd7f92f8a2",
+    "contracts/operations.json": "sha256:f4a8b569b14858c1e3b1a9aa5b955aa33dd5e37bc2ea63add00129d4f762b384",
+    "contracts/pydantic-models.md": "sha256:e8590ea592403cb3c75bc2a5a009f0b3e62f4396ef728a19039919c686de0d9a",
+    "README.md": "sha256:684cdae3c2860e95fa15e255cf2ee7e65a97fbb10c0f57ab30cf7fce32d9fa8b",
+    "requirements.md": "sha256:6cdc711b3b4064bb7f5ebc665ad5bf401427831363228e7b9d1e614ada487152"
+  },
+  "not_executed": [
+    "Pydantic export conformance",
+    "application contract/semantic tests",
+    "PostgreSQL transaction and isolation tests",
+    "record/replay execution",
+    "Playground E2E",
+    "clean repository bootstrap",
+    "quality benchmarks"
+  ]
+}

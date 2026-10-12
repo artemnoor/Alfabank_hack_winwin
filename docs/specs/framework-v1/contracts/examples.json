@@ -1,0 +1,2847 @@
+{
+  "purpose": "Synthetic JSON Schema examples only. Not executable fixture expectations or approved algorithm gold; cross-field/state/provenance semantics require the specified fixture suite.",
+  "examples": [
+    {
+      "operation_id": "Sources.fetch",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-1",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "source_id": "synthetic-example",
+          "cursor": null,
+          "since": null,
+          "limit": 1
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-1",
+          "operation_id": "Sources.fetch",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "materials": [],
+          "next_cursor": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "operation_id": "Documents.prepare",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-2",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "material": {
+            "material_id": "fixture-radio-news",
+            "source_id": null,
+            "source_url": null,
+            "title": "Синтетический пример ограничения экспорта",
+            "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+            "published_at": null,
+            "collected_at": "2026-10-12T00:00:00Z",
+            "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "language": "ru",
+            "provenance": {
+              "origin": "synthetic",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "normalize_newlines": true,
+          "trim_outer_whitespace": true
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-2",
+          "operation_id": "Documents.prepare",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "prepared": {
+            "material": {
+              "material_id": "fixture-radio-news",
+              "source_id": null,
+              "source_url": null,
+              "title": "Синтетический пример ограничения экспорта",
+              "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+              "published_at": null,
+              "collected_at": "2026-10-12T00:00:00Z",
+              "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+              "language": "ru",
+              "provenance": {
+                "origin": "synthetic",
+                "source_refs": [],
+                "input_statement_refs": [],
+                "producer_run_id": null,
+                "derivation_method": null,
+                "evidence_refs": [],
+                "origin_verified": false
+              }
+            },
+            "raw_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "prepared_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "quality": "valid",
+            "span_map": [
+              {
+                "prepared_start": 0,
+                "prepared_end": 81,
+                "raw_start": 0,
+                "raw_end": 81
+              }
+            ],
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Documents.register",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-3",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "document_id": "synthetic-example",
+          "expected_revision": 0,
+          "raw": {
+            "material_id": "fixture-radio-news",
+            "source_id": null,
+            "source_url": null,
+            "title": "Синтетический пример ограничения экспорта",
+            "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+            "published_at": null,
+            "collected_at": "2026-10-12T00:00:00Z",
+            "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "language": "ru",
+            "provenance": {
+              "origin": "synthetic",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "prepared": null
+        },
+        "idempotency_key": "example-command-3"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-3",
+          "operation_id": "Documents.register",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "version": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "kind": "raw",
+            "raw": {
+              "material_id": "fixture-radio-news",
+              "source_id": null,
+              "source_url": null,
+              "title": "Синтетический пример ограничения экспорта",
+              "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+              "published_at": null,
+              "collected_at": "2026-10-12T00:00:00Z",
+              "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+              "language": "ru",
+              "provenance": {
+                "origin": "synthetic",
+                "source_refs": [],
+                "input_statement_refs": [],
+                "producer_run_id": null,
+                "derivation_method": null,
+                "evidence_refs": [],
+                "origin_verified": false
+              }
+            },
+            "prepared": null,
+            "parent_ref": null
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Documents.read",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-4",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "documents",
+            "document_ids": [
+              "synthetic-example"
+            ],
+            "revision": null,
+            "as_of": null
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-4",
+          "operation_id": "Documents.read",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "documents",
+          "versions": [],
+          "missing_ids": []
+        }
+      }
+    },
+    {
+      "operation_id": "Understanding.classify",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-5",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "material": {
+            "material": {
+              "material_id": "fixture-radio-news",
+              "source_id": null,
+              "source_url": null,
+              "title": "Синтетический пример ограничения экспорта",
+              "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+              "published_at": null,
+              "collected_at": "2026-10-12T00:00:00Z",
+              "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+              "language": "ru",
+              "provenance": {
+                "origin": "synthetic",
+                "source_refs": [],
+                "input_statement_refs": [],
+                "producer_run_id": null,
+                "derivation_method": null,
+                "evidence_refs": [],
+                "origin_verified": false
+              }
+            },
+            "raw_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "prepared_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "quality": "valid",
+            "span_map": [
+              {
+                "prepared_start": 0,
+                "prepared_end": 81,
+                "raw_start": 0,
+                "raw_end": 81
+              }
+            ],
+            "warnings": []
+          },
+          "taxonomy": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "allowed_codes": [
+            {
+              "namespace": "synthetic-example",
+              "version": "1.0.0",
+              "code": "synthetic-example"
+            }
+          ],
+          "multi_label": true
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-5",
+          "operation_id": "Understanding.classify",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "topics": [],
+          "event_hints": [],
+          "classification_status": "classified",
+          "missing_data": []
+        }
+      }
+    },
+    {
+      "operation_id": "Understanding.extract",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-6",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "material": {
+            "material": {
+              "material_id": "fixture-radio-news",
+              "source_id": null,
+              "source_url": null,
+              "title": "Синтетический пример ограничения экспорта",
+              "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+              "published_at": null,
+              "collected_at": "2026-10-12T00:00:00Z",
+              "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+              "language": "ru",
+              "provenance": {
+                "origin": "synthetic",
+                "source_refs": [],
+                "input_statement_refs": [],
+                "producer_run_id": null,
+                "derivation_method": null,
+                "evidence_refs": [],
+                "origin_verified": false
+              }
+            },
+            "raw_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "prepared_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+            "quality": "valid",
+            "span_map": [
+              {
+                "prepared_start": 0,
+                "prepared_end": 81,
+                "raw_start": 0,
+                "raw_end": 81
+              }
+            ],
+            "warnings": []
+          },
+          "event_schema": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "hints": [],
+          "known_entities": []
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-6",
+          "operation_id": "Understanding.extract",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "mentions": [],
+          "evidence_spans": [],
+          "unresolved_entities": [],
+          "missing_data": []
+        }
+      }
+    },
+    {
+      "operation_id": "Events.propose_resolution",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-7",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "mentions": [],
+          "existing": {
+            "events": [],
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "evidence": [],
+          "policy": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-7",
+          "operation_id": "Events.propose_resolution",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "proposal": {
+            "proposal_id": "synthetic-example",
+            "source_snapshot": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "decisions": [],
+            "unresolved_mentions": [],
+            "missing_data": [],
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Events.apply",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-8",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "proposal": {
+            "proposal_id": "synthetic-example",
+            "source_snapshot": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "decisions": [],
+            "unresolved_mentions": [],
+            "missing_data": [],
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "expected_revisions": [],
+          "evidence": []
+        },
+        "idempotency_key": "example-command-8"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-8",
+          "operation_id": "Events.apply",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "snapshot": {
+            "events": [],
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Events.read",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-9",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "events",
+            "event_ids": [],
+            "partition_id": "synthetic-example",
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            },
+            "limit": 1,
+            "cursor": null
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-9",
+          "operation_id": "Events.read",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "events",
+          "snapshot": {
+            "events": [],
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "operation_id": "Business.propose_profile",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-10",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "company": {
+            "entity_id": "synthetic-example",
+            "kind": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "display_name": "synthetic-example"
+          },
+          "description": "Я продаю радиодетали",
+          "documents": [],
+          "answers": [],
+          "existing": null,
+          "as_of": {
+            "valid_as_of": "2026-10-12T00:00:00Z",
+            "known_as_of": "2026-10-12T00:00:00Z"
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-10",
+          "operation_id": "Business.propose_profile",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "proposal": {
+            "proposal_id": "synthetic-example",
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "expected_revision": 0,
+            "add_statements": [],
+            "supersede_refs": [],
+            "contradictions": [],
+            "missing_data": [],
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Business.propose_questions",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-11",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "profile": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "statements": [],
+            "contradictions": [],
+            "missing_data": [],
+            "answers": [],
+            "preferences": {
+              "max_questions": 0,
+              "allow_event_prompts": false,
+              "suppressed_targets": []
+            },
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "event": null,
+          "question_history": [],
+          "budget": 0
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-11",
+          "operation_id": "Business.propose_questions",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "questions": [],
+          "stop_reason": "budget"
+        }
+      }
+    },
+    {
+      "operation_id": "Business.apply",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-12",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "proposal": {
+            "proposal_id": "synthetic-example",
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "expected_revision": 0,
+            "add_statements": [],
+            "supersede_refs": [],
+            "contradictions": [],
+            "missing_data": [],
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "answers": [],
+          "preferences": null,
+          "evidence": []
+        },
+        "idempotency_key": "example-command-12"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-12",
+          "operation_id": "Business.apply",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "snapshot": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "statements": [],
+            "contradictions": [],
+            "missing_data": [],
+            "answers": [],
+            "preferences": {
+              "max_questions": 0,
+              "allow_event_prompts": false,
+              "suppressed_targets": []
+            },
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Business.read",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-13",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "business",
+            "company_id": "synthetic-example",
+            "revision": null,
+            "as_of": null
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-13",
+          "operation_id": "Business.read",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "business",
+          "snapshot": null
+        }
+      }
+    },
+    {
+      "operation_id": "Graph.build",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-14",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "graph_id": "synthetic-example",
+          "knowledge": {
+            "statements": [],
+            "entities": [],
+            "slices": [],
+            "evidence": [],
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "ontology": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "rules": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-14",
+          "operation_id": "Graph.build",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "candidate": {
+            "graph_id": "synthetic-example",
+            "revision": 0,
+            "nodes": [],
+            "edges": [],
+            "manifest": {
+              "ontology": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "rules": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "input_slices": [],
+              "as_of": {
+                "valid_as_of": "2026-10-12T00:00:00Z",
+                "known_as_of": "2026-10-12T00:00:00Z"
+              },
+              "builder": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "completeness": "complete_for_declared_slice",
+            "missing_data": []
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Graph.publish",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-15",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "candidate": {
+            "graph_id": "synthetic-example",
+            "revision": 0,
+            "nodes": [],
+            "edges": [],
+            "manifest": {
+              "ontology": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "rules": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "input_slices": [],
+              "as_of": {
+                "valid_as_of": "2026-10-12T00:00:00Z",
+                "known_as_of": "2026-10-12T00:00:00Z"
+              },
+              "builder": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "completeness": "complete_for_declared_slice",
+            "missing_data": []
+          },
+          "expected_revision": 0
+        },
+        "idempotency_key": "example-command-15"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-15",
+          "operation_id": "Graph.publish",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "projection_ref": {
+            "owner": "Documents",
+            "object_id": "synthetic-example",
+            "revision": 1,
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Graph.query",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-16",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "subgraph",
+            "graph_id": "synthetic-example",
+            "revision": 1,
+            "seed_ids": [],
+            "relations": [],
+            "max_depth": 0,
+            "max_nodes": 1,
+            "required_slices": [],
+            "freshness_policy": "current_required",
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-16",
+          "operation_id": "Graph.query",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "subgraph",
+          "subgraph": null
+        }
+      }
+    },
+    {
+      "operation_id": "Matching.match",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-17",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "event": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "event_type": {
+              "namespace": "synthetic-example",
+              "version": "1.0.0",
+              "code": "synthetic-example"
+            },
+            "lifecycle": "active",
+            "statements": [],
+            "mention_ids": [],
+            "lineage_refs": [],
+            "missing_data": []
+          },
+          "graph": {
+            "snapshot": {
+              "graph_id": "synthetic-example",
+              "revision": 0,
+              "nodes": [],
+              "edges": [],
+              "manifest": {
+                "ontology": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "rules": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "input_slices": [],
+                "as_of": {
+                  "valid_as_of": "2026-10-12T00:00:00Z",
+                  "known_as_of": "2026-10-12T00:00:00Z"
+                },
+                "builder": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "completeness": "complete_for_declared_slice",
+              "missing_data": []
+            },
+            "freshness": "current",
+            "missing_slices": [],
+            "traversal_truncated": false,
+            "query_scope": []
+          },
+          "profiles": [],
+          "mode": "strict",
+          "limit": 1
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-17",
+          "operation_id": "Matching.match",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "matches": [],
+          "candidate_scope": [],
+          "search_complete_for_scope": false,
+          "missing_data": []
+        }
+      }
+    },
+    {
+      "operation_id": "Impact.assess",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-18",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "event": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "event_type": {
+              "namespace": "synthetic-example",
+              "version": "1.0.0",
+              "code": "synthetic-example"
+            },
+            "lifecycle": "active",
+            "statements": [],
+            "mention_ids": [],
+            "lineage_refs": [],
+            "missing_data": []
+          },
+          "profile": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "statements": [],
+            "contradictions": [],
+            "missing_data": [],
+            "answers": [],
+            "preferences": {
+              "max_questions": 0,
+              "allow_event_prompts": false,
+              "suppressed_targets": []
+            },
+            "slice": {
+              "owner": "Events",
+              "partition_id": "synthetic-example",
+              "revision": 0,
+              "selection_key": "synthetic-example"
+            },
+            "as_of": {
+              "valid_as_of": "2026-10-12T00:00:00Z",
+              "known_as_of": "2026-10-12T00:00:00Z"
+            }
+          },
+          "match": {
+            "match_id": "synthetic-example",
+            "event_ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "exposure": "confirmed",
+            "affected_components": [],
+            "edge_paths": [],
+            "evidence_refs": [],
+            "missing_data": [],
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "graph": {
+            "snapshot": {
+              "graph_id": "synthetic-example",
+              "revision": 0,
+              "nodes": [],
+              "edges": [],
+              "manifest": {
+                "ontology": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "rules": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "input_slices": [],
+                "as_of": {
+                  "valid_as_of": "2026-10-12T00:00:00Z",
+                  "known_as_of": "2026-10-12T00:00:00Z"
+                },
+                "builder": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "completeness": "complete_for_declared_slice",
+              "missing_data": []
+            },
+            "freshness": "current",
+            "missing_slices": [],
+            "traversal_truncated": false,
+            "query_scope": []
+          },
+          "evidence": [],
+          "rules": null,
+          "as_of": {
+            "valid_as_of": "2026-10-12T00:00:00Z",
+            "known_as_of": "2026-10-12T00:00:00Z"
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-18",
+          "operation_id": "Impact.assess",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "assessment": {
+            "assessment_id": "synthetic-example",
+            "event_ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "graph_manifest": {
+              "ontology": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "rules": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "input_slices": [],
+              "as_of": {
+                "valid_as_of": "2026-10-12T00:00:00Z",
+                "known_as_of": "2026-10-12T00:00:00Z"
+              },
+              "builder": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "exposure": "confirmed",
+            "likelihood": "likely",
+            "direction": "negative",
+            "materiality": "high",
+            "mechanisms": [],
+            "assumptions": [],
+            "scenarios": [],
+            "missing_data": [],
+            "evidence_refs": [],
+            "confidence": {
+              "level": "low",
+              "method": null,
+              "limitations": []
+            },
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Recommendations.propose",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-19",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "assessment": {
+            "assessment_id": "synthetic-example",
+            "event_ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "company": {
+              "entity_id": "synthetic-example",
+              "kind": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "display_name": "synthetic-example"
+            },
+            "graph_manifest": {
+              "ontology": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "rules": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "input_slices": [],
+              "as_of": {
+                "valid_as_of": "2026-10-12T00:00:00Z",
+                "known_as_of": "2026-10-12T00:00:00Z"
+              },
+              "builder": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "exposure": "confirmed",
+            "likelihood": "likely",
+            "direction": "negative",
+            "materiality": "high",
+            "mechanisms": [],
+            "assumptions": [],
+            "scenarios": [],
+            "missing_data": [],
+            "evidence_refs": [],
+            "confidence": {
+              "level": "low",
+              "method": null,
+              "limitations": []
+            },
+            "provenance": {
+              "origin": "public_source",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": null,
+              "evidence_refs": [],
+              "origin_verified": false
+            }
+          },
+          "audience": "entrepreneur",
+          "allowed_actions": [],
+          "constraints": []
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-19",
+          "operation_id": "Recommendations.propose",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "recommendations": [],
+          "missing_data": []
+        }
+      }
+    },
+    {
+      "operation_id": "Evidence.register",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-20",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "evidence_id": "synthetic-example",
+          "expected_revision": 0,
+          "source_ref": {
+            "owner": "Documents",
+            "object_id": "synthetic-example",
+            "revision": 1,
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "locator": {
+            "kind": "text_span",
+            "start": 0,
+            "end": 0,
+            "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          }
+        },
+        "idempotency_key": "example-command-20"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-20",
+          "operation_id": "Evidence.register",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "evidence": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "source_ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 0,
+              "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "source_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "verification": "verified_anchor",
+            "source_reliability": "unassessed",
+            "reliability_method": null
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Evidence.read",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-21",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "evidence",
+            "refs": [
+              {
+                "owner": "Documents",
+                "object_id": "synthetic-example",
+                "revision": 1,
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              }
+            ],
+            "include_source_text": false
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-21",
+          "operation_id": "Evidence.read",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "evidence",
+          "records": [],
+          "source_artifacts": [],
+          "missing_refs": []
+        }
+      }
+    },
+    {
+      "operation_id": "Runs.query",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-22",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "run_ids": [],
+          "operation_id": null,
+          "scenario_id": null,
+          "include_artifacts": false,
+          "limit": 1,
+          "cursor": null
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-22",
+          "operation_id": "Runs.query",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "runs": [],
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "operation_id": "Cases.save",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-23",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "case_id": "synthetic-example",
+          "expected_revision": 0,
+          "source_run_id": "synthetic-example",
+          "title": "synthetic-example",
+          "tags": []
+        },
+        "idempotency_key": "example-command-23"
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-23",
+          "operation_id": "Cases.save",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "case": {
+            "ref": {
+              "owner": "Documents",
+              "object_id": "synthetic-example",
+              "revision": 1,
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "title": "synthetic-example",
+            "source_run_id": "synthetic-example",
+            "run": {
+              "run_id": "synthetic-example",
+              "operation_id": "synthetic-example",
+              "contract_version": "1.0.0",
+              "implementation": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "manifest": {
+                "contract_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+                "envelope_version": "1.0.0",
+                "hash_format": "canonical-json-v1",
+                "implementation": {
+                  "id": "synthetic-example",
+                  "version": "1.0.0",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                },
+                "configuration": {
+                  "ref": {
+                    "artifact_id": "synthetic-example",
+                    "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+                    "schema_id": "synthetic-example",
+                    "schema_version": "1.0.0",
+                    "size_bytes": 0,
+                    "classification": "synthetic",
+                    "media_type": "application/json"
+                  },
+                  "content_json": null,
+                  "availability": "available"
+                },
+                "models": [],
+                "prompts": [],
+                "taxonomies": [],
+                "ontologies": [],
+                "rules": [],
+                "bindings": [],
+                "scenario": null,
+                "runtime_lock_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+                "runtime_build_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+                "platform": "synthetic-example",
+                "analytical_time": "2026-10-12T00:00:00Z",
+                "random_seed": 0,
+                "recording": "full",
+                "state_capture": null,
+                "replay_of": null,
+                "data_classification": "synthetic",
+                "data_policy": {
+                  "policy": {
+                    "id": "synthetic-example",
+                    "version": "1.0.0",
+                    "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+                  },
+                  "classification": "synthetic",
+                  "processing_allowed": false,
+                  "egress_allowed": false,
+                  "recording": "full",
+                  "export_allowed": false,
+                  "reason_codes": []
+                }
+              },
+              "scenario": null,
+              "parent_run_id": null,
+              "status": "running",
+              "input": null,
+              "output": null,
+              "dependencies": [],
+              "spans": [],
+              "measurements": [],
+              "lineage": {
+                "synthetic_source": false,
+                "mock_derivation": false,
+                "unknown_origin": false,
+                "source_refs": []
+              },
+              "trace_status": "complete",
+              "replay_status": "available",
+              "analytical_time": "2026-10-12T00:00:00Z",
+              "random_seed": 0,
+              "runtime_build_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "tags": [],
+            "approval": "draft"
+          },
+          "receipt": {
+            "operation_id": "synthetic-example",
+            "idempotency_key": "synthetic-example",
+            "command_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "applied": false,
+            "changed_refs": [],
+            "audit_id": "synthetic-example",
+            "committed_at": "2026-10-12T00:00:00Z",
+            "original_run_id": "synthetic-example"
+          }
+        }
+      }
+    },
+    {
+      "operation_id": "Cases.query",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-24",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "query": {
+            "kind": "cases",
+            "case_ids": [],
+            "revision": null,
+            "tags": [],
+            "include_artifacts": false,
+            "limit": 1,
+            "cursor": null
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-24",
+          "operation_id": "Cases.query",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "kind": "cases",
+          "cases": [],
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "operation_id": "Evaluation.evaluate",
+      "request": {
+        "contract_version": "1.0.0",
+        "request_id": "example-25",
+        "sandbox_id": "spec-examples",
+        "implementation": {
+          "id": "mock.baseline",
+          "version": "1.0.0",
+          "parameters": {
+            "scenario": "default"
+          }
+        },
+        "execution": {
+          "mode": "live",
+          "recording": "full",
+          "analytical_time": "2026-10-12T00:00:00Z",
+          "random_seed": 1,
+          "timeout_ms": 30000
+        },
+        "data_declaration": "synthetic",
+        "payload": {
+          "results": [
+            {
+              "run_id": "synthetic-example",
+              "input_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "implementation": {
+                "id": "synthetic-example",
+                "version": "1.0.0",
+                "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+              },
+              "output": {
+                "ref": {
+                  "artifact_id": "synthetic-example",
+                  "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+                  "schema_id": "synthetic-example",
+                  "schema_version": "1.0.0",
+                  "size_bytes": 0,
+                  "classification": "synthetic",
+                  "media_type": "application/json"
+                },
+                "content_json": null,
+                "availability": "available"
+              }
+            }
+          ],
+          "expectations": [],
+          "require_same_input": false,
+          "method": {
+            "id": "synthetic-example",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          }
+        }
+      },
+      "response": {
+        "meta": {
+          "run_id": "example-run-25",
+          "operation_id": "Evaluation.evaluate",
+          "contract_version": "1.0.0",
+          "implementation": {
+            "id": "mock.baseline",
+            "version": "1.0.0",
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+          },
+          "execution_mode": "live",
+          "environment": "testing",
+          "configuration_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "duration_ms": 0,
+          "lineage": {
+            "synthetic_source": true,
+            "mock_derivation": true,
+            "unknown_origin": false,
+            "source_refs": []
+          },
+          "trace_status": "metadata_only",
+          "replay_status": "unavailable",
+          "measurements": [],
+          "data_policy": {
+            "policy": {
+              "id": "synthetic-example",
+              "version": "1.0.0",
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64"
+            },
+            "classification": "synthetic",
+            "processing_allowed": false,
+            "egress_allowed": false,
+            "recording": "full",
+            "export_allowed": false,
+            "reason_codes": []
+          }
+        },
+        "status": "success",
+        "payload": {
+          "report": {
+            "evaluation_id": "synthetic-example",
+            "run_ids": [],
+            "comparable": false,
+            "metrics": [],
+            "limitations": []
+          }
+        }
+      }
+    }
+  ]
+}

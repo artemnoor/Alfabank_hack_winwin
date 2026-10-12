@@ -14,7 +14,10 @@ from alfalab_contracts.semantics import (
     validate_prepare_pair,
     validate_profile_pair,
     validate_resolution_pair,
+    validate_operation_semantics,
+    validate_dto,
 )
+from alfalab_contracts.registry import load_operation_registry
 
 H = "sha256:" + "a" * 64
 
@@ -169,7 +172,7 @@ def test_inferred_statements_require_explicit_derivation_inputs() -> None:
     _model("Statement", {**statement, "provenance": provenance})
 
 
-def test_confirmed_statements_require_an_evidence_reference() -> None:
+def test_confirmed_statements_require_evidence_reference_structure_only() -> None:
     statement = {
         "statement_id": "statement-confirmed",
         "revision": 1,
@@ -186,6 +189,9 @@ def test_confirmed_statements_require_an_evidence_reference() -> None:
     }
     with pytest.raises(ValidationError, match="evidence reference"):
         _model("Statement", statement)
+    # This deliberately unresolved fake ID/hash demonstrates the DTO boundary:
+    # structure is accepted, while existence, anchor integrity, and owner policy
+    # must be checked before a state owner persists the confirmed status.
     _model(
         "Statement",
         {
@@ -196,6 +202,147 @@ def test_confirmed_statements_require_an_evidence_reference() -> None:
             },
         },
     )
+    with pytest.raises(ValidationError, match="Provenance evidence_refs"):
+        _model(
+            "Statement",
+            {
+                **statement,
+                "provenance": {
+                    **_provenance(),
+                    "evidence_refs": [_object_ref("Documents", "not-evidence")],
+                },
+            },
+        )
+
+
+def test_typed_object_ref_owners_and_evidence_boundary() -> None:
+    provenance = _provenance()
+    _model("Provenance", {**provenance, "evidence_refs": [_object_ref("Evidence")]})
+    with pytest.raises(ValidationError, match="Provenance evidence_refs"):
+        _model("Provenance", {**provenance, "evidence_refs": [_object_ref("Documents")]})
+
+    evidence = {
+        "ref": _object_ref("Evidence", "evidence-1"),
+        "source_ref": _object_ref("Documents", "document-1"),
+        "locator": {"kind": "whole_artifact"},
+        "source_hash": H,
+        "verification": "verified_anchor",
+        "source_reliability": "unassessed",
+        "reliability_method": None,
+    }
+    # DTO validation establishes type/owner structure only. It does not resolve
+    # the IDs or hashes, prove fact truth, or apply an owner policy.
+    _model("EvidenceRecord", evidence)
+    for invalid in (
+        {**evidence, "ref": _object_ref("Documents", "evidence-1")},
+        {**evidence, "source_ref": _object_ref("Events", "event-1")},
+        {**evidence, "source_ref": _object_ref("Graph", "graph-1")},
+    ):
+        with pytest.raises(ValidationError):
+            _model("EvidenceRecord", invalid)
+    for source_owner in ("Documents", "Business", "Runs"):
+        _model("EvidenceRecord", {**evidence, "source_ref": _object_ref(source_owner, "source-1")})
+
+    _model("EvidenceSelection", {"kind": "evidence", "refs": [_object_ref("Evidence")], "include_source_text": False})
+    with pytest.raises(ValidationError, match="EvidenceSelection refs"):
+        _model("EvidenceSelection", {"kind": "evidence", "refs": [_object_ref("Documents")], "include_source_text": False})
+    _model("EvidenceResult", {"kind": "evidence", "records": [], "source_artifacts": [], "missing_refs": [_object_ref("Evidence")]})
+    with pytest.raises(ValidationError, match="EvidenceResult missing_refs"):
+        _model("EvidenceResult", {"kind": "evidence", "records": [], "source_artifacts": [], "missing_refs": [_object_ref("Documents")]})
+
+
+def test_event_decision_reference_owners_are_typed() -> None:
+    base = {"mention_ids": [], "proposed_events": [], "reason": "deferred", "evidence_refs": [], "action": "defer", "target_refs": []}
+    _model("EventDecision", base)
+    with pytest.raises(ValidationError, match="target_refs"):
+        _model("EventDecision", {**base, "action": "attach", "target_refs": [_object_ref("Documents")]})
+    with pytest.raises(ValidationError, match="evidence_refs"):
+        _model("EventDecision", {**base, "evidence_refs": [_object_ref("Documents")]})
+
+
+def test_all_typed_object_ref_owner_rules() -> None:
+    from alfalab_contracts import SCHEMA_TYPES
+
+    ref = lambda owner: SCHEMA_TYPES["ObjectRef"].model_construct(owner=owner)
+    cases = (
+        ("DocumentVersion", {"ref": ref("Documents"), "parent_ref": None}, "ref", {"Documents"}),
+        ("DocumentVersion", {"ref": ref("Documents"), "parent_ref": ref("Documents")}, "parent_ref", {"Documents"}),
+        ("BusinessSnapshot", {"ref": ref("Business")}, "ref", {"Business"}),
+        ("CaseRecord", {"ref": ref("Cases")}, "ref", {"Cases"}),
+        ("EventRecord", {"ref": ref("Events"), "lineage_refs": []}, "ref", {"Events"}),
+        ("EventRecord", {"ref": ref("Events"), "lineage_refs": [ref("Events")]}, "lineage_refs", {"Events"}),
+        ("EventDecision", {"action": "attach", "target_refs": [ref("Events")], "evidence_refs": [], "proposed_events": []}, "target_refs", {"Events"}),
+        ("EventDecision", {"action": "defer", "target_refs": [], "evidence_refs": [ref("Evidence")], "proposed_events": []}, "evidence_refs", {"Evidence"}),
+        ("EvidenceRecord", {"ref": ref("Evidence"), "source_ref": ref("Documents")}, "ref", {"Evidence"}),
+        ("EvidenceRecord", {"ref": ref("Evidence"), "source_ref": ref("Documents")}, "source_ref", {"Documents", "Business", "Runs"}),
+        ("EvidenceSelection", {"refs": [ref("Evidence")]}, "refs", {"Evidence"}),
+        ("EvidenceResult", {"missing_refs": [ref("Evidence")]}, "missing_refs", {"Evidence"}),
+        ("GraphEdge", {"evidence_refs": [ref("Evidence")]}, "evidence_refs", {"Evidence"}),
+        ("ImpactAssessment", {"event_ref": ref("Events"), "evidence_refs": []}, "event_ref", {"Events"}),
+        ("ImpactAssessment", {"event_ref": ref("Events"), "evidence_refs": [ref("Evidence")]}, "evidence_refs", {"Evidence"}),
+        ("Match", {"event_ref": ref("Events"), "evidence_refs": []}, "event_ref", {"Events"}),
+        ("Match", {"event_ref": ref("Events"), "evidence_refs": [ref("Evidence")]}, "evidence_refs", {"Evidence"}),
+        ("Provenance", {"evidence_refs": [ref("Evidence")]}, "evidence_refs", {"Evidence"}),
+        ("PublishGraphOutput", {"projection_ref": ref("Graph")}, "projection_ref", {"Graph"}),
+        ("Recommendation", {"evidence_refs": [ref("Evidence")]}, "evidence_refs", {"Evidence"}),
+        ("RegisterEvidenceInput", {"source_ref": ref("Documents")}, "source_ref", {"Documents", "Business", "Runs"}),
+        ("StatementRef", {"aggregate_ref": ref("Business")}, "aggregate_ref", {"Events", "Business"}),
+    )
+    for model_name, base_fields, field, allowed_owners in cases:
+        for owner in allowed_owners:
+            fields = {**base_fields, field: ref(owner) if field not in {"target_refs", "evidence_refs", "lineage_refs", "refs", "missing_refs"} else [ref(owner)]}
+            validate_dto(SCHEMA_TYPES[model_name].model_construct(**fields))
+        invalid_owner = next(owner for owner in ("Documents", "Events", "Business", "Graph", "Evidence", "Runs", "Cases") if owner not in allowed_owners)
+        fields = {**base_fields, field: ref(invalid_owner) if field not in {"target_refs", "evidence_refs", "lineage_refs", "refs", "missing_refs"} else [ref(invalid_owner)]}
+        with pytest.raises(ValueError):
+            validate_dto(SCHEMA_TYPES[model_name].model_construct(**fields))
+
+
+def test_command_receipt_changed_ref_owner_matches_operation_owner(examples: list[dict]) -> None:
+    from copy import deepcopy
+
+    _, contracts = load_operation_registry()
+    command_owners = {
+        "Documents.register": "Documents",
+        "Events.apply": "Events",
+        "Business.apply": "Business",
+        "Graph.publish": "Graph",
+        "Evidence.register": "Evidence",
+        "Cases.save": "Cases",
+    }
+    catalog_command_owners = {
+        operation_id: contract.descriptor.owner.title()
+        for operation_id, contract in contracts.items()
+        if contract.descriptor.kind == "command"
+    }
+    assert command_owners == catalog_command_owners
+    by_operation = {example["operation_id"]: example for example in examples}
+    for operation_id, owner in command_owners.items():
+        example = by_operation[operation_id]
+        contract = contracts[operation_id]
+        request = contract.request_type.model_validate(example["request"])
+        response_data = deepcopy(example["response"])
+        response_data["payload"] = dict(response_data["payload"])
+        # The Cases.save shape example intentionally includes a separate known
+        # ArtifactView semantic mismatch; make that unrelated field valid here.
+        def normalize_artifact_views(value: object) -> None:
+            if isinstance(value, dict):
+                if value.get("availability") == "available" and value.get("content_json") is None:
+                    value["availability"] = "metadata_only"
+                for child in value.values():
+                    normalize_artifact_views(child)
+            elif isinstance(value, list):
+                for child in value:
+                    normalize_artifact_views(child)
+
+        normalize_artifact_views(response_data)
+        receipt = dict(response_data["payload"]["receipt"])
+        invalid_owner = "Events" if owner == "Documents" else "Documents"
+        receipt["changed_refs"] = [_object_ref(invalid_owner)]
+        response_data["payload"]["receipt"] = receipt
+        response = contract.response_type.model_validate(response_data)
+        with pytest.raises(ValueError, match=f"{operation_id} receipt.changed_refs"):
+            validate_operation_semantics(operation_id, request, response)
 
 
 def test_text_span_bounds_and_known_financial_values_require_minimal_support() -> None:
@@ -469,9 +616,11 @@ def test_resolution_business_and_evaluation_cross_dto_rules(examples: list[dict]
             ),
         )
 
-    existing_snapshot_data = dict(
-        _model("ImpactInput", next(item for item in examples if item["operation_id"] == "Impact.assess")["request"]["payload"]).profile.model_dump(mode="json")
-    )
+    impact_payload = dict(next(item for item in examples if item["operation_id"] == "Impact.assess")["request"]["payload"])
+    impact_payload["profile"] = {**impact_payload["profile"], "ref": {**impact_payload["profile"]["ref"], "owner": "Business"}}
+    impact_payload["event"] = {**impact_payload["event"], "ref": {**impact_payload["event"]["ref"], "owner": "Events"}}
+    impact_payload["match"] = {**impact_payload["match"], "event_ref": {**impact_payload["match"]["event_ref"], "owner": "Events"}}
+    existing_snapshot_data = dict(_model("ImpactInput", impact_payload).profile.model_dump(mode="json"))
     existing_snapshot_data["ref"] = {**existing_snapshot_data["ref"], "owner": "Business"}
     existing_snapshot_data["statements"] = [
         {
@@ -557,7 +706,9 @@ def test_matching_paths_must_be_present_and_topologically_connected(examples: li
     matching_example = next(item for item in examples if item["operation_id"] == "Matching.match")
     impact_example = next(item for item in examples if item["operation_id"] == "Impact.assess")
     payload = deepcopy(matching_example["request"]["payload"])
-    profile = impact_example["request"]["payload"]["profile"]
+    payload["event"]["ref"]["owner"] = "Events"
+    profile = deepcopy(impact_example["request"]["payload"]["profile"])
+    profile["ref"]["owner"] = "Business"
     payload["profiles"] = [profile]
 
     node_ids = ["node-1", "node-2", "node-3", "node-4"]
@@ -605,7 +756,7 @@ def test_matching_paths_must_be_present_and_topologically_connected(examples: li
     request = _model("MatchingInput", payload)
     match = {
         "match_id": "match-1",
-        "event_ref": matching_example["request"]["payload"]["event"]["ref"],
+        "event_ref": payload["event"]["ref"],
         "company": profile["company"],
         "exposure": "potential",
         "affected_components": [],

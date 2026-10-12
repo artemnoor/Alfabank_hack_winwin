@@ -1,6 +1,6 @@
 # Декларативные Pydantic-модели v1.0
 
-Это декларация ожидаемого отображения OpenAPI schemas в исполняемые Pydantic-типы; исходным нормативным источником остаётся `openapi.json`. T01 реализует Object schema отдельной моделью с `extra=forbid`. Scalar coercion запрещён; JSON timestamps валидируются как UTC strings, datetime conversion внутри implementation явно. Nullable поле обязательно, если входит в required. oneOf с kind/mode → discriminated union. Остальные oneOf требуют эксклюзивных вариантов. Межполевые validators — в 02-contracts.md и карточках операций; их код находится в `packages/contracts`.
+Это декларация ожидаемого отображения OpenAPI schemas в исполняемые Pydantic-типы; исходным нормативным источником остаётся `openapi.json`. T01 реализует Object schema отдельной моделью с `extra=forbid`. Scalar coercion запрещён; JSON timestamps валидируются как UTC strings, datetime conversion внутри implementation явно. Nullable поле обязательно, если входит в required. oneOf с kind/mode → discriminated union. Остальные oneOf требуют эксклюзивных вариантов. Межполевые validators — в 02-contracts.md и карточках операций; их код находится в `packages/contracts`. Owner-ограничения ObjectRef и граница DTO/trusted owner policy для `confirmed` определены в 02-contracts.md.
 
 ## Identifier
 

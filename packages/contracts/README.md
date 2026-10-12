@@ -65,10 +65,13 @@ and evaluation. Scope and hash
 resolution, source trust, producer-run lookup, registered
 ontology/calibration policies, immutable aggregate membership, and
 artifact-schema lookup require trusted context or owner ports and are not
-asserted by standalone DTO parsing. A `confirmed` Statement must at least carry
-an evidence reference; resolving that reference, checking its immutable anchor,
-and deciding whether its evidence is acceptable remain trusted owner-boundary
-checks. The exact policy for acceptable evidence remains open. TextSpan bounds
+asserted by standalone DTO parsing. A `confirmed` Statement must carry at least
+one ObjectRef owned by Evidence. DTO parsing does not resolve the ID/hash or
+prove the fact. The Events/Business owner must resolve the reference through
+the Evidence port, check scope/hash/anchor, then require an explicitly allowing
+owner policy before persisting `confirmed`; otherwise the status remains
+`unknown`/unverified. Anchor verification does not prove truth, and no universal
+source-reliability threshold is defined. TextSpan bounds
 must be ordered, while an empty `[n,n)` range remains accepted because the
 normative contract does not currently forbid it. Unknown references or origins
 must never be treated as verified.

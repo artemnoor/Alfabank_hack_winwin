@@ -1,13 +1,13 @@
 # План реализации и параллельная разработка
 
-Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. Код T01 реализован в ветке `codex/t01-pydantic-contracts`, но её приёмка ожидает уточнения фразы «допустимое основание» для `confirmed` Statement в `02-contracts.md`. T02–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
+Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01 реализована и независимо проверена в ветке `codex/t01-pydantic-contracts`; правило `confirmed` согласовано, изменения аудита готовы к PR review. Merge не выполнен. T02–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
 
 ## Этапы и блокировки
 
 | Задача | Результат / рекомендуемый владелец | Blocked by | Проверяемая приёмка |
 |---|---|---|---|
 | T00 Toolchain и чистый checkout — выполнено | Root README, exact runtime manifest, uv/npm locks, Compose PostgreSQL, базовые bootstrap/doctor CLI; platform | подтверждение spec | Windows и Linux userland в WSL создают окружение и подключаются к изолированной DB без model keys; повтор не разрушает state; versions/digest pinned. Native Linux и полный clean-room bootstrap/doctor повторно проверяются в T18 |
-| T01 Pydantic и schemas | 215 моделей/типов, semantic validators, OpenAPI export, 25 descriptors; contracts owner | T00 | Реализовано; review pending до уточнения правила основания для подтверждённого Statement. Structural conformance, operation bindings, refs/extra/scalars/unions и положительные/отрицательные wire cases проверены |
+| T01 Pydantic и schemas | 215 моделей/типов, semantic validators, OpenAPI export, 25 descriptors; contracts owner | T00 | Реализовано; независимый аудит PASS после owner-ссылок и уточнения `confirmed`. OpenAPI shape, operation bindings, refs/extra/scalars/unions и положительные/отрицательные wire cases проверены; PR review ожидается |
 | T02 Shared fixtures и public Protocol | approved radio/steel datasets, operation fixtures, input/output hash rules, Protocol/context stubs; contracts + QA | T01 | каждый mock operation имеет достаточный воспроизводимый сценарий; versions/hashes; consumer bindings валидируются |
 | T03 Минимальный execution slice | Documents.prepare real/mock → typed HTTP → trace → общий UI editor; platform + frontend | T01 | одно выполнение через HTTP/CLI/Playground, actual execution metadata, schema errors sanitized |
 | T04 Owner storage и receipts | migrations, DB-role isolation, artifacts, generic owner transaction helper, Documents.register/read; storage | T01 | roundtrip command/read, concurrent duplicate/conflict/crash, artifact hashes, scope isolation |

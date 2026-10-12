@@ -1,6 +1,6 @@
 # План T01 — Pydantic и схемы
 
-Статус: реализация T01 и проверки выполнены; sign-off остаётся pending до уточнения допустимого evidence для `confirmed` Statement и review решения. Межполевые проверки `none_found` принадлежат будущей проверке алгоритма Impact, а не DTO-shape валидатору. Ограничения задокументированы в `packages/contracts/README.md`. Основа плана: критерии T01 из `docs/specs/framework-v1/10-implementation-plan.md`.
+Статус: реализация T01 и независимый технический аудит пройдены; правило для `confirmed` согласовано, проверки owner-ссылок добавлены, изменения готовы к PR review. Merge не выполнен. Межполевые проверки `none_found` принадлежат будущей проверке алгоритма Impact, а не DTO-shape валидатору. Граница DTO/trusted owner policy задокументирована в `docs/specs/framework-v1/02-contracts.md` и `packages/contracts/README.md`. Основа плана: критерии T01 из `docs/specs/framework-v1/10-implementation-plan.md`.
 
 ## Original Request
 
@@ -124,7 +124,7 @@ T00 уже завершена. Следующая задача — T01.
 
 - [x] T01.1 Закрепить минимальные Python зависимости и структуру `packages/contracts` в соответствии со спецификацией.
 - [x] T01.2 Реализовать строгие Pydantic v2 модели всех нормативных OpenAPI schemas и безопасную публичную поверхность пакета.
-- [x] T01.3 Реализовать DTO-local semantic validators и явно отделить проверки, требующие trusted context/state; открытая семантика подтверждённого основания задокументирована, необоснованное `confirmed` без evidence ref отклоняется.
+- [x] T01.3 Реализовать DTO-local semantic validators и явно отделить проверки, требующие trusted context/state; `confirmed` требует Evidence-ссылку структурно, существование/hash/anchor и явное разрешение owner policy проверяются при применении состояния.
 - [x] T01.4 Реализовать строгий parser реестра, descriptors 25 операций, projection в API descriptor и schema closure hashes.
 - [x] T01.5 Реализовать OpenAPI export/conformance, положительные и отрицательные contract tests и воспроизводимые команды.
-- [x] T01.6 Выполнить независимое ревью, исправить подтверждённые дефекты, повторить проверки и записать ограничения. Приёмка ожидает spec clarification по `confirmed` Statement; operation-level правило `none_found` остаётся acceptance пунктом алгоритма Impact.
+- [x] T01.6 Выполнить независимое ревью, исправить подтверждённые дефекты, повторить проверки и записать ограничения. Operation-level правило `none_found` остаётся acceptance пунктом алгоритма Impact.

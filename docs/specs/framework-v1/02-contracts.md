@@ -32,9 +32,9 @@ Live execution фиксирует analytical_time и random_seed. Replay executi
 | PreparedMaterial | raw_hash совпадает с исходным текстом; prepared_hash с material.text; span map ordered, bounds valid, покрывает подготовленные code points |
 | Validity | valid_to > valid_from, если оба известны; unknown bounds не заменяются текущим временем |
 | TimeSlice | valid_as_of и known_as_of независимы; recorded_at > known_as_of исключает утверждение из исторического среза |
-| ObjectRef | owner соответствует типу; scope проверяется trusted context; hash проверяется при разрешении |
+| ObjectRef | owner соответствует типу по таблице ниже; scope проверяется trusted context; hash проверяется при разрешении |
 | StatementRef | aggregate_ref.owner только Events или Business; statement_id/revision/hash находятся внутри указанной immutable версии aggregate. Ссылка на весь профиль не подменяет ссылку на конкретное утверждение |
-| Statement | derived/inferred имеет derivation method и input refs; подтверждение требует допустимого основания; conflicting claims сохраняются |
+| Statement | derived/inferred имеет derivation method и input refs; `confirmed` требует Evidence-ссылку структурно и допустимое основание по trusted owner policy; conflicting claims сохраняются |
 | Provenance | клиентский origin_verified не повышает trust; producer_run_id/source refs сверяются или помечаются unknown |
 | QuestionAnswer | answered требует value; skipped/declined/unknown требуют null value; skip не создаёт false |
 | TopicScore | score_method обязателен при raw_score; calibrated=true требует зарегистрированной calibration method |
@@ -54,6 +54,32 @@ Live execution фиксирует analytical_time и random_seed. Replay executi
 | EvaluationInput | comparable только при одинаковом declared input hash, если require_same_input=true; expectations утверждаются вне Cases.save |
 
 ObjectRef.hash вычисляется по каноническому semantic record без собственного поля ref.hash, чтобы избежать self-reference. ArtifactRef.hash относится к фактически сохранённым bytes. Эти два hash domain не смешиваются.
+
+### Владельцы типизированных ссылок
+
+Поле `ObjectRef.owner` проверяется по смыслу поля, а не по одному общему enum. DTO-проверка применяет следующие правила:
+
+| Поле | Допустимый owner |
+|---|---|
+| `DocumentVersion.ref`, `DocumentVersion.parent_ref` | `Documents` |
+| `EventRecord.ref`, `EventRecord.lineage_refs`, `EventDecision.target_refs`, `Match.event_ref`, `ImpactAssessment.event_ref` | `Events` |
+| `BusinessSnapshot.ref` | `Business` |
+| `PublishGraphOutput.projection_ref` | `Graph` |
+| `EvidenceRecord.ref`, `EvidenceSelection.refs`, `EvidenceResult.missing_refs`, все поля `evidence_refs` (`Statement` provenance, `Provenance`, `EventDecision`, `GraphEdge`, `Match`, `ImpactAssessment`, `Recommendation`) | `Evidence` |
+| `CaseRecord.ref` | `Cases` |
+| `EvidenceRecord.source_ref`, `RegisterEvidenceInput.source_ref` | `Documents`, `Business` или `Runs` |
+| `StatementRef.aggregate_ref` | `Events` или `Business` |
+| `CommandReceipt.changed_refs` | owner команды, установленный operation ID |
+
+`Provenance.source_refs` и `LineageSummary.source_refs` контекстны и могут ссылаться на разные типы первоисточников; DTO не навязывает им один owner. Проверка owner не разрешает ссылку, не подтверждает её существование или scope и не проверяет hash. Это делают trusted owner ports.
+
+### Статус `confirmed` и Evidence
+
+Для `Statement.epistemic_status=confirmed` Pydantic проверяет, что `provenance.evidence_refs` непуст и каждая такая ссылка имеет owner `Evidence`. Это только структурная проверка: она не доказывает существование Evidence, корректность hash/anchor или истинность факта.
+
+До сохранения утверждения соответствующий владелец состояния (`Events` или `Business`) разрешает ссылку через Evidence owner/read port и проверяет существование в допустимом scope, immutable source hash и anchor. `verified_anchor` подтверждает целостность якоря, но не истинность утверждения. Затем только явно разрешающая trusted policy владельца может допустить `confirmed`. Универсальный порог source reliability не задаётся. Без разрешающей policy владелец не сохраняет статус `confirmed`; утверждение остаётся `unknown`/unverified. `source_reliability=unassessed` само по себе не даёт права подтверждения.
+
+Pydantic package не выполняет owner read и не принимает policy от caller: его standalone DTO не может решить, является ли вымышленная или недоступная ссылка допустимым основанием. Этот gate является обязательной частью соответствующих owner command реализаций и проверяется на их runtime-границе.
 
 StatementRef.hash относится к каноническому Statement. Разрешение StatementRef использует существующее Events.read/Business.read по aggregate ID/revision, затем выбирает и проверяет конкретное утверждение; новый endpoint и прямой SQL другого owner не нужны. Для unsaved proposals ссылки на ещё не сохранённые утверждения остаются внутри proposal по statement_id; их нельзя выдавать за durable StatementRef.
 

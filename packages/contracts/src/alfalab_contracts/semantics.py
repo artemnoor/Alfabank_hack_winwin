@@ -55,6 +55,17 @@ def _ensure(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
+def _require_ref_owner(ref: OpenAPIModel, owners: set[str], field: str) -> None:
+    owner = _enum_value(ref.owner)
+    allowed = ", ".join(sorted(owners))
+    _ensure(owner in owners, f"{field} owner must be one of: {allowed}")
+
+
+def _require_refs_owner(refs: list[OpenAPIModel], owners: set[str], field: str) -> None:
+    for index, ref in enumerate(refs):
+        _require_ref_owner(ref, owners, f"{field}[{index}]")
+
+
 def validate_dto(model: OpenAPIModel) -> None:
     """Apply only semantic rules decidable from this DTO's typed values."""
     name = type(model).__name__
@@ -81,10 +92,78 @@ def validate_dto(model: OpenAPIModel) -> None:
             )
 
     elif name == "StatementRef":
+        owner = _enum_value(model.aggregate_ref.owner)
         _ensure(
-            _enum_value(model.aggregate_ref.owner) in {"Events", "Business"},
+            owner in {"Events", "Business"},
             "StatementRef aggregate owner must be Events or Business",
         )
+
+    elif name == "DocumentVersion":
+        _require_ref_owner(model.ref, {"Documents"}, "DocumentVersion ref")
+        if model.parent_ref is not None:
+            _require_ref_owner(model.parent_ref, {"Documents"}, "DocumentVersion parent_ref")
+
+    elif name == "BusinessSnapshot":
+        _require_ref_owner(model.ref, {"Business"}, "BusinessSnapshot ref")
+
+    elif name == "CaseRecord":
+        _require_ref_owner(model.ref, {"Cases"}, "CaseRecord ref")
+
+    elif name == "EventRecord":
+        _require_ref_owner(model.ref, {"Events"}, "EventRecord ref")
+        _require_refs_owner(model.lineage_refs, {"Events"}, "EventRecord lineage_refs")
+
+    elif name == "EventDecision":
+        _require_refs_owner(model.target_refs, {"Events"}, "EventDecision target_refs")
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "EventDecision evidence_refs")
+        action = _enum_value(model.action)
+        targets = len(model.target_refs)
+        successors = len(model.proposed_events)
+        if action == "create":
+            _ensure(targets == 0, "create cannot target an existing event")
+        elif action in {"attach", "correct"}:
+            _ensure(targets == 1, f"{action} requires exactly one target")
+        elif action == "merge":
+            _ensure(targets >= 2, "merge requires at least two targets")
+            _ensure(successors == 1, "merge requires exactly one successor")
+        elif action == "split":
+            _ensure(targets == 1, "split requires exactly one target")
+            _ensure(successors >= 2, "split requires at least two successors")
+        elif action == "defer":
+            _ensure(targets == 0 and successors == 0, "defer cannot change event state")
+
+    elif name == "EvidenceRecord":
+        _require_ref_owner(model.ref, {"Evidence"}, "EvidenceRecord ref")
+        _require_ref_owner(model.source_ref, {"Documents", "Business", "Runs"}, "EvidenceRecord source_ref")
+
+    elif name == "EvidenceSelection":
+        _require_refs_owner(model.refs, {"Evidence"}, "EvidenceSelection refs")
+
+    elif name == "EvidenceResult":
+        _require_refs_owner(model.missing_refs, {"Evidence"}, "EvidenceResult missing_refs")
+
+    elif name == "GraphEdge":
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "GraphEdge evidence_refs")
+
+    elif name == "ImpactAssessment":
+        _require_ref_owner(model.event_ref, {"Events"}, "ImpactAssessment event_ref")
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "ImpactAssessment evidence_refs")
+
+    elif name == "Match":
+        _require_ref_owner(model.event_ref, {"Events"}, "Match event_ref")
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "Match evidence_refs")
+
+    elif name == "Provenance":
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "Provenance evidence_refs")
+
+    elif name == "PublishGraphOutput":
+        _require_ref_owner(model.projection_ref, {"Graph"}, "PublishGraphOutput projection_ref")
+
+    elif name == "Recommendation":
+        _require_refs_owner(model.evidence_refs, {"Evidence"}, "Recommendation evidence_refs")
+
+    elif name == "RegisterEvidenceInput":
+        _require_ref_owner(model.source_ref, {"Documents", "Business", "Runs"}, "RegisterEvidenceInput source_ref")
 
     elif name == "Statement":
         if model.epistemic_status.value == "confirmed":
@@ -109,23 +188,6 @@ def validate_dto(model: OpenAPIModel) -> None:
     elif name == "TopicScore":
         if model.raw_score is not None or model.calibrated:
             _ensure(model.score_method is not None, "raw_score or calibrated score requires score_method")
-
-    elif name == "EventDecision":
-        action = _enum_value(model.action)
-        targets = len(model.target_refs)
-        successors = len(model.proposed_events)
-        if action == "create":
-            _ensure(targets == 0, "create cannot target an existing event")
-        elif action in {"attach", "correct"}:
-            _ensure(targets == 1, f"{action} requires exactly one target")
-        elif action == "merge":
-            _ensure(targets >= 2, "merge requires at least two targets")
-            _ensure(successors == 1, "merge requires exactly one successor")
-        elif action == "split":
-            _ensure(targets == 1, "split requires exactly one target")
-            _ensure(successors >= 2, "split requires at least two successors")
-        elif action == "defer":
-            _ensure(targets == 0 and successors == 0, "defer cannot change event state")
 
     elif name == "EventChangeProposal":
         mention_ids = [
@@ -418,6 +480,21 @@ def validate_recommendation_pair(request: RecommendationInput, response: Recomme
 
 def validate_operation_semantics(operation_id: str, request: OpenAPIModel, response: OpenAPIModel) -> None:
     """Dispatch all request/response semantic invariants supported by T01."""
+    command_owner = {
+        "Documents.register": "Documents",
+        "Events.apply": "Events",
+        "Business.apply": "Business",
+        "Graph.publish": "Graph",
+        "Evidence.register": "Evidence",
+        "Cases.save": "Cases",
+    }.get(operation_id)
+    if command_owner is not None:
+        _require_refs_owner(
+            response.payload.receipt.changed_refs,
+            {command_owner},
+            f"{operation_id} receipt.changed_refs",
+        )
+
     if operation_id == "Documents.prepare":
         validate_prepare_pair(request.payload, response.payload)
     elif operation_id == "Events.propose_resolution":

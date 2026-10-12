@@ -1,6 +1,6 @@
 # Alfabank_hack_winwin
 
-[![Статус: T01 review pending](https://img.shields.io/badge/status-T01%20review%20pending-orange)](docs/specs/framework-v1/10-implementation-plan.md)
+[![Статус: T01 audit pass](https://img.shields.io/badge/status-T01%20audit%20pass-brightgreen)](docs/specs/framework-v1/10-implementation-plan.md)
 [![Последний тег: v0.1.0-bootstrap](https://img.shields.io/badge/latest%20tag-v0.1.0--bootstrap-blue)](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap)
 [![Релиз: пока не опубликован](https://img.shields.io/badge/GitHub%20Release-not%20published-lightgrey)](https://github.com/artemnoor/Alfabank_hack_winwin/releases)
 [![Python 3.12.15](https://img.shields.io/badge/Python-3.12.15-3776AB?logo=python&logoColor=white)](toolchain.lock.json)
@@ -9,13 +9,13 @@
 
 > Модульный AI-каркас для хакатона Альфа-Банка: строгие контракты операций, заменяемые реализации, контролируемые моки и воспроизводимые запуски.
 
-Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. **T00 завершена; реализация T01 находится на review pending.** Исполняемые контракты готовы, но до перехода к T02 нужно разрешить неоднозначность семантики подтверждённых утверждений. Backend-операции, API и Playground ещё не реализованы.
+Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. **T00 завершена; независимый технический аудит T01 пройден, исправления подготовлены к PR review.** Правило для `confirmed` согласовано и зафиксировано. Backend-операции, API и Playground ещё не реализованы.
 
 ## Состояние проекта
 
 | Показатель | Состояние |
 |---|---|
-| Текущий этап | **T01 реализована; приёмка ожидает уточнения спецификации** |
+| Текущий этап | **T01 реализована и аудит пройден; изменения ожидают PR review** |
 | Последний Git-тег | [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) |
 | GitHub Release | Пока не опубликован; тег отмечает bootstrap-снимок |
 | Framework Ready | Нет — запланирована приёмка T18 после реализации каркаса |
@@ -112,7 +112,7 @@ Bootstrap ставит точный CPython через закреплённый 
 | Этап | Результат | Статус |
 |---|---|---|
 | T00 | Toolchain, PostgreSQL, bootstrap и doctor | ✅ Выполнено |
-| T01 | Pydantic v2-модели, семантические валидаторы и типизированные descriptors 25 операций | Реализовано; review pending |
+| T01 | Pydantic v2-модели, семантические валидаторы и типизированные descriptors 25 операций | Аудит PASS; исправления ожидают PR review |
 | T02 | Общие fixtures и публичные Protocol | После приёмки T01 |
 | T03–T06 | Исполнитель, хранилище запусков, политики данных и replay | Запланировано |
 | T07–T14 | Sources/Documents, Understanding/Events, Business, Evidence, Graph и аналитические операции | Запланировано |

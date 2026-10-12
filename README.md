@@ -1,50 +1,130 @@
-# Каркас AI-системы Альфа-Банка — локальный запуск
+# Alfabank_hack_winwin
 
-В репозитории сейчас выполняется только задача T00: закреплённый toolchain и изолированная локальная PostgreSQL. API, предметные операции, fixtures и Playground относятся к последующим задачам; рабочих endpoint пока нет.
+[![Статус: T00 выполнена, T01 следующая](https://img.shields.io/badge/status-T00%20complete%20%7C%20T01%20next-orange)](docs/specs/framework-v1/10-implementation-plan.md)
+[![Последний тег: v0.1.0-bootstrap](https://img.shields.io/badge/latest%20tag-v0.1.0--bootstrap-blue)](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap)
+[![Релиз: пока не опубликован](https://img.shields.io/badge/GitHub%20Release-not%20published-lightgrey)](https://github.com/artemnoor/Alfabank_hack_winwin/releases)
+[![Python 3.12.15](https://img.shields.io/badge/Python-3.12.15-3776AB?logo=python&logoColor=white)](toolchain.lock.json)
+[![Node.js 22.23.3 и npm 10.9.9](https://img.shields.io/badge/Node.js-22.23.3%20%7C%20npm%2010.9.9-339933?logo=nodedotjs&logoColor=white)](toolchain.lock.json)
+[![PostgreSQL 16.15](https://img.shields.io/badge/PostgreSQL-16.15-4169E1?logo=postgresql&logoColor=white)](toolchain.lock.json)
 
-## Предварительные требования
+> Модульный AI-каркас для хакатона Альфа-Банка: строгие контракты операций, заменяемые реализации, контролируемые моки и воспроизводимые запуски.
 
-- Git и доступ в интернет при первом bootstrap.
-- CPython 3.12 для запуска bootstrap. Скрипт скачает точную закреплённую patch-версию и будет использовать её локально.
-- Docker Desktop в Windows либо Docker Engine и Compose v2 plugin в Linux. Docker daemon должен быть запущен.
-- Windows x64 или Linux x86_64 с glibc. Проверенные архивы в `toolchain.lock.json` сейчас предназначены для этих настольных архитектур.
+Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. Сейчас выполнен этап **T00 — toolchain и локальная среда**. Backend-операции, API и Playground ещё не реализованы.
 
-Node.js, npm, uv, точная версия Python и PostgreSQL устанавливаются или загружаются bootstrap в игнорируемую `.local/` и Docker volume. SDK нейросетей и API-ключи не нужны. Digest multi-arch образа базы закреплён.
+## Состояние проекта
 
-## Первый запуск
+| Показатель | Состояние |
+|---|---|
+| Текущий этап | **T00 завершён; T01 следующий** |
+| Последний Git-тег | [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) |
+| GitHub Release | Пока не опубликован; тег отмечает bootstrap-снимок |
+| Framework Ready | Нет — запланирована приёмка T18 после реализации каркаса |
+| CI | Ещё нет; матрица проверок предусмотрена задачей T17 |
+| Локальная проверка T00 | Windows и Linux userland в WSL; отдельный Linux-хост ещё не проверялся |
 
-Команды нужно выполнять из корня репозитория.
+Значки выше отражают только текущий этап и закреплённые версии инструментов. Они **не** означают, что AI-алгоритмы готовы или что система прошла CI.
 
-Windows PowerShell:
+## Что строим
+
+Целевая система — модульный монолит с 25 публичными операциями. У каждой операции будут собственные строгие входные и выходные схемы, HTTP-вызов, mock и fixtures; модули смогут иметь несколько независимых реализаций. Общий исполнитель будет использоваться продуктовым API, CLI, сценариями и Developer Playground.
+
+### Целевой поток данных
+
+Диаграмма показывает направление проектирования из спецификации; её блоки пока не являются реализованными сервисами.
+
+```mermaid
+flowchart LR
+    Sources[Источники] --> Documents[Документы]
+    Documents --> Understanding[Классификация и извлечение]
+    Understanding --> Events[Идентичность и разрешение событий]
+    Business[Профиль бизнеса и факты] --> Graph[Проекция Knowledge Graph]
+    Events --> Graph
+    Graph --> Matching[Сопоставление сущностей и воздействия]
+    Matching --> Impact[Impact Engine]
+    Impact --> Recommendations[Рекомендации]
+    Documents -. доказательства .-> Evidence[Evidence]
+    Events -. происхождение утверждений .-> Evidence
+    Executor[Общий исполнитель] --> Runs[История запусков и trace]
+```
+
+### Целевое выполнение операции
+
+```mermaid
+flowchart LR
+    Clients[API · CLI · Playground] --> Executor[Общий механизм исполнения]
+    Executor --> Policy[Профиль среды и политики]
+    Policy --> Registry[Реестр операций и DI]
+    Registry --> Choice{Выбранная реализация}
+    Choice --> Mock[Mock]
+    Choice --> Real[Real adapter]
+    Choice --> Replay[Record / replay]
+    Executor --> Trace[Run history · spans · provenance]
+    Mock --> Owner[Публичные порты владельцев состояния]
+    Real --> Owner
+    Replay --> Owner
+    Owner --> PostgreSQL[(Одна локальная PostgreSQL)]
+```
+
+Основные архитектурные границы:
+
+- Модули общаются типизированными интерфейсами; HTTP нужен для независимого вызова операций, а не как обязательный внутренний транспорт.
+- Мок выбирается явно. Нет автоматического перехода с real на mock.
+- Происхождение данных отделено от происхождения исполнения: настоящий алгоритм может обработать синтетические данные.
+- Сценарии связывают публичные операции и не заменяют их. Повторное исполнение использует строгий record/replay.
+- Knowledge Graph — перестраиваемая проекция утверждений и доказательств, а не единственное хранилище знаний.
+
+## Быстрый старт
+
+Нужны Git, доступ в интернет при первом запуске, CPython 3.12 для запуска bootstrap и Docker Desktop (Windows) либо Docker Engine с Compose v2 (Linux). Поддерживаемый bootstrap toolchain сейчас закреплён для Windows x64 и Linux x86_64 с glibc. Ключи LLM и SDK моделей не нужны.
+
+Из корня репозитория:
 
 ```powershell
 py -3.12 tools/dev.py bootstrap
 py -3.12 tools/dev.py doctor --profile all
 ```
 
-Linux:
+В Linux используйте `python3.12` вместо `py -3.12`:
 
 ```sh
 python3.12 tools/dev.py bootstrap
 python3.12 tools/dev.py doctor --profile all
 ```
 
-При первом запуске скачиваются точные архивы CPython, uv и Node.js/npm. Перед установкой каждого архива проверяется SHA‑256. Затем окружения синхронизируются по зафиксированным lock-файлам, запускается только закреплённая PostgreSQL. База доступна через свободный порт на `127.0.0.1` и подключена к отдельной Docker-сети без других контейнеров проекта. Эта сеть нужна локальным процессам API в последующих задачах; сам PostgreSQL не запускает сетевые адаптеры приложения. Создаются отдельные базы `alfalab_development` и `alfalab_testing` с отдельными ролями без прав суперпользователя. Пароли хранятся в `.local/t00/`. База сохраняется между запусками bootstrap; credentials не вращаются.
+Bootstrap ставит точный CPython через закреплённый uv, проверяет SHA-256 архивов uv и Node.js/npm, синхронизирует lock-файлы и запускает только PostgreSQL. Он создаёт раздельные `development` и `testing` базы с отдельными ролями. Пароли и состояние остаются в игнорируемом `.local/`; повторный bootstrap сохраняет credentials и данные.
 
-Docker bridge обеспечивает соединение локального API с базой, но сам по себе не блокирует исходящий сетевой трафик контейнера. В T00 запускается только PostgreSQL, без сетевых адаптеров приложения или внешних model-клиентов; контроль egress будущих адаптеров относится к T06.
+Успешный `doctor` завершает вывод строкой `Проверки T00 пройдены. Это ещё не Framework Ready.` Сейчас эта команда проверяет toolchain и базу. Она не запускает API или Playground — их ещё нет.
 
-Bootstrap не печатает credentials. В Windows для каталога секретов и файлов назначается ACL текущего пользователя; в Linux используются права `0700`/`0600`. Git игнорирует `.local/`, `.venv/` и `node_modules/`. Не копируйте `.local/` в fixtures или коммиты.
+## План работ
 
-## Проверка окружения
+| Этап | Результат | Статус |
+|---|---|---|
+| T00 | Toolchain, PostgreSQL, bootstrap и doctor | ✅ Выполнено |
+| T01–T02 | Строгие схемы 25 операций, общие fixtures и публичные интерфейсы | Следом — T01 |
+| T03–T06 | Исполнитель, хранилище запусков, политики данных и replay | Запланировано |
+| T07–T14 | Sources/Documents, Understanding/Events, Business, Evidence, Graph и аналитические операции | Запланировано |
+| T15–T17 | Playground, сценарии и CI readiness matrix | Запланировано |
+| T18 | Чистая приёмка, полный сквозной сценарий и отчёт Framework Ready | Запланировано |
 
-```sh
-python3.12 tools/dev.py doctor --profile all
-```
+Приёмка Framework Ready не означает, что модели прошли оценку качества или что подтверждена готовность продукта. Это отдельные уровни **Algorithm Ready** и **Product Ready**. Полные зависимости, владельцы и критерии каждого этапа — в [плане реализации](docs/specs/framework-v1/10-implementation-plan.md).
 
-`doctor` показывает версии закреплённых инструментов, проверяет оба lock-файла и Compose-конфигурацию, доступность Docker/Compose и PostgreSQL. Он подключается к выбранной базе собственными credentials и проверяет запрет на доступ к другой, административной и template базам, наличие только контейнера PostgreSQL в выделенной Docker-сети и публикацию порта только на loopback. Модельные ключи не требуются. При ошибке команда завершается с ненулевым кодом и кратким описанием исправления.
+## Документы
 
-Посмотреть состояние контейнера без credentials можно командой `docker compose ps`. Идентификатор Compose-проекта и порт записаны в `.local/t00/runtime.json`; секретов там нет. В T00 нет команды reset/down: обычный запуск bootstrap или doctor не удалит локальные данные. Миграции, owner-схемы, API, frontend-зависимости и предметные тесты добавляются в назначенных задачах.
+| Документ | Для чего |
+|---|---|
+| [Спецификация v1.0](docs/specs/framework-v1/README.md) | Содержание, статус и нормативность решений |
+| [Архитектура](docs/specs/framework-v1/01-architecture.md) | Слои, границы модулей, зависимости и владельцы данных |
+| [Контракты и операции](docs/specs/framework-v1/02-contracts.md) · [каталог 25 операций](docs/specs/framework-v1/03-operations.md) | Типы, версии, API и семантика операций |
+| [Исполнение](docs/specs/framework-v1/04-execution.md) · [хранилище](docs/specs/framework-v1/05-storage.md) | DI, политика, побочные эффекты и состояние |
+| [Сценарии и replay](docs/specs/framework-v1/06-replay-scenarios.md) · [Playground](docs/specs/framework-v1/07-playground.md) | Остановка, воспроизведение и ручные эксперименты |
+| [Проверки](docs/specs/framework-v1/08-verification.md) · [локальные данные](docs/specs/framework-v1/09-local-data.md) | CI, уровни готовности, секреты и политика данных |
+| [Риски и решения](docs/specs/framework-v1/11-decisions-risks.md) | Принятые компромиссы и открытые вопросы |
+| [OpenAPI](docs/specs/framework-v1/contracts/openapi.json) · [примеры контрактов](docs/specs/framework-v1/contracts/examples.json) | Нормативные снимки схем и примеров |
 
-## Закреплённый toolchain
+## Релизы и участие
 
-`toolchain.lock.json` — основной перечень точных версий, официальных URL и контрольных сумм, а также digest PostgreSQL. Скрипт проверяет, что `.python-version`, `.node-version`, `pyproject.toml`, npm manifest/lock и `compose.yaml` соответствуют этому перечню. Обновление toolchain требует явного изменения pin и review.
+Последний тег [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) фиксирует базовую среду T00. Отдельный [GitHub Release](https://github.com/artemnoor/Alfabank_hack_winwin/releases) пока не опубликован; этот тег не обозначает готовность приложения.
+
+Для разработки выберите задачу из плана и её критерии приёмки. Изменения контрактов требуют проверки затронутых потребителей; секреты, `.local/`, `.venv/` и `node_modules/` в коммиты не добавляются. В проекте пока нет CI-конфигурации или набора прикладных тестов — они появятся в запланированных задачах.
+
+**Лицензия:** пока не выбрана. Публичная видимость репозитория не задаёт условия повторного использования кода.

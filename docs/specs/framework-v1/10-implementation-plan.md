@@ -1,12 +1,12 @@
 # План реализации и параллельная разработка
 
-Статус всех задач: planned. В текущей сессии выполнена подготовка документов, не задачи приложения. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт с утверждёнными требованиями поднимается в spec review.
+Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01–T18 ещё не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт с утверждёнными требованиями поднимается в spec review.
 
 ## Этапы и блокировки
 
 | Задача | Результат / рекомендуемый владелец | Blocked by | Проверяемая приёмка |
 |---|---|---|---|
-| T00 Toolchain и чистый checkout | Root README, exact runtime manifest, uv/npm locks, Compose PostgreSQL, базовые bootstrap/doctor CLI; platform | подтверждение spec | Windows/Linux создают окружение и подключаются к изолированной DB без model keys; повтор не разрушает state; versions/digest pinned. Полный bootstrap/doctor проверяется в T18 |
+| T00 Toolchain и чистый checkout — выполнено | Root README, exact runtime manifest, uv/npm locks, Compose PostgreSQL, базовые bootstrap/doctor CLI; platform | подтверждение spec | Windows и Linux userland в WSL создают окружение и подключаются к изолированной DB без model keys; повтор не разрушает state; versions/digest pinned. Native Linux и полный clean-room bootstrap/doctor повторно проверяются в T18 |
 | T01 Pydantic и schemas | 215 моделей/типов, semantic validators, OpenAPI export, 25 descriptors; contracts owner | T00 | export diff с нормативным снимком; refs/extra/scalars/unions; 25 IDs; positive/negative wire cases |
 | T02 Shared fixtures и public Protocol | approved radio/steel datasets, operation fixtures, input/output hash rules, Protocol/context stubs; contracts + QA | T01 | каждый mock operation имеет достаточный воспроизводимый сценарий; versions/hashes; consumer bindings валидируются |
 | T03 Минимальный execution slice | Documents.prepare real/mock → typed HTTP → trace → общий UI editor; platform + frontend | T01 | одно выполнение через HTTP/CLI/Playground, actual execution metadata, schema errors sanitized |

@@ -1,0 +1,151 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "radio-news",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Understanding_classifyResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Understanding_classifyResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Understanding.classify",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:231d3003d74f5fe53ad6559068b84e0e2c2c6d741130fa0de279d4eb01b99fd9",
+    "expected_result": "sha256:f04c1242635398cbbe327dacf496903ddc4b23ed5bd534f7e579c68e67bbdc03",
+    "request": "sha256:6a96ae6e624b541bf8ad83b9c0310135f422ed52956c7bc9c46139388fd84229"
+  },
+  "operation_id": "Understanding.classify",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "allowed_codes": [
+        {
+          "code": "synthetic-example",
+          "namespace": "synthetic-example",
+          "version": "1.0.0"
+        }
+      ],
+      "material": {
+        "material": {
+          "collected_at": "2026-10-12T00:00:00Z",
+          "content_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+          "language": "ru",
+          "material_id": "fixture-radio-news",
+          "provenance": {
+            "derivation_method": null,
+            "evidence_refs": [],
+            "input_statement_refs": [],
+            "origin": "synthetic",
+            "origin_verified": false,
+            "producer_run_id": null,
+            "source_refs": []
+          },
+          "published_at": null,
+          "source_id": null,
+          "source_url": null,
+          "text": "Учебный источник сообщает об ограничении экспорта радиодеталей. Сроки неизвестны.",
+          "title": "Синтетический пример ограничения экспорта"
+        },
+        "prepared_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+        "quality": "valid",
+        "raw_hash": "sha256:f457da6b9ddfceaea5835a437a921f31389b18093b54caa1c509bb68eae45770",
+        "span_map": [
+          {
+            "prepared_end": 81,
+            "prepared_start": 0,
+            "raw_end": 81,
+            "raw_start": 0
+          }
+        ],
+        "warnings": []
+      },
+      "multi_label": true,
+      "taxonomy": {
+        "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "id": "synthetic-example",
+        "version": "1.0.0"
+      }
+    },
+    "request_id": "fixture-05-radio-news",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Understanding_classifyRequest",
+  "response_model": "Understanding_classifyResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:6dfd95dfd60ec0c6f7660170c36780057bcab2fdef5e15a187270dc7c22a7fe0",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

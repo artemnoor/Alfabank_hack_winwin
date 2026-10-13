@@ -1,0 +1,187 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "conflict",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "same-idempotency-key-has-different-canonical-payload"
+      },
+      {
+        "allowed_error_codes": [
+          "IDEMPOTENCY_CONFLICT",
+          "VERSION_CONFLICT"
+        ],
+        "id": "reject-without-applying-a-second-state-change"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON",
+    "request_sequence_scope": "ordered complete wire requests"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:df8120ce1c9ec651e5a4b677e5c5f56ea4eec433a38175210f3c879caa71550f",
+    "expected_result": "sha256:f9878bf9680c169c8eb4f0262bd9c49b8c82e66c40d21fba49e8bb36c75066cd",
+    "request": "sha256:dfe7e88984e5defe64ad093f92a2950f4ce9f2fd903ff73190e7bcbc1481c354",
+    "request_sequence": "sha256:cae4d0a90715ca6e5bd2b9a3d10e40bcfe27761f44f71de69ce312382077385b"
+  },
+  "operation_id": "Evidence.register",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-20",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "evidence_id": "synthetic-example-changed",
+      "expected_revision": 0,
+      "locator": {
+        "end": 0,
+        "kind": "text_span",
+        "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "start": 0
+      },
+      "source_ref": {
+        "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+        "object_id": "synthetic-example",
+        "owner": "Documents",
+        "revision": 1
+      }
+    },
+    "request_id": "fixture-20-conflict",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Evidence_registerRequest",
+  "request_sequence": [
+    {
+      "contract_version": "1.0.0",
+      "data_declaration": "synthetic",
+      "execution": {
+        "analytical_time": "2026-10-12T00:00:00Z",
+        "mode": "live",
+        "random_seed": 20261012,
+        "recording": "full",
+        "timeout_ms": 30000
+      },
+      "idempotency_key": "example-command-20",
+      "implementation": {
+        "id": "mock.baseline",
+        "parameters": {
+          "scenario": "default"
+        },
+        "version": "1.0.0"
+      },
+      "payload": {
+        "evidence_id": "synthetic-example",
+        "expected_revision": 0,
+        "locator": {
+          "end": 0,
+          "kind": "text_span",
+          "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "start": 0
+        },
+        "source_ref": {
+          "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "object_id": "synthetic-example",
+          "owner": "Documents",
+          "revision": 1
+        }
+      },
+      "request_id": "fixture-20-raw-span",
+      "sandbox_id": "fixtures-t02"
+    },
+    {
+      "contract_version": "1.0.0",
+      "data_declaration": "synthetic",
+      "execution": {
+        "analytical_time": "2026-10-12T00:00:00Z",
+        "mode": "live",
+        "random_seed": 20261012,
+        "recording": "full",
+        "timeout_ms": 30000
+      },
+      "idempotency_key": "example-command-20",
+      "implementation": {
+        "id": "mock.baseline",
+        "parameters": {
+          "scenario": "default"
+        },
+        "version": "1.0.0"
+      },
+      "payload": {
+        "evidence_id": "synthetic-example-changed",
+        "expected_revision": 0,
+        "locator": {
+          "end": 0,
+          "kind": "text_span",
+          "quote_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "start": 0
+        },
+        "source_ref": {
+          "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "object_id": "synthetic-example",
+          "owner": "Documents",
+          "revision": 1
+        }
+      },
+      "request_id": "fixture-20-conflict",
+      "sandbox_id": "fixtures-t02"
+    }
+  ],
+  "response_model": "Evidence_registerResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:f3f0696c0156d121c3e20a9b4e0d429229d848a7c467b479c609971e64305c7b",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

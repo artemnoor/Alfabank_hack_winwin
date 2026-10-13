@@ -1,0 +1,113 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "current-minimal",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Business_readResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Business_readResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Business.read",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:31950e105a661a4ae5ed0ba46c98524c5d88ef11adeaed93ccac822ef1cf0944",
+    "expected_result": "sha256:7b9e150574db74138fb7cff1e25ad1cc94a8c458c7d0581d8200b538b8361062",
+    "request": "sha256:db76a6a8b72aaef42c0cbdfef91787d3ad790de5a5eacc54af2dd8a93154c942"
+  },
+  "operation_id": "Business.read",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "as_of": null,
+        "company_id": "synthetic-example",
+        "kind": "business",
+        "revision": null
+      }
+    },
+    "request_id": "fixture-13-current-minimal",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Business_readRequest",
+  "response_model": "Business_readResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:bcd1da7eced56629c7d6e1b79106eeeb53261c595d494bf5a36fc7f2b0b10cf7",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

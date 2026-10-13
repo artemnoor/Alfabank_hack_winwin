@@ -1,0 +1,119 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "span-with-source",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Evidence_readResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Evidence_readResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Evidence.read",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:4cc43f32dd68a2a07c2b065832f4639d3ad4989a223b23d055be847631109253",
+    "expected_result": "sha256:88ecac6d8c913ac3ae8981bf2a72693be4afc5e426e009a3d818ce445d75449d",
+    "request": "sha256:33648264d1946eb3bfba2fb52aab3cefcc5ed7e30052967b3925c2dd06b960bf"
+  },
+  "operation_id": "Evidence.read",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "include_source_text": false,
+        "kind": "evidence",
+        "refs": [
+          {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "object_id": "synthetic-example",
+            "owner": "Evidence",
+            "revision": 1
+          }
+        ]
+      }
+    },
+    "request_id": "fixture-21-span-with-source",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Evidence_readRequest",
+  "response_model": "Evidence_readResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:c80ebbb1c539b3370956a867e36890318e02ba81337ea0f11f4bf3b3f5476eab",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

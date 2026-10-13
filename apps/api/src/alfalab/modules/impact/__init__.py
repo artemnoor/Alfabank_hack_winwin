@@ -1,0 +1,1 @@
+"""Impact owner public interfaces."""

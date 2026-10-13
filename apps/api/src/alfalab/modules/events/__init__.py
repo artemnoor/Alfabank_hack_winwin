@@ -1,0 +1,1 @@
+"""Events owner public interfaces."""

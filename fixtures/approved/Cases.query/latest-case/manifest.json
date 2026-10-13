@@ -1,0 +1,116 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "latest-case",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Cases_queryResponse",
+    "rules": [
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Cases_queryResponse"
+      },
+      {
+        "id": "operation-semantic-invariants",
+        "operation_id": "Cases.query",
+        "source": "operations.json"
+      },
+      {
+        "id": "deterministic-replay-input",
+        "scope": "request+before_state+analytical_time+seed"
+      },
+      {
+        "expected_classification": "synthetic",
+        "id": "synthetic-lineage-is-preserved"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:43904d365e5dbf549509ccd2125706ecdfbe9c4aadaaee12ccb7b10e14ea2ab1",
+    "expected_result": "sha256:cb735281b821a7a90f6d05c2c38c7cbc798d190e32a1a5b717d4085c4e3d7d16",
+    "request": "sha256:bf18ab607325ad88adc8889b9417201cd415d6987d8c563a792e5afb43d9dbd4"
+  },
+  "operation_id": "Cases.query",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "case_ids": [],
+        "cursor": null,
+        "include_artifacts": false,
+        "kind": "cases",
+        "limit": 1,
+        "revision": null,
+        "tags": []
+      }
+    },
+    "request_id": "fixture-24-latest-case",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Cases_queryRequest",
+  "response_model": "Cases_queryResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:439fca1bb7e48f455621cbaa71bbb6fbb8468156c35c243dbc6eeadb58c987b0",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

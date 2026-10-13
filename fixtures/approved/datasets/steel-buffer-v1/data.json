@@ -1,0 +1,59 @@
+{
+  "classification": "synthetic",
+  "dataset_id": "steel-buffer-v1",
+  "records": {
+    "company": {
+      "company_id": "synthetic-steel-example",
+      "display_name": "Учебная компания «Сталь»",
+      "known_facts": [
+        {
+          "predicate": "business_activity",
+          "statement_id": "steel-activity-1",
+          "value": "гипотетическое производство стали"
+        }
+      ],
+      "synthetic_entity": true,
+      "unknowns": [
+        "inventory_buffer_days",
+        "supplier_concentration",
+        "procurement_volume",
+        "revenue"
+      ]
+    },
+    "events": [
+      {
+        "confirmed": false,
+        "event_id": "steel-event-supply-1",
+        "status": "potential",
+        "text": "гипотетическая задержка поставки материала"
+      }
+    ],
+    "materials": [
+      {
+        "content_hash": "sha256:d57c49712cb9e0585da402a3dcb594384d9b485ef301d4073f153819986d19e7",
+        "language": "ru",
+        "material_id": "fixture-steel-buffer",
+        "published_at": null,
+        "source_id": "synthetic-steel-example",
+        "text": "Учебный пример: производитель стали рассматривает запасной буфер поставок; его размер неизвестен.",
+        "title": "Гипотетический запасной буфер"
+      }
+    ],
+    "mitigation_assumption": {
+      "assumption_id": "steel-buffer-assumption-v1",
+      "confirmed": false,
+      "description": "Гипотетический резерв поставок может смягчить перебой.",
+      "quantity": null,
+      "source": "synthetic_assumption",
+      "unit": "days"
+    }
+  },
+  "snapshots": {
+    "baseline": {
+      "sandbox_id": "fixtures-t02",
+      "state": "approved synthetic baseline"
+    }
+  },
+  "synthetic_only": true,
+  "version": "1.0.0"
+}

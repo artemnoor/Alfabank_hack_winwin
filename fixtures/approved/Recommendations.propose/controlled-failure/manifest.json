@@ -1,0 +1,170 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    },
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f",
+      "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+      "dataset_id": "steel-buffer-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "controlled-failure",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "mock-failure-is-deterministic",
+        "mock_scenario": "fatal_error"
+      },
+      {
+        "id": "error-does-not-echo-request-or-provider-body"
+      },
+      {
+        "applies_to": false,
+        "id": "command-state-not-applied-or-outcome-explicit"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:7217fe554e4a3e3dc0b55245a3b68ddd17386ce20656c3b33b2eaeb10cb79725",
+    "expected_result": "sha256:d1c67b47f2e4d6abe59ec8359801d7bd5ad706a017b18735e2e62710f62152ec",
+    "request": "sha256:4440596fd9d1912d7ad7932f9080eb09a2febef9c2f62f3a49d7a33d1011e1f9"
+  },
+  "operation_id": "Recommendations.propose",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "fatal_error"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "allowed_actions": [],
+      "assessment": {
+        "assessment_id": "synthetic-example",
+        "assumptions": [],
+        "company": {
+          "display_name": "synthetic-example",
+          "entity_id": "synthetic-example",
+          "kind": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          }
+        },
+        "confidence": {
+          "level": "low",
+          "limitations": [],
+          "method": null
+        },
+        "direction": "negative",
+        "event_ref": {
+          "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "object_id": "synthetic-example",
+          "owner": "Events",
+          "revision": 1
+        },
+        "evidence_refs": [],
+        "exposure": "confirmed",
+        "graph_manifest": {
+          "as_of": {
+            "known_as_of": "2026-10-12T00:00:00Z",
+            "valid_as_of": "2026-10-12T00:00:00Z"
+          },
+          "builder": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          },
+          "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "input_slices": [],
+          "ontology": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          },
+          "rules": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          }
+        },
+        "likelihood": "likely",
+        "materiality": "high",
+        "mechanisms": [],
+        "missing_data": [],
+        "provenance": {
+          "derivation_method": null,
+          "evidence_refs": [],
+          "input_statement_refs": [],
+          "origin": "public_source",
+          "origin_verified": false,
+          "producer_run_id": null,
+          "source_refs": []
+        },
+        "scenarios": []
+      },
+      "audience": "entrepreneur",
+      "constraints": []
+    },
+    "request_id": "fixture-19-controlled-failure",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Recommendations_proposeRequest",
+  "response_model": "Recommendations_proposeResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:ac0c424c1eaac283eb83ba534b62517755469030a3a3abed83abad067244407a",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

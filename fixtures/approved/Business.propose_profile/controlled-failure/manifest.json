@@ -1,0 +1,112 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "controlled-failure",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "mock-failure-is-deterministic",
+        "mock_scenario": "fatal_error"
+      },
+      {
+        "id": "error-does-not-echo-request-or-provider-body"
+      },
+      {
+        "applies_to": false,
+        "id": "command-state-not-applied-or-outcome-explicit"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:3b486fbe568c309ab1494dd61a5359deeb739526f2e6c185776b013593539442",
+    "expected_result": "sha256:d1c67b47f2e4d6abe59ec8359801d7bd5ad706a017b18735e2e62710f62152ec",
+    "request": "sha256:3365d543a25fdee1c1a54681d67d219a522bb341ed4d7b514b2887fd4fb1ab93"
+  },
+  "operation_id": "Business.propose_profile",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "fatal_error"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "answers": [],
+      "as_of": {
+        "known_as_of": "2026-10-12T00:00:00Z",
+        "valid_as_of": "2026-10-12T00:00:00Z"
+      },
+      "company": {
+        "display_name": "synthetic-example",
+        "entity_id": "synthetic-example",
+        "kind": {
+          "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "id": "synthetic-example",
+          "version": "1.0.0"
+        }
+      },
+      "description": "Я продаю радиодетали",
+      "documents": [],
+      "existing": null
+    },
+    "request_id": "fixture-10-controlled-failure",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Business_propose_profileRequest",
+  "response_model": "Business_propose_profileResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:30751e07ede061a55a6fc249f37d4110d70e00803655321e375c7b58fb80929a",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

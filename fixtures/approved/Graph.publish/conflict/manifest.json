@@ -1,0 +1,249 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    },
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f",
+      "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+      "dataset_id": "steel-buffer-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "conflict",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "same-idempotency-key-has-different-canonical-payload"
+      },
+      {
+        "allowed_error_codes": [
+          "IDEMPOTENCY_CONFLICT",
+          "VERSION_CONFLICT"
+        ],
+        "id": "reject-without-applying-a-second-state-change"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON",
+    "request_sequence_scope": "ordered complete wire requests"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:bf7203ca472c945ce3c4237962993eb80f29222a54224e96d8629d2f3fc43024",
+    "expected_result": "sha256:f9878bf9680c169c8eb4f0262bd9c49b8c82e66c40d21fba49e8bb36c75066cd",
+    "request": "sha256:4915fce49c761f85f82764b622463675c0b04554024015181f9e0f854a63659c",
+    "request_sequence": "sha256:a569c0590bc4ce147b601bf7f618b0c0ec6409f543d836bfe060bcd5a5a74174"
+  },
+  "operation_id": "Graph.publish",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-15",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "candidate": {
+        "completeness": "complete_for_declared_slice",
+        "edges": [],
+        "graph_id": "synthetic-example-changed",
+        "manifest": {
+          "as_of": {
+            "known_as_of": "2026-10-12T00:00:00Z",
+            "valid_as_of": "2026-10-12T00:00:00Z"
+          },
+          "builder": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          },
+          "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+          "input_slices": [],
+          "ontology": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          },
+          "rules": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          }
+        },
+        "missing_data": [],
+        "nodes": [],
+        "revision": 0
+      },
+      "expected_revision": 0
+    },
+    "request_id": "fixture-15-conflict",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Graph_publishRequest",
+  "request_sequence": [
+    {
+      "contract_version": "1.0.0",
+      "data_declaration": "synthetic",
+      "execution": {
+        "analytical_time": "2026-10-12T00:00:00Z",
+        "mode": "live",
+        "random_seed": 20261012,
+        "recording": "full",
+        "timeout_ms": 30000
+      },
+      "idempotency_key": "example-command-15",
+      "implementation": {
+        "id": "mock.baseline",
+        "parameters": {
+          "scenario": "default"
+        },
+        "version": "1.0.0"
+      },
+      "payload": {
+        "candidate": {
+          "completeness": "complete_for_declared_slice",
+          "edges": [],
+          "graph_id": "synthetic-example",
+          "manifest": {
+            "as_of": {
+              "known_as_of": "2026-10-12T00:00:00Z",
+              "valid_as_of": "2026-10-12T00:00:00Z"
+            },
+            "builder": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            },
+            "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "input_slices": [],
+            "ontology": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            },
+            "rules": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            }
+          },
+          "missing_data": [],
+          "nodes": [],
+          "revision": 0
+        },
+        "expected_revision": 0
+      },
+      "request_id": "fixture-15-publish-new",
+      "sandbox_id": "fixtures-t02"
+    },
+    {
+      "contract_version": "1.0.0",
+      "data_declaration": "synthetic",
+      "execution": {
+        "analytical_time": "2026-10-12T00:00:00Z",
+        "mode": "live",
+        "random_seed": 20261012,
+        "recording": "full",
+        "timeout_ms": 30000
+      },
+      "idempotency_key": "example-command-15",
+      "implementation": {
+        "id": "mock.baseline",
+        "parameters": {
+          "scenario": "default"
+        },
+        "version": "1.0.0"
+      },
+      "payload": {
+        "candidate": {
+          "completeness": "complete_for_declared_slice",
+          "edges": [],
+          "graph_id": "synthetic-example-changed",
+          "manifest": {
+            "as_of": {
+              "known_as_of": "2026-10-12T00:00:00Z",
+              "valid_as_of": "2026-10-12T00:00:00Z"
+            },
+            "builder": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            },
+            "config_hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "input_slices": [],
+            "ontology": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            },
+            "rules": {
+              "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+              "id": "synthetic-example",
+              "version": "1.0.0"
+            }
+          },
+          "missing_data": [],
+          "nodes": [],
+          "revision": 0
+        },
+        "expected_revision": 0
+      },
+      "request_id": "fixture-15-conflict",
+      "sandbox_id": "fixtures-t02"
+    }
+  ],
+  "response_model": "Graph_publishResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:8f95f4f711296b3c028d436fe829b659df37cfbca2f51bb02b9ff58e2d1cf844",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

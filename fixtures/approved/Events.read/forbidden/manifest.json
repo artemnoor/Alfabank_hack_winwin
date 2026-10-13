@@ -1,0 +1,107 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "foreign-scope",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "forbidden",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "foreign-sandbox-object-is-denied",
+        "safe_error_code": "FORBIDDEN"
+      },
+      {
+        "id": "do-not-return-foreign-object-or-content"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:04b1e94ce09dd3617625e2af2c18ec5d4b86a4c2f13413e375acf47208d24e18",
+    "expected_result": "sha256:23a6dcaeeff6407f7286ac14a5fa1eddd72d3349cb55192b340c398c73f5d62c",
+    "request": "sha256:d1fe197ffd0c3c13aad85beb7cf794b43ae949cc993dce0f7110f56d4f9f8171"
+  },
+  "operation_id": "Events.read",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "as_of": {
+          "known_as_of": "2026-10-12T00:00:00Z",
+          "valid_as_of": "2026-10-12T00:00:00Z"
+        },
+        "cursor": null,
+        "event_ids": [
+          "foreign-event-1"
+        ],
+        "kind": "events",
+        "limit": 1,
+        "partition_id": "synthetic-example"
+      }
+    },
+    "request_id": "fixture-09-forbidden",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Events_readRequest",
+  "response_model": "Events_readResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:a8471d5c228d7190fa536466a2e204c50d706f72a5c2ef02e5478752cc9ba95e",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

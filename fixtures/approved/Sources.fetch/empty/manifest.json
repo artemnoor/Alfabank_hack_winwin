@@ -1,0 +1,102 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "empty",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Sources_fetchResponse",
+    "rules": [
+      {
+        "id": "empty-or-unknown-is-explicit",
+        "operation_id": "Sources.fetch"
+      },
+      {
+        "id": "empty-results-are-not-replaced-with-invented-facts"
+      },
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Sources_fetchResponse"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:264e43c5f0707986186b07ed0111a6771dcea2740565fcfb671ecc47bd9aeb4c",
+    "expected_result": "sha256:3819594ecdf8c4cb3b1fbd21dc45fa20d9b772d5d5e89e439c6a17d8396a9f09",
+    "request": "sha256:4c2c43fd025ef7a857f72bee5094b9f30ca0aee1453dbb1eeda63d0828ef7a22"
+  },
+  "operation_id": "Sources.fetch",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "empty"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "cursor": null,
+      "limit": 2,
+      "since": null,
+      "source_id": "synthetic-example"
+    },
+    "request_id": "fixture-01-empty",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Sources_fetchRequest",
+  "response_model": "Sources_fetchResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:d8ddb37a8425324f5bcb3ab78a3391e4fceba9fe0879e229d9f5e8dea6f89fe4",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

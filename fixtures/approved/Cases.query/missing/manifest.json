@@ -1,0 +1,109 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "missing",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Cases_queryResponse",
+    "rules": [
+      {
+        "id": "missing-target-is-explicitly-reported",
+        "operation_id": "Cases.query"
+      },
+      {
+        "id": "read-does-not-mutate-owner-state"
+      },
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Cases_queryResponse"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:adfa3271d60899917d265b2e8901b95eb7765d2a8d4ac11303d86237313e899c",
+    "expected_result": "sha256:57c7a7b765329bc183019a316fb729af3adf1b8576909c296faf31dc881effa3",
+    "request": "sha256:67c477df884e59b22e8c1ff86b3e47348d68deefdc6dd42d1b57ffc7cf94cd4f"
+  },
+  "operation_id": "Cases.query",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "case_ids": [
+          "fixture-object-that-does-not-exist"
+        ],
+        "cursor": null,
+        "include_artifacts": false,
+        "kind": "cases",
+        "limit": 1,
+        "revision": null,
+        "tags": []
+      }
+    },
+    "request_id": "fixture-24-missing",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Cases_queryRequest",
+  "response_model": "Cases_queryResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:439fca1bb7e48f455621cbaa71bbb6fbb8468156c35c243dbc6eeadb58c987b0",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

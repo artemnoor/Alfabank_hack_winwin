@@ -1,0 +1,101 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "controlled-failure",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "error_schema_id": "ErrorResponse",
+    "kind": "safe_error",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution",
+      "scope": "safe-error-fields"
+    },
+    "rules": [
+      {
+        "id": "mock-failure-is-deterministic",
+        "mock_scenario": "fatal_error"
+      },
+      {
+        "id": "error-does-not-echo-request-or-provider-body"
+      },
+      {
+        "applies_to": false,
+        "id": "command-state-not-applied-or-outcome-explicit"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "safe-error-fields",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:c9436a9da23c5d0be8a482c463f0488dfc0d44e986e3a9814e87bc3ffdf5f2af",
+    "expected_result": "sha256:d1c67b47f2e4d6abe59ec8359801d7bd5ad706a017b18735e2e62710f62152ec",
+    "request": "sha256:d39f21c4812f3202fbf94bd3c66c0fd1d96bc870f95860d2e6db13526dd95424"
+  },
+  "operation_id": "Business.read",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "fatal_error"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "query": {
+        "as_of": null,
+        "company_id": "synthetic-example",
+        "kind": "business",
+        "revision": null
+      }
+    },
+    "request_id": "fixture-13-controlled-failure",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Business_readRequest",
+  "response_model": "Business_readResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:bcd1da7eced56629c7d6e1b79106eeeb53261c595d494bf5a36fc7f2b0b10cf7",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

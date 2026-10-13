@@ -1,0 +1,128 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "empty",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "exclude_json_pointers": [
+        "/receipt/committed_at"
+      ],
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Business_applyResponse",
+    "rules": [
+      {
+        "id": "empty-or-unknown-is-explicit",
+        "operation_id": "Business.apply"
+      },
+      {
+        "id": "empty-results-are-not-replaced-with-invented-facts"
+      },
+      {
+        "id": "response-matches-public-schema",
+        "schema_id": "Business_applyResponse"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:022066e49fb069c901eae7f3e1ccc2c7fad32b71b2f28e7e11a2e1ea5a96870a",
+    "expected_result": "sha256:6021e195d73c98b79daf7d1f38aac9f69171767661426b284b6fb46054f36ee8",
+    "request": "sha256:596db9b059e45ce955443f9483528013a4fca5ed02eb38091bbe9423436e5ab0"
+  },
+  "operation_id": "Business.apply",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "idempotency_key": "example-command-12",
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "empty"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "answers": [],
+      "evidence": [],
+      "preferences": null,
+      "proposal": {
+        "add_statements": [],
+        "company": {
+          "display_name": "synthetic-example",
+          "entity_id": "synthetic-example",
+          "kind": {
+            "hash": "sha256:9104dd25a1ce3116b19f267032d457d806fa12863985474779a2144d5da4db64",
+            "id": "synthetic-example",
+            "version": "1.0.0"
+          }
+        },
+        "contradictions": [],
+        "expected_revision": 0,
+        "missing_data": [],
+        "proposal_id": "synthetic-example",
+        "provenance": {
+          "derivation_method": null,
+          "evidence_refs": [],
+          "input_statement_refs": [],
+          "origin": "public_source",
+          "origin_verified": false,
+          "producer_run_id": null,
+          "source_refs": []
+        },
+        "supersede_refs": []
+      }
+    },
+    "request_id": "fixture-12-empty",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Business_applyRequest",
+  "response_model": "Business_applyResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:a137d6857e14e14ce5bd81106058b7712aab9d0e8ff96f9195df755bce2b0c6e",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

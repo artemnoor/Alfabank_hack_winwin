@@ -1,6 +1,6 @@
 # План реализации и параллельная разработка
 
-Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01 объединена в main через PR #1. T02 (PR #2), T03 (PR #4) и T04 (PR #3) реализованы в последовательных PR и проходят интеграционную приёмку; merge не выполнен. T05–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
+Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01 объединена в main через PR #1. T02 (PR #2), T03 (PR #4) и T04 (PR #3) объединены в main последовательными merge commits и прошли интеграционную приёмку; ancestry stacked PR сохранён. T05–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
 
 ## Этапы и блокировки
 
@@ -11,7 +11,7 @@
 | T02 Shared fixtures и public Protocol | approved radio/steel datasets, operation fixtures, input/output hash rules, Protocol/context stubs; contracts + QA | T01 | каждый mock operation имеет достаточный воспроизводимый сценарий; versions/hashes; consumer bindings валидируются |
 | T03 Минимальный execution slice | Documents.prepare real/mock → typed HTTP → trace → общий UI editor; platform + frontend | T01 | одно выполнение через HTTP/CLI/Playground, actual execution metadata, schema errors sanitized |
 | T04 Owner storage и receipts | migrations, DB-role isolation, artifacts, generic owner transaction helper, Documents.register/read; storage | T01 | roundtrip command/read, concurrent duplicate/conflict/crash, artifact hashes, scope isolation |
-| T05 Run History и gateway | реальные run/spans/dependency records, Runs.query, safe errors/metrics; platform | T03,T04 | history before/after failures, partial trace, actual timings, unknown cost; no secret echo |
+| T05 Run History и gateway | реальные run/spans/dependency records, Runs.query, safe errors/metrics; platform | T03,T04 | history before/after failures, partial trace, actual timings, unknown cost; no secret echo; trusted source/fixture classification policy gate перед любой записью full content и dependency egress; client `data_declaration` не даёт разрешения; deny-path не создаёт artifact или DB content |
 | T06 Policy и replay kernel | independent data gates, cassette matching, clock/RNG, replay denial; platform/security | T02,T05 | missing/changed records fail; blocked raw egress; canary tests; metadata-only replay unavailable |
 | T07 Sources и Documents завершение | Sources.fetch mock/test source adapter, Documents.prepare/register/read vertical slice; sources owner | T02,T04,T05 | все 4 operations API/UI/contracts; inline prepare без fetch; source timeout/empty; spans/hash |
 | T08 Understanding | classify/extract mocks, alternative mock, registered placeholders real; understanding owner | T02,T03,T05 | обе независимы; multi-label/multi-event/unknown, evidence spans; common tests/UI |
@@ -27,6 +27,10 @@
 | T18 Clean-room приёмка | fresh checkout + bootstrap + E01–E14 + review risks; команда | T15,T16,T17 | Framework Ready report, reproducible demo, all mandatory gates; algorithm/product отдельны |
 
 T06–T14 в dependency T16 означает все задачи T06,T07,T08,T09,T10,T11,T12,T13,T14. Dependencies не требуют готовых AI-моделей.
+
+## Открытые проверочные условия
+
+- T04: отсутствует PostgreSQL race test для двух конкурентных регистраций с разными `idempotency_key` и одинаковым `expected_revision`. Добавить проверку, что фиксируется одна новая ревизия, а проигравшая команда получает `ExpectedRevisionConflict`.
 
 Промежуточные slices не объявляются Framework Ready. T03 записывает настоящие spans через временный in-memory RunsWriter, без обещания персистентности/replay; T05 подключает persistent writer через тот же interface. T04 проверяет owner storage/transaction integration; окончательная HTTP-приёмка команд ждёт T05 с обязательной историей. Так trace в T03 и commands в T04 не создают циклическую зависимость от T05. Bootstrap/doctor T00 проверяют только уже доступные ресурсы; seed, 25-operation smoke и UI добавляются своими задачами и принимаются в T18.
 

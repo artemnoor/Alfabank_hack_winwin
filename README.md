@@ -1,6 +1,6 @@
 # Alfabank_hack_winwin
 
-[![Статус: T01 audit pass](https://img.shields.io/badge/status-T01%20audit%20pass-brightgreen)](docs/specs/framework-v1/10-implementation-plan.md)
+[![Статус: T07 merged](https://img.shields.io/badge/status-T07%20merged-brightgreen)](docs/specs/framework-v1/10-implementation-plan.md)
 [![Последний тег: v0.1.0-bootstrap](https://img.shields.io/badge/latest%20tag-v0.1.0--bootstrap-blue)](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap)
 [![Релиз: пока не опубликован](https://img.shields.io/badge/GitHub%20Release-not%20published-lightgrey)](https://github.com/artemnoor/Alfabank_hack_winwin/releases)
 [![Python 3.12.15](https://img.shields.io/badge/Python-3.12.15-3776AB?logo=python&logoColor=white)](toolchain.lock.json)
@@ -9,13 +9,13 @@
 
 > Модульный AI-каркас для хакатона Альфа-Банка: строгие контракты операций, заменяемые реализации, контролируемые моки и воспроизводимые запуски.
 
-Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. **T00 завершена; T01 содержит строгие контракты; T03 добавляет API-вертикальный срез `Documents.prepare` и минимальный Playground.** Остальные операции, постоянное хранилище запусков, полноценная история и replay ещё не реализованы.
+Это заготовка для быстрого приспособления к ещё не опубликованному кейсу, а не готовый аналитический продукт. **T00–T07 выполнены; PR #1–#7 объединены в main.** Реализованы строгие контракты, shared fixtures, общий execution slice, owner storage, Run History и Dependency Gateway, Policy & Replay Kernel и операции Sources/Documents. Replay поддерживается для операций с разрешёнными сохранёнными данными; большая часть 25 операций пока не реализована.
 
 ## Состояние проекта
 
 | Показатель | Состояние |
 |---|---|
-| Текущий этап | **T03: локальный API и workbench для `Documents.prepare`; интеграция ожидается** |
+| Текущий этап | **T00–T07 завершены; PR #1–#7 объединены в main; следующий этап — T08** |
 | Последний Git-тег | [`v0.1.0-bootstrap`](https://github.com/artemnoor/Alfabank_hack_winwin/tree/v0.1.0-bootstrap) |
 | GitHub Release | Пока не опубликован; тег отмечает bootstrap-снимок |
 | Framework Ready | Нет — запланирована приёмка T18 после реализации каркаса |
@@ -125,11 +125,14 @@ Bootstrap ставит точный CPython через закреплённый 
 | Этап | Результат | Статус |
 |---|---|---|
 | T00 | Toolchain, PostgreSQL, bootstrap и doctor | ✅ Выполнено |
-| T01 | Pydantic v2-модели, семантические валидаторы и типизированные descriptors 25 операций | Аудит PASS; исправления ожидают PR review |
-| T02 | Общие fixtures и публичные Protocol | После приёмки T01 |
-| T03 | Общий исполнитель, HTTP/CLI и минимальный Playground для `Documents.prepare` | Реализован локально; интеграция ожидается |
-| T04–T06 | Хранилище запусков, политики данных и replay | Запланировано |
-| T07–T14 | Sources/Documents, Understanding/Events, Business, Evidence, Graph и аналитические операции | Запланировано |
+| T01 | Pydantic v2-модели, семантические валидаторы и типизированные descriptors 25 операций | ✅ PR #1 объединён; аудит PASS |
+| T02 | Общие fixtures и публичные Protocol | ✅ PR #2 объединён |
+| T03 | Общий исполнитель, HTTP/CLI и минимальный Playground для `Documents.prepare` | ✅ PR #4 объединён |
+| T04 | Owner storage и receipts для Documents | ✅ PR #3 объединён |
+| T05 | Run History, Dependency Gateway и Runs.query | ✅ PR #5 объединён; post-merge suite пройден |
+| T06 | Policy & Replay Kernel | ✅ PR #6 объединён |
+| T07 | Sources & Documents: fetch, prepare, register и read | ✅ PR #7 объединён; post-merge: 172 теста, PostgreSQL register → replay проверен |
+| T08–T14 | Understanding/Events, Business, Evidence, Graph и аналитические операции | Запланировано |
 | T15–T17 | Playground, сценарии и CI readiness matrix | Запланировано |
 | T18 | Чистая приёмка, полный сквозной сценарий и отчёт Framework Ready | Запланировано |
 

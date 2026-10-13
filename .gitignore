@@ -2,6 +2,7 @@
 .local/
 .venv/
 **/node_modules/
+apps/playground/dist/
 
 # Workspace-local agent skills and their machine-specific source lock.
 .agents/

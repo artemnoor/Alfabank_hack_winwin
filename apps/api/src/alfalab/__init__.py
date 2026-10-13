@@ -1,1 +1,1 @@
-"""Internal API runtime package namespace."""
+"""Internal API runtime and execution kernel package."""

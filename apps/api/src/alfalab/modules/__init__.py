@@ -1,1 +1,1 @@
-"""Owner modules expose public operation Protocols from their public.py."""
+"""Owner operation modules expose shared contracts and local implementations."""

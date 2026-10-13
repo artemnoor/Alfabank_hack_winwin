@@ -1,1 +1,1 @@
-"""Documents owner public interfaces."""
+"""Documents owner public interfaces, operations, and implementations."""

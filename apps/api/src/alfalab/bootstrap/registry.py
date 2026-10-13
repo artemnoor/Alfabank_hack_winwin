@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Any
 
 from alfalab_contracts import (
+    FetchInput,
+    FetchOutput,
     ImplementationDescriptor,
     MockParameters,
     OperationDescriptor,
@@ -16,7 +18,11 @@ from alfalab_contracts import (
     PrepareOutput,
     QueryRunsInput,
     QueryRunsOutput,
+    ReadDocumentsInput,
+    ReadDocumentsOutput,
     RealPrepareParameters,
+    RegisterDocumentInput,
+    RegisterDocumentOutput,
 )
 from alfalab_contracts.registry import (
     OperationContract,
@@ -31,8 +37,12 @@ from alfalab.modules.documents.implementations.prepare import (
     BaselineMockPrepare,
     RealPrepare,
 )
+from alfalab.modules.documents.operations.read import ReadOperation
+from alfalab.modules.documents.operations.register import RegisterOperation
+from alfalab.modules.documents.storage.service import DocumentsStorage
 from alfalab.modules.runs.implementation import QueryRuns
 from alfalab.modules.runs.storage.repository import RunsRepository
+from alfalab.modules.sources.implementations.fetch import FetchOperation
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +103,8 @@ def create_runtime_registry(
     environment: str,
     runs_repository: RunsRepository,
     dependencies: dict[str, DependencyDefinition] | None = None,
+    *,
+    documents_storage: DocumentsStorage | None = None,
 ) -> RuntimeRegistry:
     source_registry, contracts = load_operation_registry()
     prepare_implementations = (
@@ -121,6 +133,56 @@ def create_runtime_registry(
         ("Documents.prepare", item.id, item.version): item
         for item in prepare_implementations
     }
+    fetch_implementation = RegisteredImplementation(
+        id="mock.baseline",
+        version="1.0.0",
+        kind="mock",
+        parameter_type=MockParameters,
+        payload_type=FetchInput,
+        output_type=FetchOutput,
+        execute=FetchOperation().execute,
+        configuration={"adapter": "approved-local-fixture-v1"},
+        dependency_ids=frozenset({"sources.fixture"}),
+    )
+    implementations[
+        ("Sources.fetch", fetch_implementation.id, fetch_implementation.version)
+    ] = fetch_implementation
+
+    if documents_storage is not None:
+        register_implementation = RegisteredImplementation(
+            id="mock.baseline",
+            version="1.0.0",
+            kind="mock",
+            parameter_type=MockParameters,
+            payload_type=RegisterDocumentInput,
+            output_type=RegisterDocumentOutput,
+            execute=RegisterOperation(documents_storage).execute,
+            configuration={"owner": "documents.postgres-v1"},
+            dependency_ids=frozenset({"documents.register.before_state"}),
+        )
+        read_implementation = RegisteredImplementation(
+            id="mock.baseline",
+            version="1.0.0",
+            kind="mock",
+            parameter_type=MockParameters,
+            payload_type=ReadDocumentsInput,
+            output_type=ReadDocumentsOutput,
+            execute=ReadOperation(documents_storage).execute,
+            configuration={"owner": "documents.postgres-v1"},
+            dependency_ids=frozenset(
+                {"documents.read.versions", "documents.read.receipt"}
+            ),
+        )
+        implementations[
+            (
+                "Documents.register",
+                register_implementation.id,
+                register_implementation.version,
+            )
+        ] = register_implementation
+        implementations[
+            ("Documents.read", read_implementation.id, read_implementation.version)
+        ] = read_implementation
     query_implementation = RegisteredImplementation(
         id="mock.baseline",
         version="1.0.0",
@@ -138,7 +200,23 @@ def create_runtime_registry(
     descriptors: dict[str, OperationDescriptor] = {}
     for entry in source_registry.operations:
         actual: list[ImplementationDescriptor] = []
-        if entry.operation_id == "Documents.prepare":
+        if entry.operation_id == "Sources.fetch" and environment in {
+            "development",
+            "testing",
+        }:
+            actual = [
+                ImplementationDescriptor(
+                    id="mock.baseline",
+                    version="1.0.0",
+                    kind="mock",
+                    available=True,
+                    reason=None,
+                    parameter_schema_id="MockParameters",
+                    capabilities=["deterministic", "registered_source_only"],
+                    environments=["development", "testing"],
+                )
+            ]
+        elif entry.operation_id == "Documents.prepare":
             if environment in {"development", "testing"}:
                 actual = [
                     ImplementationDescriptor(
@@ -162,6 +240,23 @@ def create_runtime_registry(
                         environments=["development", "testing"],
                     ),
                 ]
+        elif (
+            entry.operation_id in {"Documents.register", "Documents.read"}
+            and documents_storage is not None
+            and environment in {"development", "testing"}
+        ):
+            actual = [
+                ImplementationDescriptor(
+                    id="mock.baseline",
+                    version="1.0.0",
+                    kind="mock",
+                    available=True,
+                    reason=None,
+                    parameter_schema_id="MockParameters",
+                    capabilities=["postgres_owner", "scope_isolated"],
+                    environments=["development", "testing"],
+                )
+            ]
         elif entry.operation_id == "Runs.query" and environment in {
             "development",
             "testing",

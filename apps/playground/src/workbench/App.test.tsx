@@ -10,7 +10,6 @@ import { App } from "./App";
 type Catalog = components["schemas"]["CatalogOutput"];
 type ErrorResponse = components["schemas"]["ErrorResponse"];
 type PrepareResponse = components["schemas"]["Documents_prepareResponse"];
-type RunsQueryResponse = components["schemas"]["Runs_queryResponse"];
 type OperationDescriptor = components["schemas"]["OperationDescriptor"];
 
 const implementation: components["schemas"]["ImplementationDescriptor"] = {
@@ -32,7 +31,13 @@ const operations: OperationDescriptor[] = operationRegistry.operations.map((entr
   kind: entry.kind as OperationDescriptor["kind"],
   request_schema_id: entry.request_model,
   response_schema_id: entry.response_model,
-  implementations: ["Documents.prepare", "Runs.query"].includes(entry.operation_id) ? [implementation] : [],
+  implementations: [
+    "Sources.fetch",
+    "Documents.prepare",
+    "Documents.register",
+    "Documents.read",
+    "Runs.query",
+  ].includes(entry.operation_id) ? [implementation] : [],
   effects: [],
   replay_profile: entry.replay_profile as OperationDescriptor["replay_profile"],
 }));
@@ -48,10 +53,6 @@ const catalog: Catalog = {
 const exampleResponse = examples.examples.find(
   (example) => example.operation_id === "Documents.prepare",
 )?.response as PrepareResponse;
-const runsQueryResponse = examples.examples.find(
-  (example) => example.operation_id === "Runs.query",
-)?.response as RunsQueryResponse;
-
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -65,7 +66,13 @@ function installFetch(operationResponse: Response = jsonResponse(exampleResponse
     if (url.endsWith("/system/catalog")) return jsonResponse(catalog);
     if (url.endsWith("/openapi.json")) return jsonResponse(normativeOpenApi);
     if (url.endsWith("/api/v1/documents/prepare")) return operationResponse;
-    if (url.endsWith("/api/v1/runs/query")) return jsonResponse(runsQueryResponse);
+    const descriptor = operationRegistry.operations.find((entry) => url.endsWith(entry.path));
+    if (descriptor) {
+      const response = examples.examples.find(
+        (example) => example.operation_id === descriptor.operation_id,
+      )?.response;
+      return jsonResponse(response ?? {});
+    }
     return jsonResponse({}, 404);
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -121,6 +128,45 @@ describe("operation workbench", () => {
     );
     expect(operationCall?.[1]?.method).toBe("POST");
     expect(String(operationCall?.[1]?.body)).toContain('"include_artifacts":false');
+  });
+
+  it("selects Sources.fetch and Documents.register from the runtime catalog", async () => {
+    const fetchMock = installFetch();
+    const user = userEvent.setup();
+    render(<App />);
+    await connect(user);
+
+    await user.selectOptions(screen.getByLabelText("Operation"), "Sources.fetch");
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
+    expect(await screen.findByText(/Sources\.fetch completed\./)).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.some(([input]) => String(input).endsWith("/api/v1/sources/fetch")),
+    ).toBe(true);
+
+    await user.selectOptions(screen.getByLabelText("Operation"), "Documents.register");
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
+    expect(await screen.findByText(/Documents\.register completed\./)).toBeInTheDocument();
+    const registerCall = fetchMock.mock.calls.find(([input]) =>
+      String(input).endsWith("/api/v1/documents/register"),
+    );
+    expect(registerCall?.[1]?.method).toBe("POST");
+    expect(String(registerCall?.[1]?.body)).toContain('"expected_revision":0');
+  });
+
+  it("loads and schema-validates Run History without changing the selected operation", async () => {
+    const fetchMock = installFetch();
+    const user = userEvent.setup();
+    render(<App />);
+    await connect(user);
+    await user.click(screen.getByRole("button", { name: "Load recent history" }));
+
+    expect(await screen.findByText(/"operation_id": "Runs.query"/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Operation")).toHaveValue("Documents.prepare");
+    const queryCall = fetchMock.mock.calls.find(([input]) =>
+      String(input).endsWith("/api/v1/runs/query"),
+    );
+    expect(queryCall?.[1]?.method).toBe("POST");
+    expect(String(queryCall?.[1]?.body)).toContain('"include_artifacts":false');
   });
 
   it("focuses the editor and connects an inline error for invalid JSON", async () => {

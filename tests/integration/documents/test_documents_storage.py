@@ -11,6 +11,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from alfalab.common.limits import MAX_ARTIFACT_RESPONSE_BYTES
+from alfalab.execution.context import SystemDomainClock
 from alfalab.modules.documents.operations.read import ReadOperation
 from alfalab.modules.documents.operations.register import RegisterOperation
 from alfalab.modules.documents.storage.artifacts import (
@@ -19,6 +20,7 @@ from alfalab.modules.documents.storage.artifacts import (
 )
 from alfalab.modules.documents.storage.context import TrustedScope
 from alfalab.modules.documents.storage.errors import (
+    DocumentsPolicyDenied,
     DocumentsStorageError,
     ExpectedRevisionConflict,
     IdempotencyConflict,
@@ -123,9 +125,13 @@ def _payload(
 ):
     raw = _raw(f"raw-{document_id}", text, published_at=published_at)
     prepared_text = text.strip()
-    prepared_material = _raw(
-        f"prepared-{document_id}", prepared_text, published_at=published_at
+    prepared_material = raw.model_copy(
+        update={
+            "text": prepared_text,
+            "content_hash": _hash_text(prepared_text),
+        }
     )
+    trim_start = len(text) - len(text.lstrip())
     prepared = PreparedMaterial(
         material=prepared_material,
         raw_hash=raw.content_hash,
@@ -136,14 +142,14 @@ def _payload(
                 SpanMap(
                     prepared_start=0,
                     prepared_end=len(prepared_text),
-                    raw_start=0,
-                    raw_end=len(text),
+                    raw_start=trim_start,
+                    raw_end=trim_start + len(prepared_text),
                 )
             ]
             if prepared_text
             else []
         ),
-        warnings=[],
+        warnings=[] if prepared_text else ["empty_text"],
     )
     return RegisterDocumentInput(
         document_id=document_id,
@@ -173,6 +179,7 @@ def _context(
         implementation_id="documents.owner-storage",
         implementation_version="1.0.0",
         implementation_configuration_hash=_hash_text("documents-owner-storage-v1"),
+        domain_clock=SystemDomainClock(),
         principal=SimpleNamespace(
             tenant_id=tenant_id,
             actor_id="actor-test",
@@ -584,6 +591,78 @@ def test_register_requires_documents_register_permission(documents_storage):
     ]
 
 
+def test_register_denies_untrusted_material_before_owner_writes(
+    documents_engine, tmp_path
+):
+    from alfalab.modules.documents.storage.schema import documents
+
+    tenant, sandbox = _new_scope()
+    document_id = f"doc-{uuid.uuid4().hex}"
+    storage = DocumentsStorage(documents_engine, ArtifactStore(tmp_path / "artifacts"))
+    context = _context(
+        tenant,
+        sandbox,
+        key=f"key-{uuid.uuid4().hex}",
+        operation_id="Documents.register",
+    )
+
+    with pytest.raises(DocumentsPolicyDenied):
+        storage.register(_payload(document_id, 0, "Untrusted content"), context)
+
+    with documents_engine.connect() as connection:
+        assert (
+            connection.execute(
+                select(documents.c.document_id).where(
+                    documents.c.tenant_id == tenant,
+                    documents.c.sandbox_id == sandbox,
+                    documents.c.document_id == document_id,
+                )
+            ).first()
+            is None
+        )
+
+
+def test_documents_read_rejects_same_size_tampered_artifact(documents_engine, tmp_path):
+    tenant, sandbox = _new_scope()
+    document_id = f"doc-{uuid.uuid4().hex}"
+    artifact_root = tmp_path / "artifacts"
+    storage = DocumentsStorage(
+        documents_engine,
+        ArtifactStore(artifact_root),
+        trusted_material=lambda _material, _context: True,
+        trusted_content_hash=lambda _content_hash: True,
+    )
+    _register(
+        storage,
+        tenant,
+        sandbox,
+        _payload(document_id, 0, "Tamper detection material"),
+        f"key-{uuid.uuid4().hex}",
+    )
+    with documents_engine.connect() as connection:
+        artifact_hash = connection.execute(
+            select(versions.c.raw_artifact_hash).where(
+                versions.c.tenant_id == tenant,
+                versions.c.sandbox_id == sandbox,
+                versions.c.document_id == document_id,
+            )
+        ).scalar_one()
+    path = (
+        artifact_root
+        / "testing"
+        / tenant
+        / sandbox
+        / f"{artifact_hash.removeprefix('sha256:')}.json"
+    )
+    contents = bytearray(path.read_bytes())
+    contents[0] = ord(" ") if contents[0] != ord(" ") else ord("!")
+    path.write_bytes(contents)
+
+    with pytest.raises(ArtifactIntegrityError) as error:
+        _read(storage, tenant, sandbox, document_id)
+    assert "Tamper detection material" not in str(error.value)
+
+
 def test_register_rejects_span_map_outside_raw_text_before_commit(documents_storage):
     tenant, sandbox = _new_scope()
     document_id = f"doc-{uuid.uuid4().hex}"
@@ -704,6 +783,62 @@ def test_concurrent_duplicate_returns_one_atomic_commit(documents_storage):
             )
         ).all()
     assert len(version_count) == len(receipt_count) == len(audit_count) == 1
+
+
+def test_concurrent_distinct_keys_same_expected_revision_conflict_atomically(
+    documents_storage,
+):
+    tenant, sandbox = _new_scope()
+    document_id = f"doc-{uuid.uuid4().hex}"
+    keys = (f"key-{uuid.uuid4().hex}", f"key-{uuid.uuid4().hex}")
+    payload = _payload(document_id, 0, "Одновременные независимые команды")
+
+    def call(key: str, run_id: str):
+        try:
+            return (
+                "success",
+                _register(
+                    documents_storage, tenant, sandbox, payload, key, run_id=run_id
+                ),
+            )
+        except ExpectedRevisionConflict:
+            return ("conflict", None)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [
+            pool.submit(call, keys[0], "run-distinct-key-a"),
+            pool.submit(call, keys[1], "run-distinct-key-b"),
+        ]
+        results = [future.result(timeout=20) for future in futures]
+    assert sorted(result[0] for result in results) == ["conflict", "success"]
+    winner_index = next(
+        index for index, result in enumerate(results) if result[0] == "success"
+    )
+
+    with documents_storage._engine.connect() as connection:
+        revisions = connection.execute(
+            select(versions.c.revision).where(
+                versions.c.tenant_id == tenant,
+                versions.c.sandbox_id == sandbox,
+                versions.c.document_id == document_id,
+            )
+        ).all()
+        receipts = connection.execute(
+            select(command_receipts.c.idempotency_key).where(
+                command_receipts.c.tenant_id == tenant,
+                command_receipts.c.sandbox_id == sandbox,
+                command_receipts.c.operation_id == "Documents.register",
+            )
+        ).all()
+        audits = connection.execute(
+            select(audit_entries.c.audit_id).where(
+                audit_entries.c.tenant_id == tenant,
+                audit_entries.c.sandbox_id == sandbox,
+            )
+        ).all()
+    assert revisions == [(1,)]
+    assert receipts == [(keys[winner_index],)]
+    assert len(audits) == 1
 
 
 def test_failure_after_commit_replays_saved_response(documents_storage):
@@ -854,11 +989,21 @@ def test_operation_adapters_preserve_typed_register_read_contract(documents_stor
         key=f"key-{uuid.uuid4().hex}",
         operation_id="Documents.register",
     )
+    context.dependency_gateway = SimpleNamespace(
+        invoke=lambda dependency_id, request: (
+            documents_storage.capture_register_before_state(request, context)
+        )
+    )
     registered = RegisterOperation(documents_storage).execute(
         _payload(document_id, 0, "Operation protocol roundtrip"),
         context,
     )
     read_context = _context(tenant, sandbox, key=None, operation_id="Documents.read")
+    read_context.dependency_gateway = SimpleNamespace(
+        invoke=lambda dependency_id, request: documents_storage.read(
+            ReadDocumentsInput(query=request), read_context
+        )
+    )
     read = ReadOperation(documents_storage).execute(
         ReadDocumentsInput(
             query=DocumentSelection(

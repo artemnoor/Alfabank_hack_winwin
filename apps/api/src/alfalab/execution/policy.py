@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
-from alfalab_contracts import DataPolicyDecision, VersionedRef
+from alfalab_contracts import (
+    DataPolicyDecision,
+    RawMaterial,
+    ReadDocumentsInput,
+    VersionedRef,
+)
 
 TrustedClassification = Literal["synthetic", "public", "closed", "secret"]
 
@@ -37,8 +42,100 @@ class ResolvedPolicy:
 class TrustedDataPolicyResolver:
     """Resolve only server-registered sources; ignore caller declarations."""
 
-    def __init__(self, sources: Mapping[str, TrustedSource] | None = None) -> None:
+    def __init__(
+        self,
+        sources: Mapping[str, TrustedSource] | None = None,
+        *,
+        approved_content_hashes: frozenset[str] = frozenset(),
+        material_validator: Callable[[RawMaterial, str, frozenset[str]], bool]
+        | None = None,
+        document_hash_resolver: Callable[..., tuple[str, ...]] | None = None,
+    ) -> None:
         self._sources = dict(sources or {})
+        self._approved_content_hashes = approved_content_hashes
+        self._material_validator = material_validator
+        self._document_hash_resolver = document_hash_resolver
+
+    def resolve_source(self, source_id: str) -> ResolvedPolicy:
+        """Resolve a registered source without accepting a client declaration."""
+        source = self._sources.get(source_id)
+        if source is None:
+            return self._decision(
+                classification="unknown",
+                processing_allowed=False,
+                egress_allowed=False,
+                recording="metadata_only",
+                export_allowed=False,
+                reason="UNREGISTERED_SOURCE",
+            )
+        return self._trusted(source_id, source, payload_hash=None)
+
+    def resolve_material(
+        self,
+        material: RawMaterial,
+        *,
+        payload_hash: str,
+        tenant_id: str,
+        allowed_sandboxes: frozenset[str],
+    ) -> ResolvedPolicy:
+        """Trust exact approved material or an exact approved operation fixture."""
+        legacy_source_id = material.source_id or material.material_id
+        legacy = self.resolve(legacy_source_id, payload_hash=payload_hash)
+        if legacy.decision.classification in {"synthetic", "public"}:
+            return legacy
+        source_id = material.source_id or ""
+        source = self._sources.get(source_id)
+        if (
+            source is None
+            or self._material_validator is None
+            or not self._material_validator(material, tenant_id, allowed_sandboxes)
+        ):
+            return legacy
+        return self._trusted(source_id, source, payload_hash=material.content_hash)
+
+    def resolve_document_read(
+        self,
+        payload: ReadDocumentsInput,
+        *,
+        tenant_id: str,
+        sandbox_id: str,
+        environment: str = "testing",
+    ) -> ResolvedPolicy:
+        """Classify selected owner rows from scoped metadata before loading blobs."""
+        if self._document_hash_resolver is None:
+            return self._decision(
+                classification="unknown",
+                processing_allowed=True,
+                egress_allowed=False,
+                recording="metadata_only",
+                export_allowed=False,
+                reason="DOCUMENT_POLICY_UNAVAILABLE",
+            )
+        hashes = self._document_hash_resolver(
+            payload,
+            tenant_id=tenant_id,
+            sandbox_id=sandbox_id,
+            environment=environment,
+        )
+        if hashes and all(value in self._approved_content_hashes for value in hashes):
+            source = next(
+                (
+                    item
+                    for item in self._sources.values()
+                    if item.classification == "synthetic" and item.recording == "full"
+                ),
+                None,
+            )
+            if source is not None:
+                return self._trusted("Documents.read", source, payload_hash=None)
+        return self._decision(
+            classification="unknown",
+            processing_allowed=not hashes,
+            egress_allowed=False,
+            recording="metadata_only",
+            export_allowed=False,
+            reason="DOCUMENT_CONTENT_NOT_APPROVED_FOR_RECORDING",
+        )
 
     def resolve(
         self,
@@ -81,6 +178,15 @@ class TrustedDataPolicyResolver:
                     else "SECRET_DATA_DENIED"
                 ),
             )
+        return self._trusted(source_id, source, payload_hash=payload_hash)
+
+    def _trusted(
+        self,
+        source_id: str,
+        source: TrustedSource,
+        *,
+        payload_hash: str | None,
+    ) -> ResolvedPolicy:
         return self._decision(
             classification=source.classification,
             processing_allowed=source.processing_allowed,

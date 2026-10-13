@@ -35,6 +35,7 @@ class DependencyDefinition:
     # Set only by the server registry after confirming its secret inventory is exhaustive.
     secret_inventory_complete: bool = False
     model_identity: ModelIdentity | None = None
+    requires_egress: bool = True
 
 
 class ControlledDependencyGateway:
@@ -85,7 +86,7 @@ class ControlledDependencyGateway:
                 category="policy",
                 safe_message="The active data policy denied this dependency attempt.",
             )
-        if not self._policy.egress_allowed:
+        if definition.requires_egress and not self._policy.egress_allowed:
             self._record_denied(definition, reason="egress-denied")
             raise SafeExecutionError(
                 status_code=403,

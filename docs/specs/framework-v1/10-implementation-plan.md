@@ -1,6 +1,6 @@
 # План реализации и параллельная разработка
 
-Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01 объединена в main через PR #1. T02 (PR #2), T03 (PR #4) и T04 (PR #3) объединены в main последовательными merge commits и прошли интеграционную приёмку; ancestry stacked PR сохранён. T05 (PR #5) объединена в main; её интеграционная приёмка завершена. Выполняется T06; T07–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
+Текущее состояние: T00 выполнена; bootstrap и doctor проверены на Windows и в Linux userland через WSL. T01 объединена в main через PR #1. T02 (PR #2), T03 (PR #4) и T04 (PR #3) объединены в main последовательными merge commits и прошли интеграционную приёмку; ancestry stacked PR сохранён. T05 (PR #5) объединена в main; её интеграционная приёмка завершена. T06 (PR #6) объединена в main merge commit `428a8e0cac3adb70280e739b5032b0b5d8b43e72`. Выполняется T07 в ветке `codex/t07-sources-documents`; T08–T18 не начаты. Отдельная проверка на native Linux-хосте и повторная clean-room приёмка остаются в T18. Архитектурных развилок для исполнителя в этих задачах нет; выявленный конфликт или неоднозначность поднимается в spec review.
 
 ## Этапы и блокировки
 
@@ -12,8 +12,8 @@
 | T03 Минимальный execution slice | Documents.prepare real/mock → typed HTTP → trace → общий UI editor; platform + frontend | T01 | одно выполнение через HTTP/CLI/Playground, actual execution metadata, schema errors sanitized |
 | T04 Owner storage и receipts | migrations, DB-role isolation, artifacts, generic owner transaction helper, Documents.register/read; storage | T01 | roundtrip command/read, concurrent duplicate/conflict/crash, artifact hashes, scope isolation |
 | T05 Run History и gateway | реальные run/spans/dependency records, Runs.query, safe errors/metrics; platform | T03,T04 | PostgreSQL history before/after operation and database failures; complete/partial/metadata_only traces with actual timings and dependency attempts; stable REPEATABLE READ snapshot across pages despite concurrent status/span/dependency changes and newly arriving runs; tenant/sandbox isolation and current-query exclusion; denied artifacts never leave through Runs.query; artifact reads are size-bounded; no secret echo; trusted source/fixture classification policy gate перед любой записью full content и dependency egress; client `data_declaration` не даёт разрешения; deny-path не создаёт artifact или DB content |
-| T06 Policy и replay kernel | independent data gates, cassette matching, clock/RNG, replay denial; platform/security | T02,T05 | missing/changed records fail; blocked raw egress; canary tests; metadata-only replay unavailable |
-| T07 Sources и Documents завершение | Sources.fetch mock/test source adapter, Documents.prepare/register/read vertical slice; sources owner | T02,T04,T05 | все 4 operations API/UI/contracts; inline prepare без fetch; source timeout/empty; spans/hash |
+| T06 Policy и replay kernel — объединена в main (PR #6) | independent data gates, cassette matching, clock/RNG, replay denial; platform/security | T02,T05 | Merge commit `428a8e0cac3adb70280e739b5032b0b5d8b43e72`; replay для Runs.query remains unavailable без одобренного owner-read snapshot |
+| T07 Sources и Documents — выполняется | Sources.fetch mock/test source adapter, Documents.prepare/register/read vertical slice; sources owner | T02,T04,T05,T06 | все 4 operations API/CLI/Playground; approved-source provenance; PostgreSQL owner transactions/receipts; strict source/owner-read/restore-state replay; no network fallback |
 | T08 Understanding | classify/extract mocks, alternative mock, registered placeholders real; understanding owner | T02,T03,T05 | обе независимы; multi-label/multi-event/unknown, evidence spans; common tests/UI |
 | T09 Events | propose_resolution/apply/read с isolated state; events owner | T02,T04,T05 | snapshot-only proposal; create/attach/correct/merge/split/defer; no silent overwrite; receipts/history |
 | T10 Business | profile/questions/apply/read; business owner | T02,T04,T05 | sparse/conflicting profile, skips/declines, stateful commands, independent tests/UI |
@@ -30,7 +30,7 @@ T06–T14 в dependency T16 означает все задачи T06,T07,T08,T09
 
 ## Открытые проверочные условия
 
-- T04: отсутствует PostgreSQL race test для двух конкурентных регистраций с разными `idempotency_key` и одинаковым `expected_revision`. Добавить проверку, что фиксируется одна новая ревизия, а проигравшая команда получает `ExpectedRevisionConflict`.
+- T04: долг конкурентной регистрации закрыт в T07 PostgreSQL regression test: разные `idempotency_key` с одинаковым `expected_revision` оставляют ровно одну новую ревизию/receipt/audit; проигравшая команда получает `ExpectedRevisionConflict`.
 - T04: `Documents.read` не может вернуть нормативное предупреждение для неизвестного `published_at`: утверждённые `DocumentVersion` и `DocumentResult` не содержат поля предупреждения. Оставить предупреждение отложенным; не менять OpenAPI до отдельного решения по контракту.
 - T05: конкурентное создание query snapshots не проверено отдельным PostgreSQL race test; проверка лимита активных snapshots и их вставка пока не сериализованы.
 - T05: snapshot собирается в памяти до проверки итогового byte limit, поэтому текущий лимит не ограничивает пиковое потребление памяти.

@@ -1,0 +1,4 @@
+"""Shared execution response limits."""
+
+MAX_ARTIFACT_RESPONSE_BYTES = 2 * 1024 * 1024
+ARTIFACT_RESPONSE_ENVELOPE_RESERVE_BYTES = 64 * 1024

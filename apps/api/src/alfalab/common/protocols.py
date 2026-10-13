@@ -8,12 +8,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Generic, Protocol, TypeVar, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from alfalab_contracts import ArtifactRef, ArtifactView, EvidenceRecord, ObjectRef
-
-InputT = TypeVar("InputT", contravariant=True)
-OutputT = TypeVar("OutputT", covariant=True)
 
 
 @runtime_checkable
@@ -168,10 +165,12 @@ class OperationContext(Protocol):
 
 
 @runtime_checkable
-class OperationImplementation(Protocol, Generic[InputT, OutputT]):
+class OperationImplementation[InputT_contra, OutputT_co](Protocol):
     """Typed operation port: payload plus trusted context produces typed output."""
 
-    def execute(self, payload: InputT, context: OperationContext, /) -> OutputT: ...
+    def execute(
+        self, payload: InputT_contra, context: OperationContext, /
+    ) -> OutputT_co: ...
 
 
 class TrustedContextError(ValueError):
@@ -182,9 +181,13 @@ def validate_trusted_scope(context: OperationContext) -> None:
     """Check duplicated context scope before an operation receives it."""
     principal = context.principal
     if context.tenant_id != principal.tenant_id:
-        raise TrustedContextError("operation tenant does not match authenticated principal")
+        raise TrustedContextError(
+            "operation tenant does not match authenticated principal"
+        )
     if context.sandbox_id not in principal.allowed_sandboxes:
-        raise TrustedContextError("operation sandbox is not authorized for authenticated principal")
+        raise TrustedContextError(
+            "operation sandbox is not authorized for authenticated principal"
+        )
 
 
 __all__ = [

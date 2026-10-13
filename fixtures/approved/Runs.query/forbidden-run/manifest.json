@@ -7,11 +7,11 @@
       "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
       "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
       "dataset_id": "radio-export-v1",
-      "snapshot_id": "baseline",
+      "snapshot_id": "foreign-scope",
       "version": "1.0.0"
     }
   ],
-  "case_id": "missing",
+  "case_id": "forbidden-run",
   "cassette_refs": [],
   "classification": "synthetic",
   "contract_version": "1.0.0",
@@ -20,24 +20,16 @@
     "output_hash_rule": {
       "algorithm": "sha256",
       "canonicalization": "canonical-json-v1",
-      "exclude_json_pointers": [
-        "/receipt/committed_at"
-      ],
       "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
       "scope": "response.payload"
     },
     "response_schema_id": "Runs_queryResponse",
     "rules": [
       {
-        "id": "missing-target-is-explicitly-reported",
-        "operation_id": "Runs.query"
+        "id": "foreign-run-is-omitted"
       },
       {
-        "id": "read-does-not-mutate-owner-state"
-      },
-      {
-        "id": "response-matches-public-schema",
-        "schema_id": "Runs_queryResponse"
+        "id": "foreign-run-existence-is-not-disclosed"
       }
     ]
   },
@@ -45,13 +37,13 @@
     "canonicalization": "canonical-json-v1",
     "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
     "expected_result_scope": "expected result and output hash rules",
-    "output_scope": "response.payload",
+    "output_scope": "safe-error-fields",
     "request_scope": "complete wire request JSON"
   },
   "hashes": {
-    "deterministic_input": "sha256:437e5465ec2e4456d2cf43f1cf31a432639c4ed88517d373e68dc0cdfcc076a4",
-    "expected_result": "sha256:94d89c2aad986a37b58538e469b5b75cd67db5ad6b7fe861957f34b18f64dca3",
-    "request": "sha256:fb28bda483d284c47067ca2d9d5ae84652e38dbda7148d1d979872f3b043c6bb"
+    "deterministic_input": "sha256:68d9d304ec292f7d927ee2599a58376dc733f160c73ed0e6c8e2c04fd3ca810d",
+    "expected_result": "sha256:ae503c2299d06f54ebff2ef47800669d259789a29f82d513c95452cb748540d6",
+    "request": "sha256:d712d0a6471639d9ec4e43c5a7ade73695f26abe321293589bcb1e034cd1f334"
   },
   "operation_id": "Runs.query",
   "request": {
@@ -77,11 +69,11 @@
       "limit": 1,
       "operation_id": null,
       "run_ids": [
-        "fixture-object-that-does-not-exist"
+        "foreign-run-1"
       ],
       "scenario_id": null
     },
-    "request_id": "fixture-22-missing",
+    "request_id": "fixture-22-forbidden-run",
     "sandbox_id": "fixtures-t02"
   },
   "request_model": "Runs_queryRequest",

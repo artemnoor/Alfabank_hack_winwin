@@ -7,33 +7,31 @@
       "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
       "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
       "dataset_id": "radio-export-v1",
-      "snapshot_id": "foreign-scope",
+      "snapshot_id": "baseline",
       "version": "1.0.0"
     }
   ],
-  "case_id": "forbidden",
+  "case_id": "failed-partial-trace",
   "cassette_refs": [],
   "classification": "synthetic",
   "contract_version": "1.0.0",
   "expected_result": {
-    "error_schema_id": "ErrorResponse",
-    "kind": "safe_error",
+    "kind": "result",
     "output_hash_rule": {
       "algorithm": "sha256",
       "canonicalization": "canonical-json-v1",
-      "expected_digest": "computed-from-execution",
-      "scope": "safe-error-fields"
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
     },
+    "response_schema_id": "Runs_queryResponse",
     "rules": [
       {
-        "id": "foreign-sandbox-object-is-denied",
-        "safe_error_code": "FORBIDDEN"
+        "expected_status": "failed",
+        "id": "failed-run-remains-queryable"
       },
       {
-        "id": "do-not-return-foreign-object-or-content"
-      },
-      {
-        "id": "read-does-not-mutate-owner-state"
+        "expected_trace_status": "partial",
+        "id": "partial-trace-status-is-preserved"
       }
     ]
   },
@@ -41,13 +39,13 @@
     "canonicalization": "canonical-json-v1",
     "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
     "expected_result_scope": "expected result and output hash rules",
-    "output_scope": "safe-error-fields",
+    "output_scope": "response.payload",
     "request_scope": "complete wire request JSON"
   },
   "hashes": {
-    "deterministic_input": "sha256:c2a6d47057ac01b28d000e2b8080eee1c2b4fe29bcc5bae3578bb67d1fee6d65",
-    "expected_result": "sha256:23a6dcaeeff6407f7286ac14a5fa1eddd72d3349cb55192b340c398c73f5d62c",
-    "request": "sha256:b32f00ec370672122c3d13e6e56123955fc1a0d657301503ca7fdfa46a2eae22"
+    "deterministic_input": "sha256:1311fe652fc3776c2638af56ac35180a6d1dda5ceab90cc0e48e587647a3e88a",
+    "expected_result": "sha256:4e1bc5dc3f8b80a8ddbc7181c03a0035ce7a7aeaf22e8be3d68c6868059af95c",
+    "request": "sha256:f95b409871c05780640e6fabc15afe9b79ad09f057bbcc623930e41be03dcc6c"
   },
   "operation_id": "Runs.query",
   "request": {
@@ -73,11 +71,11 @@
       "limit": 1,
       "operation_id": null,
       "run_ids": [
-        "foreign-run-1"
+        "fixture-failed-run"
       ],
       "scenario_id": null
     },
-    "request_id": "fixture-22-forbidden",
+    "request_id": "fixture-22-failed-partial-trace",
     "sandbox_id": "fixtures-t02"
   },
   "request_model": "Runs_queryRequest",

@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TextIO
 
+from alfalab_contracts import ErrorResponse
 from pydantic import ValidationError
 
 from alfalab.bootstrap.runtime import ExecutionRuntime, create_execution_runtime
@@ -16,7 +17,6 @@ from alfalab.bootstrap.settings import ApiSettings
 from alfalab.execution.context import TrustedPrincipal
 from alfalab.execution.errors import SafeExecutionError
 from alfalab.transport.errors import safe_error_body
-from alfalab_contracts import ErrorResponse
 
 
 def _write_json(stream: TextIO, value: object) -> None:
@@ -55,7 +55,9 @@ def _read_bounded_input(
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="alfalab")
     subparsers = parser.add_subparsers(dest="operation", required=True)
-    prepare_parser = subparsers.add_parser("prepare", help="execute Documents.prepare from JSON")
+    prepare_parser = subparsers.add_parser(
+        "prepare", help="execute Documents.prepare from JSON"
+    )
     prepare_parser.add_argument(
         "--request",
         type=Path,
@@ -91,7 +93,11 @@ def run_cli(
 
     try:
         runtime_settings = settings or ApiSettings.from_environment()
-        execution_runtime = runtime or create_execution_runtime(runtime_settings.environment)
+        execution_runtime = runtime or create_execution_runtime(
+            runtime_settings.environment,
+            runs_database_url=runtime_settings.runs_database_url,
+            artifact_root=runtime_settings.artifact_root,
+        )
     except (OSError, ValueError, ValidationError):
         _write_json(
             error_stream,
@@ -151,7 +157,7 @@ def run_cli(
         tenant_id=runtime_settings.tenant_id,
         role="developer",
         allowed_sandboxes=runtime_settings.allowed_sandboxes,
-        permissions=frozenset({"documents.prepare", "catalog.read"}),
+        permissions=frozenset({"Documents.prepare", "catalog.read"}),
     )
     try:
         response = execution_runtime.execution_service.invoke(

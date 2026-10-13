@@ -1,0 +1,1 @@
+"""Runs owner storage adapters."""

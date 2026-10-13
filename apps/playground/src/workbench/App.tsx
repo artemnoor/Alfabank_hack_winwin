@@ -1,20 +1,23 @@
 import Ajv, { type AnySchema, type ValidateFunction } from "ajv";
 import { useMemo, useRef, useState } from "react";
 import prepareExamples from "../../../../docs/specs/framework-v1/contracts/examples.json";
-import type { components, paths } from "../api/openapi";
+import type { components } from "../api/openapi";
 
 type Catalog = components["schemas"]["CatalogOutput"];
 type OperationDescriptor = components["schemas"]["OperationDescriptor"];
 type PrepareRequest = components["schemas"]["Documents_prepareRequest"];
 type PrepareResponse = components["schemas"]["Documents_prepareResponse"];
-type PreparePost = NonNullable<paths["/api/v1/documents/prepare"]["post"]>;
-type PrepareRequestFromPath = NonNullable<PreparePost["requestBody"]>["content"]["application/json"];
-type PrepareResponseFromPath = PreparePost["responses"][200]["content"]["application/json"];
+type RunsQueryRequest = components["schemas"]["Runs_queryRequest"];
+type RunsQueryResponse = components["schemas"]["Runs_queryResponse"];
+type SupportedRequest = PrepareRequest | RunsQueryRequest;
+type SupportedResponse = PrepareResponse | RunsQueryResponse;
+type SupportedOperationId = "Documents.prepare" | "Runs.query";
 
 const OPENAPI_ID = "http://alfalab.local/runtime-openapi.json";
-const prepareExample = prepareExamples.examples.find(
-  (example) => example.operation_id === "Documents.prepare",
-);
+const supportedOperationIds: SupportedOperationId[] = ["Documents.prepare", "Runs.query"];
+const exampleFor = (operationId: SupportedOperationId) =>
+  prepareExamples.examples.find((example) => example.operation_id === operationId);
+const prepareExample = exampleFor("Documents.prepare");
 const initialRequest = JSON.stringify(
   { ...prepareExample?.request, sandbox_id: "demo-a" },
   null,
@@ -94,6 +97,7 @@ export function App() {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [openApi, setOpenApi] = useState<unknown>(null);
   const [sandboxId, setSandboxId] = useState("demo-a");
+  const [operationId, setOperationId] = useState<SupportedOperationId>("Documents.prepare");
   const [implementationId, setImplementationId] = useState("mock.baseline");
   const [requestText, setRequestText] = useState(initialRequest);
   const [requestError, setRequestError] = useState("");
@@ -102,11 +106,11 @@ export function App() {
   const [status, setStatus] = useState("Connect to the local API to load the request schema.");
   const requestEditor = useRef<HTMLTextAreaElement>(null);
 
-  const prepareDescriptor: OperationDescriptor | undefined = useMemo(
-    () => catalog?.operations.find((operation) => operation.operation_id === "Documents.prepare"),
-    [catalog],
+  const operationDescriptor: OperationDescriptor | undefined = useMemo(
+    () => catalog?.operations.find((operation) => operation.operation_id === operationId),
+    [catalog, operationId],
   );
-  const availableImplementations = prepareDescriptor?.implementations.filter(
+  const availableImplementations = operationDescriptor?.implementations.filter(
     (item) => item.available,
   ) ?? [];
 
@@ -153,11 +157,14 @@ export function App() {
         setStatus("The local API catalog does not match the published contract.");
         return false;
       }
-      const operation = catalogBody.operations.find(
-        (entry) => entry.operation_id === "Documents.prepare",
+      const supportedOperations = supportedOperationIds.map((id) =>
+        catalogBody.operations.find((entry) => entry.operation_id === id),
       );
-      if (!operation || operation.implementations.every((implementation) => !implementation.available)) {
-        setStatus("Documents.prepare has no available implementation in this API build.");
+      const unavailable = supportedOperations.find(
+        (operation) => !operation || operation.implementations.every((implementation) => !implementation.available),
+      );
+      if (unavailable) {
+        setStatus("Documents.prepare and Runs.query must both be available in this API build.");
         return false;
       }
 
@@ -166,9 +173,10 @@ export function App() {
       setOpenApi(schemaBody);
       const firstSandbox = catalogBody.allowed_sandboxes[0];
       if (firstSandbox) setSandboxId(firstSandbox);
-      const firstImplementation = operation.implementations.find((item) => item.available);
+      const selectedOperation = supportedOperations.find((entry) => entry?.operation_id === operationId)!;
+      const firstImplementation = selectedOperation.implementations.find((item) => item.available);
       if (firstImplementation) setImplementationId(firstImplementation.id);
-      setStatus(`Connected. ${operation.implementations.filter((item) => item.available).length} prepare implementation(s) available.`);
+      setStatus(`Connected. ${supportedOperationIds.length} operations are available from this API build.`);
       return true;
     } catch {
       setStatus("Could not reach the local API. Check that it is running and try again.");
@@ -208,28 +216,39 @@ export function App() {
     setStatus("Request controls updated the JSON editor.");
   }
 
-  function loadExample() {
-    if (!prepareExample) {
-      setStatus("No Documents.prepare example is available in the contract examples file.");
+  function changeOperation(value: string) {
+    if (!supportedOperationIds.includes(value as SupportedOperationId)) return;
+    const selectedId = value as SupportedOperationId;
+    setOperationId(selectedId);
+    const descriptor = catalog?.operations.find((operation) => operation.operation_id === selectedId);
+    const nextImplementation = descriptor?.implementations.find((item) => item.available);
+    if (nextImplementation) setImplementationId(nextImplementation.id);
+    const example = exampleFor(selectedId);
+    if (!example) {
+      setStatus(`No ${selectedId} example is available in the contract examples file.`);
       return;
     }
-    const example = JSON.parse(JSON.stringify(prepareExample.request)) as Record<string, unknown>;
-    example.sandbox_id = sandboxId;
-    const implementation = availableImplementations.find((item) => item.id === implementationId);
+    const request = JSON.parse(JSON.stringify(example.request)) as Record<string, unknown>;
+    request.sandbox_id = sandboxId;
+    const implementation = nextImplementation ?? descriptor?.implementations.find((item) => item.id === implementationId);
     if (implementation) {
-      example.implementation = {
+      request.implementation = {
         id: implementation.id,
         version: implementation.version,
         parameters: implementation.kind === "mock" ? { scenario: "default" } : {},
       };
     }
-    setRequestText(JSON.stringify(example, null, 2));
+    setRequestText(JSON.stringify(request, null, 2));
     setRequestError("");
     setResult("");
-    setStatus("Loaded the synthetic schema example. Review the request before running it.");
+    setStatus(`Loaded the ${selectedId} schema example. Review the request before running it.`);
   }
 
-  async function runPrepare() {
+  function loadExample() {
+    changeOperation(operationId);
+  }
+
+  async function runOperation() {
     setResult("");
     setRequestError("");
     let body: unknown;
@@ -239,17 +258,17 @@ export function App() {
       focusRequestError("This is not valid JSON. Correct the syntax and try again.");
       return;
     }
-    if (!prepareDescriptor || !openApi || !catalog) {
+    if (!operationDescriptor || !openApi || !catalog) {
       setStatus("Connect to the local API first so the request can be validated against its schema.");
       return;
     }
-    const requestValidator = makeValidator<PrepareRequest>(openApi, prepareDescriptor.request_schema_id);
+    const requestValidator = makeValidator<SupportedRequest>(openApi, operationDescriptor.request_schema_id);
     if (!requestValidator) {
       setStatus("The request schema is missing from the loaded OpenAPI document.");
       return;
     }
     if (!requestValidator(body)) {
-      focusRequestError("The JSON does not match the Documents.prepare request schema.");
+      focusRequestError(`The JSON does not match the ${operationId} request schema.`);
       return;
     }
 
@@ -260,16 +279,16 @@ export function App() {
     }
 
     setBusy(true);
-    setStatus("Running Documents.prepare…");
+    setStatus(`Running ${operationId}…`);
     try {
-      const response = await fetch(`${normalizedUrl}${prepareDescriptor.path}`, {
-        method: prepareDescriptor.method,
+      const response = await fetch(`${normalizedUrl}${operationDescriptor.path}`, {
+        method: operationDescriptor.method,
         redirect: "error",
         headers: {
           Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body satisfies PrepareRequestFromPath),
+        body: JSON.stringify(body),
       });
       const responseBody = await readJson(response);
       if (!response.ok) {
@@ -279,18 +298,18 @@ export function App() {
         return;
       }
 
-      const responseValidator = makeValidator<PrepareResponse>(
+      const responseValidator = makeValidator<SupportedResponse>(
         openApi,
-        prepareDescriptor.response_schema_id,
+        operationDescriptor.response_schema_id,
       );
       if (!responseValidator || !responseValidator(responseBody)) {
         setResult("The API response did not match its published response schema.");
         setStatus("The API returned a response that could not be verified.");
         return;
       }
-      const typedResponse: PrepareResponseFromPath = responseBody;
-      setResult(JSON.stringify(typedResponse, null, 2));
-      setStatus(`Documents.prepare completed. Run ${typedResponse.meta.run_id}.`);
+      setResult(JSON.stringify(responseBody, null, 2));
+      const runId = isRecord(responseBody) && isRecord(responseBody.meta) ? responseBody.meta.run_id : null;
+      setStatus(`${operationId} completed${typeof runId === "string" ? `. Run ${runId}.` : "."}`);
     } catch {
       setResult("Could not reach the local API. Check that it is running and try again.");
       setStatus("The operation could not reach the local API.");
@@ -304,9 +323,9 @@ export function App() {
       <header className="page-header">
         <div>
           <p className="eyebrow">AlfaLab · Local developer tool</p>
-          <h1>Prepare workbench</h1>
+          <h1>Operation workbench</h1>
           <p className="intro">
-            Validate and run <code>Documents.prepare</code> against the local API. The schema and
+            Validate and run supported operations against the local API. The schema and
             operation catalog come from this API build.
           </p>
         </div>
@@ -357,7 +376,7 @@ export function App() {
         <section className="panel request-panel" aria-labelledby="request-title">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Operation · POST /api/v1/documents/prepare</p>
+              <p className="eyebrow">Operation · {operationDescriptor?.method ?? "POST"} {operationDescriptor?.path ?? "/api/v1/documents/prepare"}</p>
               <h2 id="request-title">Request JSON</h2>
             </div>
             <button className="secondary-button" type="button" onClick={loadExample}>
@@ -366,6 +385,17 @@ export function App() {
           </div>
 
           <div className="request-controls">
+            <label>
+              Operation
+              <select
+                aria-label="Operation"
+                value={operationId}
+                disabled={!catalog}
+                onChange={(event) => changeOperation(event.target.value)}
+              >
+                {supportedOperationIds.map((id) => <option key={id} value={id}>{id}</option>)}
+              </select>
+            </label>
             <label>
               Implementation
               <select
@@ -417,8 +447,8 @@ export function App() {
             {requestError || "The editor is checked against the loaded OpenAPI request schema before sending."}
           </p>
           <div className="request-actions">
-            <button type="button" onClick={() => void runPrepare()} disabled={busy || !catalog}>
-              {busy ? "Working…" : "Run prepare"}
+            <button type="button" onClick={() => void runOperation()} disabled={busy || !catalog}>
+              {busy ? "Working…" : "Run operation"}
             </button>
             <span className="privacy-note">Request data stays on the configured loopback API.</span>
           </div>

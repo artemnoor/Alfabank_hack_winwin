@@ -20,7 +20,3 @@ class ExpectedRevisionConflict(DocumentsStorageError):
         self.expected = expected
         self.actual = actual
         super().__init__(f"expected revision {expected}; current revision is {actual}")
-
-
-class ArtifactIntegrityError(DocumentsStorageError):
-    """An immutable artifact does not match its content-addressed reference."""

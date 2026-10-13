@@ -10,6 +10,7 @@ import { App } from "./App";
 type Catalog = components["schemas"]["CatalogOutput"];
 type ErrorResponse = components["schemas"]["ErrorResponse"];
 type PrepareResponse = components["schemas"]["Documents_prepareResponse"];
+type RunsQueryResponse = components["schemas"]["Runs_queryResponse"];
 type OperationDescriptor = components["schemas"]["OperationDescriptor"];
 
 const implementation: components["schemas"]["ImplementationDescriptor"] = {
@@ -31,7 +32,7 @@ const operations: OperationDescriptor[] = operationRegistry.operations.map((entr
   kind: entry.kind as OperationDescriptor["kind"],
   request_schema_id: entry.request_model,
   response_schema_id: entry.response_model,
-  implementations: entry.operation_id === "Documents.prepare" ? [implementation] : [],
+  implementations: ["Documents.prepare", "Runs.query"].includes(entry.operation_id) ? [implementation] : [],
   effects: [],
   replay_profile: entry.replay_profile as OperationDescriptor["replay_profile"],
 }));
@@ -47,6 +48,9 @@ const catalog: Catalog = {
 const exampleResponse = examples.examples.find(
   (example) => example.operation_id === "Documents.prepare",
 )?.response as PrepareResponse;
+const runsQueryResponse = examples.examples.find(
+  (example) => example.operation_id === "Runs.query",
+)?.response as RunsQueryResponse;
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -61,6 +65,7 @@ function installFetch(operationResponse: Response = jsonResponse(exampleResponse
     if (url.endsWith("/system/catalog")) return jsonResponse(catalog);
     if (url.endsWith("/openapi.json")) return jsonResponse(normativeOpenApi);
     if (url.endsWith("/api/v1/documents/prepare")) return operationResponse;
+    if (url.endsWith("/api/v1/runs/query")) return jsonResponse(runsQueryResponse);
     return jsonResponse({}, 404);
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -73,7 +78,7 @@ async function connect(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByText(/Connected\./);
 }
 
-describe("Documents.prepare workbench", () => {
+describe("operation workbench", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -89,7 +94,7 @@ describe("Documents.prepare workbench", () => {
     render(<App />);
     await connect(user);
 
-    await user.click(screen.getByRole("button", { name: "Run prepare" }));
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
 
     expect(await screen.findByText(/Documents\.prepare completed\./)).toBeInTheDocument();
     expect(screen.getByText(/"run_id": "example-run-2"/)).toBeInTheDocument();
@@ -101,6 +106,23 @@ describe("Documents.prepare workbench", () => {
     expect(String(operationCall?.[1]?.body)).toContain('"request_id":"example-2"');
   });
 
+  it("selects Runs.query in the same workbench and sends its schema-checked request", async () => {
+    const fetchMock = installFetch();
+    const user = userEvent.setup();
+    render(<App />);
+    await connect(user);
+    await user.selectOptions(screen.getByLabelText("Operation"), "Runs.query");
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
+
+    expect(await screen.findByText(/Runs\.query completed\./)).toBeInTheDocument();
+    expect(screen.getByText(/"operation_id": "Runs.query"/)).toBeInTheDocument();
+    const operationCall = fetchMock.mock.calls.find(([input]) =>
+      String(input).endsWith("/api/v1/runs/query"),
+    );
+    expect(operationCall?.[1]?.method).toBe("POST");
+    expect(String(operationCall?.[1]?.body)).toContain('"include_artifacts":false');
+  });
+
   it("focuses the editor and connects an inline error for invalid JSON", async () => {
     installFetch();
     const user = userEvent.setup();
@@ -109,7 +131,7 @@ describe("Documents.prepare workbench", () => {
 
     const editor = screen.getByLabelText("Complete typed request");
     fireEvent.change(editor, { target: { value: "{not json}" } });
-    await user.click(screen.getByRole("button", { name: "Run prepare" }));
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
 
     expect(editor).toHaveFocus();
     expect(editor).toHaveAttribute("aria-invalid", "true");
@@ -125,7 +147,7 @@ describe("Documents.prepare workbench", () => {
 
     const editor = screen.getByLabelText("Complete typed request");
     fireEvent.change(editor, { target: { value: "{}" } });
-    await user.click(screen.getByRole("button", { name: "Run prepare" }));
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
 
     expect(editor).toHaveFocus();
     expect(editor).toHaveAttribute("aria-invalid", "true");
@@ -149,7 +171,7 @@ describe("Documents.prepare workbench", () => {
     const user = userEvent.setup();
     render(<App />);
     await connect(user);
-    await user.click(screen.getByRole("button", { name: "Run prepare" }));
+    await user.click(screen.getByRole("button", { name: "Run operation" }));
 
     expect(await screen.findByText(/payload\.material\.content_hash/)).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("safe API error"));

@@ -1,0 +1,99 @@
+{
+  "analytical_time": "2026-10-12T00:00:00Z",
+  "approval_review_reference": "fixtures/approved/review/t02-synthetic-content-review.json",
+  "before_state": [
+    {
+      "classification": "synthetic",
+      "data_hash": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "dataset_id": "radio-export-v1",
+      "snapshot_id": "baseline",
+      "version": "1.0.0"
+    }
+  ],
+  "case_id": "metadata-only",
+  "cassette_refs": [],
+  "classification": "synthetic",
+  "contract_version": "1.0.0",
+  "expected_result": {
+    "kind": "result",
+    "output_hash_rule": {
+      "algorithm": "sha256",
+      "canonicalization": "canonical-json-v1",
+      "expected_digest": "computed-from-execution; this fixture does not approve algorithm quality",
+      "scope": "response.payload"
+    },
+    "response_schema_id": "Runs_queryResponse",
+    "rules": [
+      {
+        "id": "artifact-references-remain-present",
+        "include_artifacts": false
+      },
+      {
+        "id": "content-is-null-and-availability-is-metadata-only"
+      }
+    ]
+  },
+  "hash_rules": {
+    "canonicalization": "canonical-json-v1",
+    "deterministic_input_scope": "complete request + server-trusted principal/scope + before-state + analytical time + seed",
+    "expected_result_scope": "expected result and output hash rules",
+    "output_scope": "response.payload",
+    "request_scope": "complete wire request JSON"
+  },
+  "hashes": {
+    "deterministic_input": "sha256:5d0d2eee27ea1e007f8e477b791e346f24b7c5bbc0df4d8f9c24d190fefa9459",
+    "expected_result": "sha256:e67f8c2bf3e4ca9e797181358eab7f11b0d384e5e3ae8f493c3791e5d115b3d2",
+    "request": "sha256:36da2b279c05384c28e07258f69cd396210e166a340c65cbee66a1467fe885a2"
+  },
+  "operation_id": "Runs.query",
+  "request": {
+    "contract_version": "1.0.0",
+    "data_declaration": "synthetic",
+    "execution": {
+      "analytical_time": "2026-10-12T00:00:00Z",
+      "mode": "live",
+      "random_seed": 20261012,
+      "recording": "full",
+      "timeout_ms": 30000
+    },
+    "implementation": {
+      "id": "mock.baseline",
+      "parameters": {
+        "scenario": "default"
+      },
+      "version": "1.0.0"
+    },
+    "payload": {
+      "cursor": null,
+      "include_artifacts": false,
+      "limit": 1,
+      "operation_id": null,
+      "run_ids": [
+        "fixture-metadata-only-run"
+      ],
+      "scenario_id": null
+    },
+    "request_id": "fixture-22-metadata-only",
+    "sandbox_id": "fixtures-t02"
+  },
+  "request_model": "Runs_queryRequest",
+  "response_model": "Runs_queryResponse",
+  "schema": "alfalab.approved-operation-fixture/v1",
+  "schema_hash": "sha256:79698a95725a1b67e2ac8778bd2ff08c7d83862be7ee899d63834b09f3bb2e8c",
+  "seed": 20261012,
+  "trusted_context": {
+    "actor_id": "actor-fixture-runner",
+    "allowed_sandboxes": [
+      "fixtures-t02"
+    ],
+    "permissions": [
+      "operation:execute"
+    ],
+    "role": "fixture-runner",
+    "selected_sandbox": "fixtures-t02",
+    "source": "approved-fixture-principal",
+    "tenant_id": "tenant-fixtures-t02"
+  },
+  "version": "1.0.0"
+}

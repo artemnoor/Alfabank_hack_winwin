@@ -4,28 +4,31 @@ from __future__ import annotations
 
 import json
 import secrets
-from pathlib import Path
+from contextlib import asynccontextmanager
 from typing import Annotated
 
+from alfalab_contracts import CatalogOutput, HealthOutput
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from alfalab_contracts import CatalogOutput, HealthOutput
-from alfalab.bootstrap.registry import RuntimeRegistry, repository_root, runtime_build_hash
+from alfalab.bootstrap.registry import (
+    RuntimeRegistry,
+    repository_root,
+    runtime_build_hash,
+)
 from alfalab.bootstrap.runtime import create_execution_runtime
 from alfalab.bootstrap.settings import ApiSettings
 from alfalab.execution.context import TrustedPrincipal
 from alfalab.execution.errors import SafeExecutionError
-from alfalab.transport.errors import safe_error_body
+from alfalab.execution.service import ExecutionService
 from alfalab.transport.http.errors import (
     safe_execution_error_handler,
     unexpected_error_handler,
     validation_error_handler,
 )
 from alfalab.transport.http.middleware import BodySizeLimitMiddleware
-
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -58,7 +61,7 @@ def get_trusted_principal(
         tenant_id=settings.tenant_id,
         role="developer",
         allowed_sandboxes=settings.allowed_sandboxes,
-        permissions=frozenset({"documents.prepare", "catalog.read"}),
+        permissions=frozenset({"Documents.prepare", "Runs.query", "catalog.read"}),
     )
 
 
@@ -71,9 +74,7 @@ def _runtime_openapi(registry: RuntimeRegistry) -> dict[str, object]:
     available_paths = {descriptor.path for descriptor in registry.available_routes()}
     available_paths.update({"/system/catalog", "/health/live", "/health/ready"})
     snapshot["paths"] = {
-        key: value
-        for key, value in snapshot["paths"].items()
-        if key in available_paths
+        key: value for key, value in snapshot["paths"].items() if key in available_paths
     }
     snapshot["info"]["description"] = (
         "Runtime API surface for this local build. Operation schemas remain bound to "
@@ -113,9 +114,20 @@ def _install_operation_routes(
 
 def create_app(settings: ApiSettings | None = None) -> FastAPI:
     settings = settings or ApiSettings.from_environment()
-    runtime = create_execution_runtime(settings.environment)
+    runtime = create_execution_runtime(
+        settings.environment,
+        runs_database_url=settings.runs_database_url,
+        artifact_root=settings.artifact_root,
+    )
     limits = runtime.limits
     registry = runtime.registry
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        try:
+            yield
+        finally:
+            runtime.close()
 
     app = FastAPI(
         title="AlfaLab API",
@@ -123,11 +135,13 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
         openapi_url="/openapi.json",
         docs_url="/docs",
         redoc_url=None,
+        lifespan=lifespan,
     )
     app.state.settings = settings
     app.state.registry = registry
     app.state.runs_writer = runtime.runs_writer
     app.state.execution_service = runtime.execution_service
+    app.state.execution_runtime = runtime
     app.add_middleware(BodySizeLimitMiddleware, maximum_bytes=limits.request_body_bytes)
     app.add_middleware(
         CORSMiddleware,

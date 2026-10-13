@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING, Protocol
 from alfalab_contracts import Identifier
 from pydantic import TypeAdapter
 
-from .canonical import canonical_hash
+from alfalab.common.canonical import canonical_hash
+from alfalab.common.scope import TrustedScope, validate_scope
+
 from .errors import ScopeDenied
 
 if TYPE_CHECKING:
@@ -16,6 +18,8 @@ if TYPE_CHECKING:
 
 
 _IDENTIFIER = TypeAdapter(Identifier)
+
+__all__ = ["TrustedScope", "validate_scope"]
 
 
 class TrustedPrincipal(Protocol):
@@ -46,15 +50,6 @@ class OperationContext(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
-class TrustedScope:
-    """Tenant and sandbox resolved by authentication and server policy."""
-
-    tenant_id: str
-    sandbox_id: str
-    environment: str
-
-
-@dataclass(frozen=True, slots=True)
 class OwnerCommandContext:
     """Trusted command facts used for authorization and idempotency hashing.
 
@@ -73,20 +68,6 @@ class OwnerCommandContext:
     implementation_fingerprint: str
 
 
-def validate_scope(scope: TrustedScope) -> None:
-    """Reject values that could escape the configured local artifact root."""
-
-    if scope.environment not in {"development", "testing"}:
-        raise ValueError("only development and testing storage profiles are supported")
-    for name, value in (
-        ("tenant_id", scope.tenant_id),
-        ("sandbox_id", scope.sandbox_id),
-    ):
-        if not value or value in {".", ".."} or any(char in value for char in "/\\\x00"):
-            raise ValueError(f"invalid trusted {name}")
-        _IDENTIFIER.validate_python(value, strict=True)
-
-
 def owner_command_context(
     context: OperationContext,
     *,
@@ -101,7 +82,9 @@ def owner_command_context(
     scope = scope_policy.resolve(context)
     principal = context.principal
     if not principal.actor_id:
-        raise ScopeDenied("trusted principal identity or permission scope is unavailable")
+        raise ScopeDenied(
+            "trusted principal identity or permission scope is unavailable"
+        )
     if not context.idempotency_key:
         raise ScopeDenied("trusted idempotency key is unavailable")
     if not context.operation_id or not context.contract_version:
@@ -116,11 +99,13 @@ def owner_command_context(
         raise ScopeDenied("trusted contract version is invalid") from exc
     if contract_major < 1:
         raise ScopeDenied("trusted contract version is invalid")
-    implementation_fingerprint = canonical_hash({
-        "implementation_id": context.implementation_id,
-        "implementation_version": context.implementation_version,
-        "configuration_hash": context.implementation_configuration_hash,
-    })
+    implementation_fingerprint = canonical_hash(
+        {
+            "implementation_id": context.implementation_id,
+            "implementation_version": context.implementation_version,
+            "configuration_hash": context.implementation_configuration_hash,
+        }
+    )
     return OwnerCommandContext(
         scope=scope,
         actor_id=principal.actor_id,

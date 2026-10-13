@@ -3,43 +3,57 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
+from typing import Any
 
 from alfalab_contracts import (
     ImplementationDescriptor,
+    MockParameters,
     OperationDescriptor,
     PrepareInput,
     PrepareOutput,
+    QueryRunsInput,
+    QueryRunsOutput,
     RealPrepareParameters,
-    MockParameters,
 )
 from alfalab_contracts.registry import (
     OperationContract,
     build_operation_descriptor,
     load_operation_registry,
 )
+from pydantic import BaseModel
 
 from alfalab.common.protocols import OperationContext
-from alfalab.modules.documents.implementations.prepare import BaselineMockPrepare, RealPrepare
+from alfalab.execution.gateway import DependencyDefinition
+from alfalab.modules.documents.implementations.prepare import (
+    BaselineMockPrepare,
+    RealPrepare,
+)
+from alfalab.modules.runs.implementation import QueryRuns
+from alfalab.modules.runs.storage.repository import RunsRepository
 
 
 @dataclass(frozen=True, slots=True)
-class RegisteredImplementation:
+class RegisteredImplementation[PayloadT: BaseModel, OutputT: BaseModel]:
     id: str
     version: str
     kind: str
     parameter_type: type
-    execute: Callable[[PrepareInput, OperationContext], PrepareOutput]
+    payload_type: type[BaseModel]
+    output_type: type[BaseModel]
+    execute: Callable[[PayloadT, OperationContext], OutputT]
     configuration: dict[str, object]
+    dependency_ids: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
 class RuntimeRegistry:
     contracts: dict[str, OperationContract]
     descriptors: dict[str, OperationDescriptor]
-    implementations: dict[tuple[str, str, str], RegisteredImplementation]
+    implementations: dict[tuple[str, str, str], RegisteredImplementation[Any, Any]]
+    dependencies: dict[str, DependencyDefinition]
 
     def contract(self, operation_id: str) -> OperationContract:
         return self.contracts[operation_id]
@@ -75,7 +89,11 @@ def runtime_build_hash() -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def create_runtime_registry(environment: str) -> RuntimeRegistry:
+def create_runtime_registry(
+    environment: str,
+    runs_repository: RunsRepository,
+    dependencies: dict[str, DependencyDefinition] | None = None,
+) -> RuntimeRegistry:
     source_registry, contracts = load_operation_registry()
     prepare_implementations = (
         RegisteredImplementation(
@@ -83,6 +101,8 @@ def create_runtime_registry(environment: str) -> RuntimeRegistry:
             version="1.0.0",
             kind="mock",
             parameter_type=MockParameters,
+            payload_type=PrepareInput,
+            output_type=PrepareOutput,
             execute=BaselineMockPrepare().execute,
             configuration={"scenario": "operation-default"},
         ),
@@ -91,6 +111,8 @@ def create_runtime_registry(environment: str) -> RuntimeRegistry:
             version="1.0.0",
             kind="real",
             parameter_type=RealPrepareParameters,
+            payload_type=PrepareInput,
+            output_type=PrepareOutput,
             execute=RealPrepare().execute,
             configuration={"algorithm": "documents-prepare-v1"},
         ),
@@ -99,6 +121,19 @@ def create_runtime_registry(environment: str) -> RuntimeRegistry:
         ("Documents.prepare", item.id, item.version): item
         for item in prepare_implementations
     }
+    query_implementation = RegisteredImplementation(
+        id="mock.baseline",
+        version="1.0.0",
+        kind="mock",
+        parameter_type=MockParameters,
+        payload_type=QueryRunsInput,
+        output_type=QueryRunsOutput,
+        execute=QueryRuns(runs_repository).execute,
+        configuration={"scenario": "operation-default"},
+    )
+    implementations[
+        ("Runs.query", query_implementation.id, query_implementation.version)
+    ] = query_implementation
 
     descriptors: dict[str, OperationDescriptor] = {}
     for entry in source_registry.operations:
@@ -127,6 +162,22 @@ def create_runtime_registry(environment: str) -> RuntimeRegistry:
                         environments=["development", "testing"],
                     ),
                 ]
+        elif entry.operation_id == "Runs.query" and environment in {
+            "development",
+            "testing",
+        }:
+            actual = [
+                ImplementationDescriptor(
+                    id="mock.baseline",
+                    version="1.0.0",
+                    kind="mock",
+                    available=True,
+                    reason=None,
+                    parameter_schema_id="MockParameters",
+                    capabilities=["deterministic", "scope_isolated"],
+                    environments=["development", "testing"],
+                )
+            ]
         descriptors[entry.operation_id] = build_operation_descriptor(
             entry,
             actual,
@@ -137,4 +188,5 @@ def create_runtime_registry(environment: str) -> RuntimeRegistry:
         contracts=contracts,
         descriptors=descriptors,
         implementations=implementations,
+        dependencies=dict(dependencies or {}),
     )

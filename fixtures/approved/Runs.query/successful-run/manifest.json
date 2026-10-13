@@ -29,6 +29,9 @@
     "response_schema_id": "Runs_queryResponse",
     "rules": [
       {
+        "id": "run-record-is-returned"
+      },
+      {
         "id": "response-matches-public-schema",
         "schema_id": "Runs_queryResponse"
       },
@@ -59,7 +62,7 @@
   },
   "hashes": {
     "deterministic_input": "sha256:e5b0a9254bccea14a419a5c8b9d1c3e181a46124e473daed184f6dd3c7855731",
-    "expected_result": "sha256:51bef3a1d2ec1988cc42d5f55905bed7a2e75859020b6cc32a2624b18f630f11",
+    "expected_result": "sha256:d2d8eb8d774dd78ba2a66bbf05f4802015a50a3581f65a475a4396da8bca1cf5",
     "request": "sha256:ac6b0782ad1282d549afc54f1c219d7a77b0d2f7b21b0b60a7cd69a62287bbe0"
   },
   "operation_id": "Runs.query",

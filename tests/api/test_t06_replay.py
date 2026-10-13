@@ -206,13 +206,28 @@ def test_http_live_cli_replay_and_runs_query_share_actual_execution_history(
     assert replayed.record.replay_status == "available"
     assert source.record.model_dump_json() == original_record_json
 
+    http_replay_response = _post(app, _replay_request(live_request, source_run_id))
+    assert http_replay_response.status_code == 200
+    http_replay_body = http_replay_response.json()
+    http_replay_run_id = http_replay_body["meta"]["run_id"]
+    assert http_replay_body["meta"]["execution_mode"] == "replay"
+    assert http_replay_run_id not in {source_run_id, replay_run_id}
+    assert http_replay_body["payload"] == live_body["payload"]
+    assert implementation_calls == 2
+    http_replayed = app.state.runs_writer.get(
+        http_replay_run_id, tenant_id="t06-test-tenant", sandbox_id="demo-a"
+    )
+    assert http_replayed is not None
+    assert http_replayed.record.manifest.replay_of == source_run_id
+    assert source.record.model_dump_json() == original_record_json
+
     query_manifest = json.loads(RUN_QUERY.read_text(encoding="utf-8"))
     query_request = query_manifest["request"]
     query_request["sandbox_id"] = "demo-a"
     query_request["request_id"] = f"t06-history-{uuid4().hex}"
     query_request["payload"].update(
         {
-            "run_ids": [source_run_id, replay_run_id],
+            "run_ids": [source_run_id, replay_run_id, http_replay_run_id],
             "operation_id": None,
             "scenario_id": None,
             "include_artifacts": False,
@@ -223,7 +238,7 @@ def test_http_live_cli_replay_and_runs_query_share_actual_execution_history(
     history = _post(app, query_request, path="/api/v1/runs/query")
     assert history.status_code == 200
     history_ids = {row["run_id"] for row in history.json()["payload"]["runs"]}
-    assert history_ids == {source_run_id, replay_run_id}
+    assert history_ids == {source_run_id, replay_run_id, http_replay_run_id}
     assert history.json()["meta"]["run_id"] not in history_ids
 
 

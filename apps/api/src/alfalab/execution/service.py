@@ -560,15 +560,31 @@ class ExecutionService:
             # T05 Runs.query still lacks an approved immutable owner-read snapshot.
             raise replay_incompatible()
         try:
-            stored = (
-                self._runs_repository.get(source_run_id, tenant_id=principal.tenant_id)
-                if profile_value == "restore_state"
-                else self._runs_repository.get(
+            if profile_value == "restore_state":
+                # Runs repositories require a complete scope. Probe only the
+                # sandboxes granted by the trusted principal; never fall back
+                # to a tenant-wide/global lookup for stateful command replay.
+                matches = [
+                    stored_run
+                    for sandbox_id in sorted(principal.allowed_sandboxes)
+                    if (
+                        stored_run := self._runs_repository.get(
+                            source_run_id,
+                            tenant_id=principal.tenant_id,
+                            sandbox_id=sandbox_id,
+                        )
+                    )
+                    is not None
+                ]
+                if len(matches) > 1:
+                    raise replay_incompatible()
+                stored = matches[0] if matches else None
+            else:
+                stored = self._runs_repository.get(
                     source_run_id,
                     tenant_id=principal.tenant_id,
                     sandbox_id=request.sandbox_id,
                 )
-            )
         except OSError as exc:
             raise SafeExecutionError(
                 status_code=503,

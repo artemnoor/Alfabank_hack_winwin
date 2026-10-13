@@ -200,6 +200,7 @@ class DocumentsStorage:
                 revision=revision,
                 hash=version_hash,
             )
+            recorded_at = context.domain_clock.now()
             raw_artifact = self._artifacts.put_json(
                 command_context.scope,
                 payload.raw,
@@ -217,7 +218,6 @@ class DocumentsStorage:
                 )
                 prepared_artifact_hash = prepared_artifact.artifact_ref.hash
                 prepared_artifact_size_bytes = prepared_artifact.artifact_ref.size_bytes
-            recorded_at = connection.execute(select(_database_clock())).scalar_one()
             published_at = _timestamp_value(payload.raw.published_at)
             connection.execute(
                 insert(versions).values(
@@ -885,12 +885,6 @@ def _timestamp_string(value: datetime) -> str:
     return (
         value.astimezone(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
     )
-
-
-def _database_clock() -> Any:
-    from sqlalchemy import func
-
-    return func.clock_timestamp()
 
 
 def _expected_artifact_read_size(stored_size: int | None) -> int:

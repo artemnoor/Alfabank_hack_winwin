@@ -11,6 +11,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from alfalab.common.limits import MAX_ARTIFACT_RESPONSE_BYTES
+from alfalab.execution.context import SystemDomainClock
 from alfalab.modules.documents.operations.read import ReadOperation
 from alfalab.modules.documents.operations.register import RegisterOperation
 from alfalab.modules.documents.storage.artifacts import (
@@ -178,6 +179,7 @@ def _context(
         implementation_id="documents.owner-storage",
         implementation_version="1.0.0",
         implementation_configuration_hash=_hash_text("documents-owner-storage-v1"),
+        domain_clock=SystemDomainClock(),
         principal=SimpleNamespace(
             tenant_id=tenant_id,
             actor_id="actor-test",

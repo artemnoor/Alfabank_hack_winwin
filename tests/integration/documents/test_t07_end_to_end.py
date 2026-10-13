@@ -621,6 +621,266 @@ def test_sources_fetch_and_prepare_replay_execute_without_live_source_fallback(
         runtime.close()
 
 
+def test_postgres_runs_register_replay_restores_state_and_domain_time(
+    documents_runs_database: str,
+    tmp_path: Path,
+) -> None:
+    from datetime import datetime
+
+    from alfalab.common.postgres import psycopg_url
+    from alfalab.modules.documents.storage.service import DocumentsStorage
+    from alfalab.modules.runs.storage.postgres import PostgresRunsRepository
+    from sqlalchemy import create_engine
+
+    tenant = f"t07-pg-replay-tenant-{uuid4().hex}"
+    settings = ApiSettings(
+        developer_token=TOKEN,
+        environment="testing",
+        actor_id=f"t07-actor-{uuid4().hex}",
+        tenant_id=tenant,
+        allowed_sandboxes=frozenset({"source-a", "replay-b"}),
+        playground_origins=("http://127.0.0.1:5173",),
+    )
+    runtime = create_execution_runtime(
+        "testing",
+        runs_database_url=documents_runs_database,
+        documents_database_url=documents_runs_database,
+        artifact_root=tmp_path / "artifacts",
+    )
+    assert isinstance(runtime.runs_repository, PostgresRunsRepository)
+    assert isinstance(runtime.documents_storage, DocumentsStorage)
+    app = create_app(settings, execution_runtime=runtime)
+    inspection_engine = create_engine(
+        psycopg_url(documents_runs_database), pool_pre_ping=True, echo=False
+    )
+
+    def scoped_versions(sandbox_id: str) -> tuple[tuple[object, ...], ...]:
+        with inspection_engine.connect() as connection:
+            rows = (
+                connection.execute(
+                    select(
+                        versions.c.revision,
+                        versions.c.kind,
+                        versions.c.raw_content_hash,
+                        versions.c.semantic_hash,
+                        versions.c.version_hash,
+                        versions.c.parent_revision,
+                        versions.c.recorded_at,
+                    )
+                    .where(
+                        versions.c.tenant_id == tenant,
+                        versions.c.sandbox_id == sandbox_id,
+                    )
+                    .order_by(versions.c.revision)
+                )
+                .mappings()
+                .all()
+            )
+        return tuple(tuple(row.values()) for row in rows)
+
+    def scoped_receipts(sandbox_id: str) -> tuple[tuple[object, ...], ...]:
+        with inspection_engine.connect() as connection:
+            rows = (
+                connection.execute(
+                    select(
+                        command_receipts.c.idempotency_key,
+                        command_receipts.c.original_run_id,
+                        command_receipts.c.receipt_json,
+                    )
+                    .where(
+                        command_receipts.c.tenant_id == tenant,
+                        command_receipts.c.sandbox_id == sandbox_id,
+                    )
+                    .order_by(command_receipts.c.idempotency_key)
+                )
+                .mappings()
+                .all()
+            )
+        return tuple(tuple(row.values()) for row in rows)
+
+    def recorded_clock(run_id: str, sandbox_id: str) -> datetime:
+        stored = runtime.runs_repository.get(
+            run_id, tenant_id=tenant, sandbox_id=sandbox_id
+        )
+        assert stored is not None
+        clock_entries = [
+            dependency
+            for dependency in stored.record.dependencies
+            if dependency.port_id == "clock.domain.now"
+        ]
+        assert len(clock_entries) == 1
+        response = clock_entries[0].response
+        assert response is not None
+        content = runtime.runs_repository.read_replay_artifacts(
+            run_id,
+            (response.ref,),
+            tenant_id=tenant,
+            sandbox_id=sandbox_id,
+        )
+        assert content is not None
+        return datetime.fromisoformat(
+            json.loads(content[response.ref.artifact_id])["timestamp"]
+        )
+
+    try:
+        fetch = _invoke_http(
+            app,
+            _live_request(
+                "Sources.fetch",
+                "source-a",
+                {
+                    "source_id": "synthetic-example",
+                    "cursor": None,
+                    "since": None,
+                    "limit": 2,
+                },
+            ),
+            "/api/v1/sources/fetch",
+        )
+        raw_one, raw_two = fetch["payload"]["materials"]
+        prepared = []
+        for raw in (raw_one, raw_two):
+            prepare_request = _live_request(
+                "Documents.prepare",
+                "source-a",
+                {
+                    "material": raw,
+                    "normalize_newlines": True,
+                    "trim_outer_whitespace": True,
+                },
+            )
+            prepared.append(
+                _invoke_http(
+                    app,
+                    prepare_request,
+                    "/api/v1/documents/prepare",
+                )["payload"]["prepared"]
+            )
+
+        document_id = f"t07-pg-replay-doc-{uuid4().hex}"
+        key_one = f"t07-pg-replay-key-one-{uuid4().hex}"
+        request_one = _live_request(
+            "Documents.register",
+            "source-a",
+            {
+                "document_id": document_id,
+                "expected_revision": 0,
+                "raw": raw_one,
+                "prepared": prepared[0],
+            },
+        )
+        request_one["idempotency_key"] = key_one
+        result_one = _invoke_http(app, request_one, "/api/v1/documents/register")
+        run_one_id = result_one["meta"]["run_id"]
+        source_one = scoped_versions("source-a")
+        assert len(source_one) == 1
+        assert source_one[0][-1] == recorded_clock(run_one_id, "source-a")
+
+        key_two = f"t07-pg-replay-key-two-{uuid4().hex}"
+        request_two = _live_request(
+            "Documents.register",
+            "source-a",
+            {
+                "document_id": document_id,
+                "expected_revision": 1,
+                "raw": raw_two,
+                "prepared": prepared[1],
+            },
+        )
+        request_two["idempotency_key"] = key_two
+        result_two = _invoke_http(app, request_two, "/api/v1/documents/register")
+        source_run_id = result_two["meta"]["run_id"]
+        source_before_replay = scoped_versions("source-a")
+        source_receipts_before_replay = scoped_receipts("source-a")
+        assert [row[0] for row in source_before_replay] == [1, 2]
+        assert source_before_replay[1][-1] == recorded_clock(source_run_id, "source-a")
+        assert {row[0] for row in source_receipts_before_replay} == {key_one, key_two}
+
+        replay_request = copy.deepcopy(request_two)
+        replay_request["request_id"] = f"t07-pg-replay-{uuid4().hex}"
+        replay_request["sandbox_id"] = "replay-b"
+        replay_request["execution"] = {
+            "mode": "replay",
+            "recording": "full",
+            "source_run_id": source_run_id,
+            "strict": True,
+            "timeout_ms": 30_000,
+        }
+        replayed = _invoke_http(app, replay_request, "/api/v1/documents/register")
+        assert replayed["payload"]["version"] == result_two["payload"]["version"]
+        replay_run = runtime.runs_repository.get(
+            replayed["meta"]["run_id"],
+            tenant_id=tenant,
+            sandbox_id="replay-b",
+        )
+        assert replay_run is not None
+        assert replay_run.record.manifest.replay_of == source_run_id
+
+        target_latest = _invoke_http(
+            app,
+            _live_request(
+                "Documents.read",
+                "replay-b",
+                {
+                    "query": {
+                        "kind": "documents",
+                        "document_ids": [document_id],
+                        "revision": None,
+                        "as_of": None,
+                    }
+                },
+            ),
+            "/api/v1/documents/read",
+        )["payload"]["versions"][0]
+        target_previous = _invoke_http(
+            app,
+            _live_request(
+                "Documents.read",
+                "replay-b",
+                {
+                    "query": {
+                        "kind": "documents",
+                        "document_ids": [document_id],
+                        "revision": 1,
+                        "as_of": None,
+                    }
+                },
+            ),
+            "/api/v1/documents/read",
+        )["payload"]["versions"][0]
+        assert target_latest["ref"]["revision"] == 2
+        assert target_latest["parent_ref"]["revision"] == 1
+        assert target_previous["ref"]["revision"] == 1
+
+        target_rows = scoped_versions("replay-b")
+        assert target_rows == source_before_replay
+        target_receipts = scoped_receipts("replay-b")
+        assert [row[0] for row in target_receipts] == [key_two]
+        assert target_receipts[0][1] == replayed["meta"]["run_id"]
+        assert scoped_versions("source-a") == source_before_replay
+        assert scoped_receipts("source-a") == source_receipts_before_replay
+
+        inaccessible_settings = ApiSettings(
+            developer_token=TOKEN,
+            environment="testing",
+            actor_id=f"t07-actor-{uuid4().hex}",
+            tenant_id=tenant,
+            allowed_sandboxes=frozenset({"replay-b"}),
+            playground_origins=("http://127.0.0.1:5173",),
+        )
+        inaccessible_app = create_app(inaccessible_settings, execution_runtime=runtime)
+        denied = _http_response(
+            inaccessible_app, replay_request, "/api/v1/documents/register"
+        )
+        assert denied.status_code == 409
+        assert denied.json()["error"]["code"] == "REPLAY_INCOMPATIBLE"
+        assert scoped_versions("source-a") == source_before_replay
+        assert scoped_versions("replay-b") == target_rows
+    finally:
+        inspection_engine.dispose()
+        runtime.close()
+
+
 def test_register_is_gated_by_history_and_owner_receipt_survives_final_history_failure(
     admin_dsn: str,
     documents_migrated: bool,

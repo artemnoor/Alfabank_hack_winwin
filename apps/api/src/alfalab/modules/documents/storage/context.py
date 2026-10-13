@@ -9,6 +9,7 @@ from alfalab_contracts import Identifier
 from pydantic import TypeAdapter
 
 from alfalab.common.canonical import canonical_hash
+from alfalab.common.protocols import DomainClockPort
 from alfalab.common.scope import TrustedScope, validate_scope
 
 from .errors import ScopeDenied
@@ -47,6 +48,7 @@ class OperationContext(Protocol):
     implementation_id: str
     implementation_version: str
     implementation_configuration_hash: str
+    domain_clock: DomainClockPort
 
 
 @dataclass(frozen=True, slots=True)

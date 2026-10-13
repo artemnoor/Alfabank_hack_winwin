@@ -20,20 +20,25 @@ from alfalab_contracts import (
     DependencyRecord,
     ErrorInfo,
     ExecutionMeta,
+    FetchInput,
     LineageSummary,
     Measurement,
     MockParameters,
     ModelIdentity,
     OperationDescriptor,
     PrepareInput,
+    ReadDocumentsInput,
+    RegisterDocumentInput,
     RunManifest,
     RunRecord,
+    StateCapture,
     VersionedRef,
 )
 from alfalab_contracts._generated import ReplayStatus, TraceStatus
 from alfalab_contracts.registry import OperationContract
 from alfalab_contracts.semantics import validate_dto, validate_operation_semantics
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 from alfalab.bootstrap.registry import (
     RegisteredImplementation,
@@ -69,6 +74,8 @@ from alfalab.execution.replay import (
 from alfalab.execution.sequence import DependencySequence
 from alfalab.execution.temporal import parse_utc_timestamp
 from alfalab.execution.tracing import InMemoryTraceRecorder
+from alfalab.modules.documents.storage.replay import RegisterBeforeState
+from alfalab.modules.documents.validation import validate_registered_content
 from alfalab.modules.runs.storage.repository import RunsRepository, StoredRun
 
 
@@ -201,7 +208,12 @@ class ExecutionService:
         else:
             self._validate_scenario(payload, request.implementation.parameters)
             self._validate_payload(payload)
-            policy = self._resolve_policy(payload)
+            policy = self._resolve_policy(
+                operation_id,
+                payload,
+                principal=principal,
+                sandbox_id=request.sandbox_id,
+            )
 
         state = self._begin_run(
             operation_id,
@@ -247,9 +259,9 @@ class ExecutionService:
         try:
             self._apply_scenario(request.implementation.parameters)
             output = implementation.execute(state.payload, state.context)
-            if not isinstance(output, implementation.output_type) or not isinstance(
-                output, contract.output_type
-            ):
+            if not _is_valid_output(
+                output, implementation.output_type
+            ) or not _is_valid_output(output, contract.output_type):
                 raise SafeExecutionError(
                     status_code=500,
                     code="OUTPUT_CONTRACT_VIOLATION",
@@ -283,9 +295,9 @@ class ExecutionService:
                 state.replay_cassette.assert_consumed()
             if state.expected_error is not None:
                 raise replay_miss()
-            if state.expected_output is not None and _canonical_json(
-                output.model_dump(mode="json")
-            ) != _canonical_json(state.expected_output.model_dump(mode="json")):
+            if state.expected_output is not None and not self._replay_output_matches(
+                operation_id, output, state.expected_output
+            ):
                 raise replay_miss()
             elapsed_ns = perf_counter_ns() - state.started_ns
             if elapsed_ns > request.execution.timeout_ms * 1_000_000:
@@ -440,23 +452,71 @@ class ExecutionService:
             ) from exc
 
     def _validate_payload(self, payload: BaseModel) -> None:
-        if not isinstance(payload, PrepareInput):
-            return
-        if len(payload.material.text) > self._limits.max_document_chars:
-            raise invalid_input("payload.material.text")
-        try:
-            validate_dto(payload.material)
-        except ValueError as exc:
-            raise invalid_input("payload.material.content_hash") from exc
-
-    def _resolve_policy(self, payload: BaseModel) -> ResolvedPolicy:
-        source_id = None
         if isinstance(payload, PrepareInput):
-            source_id = payload.material.source_id or payload.material.material_id
-        return self._policy_resolver.resolve(
-            source_id,
-            payload_hash=_canonical_hash(payload.model_dump(mode="json")),
-        )
+            if len(payload.material.text) > self._limits.max_document_chars:
+                raise invalid_input("payload.material.text")
+            try:
+                validate_dto(payload.material)
+            except ValueError as exc:
+                raise invalid_input("payload.material.content_hash") from exc
+        elif isinstance(payload, RegisterDocumentInput):
+            if len(payload.raw.text) > self._limits.max_document_chars:
+                raise invalid_input("payload.raw.text")
+            if (
+                payload.prepared is not None
+                and len(payload.prepared.material.text)
+                > self._limits.max_document_chars
+            ):
+                raise invalid_input("payload.prepared.material.text")
+            try:
+                validate_registered_content(payload.raw, payload.prepared)
+            except ValueError as exc:
+                raise invalid_input("payload.prepared") from exc
+
+    def _resolve_policy(
+        self,
+        operation_id: str,
+        payload: BaseModel,
+        *,
+        principal: TrustedPrincipal,
+        sandbox_id: str,
+    ) -> ResolvedPolicy:
+        payload_hash = _canonical_hash(payload.model_dump(mode="json"))
+        if isinstance(payload, FetchInput):
+            return self._policy_resolver.resolve_source(payload.source_id)
+        if isinstance(payload, PrepareInput):
+            return self._policy_resolver.resolve_material(
+                payload.material,
+                payload_hash=payload_hash,
+                tenant_id=principal.tenant_id,
+                allowed_sandboxes=principal.allowed_sandboxes,
+            )
+        if isinstance(payload, RegisterDocumentInput):
+            return self._policy_resolver.resolve_material(
+                payload.raw,
+                payload_hash=payload_hash,
+                tenant_id=principal.tenant_id,
+                allowed_sandboxes=principal.allowed_sandboxes,
+            )
+        if isinstance(payload, ReadDocumentsInput):
+            try:
+                return self._policy_resolver.resolve_document_read(
+                    payload,
+                    tenant_id=principal.tenant_id,
+                    sandbox_id=sandbox_id,
+                    environment=self._environment,
+                )
+            except (OSError, SQLAlchemyError) as exc:
+                raise SafeExecutionError(
+                    status_code=503,
+                    code="STORAGE_UNAVAILABLE",
+                    category="unavailable",
+                    safe_message="Documents storage is temporarily unavailable.",
+                    retryable=True,
+                    outcome="not_applied",
+                ) from exc
+        del operation_id
+        return self._policy_resolver.resolve(None, payload_hash=payload_hash)
 
     @staticmethod
     def _configuration_hash(
@@ -485,14 +545,29 @@ class ExecutionService:
             raise replay_incompatible()
         profile = contract.descriptor.replay_profile
         profile_value = getattr(profile, "value", profile)
-        if profile_value not in {"fixed_input", "recorded_dependencies"}:
-            # Runs.query has no approved immutable owner-read bundle yet.
+        if profile_value not in {
+            "fixed_input",
+            "recorded_dependencies",
+            "recorded_owner_read",
+            "restore_state",
+        }:
+            raise replay_incompatible()
+        if (
+            profile_value == "recorded_owner_read" and operation_id != "Documents.read"
+        ) or (
+            profile_value == "restore_state" and operation_id != "Documents.register"
+        ):
+            # T05 Runs.query still lacks an approved immutable owner-read snapshot.
             raise replay_incompatible()
         try:
-            stored = self._runs_repository.get(
-                source_run_id,
-                tenant_id=principal.tenant_id,
-                sandbox_id=request.sandbox_id,
+            stored = (
+                self._runs_repository.get(source_run_id, tenant_id=principal.tenant_id)
+                if profile_value == "restore_state"
+                else self._runs_repository.get(
+                    source_run_id,
+                    tenant_id=principal.tenant_id,
+                    sandbox_id=request.sandbox_id,
+                )
             )
         except OSError as exc:
             raise SafeExecutionError(
@@ -508,7 +583,15 @@ class ExecutionService:
         record = stored.record
         if (
             stored.tenant_id != principal.tenant_id
-            or stored.sandbox_id != request.sandbox_id
+            or stored.sandbox_id not in principal.allowed_sandboxes
+            or (
+                profile_value == "restore_state"
+                and stored.sandbox_id == request.sandbox_id
+            )
+            or (
+                profile_value != "restore_state"
+                and stored.sandbox_id != request.sandbox_id
+            )
         ):
             raise replay_incompatible()
         expected_error = None
@@ -544,6 +627,10 @@ class ExecutionService:
             or record.implementation.id != implementation.id
             or record.implementation.version != implementation.version
             or record.manifest.implementation != record.implementation
+        ):
+            raise replay_incompatible()
+        if profile_value == "restore_state" and not self._valid_documents_state_capture(
+            record
         ):
             raise replay_incompatible()
 
@@ -593,10 +680,7 @@ class ExecutionService:
             or record.input.ref.schema_version != "1.0.0"
             or (
                 record.output is not None
-                and (
-                    record.output.ref.schema_id != contract.output_type.__name__
-                    or record.output.ref.schema_version != "1.0.0"
-                )
+                and record.output.ref.schema_version != "1.0.0"
             )
         ):
             raise replay_incompatible()
@@ -604,7 +688,12 @@ class ExecutionService:
         if supplied_hash != record.input.ref.hash or supplied_hash != stored.input_hash:
             raise replay_incompatible()
 
-        policy = self._resolve_policy(request.payload)
+        policy = self._resolve_policy(
+            operation_id,
+            request.payload,
+            principal=principal,
+            sandbox_id=request.sandbox_id,
+        )
         if (
             policy.decision.model_dump(mode="json")
             != record.manifest.data_policy.model_dump(mode="json")
@@ -626,7 +715,7 @@ class ExecutionService:
                 source_run_id,
                 tuple(refs),
                 tenant_id=principal.tenant_id,
-                sandbox_id=request.sandbox_id,
+                sandbox_id=stored.sandbox_id,
             )
         except OSError as exc:
             raise SafeExecutionError(
@@ -673,12 +762,14 @@ class ExecutionService:
             if source_record.output is not None:
                 output_json = verified_artifact_json(
                     source_record.output,
-                    expected_schema_id=contract.output_type.__name__,
+                    expected_schema_id=source_record.output.ref.schema_id,
                     expected_classification=record.manifest.data_classification,
                 )
-                expected_output = contract.output_type.model_validate(
-                    json.loads(output_json)
+                expected_output = TypeAdapter(contract.output_type).validate_json(
+                    output_json, strict=True
                 )
+                if source_record.output.ref.schema_id != type(expected_output).__name__:
+                    raise ValueError("recorded output schema does not match its DTO")
             for dependency in source_record.dependencies:
                 verified_artifact_json(
                     dependency.request,
@@ -806,6 +897,10 @@ class ExecutionService:
             request_id=request.request_id,
             contract_version=contract.descriptor.contract_version,
             idempotency_key=getattr(request, "idempotency_key", None),
+            execution_mode=execution_mode,
+            replay_source_sandbox_id=(
+                replay_source.stored.sandbox_id if replay_source is not None else None
+            ),
             implementation_id=implementation.id,
             implementation_version=implementation.version,
             implementation_configuration_hash=configuration_hash,
@@ -956,12 +1051,97 @@ class ExecutionService:
                 return False
         profile = self._registry.contract(state.operation_id).descriptor.replay_profile
         profile_value = getattr(profile, "value", profile)
-        if profile_value not in {"fixed_input", "recorded_dependencies"}:
+        if profile_value not in {
+            "fixed_input",
+            "recorded_dependencies",
+            "recorded_owner_read",
+            "restore_state",
+        }:
             return False
+        if profile_value == "restore_state":
+            if output is None:
+                return False
+            before_state = next(
+                (
+                    dependency
+                    for dependency in state.dependencies
+                    if dependency.port_id == "documents.register.before_state"
+                    and dependency.response is not None
+                ),
+                None,
+            )
+            if before_state is None or before_state.response.content_json is None:
+                return False
+            try:
+                snapshot = RegisterBeforeState.model_validate_json(
+                    before_state.response.content_json, strict=True
+                )
+            except ValidationError:
+                return False
+            if not snapshot.replayable:
+                return False
         if not self._dependencies_have_replayable_model_identities(state.dependencies):
             return False
         return cassette_replayable(
             state.dependencies, self._dependency_sensitive_values_by_port()
+        )
+
+    @staticmethod
+    def _replay_output_matches(
+        operation_id: str, actual: BaseModel, expected: BaseModel
+    ) -> bool:
+        """Compare deterministic outputs while excluding scoped execution metadata."""
+        actual_value = actual.model_dump(mode="json")
+        expected_value = expected.model_dump(mode="json")
+        if operation_id == "Sources.fetch":
+            for value in (actual_value, expected_value):
+                for material in value.get("materials", []):
+                    provenance = material.get("provenance")
+                    if isinstance(provenance, dict):
+                        provenance["producer_run_id"] = None
+            return _canonical_json(actual_value) == _canonical_json(expected_value)
+        if operation_id == "Documents.register":
+            actual_register = actual_value.get("receipt", {})
+            expected_register = expected_value.get("receipt", {})
+            stable_receipt_fields = (
+                "operation_id",
+                "idempotency_key",
+                "applied",
+                "changed_refs",
+            )
+            return actual_value.get("version") == expected_value.get("version") and all(
+                actual_register.get(field) == expected_register.get(field)
+                for field in stable_receipt_fields
+            )
+        return _canonical_json(actual_value) == _canonical_json(expected_value)
+
+    @staticmethod
+    def _valid_documents_state_capture(record: RunRecord) -> bool:
+        state_capture = record.manifest.state_capture
+        if (
+            state_capture is None
+            or state_capture.owner != "Documents"
+            or state_capture.before_hash != state_capture.before.hash
+            or record.output is None
+            or state_capture.after is None
+            or state_capture.after_hash != state_capture.after.hash
+            or state_capture.after.artifact_id != record.output.ref.artifact_id
+        ):
+            return False
+        before_state = next(
+            (
+                dependency
+                for dependency in record.dependencies
+                if dependency.port_id == "documents.register.before_state"
+                and dependency.response is not None
+            ),
+            None,
+        )
+        return (
+            before_state is not None
+            and before_state.response.ref.artifact_id
+            == state_capture.before.artifact_id
+            and before_state.response.ref.hash == state_capture.before_hash
         )
 
     def _model_identities_for_dependencies(
@@ -1155,6 +1335,27 @@ class ExecutionService:
             ),
         )
         output_view = self._artifact_for_output(state, output)
+        state_capture = None
+        if state.operation_id == "Documents.register":
+            before_state = next(
+                (
+                    dependency.response
+                    for dependency in state.dependencies
+                    if dependency.port_id == "documents.register.before_state"
+                    and dependency.response is not None
+                ),
+                None,
+            )
+            if before_state is not None:
+                state_capture = StateCapture(
+                    owner="Documents",
+                    before=before_state.ref,
+                    after=output_view.ref if output_view is not None else None,
+                    before_hash=before_state.ref.hash,
+                    after_hash=(
+                        output_view.ref.hash if output_view is not None else None
+                    ),
+                )
         contract = self._registry.contract(state.operation_id)
         contract_hash = _canonical_hash(contract.descriptor.model_dump(mode="json"))
         root = repository_root()
@@ -1192,7 +1393,7 @@ class ExecutionService:
             analytical_time=state.analytical_time,
             random_seed=state.random_seed,
             recording=state.policy.decision.recording,
-            state_capture=None,
+            state_capture=state_capture,
             replay_of=state.replay_of,
             data_classification=state.policy.decision.classification,
             data_policy=state.policy.decision,
@@ -1272,3 +1473,14 @@ class ExecutionService:
         if isinstance(value, (list, tuple)):
             return any(ExecutionService._contains_owner_receipt(item) for item in value)
         return False
+
+
+def _is_valid_output(value: object, output_type: type | object) -> bool:
+    """Validate DTO classes and discriminated output unions without coercion."""
+    if not isinstance(value, BaseModel):
+        return False
+    try:
+        validated = TypeAdapter(output_type).validate_python(value, strict=True)
+    except (TypeError, ValidationError):
+        return False
+    return type(validated) is type(value)

@@ -5,16 +5,21 @@ import type { components } from "../api/openapi";
 
 type Catalog = components["schemas"]["CatalogOutput"];
 type OperationDescriptor = components["schemas"]["OperationDescriptor"];
-type PrepareRequest = components["schemas"]["Documents_prepareRequest"];
-type PrepareResponse = components["schemas"]["Documents_prepareResponse"];
-type RunsQueryRequest = components["schemas"]["Runs_queryRequest"];
-type RunsQueryResponse = components["schemas"]["Runs_queryResponse"];
-type SupportedRequest = PrepareRequest | RunsQueryRequest;
-type SupportedResponse = PrepareResponse | RunsQueryResponse;
-type SupportedOperationId = "Documents.prepare" | "Runs.query";
+type SupportedOperationId =
+  | "Sources.fetch"
+  | "Documents.prepare"
+  | "Documents.register"
+  | "Documents.read"
+  | "Runs.query";
 
 const OPENAPI_ID = "http://alfalab.local/runtime-openapi.json";
-const supportedOperationIds: SupportedOperationId[] = ["Documents.prepare", "Runs.query"];
+const supportedOperationIds: SupportedOperationId[] = [
+  "Sources.fetch",
+  "Documents.prepare",
+  "Documents.register",
+  "Documents.read",
+  "Runs.query",
+];
 const exampleFor = (operationId: SupportedOperationId) =>
   prepareExamples.examples.find((example) => example.operation_id === operationId);
 const prepareExample = exampleFor("Documents.prepare");
@@ -102,6 +107,8 @@ export function App() {
   const [requestText, setRequestText] = useState(initialRequest);
   const [requestError, setRequestError] = useState("");
   const [result, setResult] = useState("");
+  const [runHistory, setRunHistory] = useState("");
+  const [historyError, setHistoryError] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Connect to the local API to load the request schema.");
   const requestEditor = useRef<HTMLTextAreaElement>(null);
@@ -113,6 +120,15 @@ export function App() {
   const availableImplementations = operationDescriptor?.implementations.filter(
     (item) => item.available,
   ) ?? [];
+  const visibleOperationIds = catalog
+    ? supportedOperationIds.filter((id) =>
+        catalog.operations.some(
+          (operation) =>
+            operation.operation_id === id &&
+            operation.implementations.some((implementation) => implementation.available),
+        ),
+      )
+    : supportedOperationIds;
 
   function focusRequestError(message: string) {
     setRequestError(message);
@@ -157,13 +173,15 @@ export function App() {
         setStatus("The local API catalog does not match the published contract.");
         return false;
       }
-      const supportedOperations = supportedOperationIds.map((id) =>
-        catalogBody.operations.find((entry) => entry.operation_id === id),
+      const visibleOperations = catalogBody.operations.filter(
+        (operation) =>
+          supportedOperationIds.includes(operation.operation_id as SupportedOperationId) &&
+          operation.implementations.some((implementation) => implementation.available),
       );
-      const unavailable = supportedOperations.find(
-        (operation) => !operation || operation.implementations.every((implementation) => !implementation.available),
-      );
-      if (unavailable) {
+      if (
+        !visibleOperations.some((operation) => operation.operation_id === "Documents.prepare") ||
+        !visibleOperations.some((operation) => operation.operation_id === "Runs.query")
+      ) {
         setStatus("Documents.prepare and Runs.query must both be available in this API build.");
         return false;
       }
@@ -173,10 +191,18 @@ export function App() {
       setOpenApi(schemaBody);
       const firstSandbox = catalogBody.allowed_sandboxes[0];
       if (firstSandbox) setSandboxId(firstSandbox);
-      const selectedOperation = supportedOperations.find((entry) => entry?.operation_id === operationId)!;
+      const activeOperationId = visibleOperations.some(
+        (operation) => operation.operation_id === operationId,
+      )
+        ? operationId
+        : (visibleOperations[0].operation_id as SupportedOperationId);
+      setOperationId(activeOperationId);
+      const selectedOperation = visibleOperations.find(
+        (entry) => entry.operation_id === activeOperationId,
+      )!;
       const firstImplementation = selectedOperation.implementations.find((item) => item.available);
       if (firstImplementation) setImplementationId(firstImplementation.id);
-      setStatus(`Connected. ${supportedOperationIds.length} operations are available from this API build.`);
+      setStatus(`Connected. ${visibleOperations.length} supported operations are available from this API build.`);
       return true;
     } catch {
       setStatus("Could not reach the local API. Check that it is running and try again.");
@@ -217,7 +243,7 @@ export function App() {
   }
 
   function changeOperation(value: string) {
-    if (!supportedOperationIds.includes(value as SupportedOperationId)) return;
+    if (!visibleOperationIds.includes(value as SupportedOperationId)) return;
     const selectedId = value as SupportedOperationId;
     setOperationId(selectedId);
     const descriptor = catalog?.operations.find((operation) => operation.operation_id === selectedId);
@@ -262,7 +288,7 @@ export function App() {
       setStatus("Connect to the local API first so the request can be validated against its schema.");
       return;
     }
-    const requestValidator = makeValidator<SupportedRequest>(openApi, operationDescriptor.request_schema_id);
+    const requestValidator = makeValidator<unknown>(openApi, operationDescriptor.request_schema_id);
     if (!requestValidator) {
       setStatus("The request schema is missing from the loaded OpenAPI document.");
       return;
@@ -298,7 +324,7 @@ export function App() {
         return;
       }
 
-      const responseValidator = makeValidator<SupportedResponse>(
+      const responseValidator = makeValidator<unknown>(
         openApi,
         operationDescriptor.response_schema_id,
       );
@@ -313,6 +339,80 @@ export function App() {
     } catch {
       setResult("Could not reach the local API. Check that it is running and try again.");
       setStatus("The operation could not reach the local API.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function loadRunHistory() {
+    setHistoryError("");
+    setRunHistory("");
+    const descriptor = catalog?.operations.find(
+      (operation) => operation.operation_id === "Runs.query",
+    );
+    const example = exampleFor("Runs.query");
+    if (!descriptor || !openApi || !example || !apiToken.trim()) {
+      setHistoryError("Connect to an API with Runs.query enabled before loading history.");
+      return;
+    }
+    const implementation = descriptor.implementations.find((item) => item.available);
+    if (!implementation) {
+      setHistoryError("Runs.query is not available in this API build.");
+      return;
+    }
+    const request = JSON.parse(JSON.stringify(example.request)) as Record<string, unknown>;
+    request.sandbox_id = sandboxId;
+    request.implementation = {
+      id: implementation.id,
+      version: implementation.version,
+      parameters: implementation.kind === "mock" ? { scenario: "default" } : {},
+    };
+    request.request_id = `playground-history-${crypto.randomUUID()}`;
+    if (isRecord(request.payload)) {
+      request.payload = {
+        ...request.payload,
+        run_ids: [],
+        operation_id: null,
+        scenario_id: null,
+        include_artifacts: false,
+        limit: 25,
+        cursor: null,
+      };
+    }
+    const requestValidator = makeValidator<unknown>(openApi, descriptor.request_schema_id);
+    if (!requestValidator || !requestValidator(request)) {
+      setHistoryError("The Runs.query example does not match its published request schema.");
+      return;
+    }
+    const normalizedUrl = localApiUrl(apiUrl.trim());
+    if (!normalizedUrl) {
+      setHistoryError("Use a local API address: localhost, 127.0.0.1, or ::1.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(`${normalizedUrl}${descriptor.path}`, {
+        method: descriptor.method,
+        redirect: "error",
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+      const responseBody = await readJson(response);
+      if (!response.ok) {
+        setHistoryError(safeErrorMessage(responseBody));
+        return;
+      }
+      const responseValidator = makeValidator<unknown>(openApi, descriptor.response_schema_id);
+      if (!responseValidator || !responseValidator(responseBody)) {
+        setHistoryError("Runs.query returned a response that does not match its published schema.");
+        return;
+      }
+      setRunHistory(JSON.stringify(responseBody, null, 2));
+    } catch {
+      setHistoryError("Could not reach the local API to load run history.");
     } finally {
       setBusy(false);
     }
@@ -393,7 +493,7 @@ export function App() {
                 disabled={!catalog}
                 onChange={(event) => changeOperation(event.target.value)}
               >
-                {supportedOperationIds.map((id) => <option key={id} value={id}>{id}</option>)}
+                {visibleOperationIds.map((id) => <option key={id} value={id}>{id}</option>)}
               </select>
             </label>
             <label>
@@ -472,6 +572,29 @@ export function App() {
           )}
         </section>
       </div>
+      <section className="panel history-panel" aria-labelledby="history-title">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Recorded executions</p>
+            <h2 id="history-title">Run History</h2>
+          </div>
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={() => void loadRunHistory()}
+            disabled={busy || !catalog}
+          >
+            Load recent history
+          </button>
+        </div>
+        {historyError ? (
+          <p className="editor-error" role="alert">{historyError}</p>
+        ) : runHistory ? (
+          <pre className="result-output" tabIndex={0}>{runHistory}</pre>
+        ) : (
+          <p className="editor-help">Load the latest run records for the selected sandbox.</p>
+        )}
+      </section>
       <footer className="page-footer">
         <span>Normative request and response shapes are generated from framework-v1 OpenAPI.</span>
         <span>Developer token is never saved to browser storage.</span>

@@ -18,7 +18,7 @@ from alfalab.bootstrap.registry import (
     repository_root,
     runtime_build_hash,
 )
-from alfalab.bootstrap.runtime import create_execution_runtime
+from alfalab.bootstrap.runtime import ExecutionRuntime, create_execution_runtime
 from alfalab.bootstrap.settings import ApiSettings
 from alfalab.execution.context import TrustedPrincipal
 from alfalab.execution.errors import SafeExecutionError
@@ -61,7 +61,18 @@ def get_trusted_principal(
         tenant_id=settings.tenant_id,
         role="developer",
         allowed_sandboxes=settings.allowed_sandboxes,
-        permissions=frozenset({"Documents.prepare", "Runs.query", "catalog.read"}),
+        permissions=frozenset(
+            {
+                "Sources.fetch",
+                "Documents.prepare",
+                "Documents.register",
+                "Documents.read",
+                "Runs.query",
+                "documents.register",
+                "documents.read",
+                "catalog.read",
+            }
+        ),
     )
 
 
@@ -112,11 +123,17 @@ def _install_operation_routes(
         )
 
 
-def create_app(settings: ApiSettings | None = None) -> FastAPI:
+def create_app(
+    settings: ApiSettings | None = None,
+    *,
+    execution_runtime: ExecutionRuntime | None = None,
+) -> FastAPI:
     settings = settings or ApiSettings.from_environment()
-    runtime = create_execution_runtime(
+    owns_runtime = execution_runtime is None
+    runtime = execution_runtime or create_execution_runtime(
         settings.environment,
         runs_database_url=settings.runs_database_url,
+        documents_database_url=settings.documents_database_url,
         artifact_root=settings.artifact_root,
     )
     limits = runtime.limits
@@ -127,7 +144,8 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
         try:
             yield
         finally:
-            runtime.close()
+            if owns_runtime:
+                runtime.close()
 
     app = FastAPI(
         title="AlfaLab API",

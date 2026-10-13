@@ -9,6 +9,10 @@ class ScopeDenied(DocumentsStorageError):
     """The trusted principal cannot use the requested scope."""
 
 
+class DocumentsPolicyDenied(DocumentsStorageError):
+    """The owner policy does not allow access to full document content."""
+
+
 class IdempotencyConflict(DocumentsStorageError):
     """An idempotency key was already used for different command semantics."""
 

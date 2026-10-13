@@ -19,7 +19,9 @@ if str(API_SOURCE) not in sys.path:
 def admin_dsn() -> str:
     value = os.environ.get("ALFALAB_T04_ADMIN_DSN")
     if not value:
-        pytest.skip("set ALFALAB_T04_ADMIN_DSN to run PostgreSQL owner integration tests")
+        pytest.skip(
+            "set ALFALAB_T04_ADMIN_DSN to run PostgreSQL owner integration tests"
+        )
     return value
 
 
@@ -29,7 +31,9 @@ def documents_migrated(admin_dsn: str) -> bool:
 
     admin_dsn = psycopg_url(admin_dsn)
     engine = create_engine(admin_dsn, pool_pre_ping=True, echo=False)
-    role_script = (ROOT / "infra" / "bootstrap" / "documents_roles.sql").read_text(encoding="utf-8")
+    role_script = (ROOT / "infra" / "bootstrap" / "documents_roles.sql").read_text(
+        encoding="utf-8"
+    )
     raw = engine.raw_connection()
     try:
         cursor = raw.cursor()
@@ -71,4 +75,11 @@ def documents_storage(documents_engine):
     from alfalab.modules.documents.storage.service import DocumentsStorage
 
     root = ROOT / ".local" / "artifacts"
-    return DocumentsStorage(documents_engine, ArtifactStore(root))
+    # These owner transaction tests use synthetic test payloads. The runtime
+    # policy gate is exercised separately with the strict approved-source catalog.
+    return DocumentsStorage(
+        documents_engine,
+        ArtifactStore(root),
+        trusted_material=lambda _material, _context: True,
+        trusted_content_hash=lambda _content_hash: True,
+    )

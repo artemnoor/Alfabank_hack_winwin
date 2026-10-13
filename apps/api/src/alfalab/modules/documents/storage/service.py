@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from datetime import datetime
+from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
 from typing import Any
 
 from alfalab_contracts import (
@@ -12,6 +12,7 @@ from alfalab_contracts import (
     DocumentSelection,
     DocumentVersion,
     ObjectRef,
+    RawMaterial,
     ReadDocumentsInput,
     ReadDocumentsOutput,
     ReceiptQuery,
@@ -22,6 +23,7 @@ from alfalab_contracts import (
 from sqlalchemy import insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.exc import IntegrityError
 
 from alfalab.common.limits import (
     MAX_ARTIFACT_RESPONSE_BYTES,
@@ -29,16 +31,26 @@ from alfalab.common.limits import (
 )
 from alfalab.execution.temporal import parse_utc_timestamp
 
+from ..validation import validate_registered_content
 from .artifacts import ArtifactStore
 from .canonical import canonical_hash
 from .context import OperationContext, TrustedScope, owner_command_context
-from .errors import DocumentsStorageError, ExpectedRevisionConflict
+from .errors import (
+    DocumentsPolicyDenied,
+    DocumentsStorageError,
+    ExpectedRevisionConflict,
+)
 from .policy import (
     DEFAULT_SCOPE_POLICY,
     DOCUMENTS_READ_PERMISSION,
     DOCUMENTS_REGISTER_PERMISSION,
     ScopePolicy,
     require_permission,
+)
+from .replay import (
+    RegisterBeforeState,
+    RegisterBeforeStateRequest,
+    RestorableDocumentVersion,
 )
 from .schema import audit_entries, command_claims, command_receipts, documents, versions
 from .transactions import OwnerCommandEffect, OwnerCommandRunner, OwnerTables
@@ -56,10 +68,15 @@ class DocumentsStorage:
         engine: Engine,
         artifacts: ArtifactStore,
         scope_policy: ScopePolicy = DEFAULT_SCOPE_POLICY,
+        *,
+        trusted_material: Callable[[RawMaterial, OperationContext], bool] | None = None,
+        trusted_content_hash: Callable[[str], bool] | None = None,
     ) -> None:
         self._engine = engine
         self._artifacts = artifacts
         self._scope_policy = scope_policy
+        self._trusted_material = trusted_material or (lambda _material, _context: False)
+        self._trusted_content_hash = trusted_content_hash or (lambda _hash: False)
         self._commands = OwnerCommandRunner(
             engine,
             OwnerTables(
@@ -75,6 +92,11 @@ class DocumentsStorage:
     ) -> RegisterDocumentOutput:
         """Store a new immutable version or return the current semantic duplicate."""
 
+        validate_registered_content(payload.raw, payload.prepared)
+        if not self._trusted_material(payload.raw, context):
+            raise DocumentsPolicyDenied(
+                "trusted source policy does not authorize storing this content"
+            )
         require_permission(context, DOCUMENTS_REGISTER_PERMISSION)
         command_context = owner_command_context(
             context, scope_policy=self._scope_policy
@@ -267,6 +289,304 @@ class DocumentsStorage:
             raise TypeError("unsupported Documents.read query kind")
         return self._read_documents(scope, payload.query)
 
+    def content_hashes_for_read(
+        self,
+        payload: ReadDocumentsInput,
+        *,
+        tenant_id: str,
+        sandbox_id: str,
+        environment: str = "testing",
+    ) -> tuple[str, ...]:
+        """Read only owner metadata needed for a pre-content policy decision."""
+        scope = TrustedScope(tenant_id, sandbox_id, environment)
+        if isinstance(payload.query, DocumentSelection):
+            hashes: list[str] = []
+            with self._engine.connect() as connection:
+                for document_id in payload.query.document_ids:
+                    record = self._select_version(
+                        connection, scope, document_id, payload.query
+                    )
+                    if record is not None:
+                        hashes.append(record["raw_content_hash"])
+            return tuple(hashes)
+        if isinstance(payload.query, ReceiptQuery):
+            with self._engine.connect() as connection:
+                receipt = self._receipt_metadata(connection, scope, payload.query)
+                if receipt is None:
+                    return ()
+                return self._content_hashes_for_audit(
+                    connection, scope, receipt["audit_id"]
+                )
+        raise TypeError("unsupported Documents.read query kind")
+
+    def capture_register_before_state(
+        self,
+        request: RegisterBeforeStateRequest,
+        context: OperationContext,
+        /,
+    ) -> RegisterBeforeState:
+        """Capture a bounded, typed immutable owner snapshot before a command."""
+        scope = self._scope_policy.resolve(context)
+        require_permission(context, DOCUMENTS_READ_PERMISSION)
+        with self._engine.connect() as connection:
+            current_revision = connection.execute(
+                select(documents.c.current_revision).where(
+                    documents.c.tenant_id == scope.tenant_id,
+                    documents.c.sandbox_id == scope.sandbox_id,
+                    documents.c.document_id == request.document_id,
+                )
+            ).scalar_one_or_none()
+            current_revision = current_revision or 0
+            receipt_key = {
+                "tenant_id": scope.tenant_id,
+                "sandbox_id": scope.sandbox_id,
+                "operation_id": REGISTER_OPERATION_ID,
+                "contract_major": 1,
+                "idempotency_key": request.idempotency_key,
+            }
+            key_used = (
+                connection.execute(
+                    select(command_receipts.c.idempotency_key)
+                    .where(*_equals(command_receipts, receipt_key))
+                    .limit(1)
+                ).first()
+                is not None
+            )
+            claim_exists = (
+                connection.execute(
+                    select(command_claims.c.idempotency_key)
+                    .where(*_equals(command_claims, receipt_key))
+                    .limit(1)
+                ).first()
+                is not None
+            )
+            key_used = key_used or claim_exists
+            if current_revision == 0:
+                return RegisterBeforeState(
+                    document_id=request.document_id,
+                    current_revision=0,
+                    versions=[],
+                    replayable=not key_used,
+                )
+            rows = (
+                connection.execute(
+                    select(versions)
+                    .where(
+                        versions.c.tenant_id == scope.tenant_id,
+                        versions.c.sandbox_id == scope.sandbox_id,
+                        versions.c.document_id == request.document_id,
+                        versions.c.revision <= current_revision,
+                    )
+                    .order_by(versions.c.revision)
+                )
+                .mappings()
+                .all()
+            )
+            if len(rows) != current_revision:
+                raise DocumentsStorageError("document history is incomplete")
+            total_size = 0
+            for row in rows:
+                raw_size = row["raw_artifact_size_bytes"]
+                prepared_size = row["prepared_artifact_size_bytes"]
+                if row["prepared_artifact_hash"] is None:
+                    prepared_size = 0
+                if (
+                    not self._trusted_content_hash(row["raw_content_hash"])
+                    or type(raw_size) is not int
+                    or raw_size < 0
+                    or raw_size > MAX_ARTIFACT_RESPONSE_BYTES
+                    or type(prepared_size) is not int
+                    or prepared_size < 0
+                    or prepared_size > MAX_ARTIFACT_RESPONSE_BYTES
+                ):
+                    return RegisterBeforeState(
+                        document_id=request.document_id,
+                        current_revision=current_revision,
+                        versions=[],
+                        replayable=False,
+                    )
+                total_size += raw_size + prepared_size
+                if total_size > MAX_ARTIFACT_RESPONSE_BYTES:
+                    return RegisterBeforeState(
+                        document_id=request.document_id,
+                        current_revision=current_revision,
+                        versions=[],
+                        replayable=False,
+                    )
+            restored = [
+                RestorableDocumentVersion(
+                    version=self._materialize_version(connection, scope, row),
+                    semantic_hash=row["semantic_hash"],
+                    published_at=(
+                        _timestamp_string(row["published_at"])
+                        if row["published_at"] is not None
+                        else None
+                    ),
+                    recorded_at=_timestamp_string(row["recorded_at"]),
+                )
+                for row in rows
+            ]
+        return RegisterBeforeState(
+            document_id=request.document_id,
+            current_revision=current_revision,
+            versions=restored,
+            replayable=not key_used,
+        )
+
+    def restore_register_before_state(
+        self,
+        snapshot: RegisterBeforeState,
+        request: RegisterBeforeStateRequest,
+        context: OperationContext,
+        /,
+    ) -> None:
+        """Restore command state only into an empty, different replay sandbox."""
+        if (
+            getattr(context, "execution_mode", "live") != "replay"
+            or getattr(context, "replay_source_sandbox_id", None) == context.sandbox_id
+            or not snapshot.replayable
+            or snapshot.document_id != request.document_id
+        ):
+            raise DocumentsPolicyDenied("recorded command state is unavailable")
+        if snapshot.current_revision != request.expected_revision:
+            raise DocumentsPolicyDenied(
+                "recorded command state does not match the request"
+            )
+        scope = self._scope_policy.resolve(context)
+        if [item.version.ref.revision for item in snapshot.versions] != list(
+            range(1, snapshot.current_revision + 1)
+        ):
+            raise DocumentsStorageError("recorded command state has invalid revisions")
+
+        receipt_key = {
+            "tenant_id": scope.tenant_id,
+            "sandbox_id": scope.sandbox_id,
+            "operation_id": REGISTER_OPERATION_ID,
+            "contract_major": 1,
+            "idempotency_key": request.idempotency_key,
+        }
+        try:
+            with self._engine.begin() as connection:
+                existing_document = connection.execute(
+                    select(documents.c.current_revision).where(
+                        documents.c.tenant_id == scope.tenant_id,
+                        documents.c.sandbox_id == scope.sandbox_id,
+                        documents.c.document_id == snapshot.document_id,
+                    )
+                ).first()
+                existing_receipt = connection.execute(
+                    select(command_receipts.c.idempotency_key)
+                    .where(*_equals(command_receipts, receipt_key))
+                    .limit(1)
+                ).first()
+                existing_claim = connection.execute(
+                    select(command_claims.c.idempotency_key)
+                    .where(*_equals(command_claims, receipt_key))
+                    .limit(1)
+                ).first()
+                if existing_document or existing_receipt or existing_claim:
+                    raise DocumentsPolicyDenied(
+                        "replay target already contains command state"
+                    )
+                if snapshot.current_revision == 0:
+                    return
+
+                restored_rows: list[dict[str, Any]] = []
+                parent_ref = None
+                for item in snapshot.versions:
+                    version = item.version
+                    if (
+                        version.ref.object_id != snapshot.document_id
+                        or version.parent_ref != parent_ref
+                    ):
+                        raise DocumentsStorageError(
+                            "recorded command state has invalid lineage"
+                        )
+                    validate_registered_content(version.raw, version.prepared)
+                    if not self._trusted_material(version.raw, context):
+                        raise DocumentsPolicyDenied(
+                            "recorded command state is not approved by data policy"
+                        )
+                    version_body = {
+                        "kind": str(getattr(version.kind, "value", version.kind)),
+                        "raw": version.raw.model_dump(mode="json"),
+                        "prepared": version.prepared.model_dump(mode="json")
+                        if version.prepared
+                        else None,
+                        "parent_ref": parent_ref.model_dump(mode="json")
+                        if parent_ref
+                        else None,
+                    }
+                    if canonical_hash(version_body) != version.ref.hash:
+                        raise DocumentsStorageError(
+                            "recorded command state failed hash verification"
+                        )
+                    raw_artifact = self._artifacts.put_json(
+                        scope,
+                        version.raw,
+                        schema_id="RawMaterial",
+                        schema_version=CONTRACT_VERSION,
+                    )
+                    prepared_artifact = (
+                        self._artifacts.put_json(
+                            scope,
+                            version.prepared,
+                            schema_id="PreparedMaterial",
+                            schema_version=CONTRACT_VERSION,
+                        )
+                        if version.prepared is not None
+                        else None
+                    )
+                    restored_rows.append(
+                        {
+                            "tenant_id": scope.tenant_id,
+                            "sandbox_id": scope.sandbox_id,
+                            "document_id": snapshot.document_id,
+                            "revision": version.ref.revision,
+                            "kind": str(getattr(version.kind, "value", version.kind)),
+                            "raw_artifact_hash": raw_artifact.artifact_ref.hash,
+                            "raw_artifact_size_bytes": raw_artifact.artifact_ref.size_bytes,
+                            "prepared_artifact_hash": prepared_artifact.artifact_ref.hash
+                            if prepared_artifact
+                            else None,
+                            "prepared_artifact_size_bytes": prepared_artifact.artifact_ref.size_bytes
+                            if prepared_artifact
+                            else None,
+                            "raw_content_hash": version.raw.content_hash,
+                            "semantic_hash": item.semantic_hash,
+                            "version_hash": version.ref.hash,
+                            "parent_revision": version.parent_ref.revision
+                            if version.parent_ref
+                            else None,
+                            "published_at": _timestamp_value(item.published_at),
+                            "recorded_at": parse_utc_timestamp(item.recorded_at),
+                        }
+                    )
+                    parent_ref = version.ref
+                connection.execute(
+                    insert(documents).values(
+                        tenant_id=scope.tenant_id,
+                        sandbox_id=scope.sandbox_id,
+                        document_id=snapshot.document_id,
+                        current_revision=0,
+                    )
+                )
+                for row in restored_rows:
+                    connection.execute(insert(versions).values(**row))
+                connection.execute(
+                    update(documents)
+                    .where(
+                        documents.c.tenant_id == scope.tenant_id,
+                        documents.c.sandbox_id == scope.sandbox_id,
+                        documents.c.document_id == snapshot.document_id,
+                    )
+                    .values(current_revision=snapshot.current_revision)
+                )
+        except IntegrityError as exc:
+            raise DocumentsPolicyDenied(
+                "replay target changed while restoring command state"
+            ) from exc
+
     def _read_receipt(self, scope: TrustedScope, query: ReceiptQuery) -> ReceiptResult:
         key = {
             "tenant_id": scope.tenant_id,
@@ -276,6 +596,18 @@ class DocumentsStorage:
             "idempotency_key": query.idempotency_key,
         }
         with self._engine.connect() as connection:
+            metadata_record = self._receipt_metadata(connection, scope, query)
+            if metadata_record is None:
+                return ReceiptResult(kind="receipt", receipt=None)
+            hashes = self._content_hashes_for_audit(
+                connection, scope, metadata_record["audit_id"]
+            )
+            if not hashes or not all(
+                self._trusted_content_hash(value) for value in hashes
+            ):
+                raise DocumentsPolicyDenied(
+                    "trusted source policy denies receipt content"
+                )
             record = (
                 connection.execute(
                     select(command_receipts).where(*_equals(command_receipts, key))
@@ -289,6 +621,12 @@ class DocumentsStorage:
         response = RegisterDocumentOutput.model_validate(
             record["response_payload_json"]
         )
+        try:
+            validate_registered_content(response.version.raw, response.version.prepared)
+        except ValueError as exc:
+            raise DocumentsStorageError(
+                "stored receipt document failed content validation"
+            ) from exc
         if record["response_schema_id"] != REGISTER_RESPONSE_SCHEMA_ID:
             raise DocumentsStorageError("stored receipt response schema is unsupported")
         if record["response_schema_version"] != CONTRACT_VERSION:
@@ -318,8 +656,63 @@ class DocumentsStorage:
                 if record is None:
                     missing.append(document_id)
                 else:
+                    if not self._trusted_content_hash(record["raw_content_hash"]):
+                        raise DocumentsPolicyDenied(
+                            "trusted source policy denies document content"
+                        )
                     results.append(self._materialize_version(connection, scope, record))
         return DocumentResult(kind="documents", versions=results, missing_ids=missing)
+
+    @staticmethod
+    def _receipt_metadata(
+        connection: Connection, scope: TrustedScope, query: ReceiptQuery
+    ) -> Mapping[str, Any] | None:
+        return (
+            connection.execute(
+                select(
+                    command_receipts.c.audit_id,
+                    command_receipts.c.tenant_id,
+                    command_receipts.c.sandbox_id,
+                ).where(
+                    command_receipts.c.tenant_id == scope.tenant_id,
+                    command_receipts.c.sandbox_id == scope.sandbox_id,
+                    command_receipts.c.operation_id == query.operation_id,
+                    command_receipts.c.contract_major == 1,
+                    command_receipts.c.idempotency_key == query.idempotency_key,
+                )
+            )
+            .mappings()
+            .one_or_none()
+        )
+
+    @staticmethod
+    def _content_hashes_for_audit(
+        connection: Connection, scope: TrustedScope, audit_id: str
+    ) -> tuple[str, ...]:
+        refs = connection.execute(
+            select(audit_entries.c.after_refs).where(
+                audit_entries.c.tenant_id == scope.tenant_id,
+                audit_entries.c.sandbox_id == scope.sandbox_id,
+                audit_entries.c.audit_id == audit_id,
+            )
+        ).scalar_one_or_none()
+        if not isinstance(refs, list):
+            return ()
+        hashes: list[str] = []
+        for value in refs:
+            if not isinstance(value, dict) or value.get("owner") != "Documents":
+                continue
+            raw_hash = connection.execute(
+                select(versions.c.raw_content_hash).where(
+                    versions.c.tenant_id == scope.tenant_id,
+                    versions.c.sandbox_id == scope.sandbox_id,
+                    versions.c.document_id == value.get("object_id"),
+                    versions.c.revision == value.get("revision"),
+                )
+            ).scalar_one_or_none()
+            if raw_hash is not None:
+                hashes.append(raw_hash)
+        return tuple(hashes)
 
     def _select_version(
         self,
@@ -394,6 +787,12 @@ class DocumentsStorage:
                 ),
             )
             prepared = PreparedMaterial.model_validate_json(prepared_json, strict=True)
+        try:
+            validate_registered_content(raw, prepared)
+        except ValueError as exc:
+            raise DocumentsStorageError(
+                "stored document artifacts failed content validation"
+            ) from exc
         parent_ref = None
         if record["parent_revision"] is not None:
             parent = _version_row(
@@ -478,6 +877,14 @@ def _semantic_hash(payload: RegisterDocumentInput) -> str:
 
 def _timestamp_value(value: str | None) -> datetime | None:
     return parse_utc_timestamp(value) if value is not None else None
+
+
+def _timestamp_string(value: datetime) -> str:
+    if value.tzinfo is None:
+        raise DocumentsStorageError("database timestamp has no timezone")
+    return (
+        value.astimezone(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
+    )
 
 
 def _database_clock() -> Any:

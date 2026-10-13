@@ -144,6 +144,8 @@ class OperationContext:
     cancellation_event: Event
     limits: ExecutionLimits
     domain_clock: DomainClockPort = field(default_factory=SystemDomainClock)
+    execution_mode: Literal["live", "replay"] = "live"
+    replay_source_sandbox_id: str | None = None
 
     @property
     def cancelled(self) -> bool:

@@ -372,7 +372,4 @@ def cassette_replayable(
                 return False
         elif entry.response is not None:
             return False
-        if entry.kind == "owner_read":
-            # The recorded owner-read bundle needs its own operation-specific adapter.
-            return False
     return True

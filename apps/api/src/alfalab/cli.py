@@ -63,6 +63,17 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="read one request DTO from this UTF-8 JSON file; default: stdin",
     )
+    run_parser = subparsers.add_parser(
+        "run", help="execute any registered operation from a typed JSON request"
+    )
+    run_parser.add_argument(
+        "operation_id", help="operation ID, for example Sources.fetch"
+    )
+    run_parser.add_argument(
+        "--request",
+        type=Path,
+        help="read one operation request DTO from this UTF-8 JSON file; default: stdin",
+    )
     return parser
 
 
@@ -80,22 +91,16 @@ def run_cli(
     output_stream = stdout or sys.stdout
     error_stream = stderr or sys.stderr
     args = _build_parser().parse_args(argv)
-    if args.operation != "prepare":
-        _write_json(
-            error_stream,
-            safe_error_body(
-                code="INVALID_INPUT",
-                category="validation",
-                safe_message="The requested CLI operation is not available.",
-            ),
-        )
-        return 2
+    operation_id = (
+        "Documents.prepare" if args.operation == "prepare" else args.operation_id
+    )
 
     try:
         runtime_settings = settings or ApiSettings.from_environment()
         execution_runtime = runtime or create_execution_runtime(
             runtime_settings.environment,
             runs_database_url=runtime_settings.runs_database_url,
+            documents_database_url=runtime_settings.documents_database_url,
             artifact_root=runtime_settings.artifact_root,
         )
     except (OSError, ValueError, ValidationError):
@@ -139,9 +144,12 @@ def run_cli(
 
     try:
         request_value = json.loads(raw_request.decode("utf-8"))
-        contract = execution_runtime.registry.contract("Documents.prepare")
+        contract = execution_runtime.registry.contract(operation_id)
+        descriptor = execution_runtime.registry.descriptor(operation_id)
+        if not descriptor.implementations:
+            raise KeyError(operation_id)
         request = contract.request_type.model_validate(request_value)
-    except (UnicodeDecodeError, ValueError, ValidationError, RecursionError):
+    except (KeyError, UnicodeDecodeError, ValueError, ValidationError, RecursionError):
         _write_json(
             error_stream,
             safe_error_body(
@@ -157,11 +165,22 @@ def run_cli(
         tenant_id=runtime_settings.tenant_id,
         role="developer",
         allowed_sandboxes=runtime_settings.allowed_sandboxes,
-        permissions=frozenset({"Documents.prepare", "catalog.read"}),
+        permissions=frozenset(
+            {
+                "Sources.fetch",
+                "Documents.prepare",
+                "Documents.register",
+                "Documents.read",
+                "Runs.query",
+                "documents.register",
+                "documents.read",
+                "catalog.read",
+            }
+        ),
     )
     try:
         response = execution_runtime.execution_service.invoke(
-            execution_runtime.registry.descriptor("Documents.prepare"),
+            descriptor,
             request,
             principal,
         )

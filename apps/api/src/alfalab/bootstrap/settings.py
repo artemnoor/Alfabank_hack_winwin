@@ -19,6 +19,7 @@ class ApiSettings:
     allowed_sandboxes: frozenset[str]
     playground_origins: tuple[str, ...]
     runs_database_url: str | None = field(default=None, repr=False)
+    documents_database_url: str | None = field(default=None, repr=False)
     artifact_root: Path | None = field(default=None, repr=False)
 
     @classmethod
@@ -42,6 +43,9 @@ class ApiSettings:
         database_url = os.environ.get(
             "ALFALAB_RUNS_DATABASE_URL"
         ) or _profile_database_url(environment)
+        documents_database_url = (
+            os.environ.get("ALFALAB_DOCUMENTS_DATABASE_URL") or database_url
+        )
         artifact_root = (
             Path(
                 os.environ.get(
@@ -62,6 +66,7 @@ class ApiSettings:
                 origin.strip() for origin in origins if origin.strip()
             ),
             runs_database_url=database_url,
+            documents_database_url=documents_database_url,
             artifact_root=artifact_root,
         )
 

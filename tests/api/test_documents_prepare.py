@@ -438,8 +438,8 @@ def test_committed_owner_result_survives_final_history_failure_as_unknown(
         original_write(record)
 
     monkeypatch.setattr(repository, "write", fail_success_write)
-    # T05 does not register a Documents command operation; this isolates the
-    # existing owner-receipt branch with a typed successful result.
+    # Keep this unit-level branch probe small; T07 adds a PostgreSQL-backed
+    # register test that exercises a real owner receipt after history failure.
     monkeypatch.setattr(
         ExecutionService, "_contains_owner_receipt", staticmethod(lambda _value: True)
     )
@@ -549,12 +549,16 @@ def test_catalog_and_runtime_openapi_show_only_available_documents_prepare() -> 
     assert [item["id"] for item in operations["Runs.query"]["implementations"]] == [
         "mock.baseline"
     ]
+    assert [item["id"] for item in operations["Sources.fetch"]["implementations"]] == [
+        "mock.baseline"
+    ]
     assert all(
         not item["implementations"]
         for key, item in operations.items()
-        if key not in {"Documents.prepare", "Runs.query"}
+        if key not in {"Sources.fetch", "Documents.prepare", "Runs.query"}
     )
     assert "/api/v1/documents/prepare" in openapi.json()["paths"]
+    assert "/api/v1/sources/fetch" in openapi.json()["paths"]
     assert "/api/v1/runs/query" in openapi.json()["paths"]
     assert "/api/v1/documents/register" not in openapi.json()["paths"]
 

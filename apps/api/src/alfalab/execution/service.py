@@ -18,20 +18,22 @@ from alfalab_contracts import (
     ArtifactRef,
     ArtifactView,
     DependencyRecord,
+    ErrorInfo,
     ExecutionMeta,
     LineageSummary,
     Measurement,
     MockParameters,
+    ModelIdentity,
     OperationDescriptor,
     PrepareInput,
     RunManifest,
     RunRecord,
     VersionedRef,
 )
-from alfalab_contracts._generated import TraceStatus
+from alfalab_contracts._generated import ReplayStatus, TraceStatus
 from alfalab_contracts.registry import OperationContract
 from alfalab_contracts.semantics import validate_dto, validate_operation_semantics
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from alfalab.bootstrap.registry import (
     RegisteredImplementation,
@@ -39,7 +41,9 @@ from alfalab.bootstrap.registry import (
     repository_root,
     runtime_build_hash,
 )
+from alfalab.common.artifacts import verified_artifact_json
 from alfalab.common.limits import MAX_ARTIFACT_RESPONSE_BYTES
+from alfalab.execution.clock import RecordingDomainClock, ReplayDomainClock
 from alfalab.execution.context import (
     DISABLED_ARTIFACT_READER,
     DISABLED_DEPENDENCY_GATEWAY,
@@ -52,18 +56,20 @@ from alfalab.execution.context import (
 from alfalab.execution.errors import SafeExecutionError, invalid_input
 from alfalab.execution.gateway import ControlledDependencyGateway
 from alfalab.execution.policy import ResolvedPolicy, TrustedDataPolicyResolver
+from alfalab.execution.recording import canonical_hash as _canonical_hash
+from alfalab.execution.recording import canonical_json as _canonical_json
+from alfalab.execution.recording import hash_text
+from alfalab.execution.replay import (
+    ReplayCassette,
+    ReplayDependencyGateway,
+    cassette_replayable,
+    replay_incompatible,
+    replay_miss,
+)
+from alfalab.execution.sequence import DependencySequence
 from alfalab.execution.temporal import parse_utc_timestamp
 from alfalab.execution.tracing import InMemoryTraceRecorder
 from alfalab.modules.runs.storage.repository import RunsRepository, StoredRun
-
-
-def _canonical_json(value: object) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def _canonical_hash(value: object) -> str:
-    encoded = _canonical_json(value).encode("utf-8")
-    return "sha256:" + hashlib.sha256(encoded).hexdigest()
 
 
 def _measurement_ms(elapsed_ns: int) -> str:
@@ -76,7 +82,7 @@ def _utc_now() -> datetime:
     return datetime.now(UTC)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class _RunState:
     operation_id: str
     run_id: str
@@ -95,6 +101,23 @@ class _RunState:
     started_ns: int
     payload: BaseModel
     scenario_id: str | None
+    execution_mode: Literal["live", "replay"]
+    replay_of: str | None
+    sequence: DependencySequence
+    replay_cassette: ReplayCassette | None
+    expected_output: BaseModel | None
+    expected_error: ErrorInfo | None
+    successful: bool = False
+    recording_complete: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class _ReplaySource:
+    stored: StoredRun
+    payload: BaseModel
+    output: BaseModel | None
+    expected_error: ErrorInfo | None
+    policy: ResolvedPolicy
 
 
 class ExecutionService:
@@ -143,14 +166,6 @@ class ExecutionService:
                 category="access",
                 safe_message="The requested sandbox is not available to this principal.",
             )
-        if request.execution.mode != "live":
-            raise SafeExecutionError(
-                status_code=409,
-                code="REPLAY_INCOMPATIBLE",
-                category="replay",
-                safe_message="Replay is unavailable for this execution slice.",
-            )
-
         implementation = self._resolve_implementation(
             operation_id,
             request.implementation.id,
@@ -169,32 +184,25 @@ class ExecutionService:
             )
         if type(request.implementation.parameters) is not implementation.parameter_type:
             raise invalid_input("implementation.parameters")
-        self._validate_scenario(request.payload, request.implementation.parameters)
-
-        if isinstance(request.payload, PrepareInput):
-            if len(request.payload.material.text) > self._limits.max_document_chars:
-                raise invalid_input("payload.material.text")
-            try:
-                validate_dto(request.payload.material)
-            except ValueError as exc:
-                raise invalid_input("payload.material.content_hash") from exc
-
-        # Classification is resolved before payload hashes or artifacts are recorded.
-        source_id = None
-        if isinstance(request.payload, PrepareInput):
-            # A material ID is only a lookup key into the server's reviewed source
-            # registry; trust still requires an exact approved payload hash.
-            source_id = (
-                request.payload.material.source_id
-                or request.payload.material.material_id
+        replay_source = None
+        payload = request.payload
+        if request.execution.mode == "replay":
+            self._validate_scenario(payload, request.implementation.parameters)
+            self._validate_payload(payload)
+            replay_source = self._load_replay_source(
+                operation_id,
+                contract,
+                request,
+                principal,
+                implementation,
             )
-        candidate_payload_hash = _canonical_hash(
-            request.payload.model_dump(mode="json")
-        )
-        policy = self._policy_resolver.resolve(
-            source_id,
-            payload_hash=candidate_payload_hash,
-        )
+            payload = replay_source.payload
+            policy = replay_source.policy
+        else:
+            self._validate_scenario(payload, request.implementation.parameters)
+            self._validate_payload(payload)
+            policy = self._resolve_policy(payload)
+
         state = self._begin_run(
             operation_id,
             contract,
@@ -202,6 +210,8 @@ class ExecutionService:
             principal,
             implementation,
             policy,
+            payload=payload,
+            replay_source=replay_source,
         )
 
         if not policy.processing_allowed:
@@ -236,7 +246,7 @@ class ExecutionService:
 
         try:
             self._apply_scenario(request.implementation.parameters)
-            output = implementation.execute(request.payload, state.context)
+            output = implementation.execute(state.payload, state.context)
             if not isinstance(output, implementation.output_type) or not isinstance(
                 output, contract.output_type
             ):
@@ -269,6 +279,14 @@ class ExecutionService:
                     outcome="unknown",
                     meta=preliminary_meta,
                 ) from exc
+            if state.replay_cassette is not None:
+                state.replay_cassette.assert_consumed()
+            if state.expected_error is not None:
+                raise replay_miss()
+            if state.expected_output is not None and _canonical_json(
+                output.model_dump(mode="json")
+            ) != _canonical_json(state.expected_output.model_dump(mode="json")):
+                raise replay_miss()
             elapsed_ns = perf_counter_ns() - state.started_ns
             if elapsed_ns > request.execution.timeout_ms * 1_000_000:
                 raise SafeExecutionError(
@@ -290,11 +308,32 @@ class ExecutionService:
                         category="validation",
                         safe_message="The artifact response exceeds 2 MiB; retry with include_artifacts=false.",
                     )
-        except SafeExecutionError as exc:
+        except SafeExecutionError as caught_error:
+            execution_error = caught_error
+            if state.execution_mode == "replay" and state.replay_cassette is not None:
+                try:
+                    state.replay_cassette.assert_consumed()
+                except SafeExecutionError:
+                    execution_error = replay_miss()
+            if state.execution_mode == "replay" and execution_error.code not in {
+                "REPLAY_MISS",
+                "REPLAY_INCOMPATIBLE",
+            }:
+                expected = state.expected_error
+                if (
+                    expected is None
+                    or execution_error.code != expected.code
+                    or execution_error.category != expected.category
+                    or execution_error.retryable != expected.retryable
+                    or execution_error.outcome != expected.outcome
+                ):
+                    execution_error = replay_miss()
             self._finish_spans(state, status="error")
-            return self._finalize_error(contract, state, exc)
+            return self._finalize_error(contract, state, execution_error)
         except OSError as exc:
             self._finish_spans(state, status="error")
+            if state.execution_mode == "replay":
+                return self._finalize_error(contract, state, replay_miss(), cause=exc)
             safe = SafeExecutionError(
                 status_code=503,
                 code="HISTORY_UNAVAILABLE",
@@ -307,6 +346,8 @@ class ExecutionService:
         except Exception as exc:  # noqa: BLE001 - redact arbitrary implementation and storage failures
             # Exception text may contain source material, provider bodies, or locals.
             self._finish_spans(state, status="error")
+            if state.execution_mode == "replay":
+                return self._finalize_error(contract, state, replay_miss(), cause=exc)
             safe = SafeExecutionError(
                 status_code=500,
                 code="INTERNAL_ERROR",
@@ -316,13 +357,20 @@ class ExecutionService:
             )
             return self._finalize_error(contract, state, safe, cause=exc)
 
+        state.successful = True
+        state.recording_complete = self._recording_supports_replay(state, output)
         self._finish_spans(state, status="success")
         meta = self._build_meta(state, elapsed_ns=perf_counter_ns() - state.started_ns)
         response = contract.response_type(meta=meta, status="success", payload=output)
         try:
             self._write_run(state, meta, status="success", output=output)
         except OSError as exc:
-            partial_meta = meta.model_copy(update={"trace_status": TraceStatus.partial})
+            partial_meta = meta.model_copy(
+                update={
+                    "trace_status": TraceStatus.partial,
+                    "replay_status": ReplayStatus.unavailable,
+                }
+            )
             response = response.model_copy(update={"meta": partial_meta})
             try:
                 self._write_run(state, partial_meta, status="unknown", output=None)
@@ -353,6 +401,9 @@ class ExecutionService:
         cause: Exception | None = None,
     ) -> BaseModel:
         del cause
+        state.recording_complete = self._recording_supports_replay(
+            state, None, error=error
+        )
         elapsed_ns = perf_counter_ns() - state.started_ns
         meta = self._build_meta(state, elapsed_ns=elapsed_ns)
         try:
@@ -387,6 +438,283 @@ class ExecutionService:
                 safe_message="The selected implementation is unavailable.",
                 retryable=True,
             ) from exc
+
+    def _validate_payload(self, payload: BaseModel) -> None:
+        if not isinstance(payload, PrepareInput):
+            return
+        if len(payload.material.text) > self._limits.max_document_chars:
+            raise invalid_input("payload.material.text")
+        try:
+            validate_dto(payload.material)
+        except ValueError as exc:
+            raise invalid_input("payload.material.content_hash") from exc
+
+    def _resolve_policy(self, payload: BaseModel) -> ResolvedPolicy:
+        source_id = None
+        if isinstance(payload, PrepareInput):
+            source_id = payload.material.source_id or payload.material.material_id
+        return self._policy_resolver.resolve(
+            source_id,
+            payload_hash=_canonical_hash(payload.model_dump(mode="json")),
+        )
+
+    @staticmethod
+    def _configuration_hash(
+        implementation: RegisteredImplementation, parameters: BaseModel
+    ) -> str:
+        return _canonical_hash(
+            {
+                "implementation": implementation.id,
+                "version": implementation.version,
+                "configuration": implementation.configuration,
+                "parameters": parameters.model_dump(mode="json"),
+            }
+        )
+
+    def _load_replay_source(
+        self,
+        operation_id: str,
+        contract: OperationContract,
+        request: BaseModel,
+        principal: TrustedPrincipal,
+        implementation: RegisteredImplementation,
+    ) -> _ReplaySource:
+        execution = request.execution
+        source_run_id = execution.source_run_id
+        if execution.strict is not True or execution.recording != "full":
+            raise replay_incompatible()
+        profile = contract.descriptor.replay_profile
+        profile_value = getattr(profile, "value", profile)
+        if profile_value not in {"fixed_input", "recorded_dependencies"}:
+            # Runs.query has no approved immutable owner-read bundle yet.
+            raise replay_incompatible()
+        try:
+            stored = self._runs_repository.get(
+                source_run_id,
+                tenant_id=principal.tenant_id,
+                sandbox_id=request.sandbox_id,
+            )
+        except OSError as exc:
+            raise SafeExecutionError(
+                status_code=503,
+                code="HISTORY_UNAVAILABLE",
+                category="unavailable",
+                safe_message="Execution history is temporarily unavailable.",
+                retryable=True,
+            ) from exc
+        if stored is None:
+            raise replay_incompatible()
+
+        record = stored.record
+        if (
+            stored.tenant_id != principal.tenant_id
+            or stored.sandbox_id != request.sandbox_id
+        ):
+            raise replay_incompatible()
+        expected_error = None
+        if (
+            stored.writer_status == "success"
+            and record.status == "success"
+            and record.output is not None
+        ):
+            pass
+        elif (
+            stored.writer_status == "error"
+            and record.status == "failed"
+            and record.output is None
+        ):
+            expected_error = self._terminal_dependency_error(record.dependencies)
+            if expected_error is None:
+                raise replay_incompatible()
+        else:
+            raise replay_incompatible()
+
+        if (
+            record.operation_id != operation_id
+            or record.replay_status != "available"
+            or record.trace_status != "complete"
+            or record.manifest.recording != "full"
+            or record.manifest.data_classification not in {"synthetic", "public"}
+            or not record.manifest.data_policy.processing_allowed
+            or record.manifest.envelope_version != "1.0.0"
+            or record.manifest.hash_format != "canonical-json-v1"
+            or record.analytical_time != record.manifest.analytical_time
+            or record.random_seed != record.manifest.random_seed
+            or record.contract_version != contract.descriptor.contract_version
+            or record.implementation.id != implementation.id
+            or record.implementation.version != implementation.version
+            or record.manifest.implementation != record.implementation
+        ):
+            raise replay_incompatible()
+
+        configuration_hash = self._configuration_hash(
+            implementation, request.implementation.parameters
+        )
+        if (
+            record.configuration_hash != configuration_hash
+            or record.manifest.configuration.ref.schema_id != "RuntimeConfiguration"
+            or record.manifest.configuration.ref.schema_version != "1.0.0"
+        ):
+            raise replay_incompatible()
+
+        current_contract_hash = _canonical_hash(
+            contract.descriptor.model_dump(mode="json")
+        )
+        current_build_hash = runtime_build_hash()
+        lock_path = repository_root() / "uv.lock"
+        current_lock_hash = (
+            "sha256:" + hashlib.sha256(lock_path.read_bytes()).hexdigest()
+            if lock_path.is_file()
+            else _canonical_hash({"lock": "unavailable"})
+        )
+        if (
+            record.manifest.contract_hash != current_contract_hash
+            or record.manifest.runtime_build_hash != current_build_hash
+            or record.runtime_build_hash != current_build_hash
+            or record.manifest.runtime_lock_hash != current_lock_hash
+        ):
+            raise replay_incompatible()
+        source_models = [
+            model.model_dump(mode="json") for model in record.manifest.models
+        ]
+        current_models = [
+            model.model_dump(mode="json")
+            for model in self._model_identities_for_dependencies(record.dependencies)
+        ]
+        if not self._dependencies_have_replayable_model_identities(
+            record.dependencies
+        ) or _canonical_json(source_models) != _canonical_json(current_models):
+            raise replay_incompatible()
+
+        if record.input is None or (expected_error is None and record.output is None):
+            raise replay_incompatible()
+        if (
+            record.input.ref.schema_id != contract.input_type.__name__
+            or record.input.ref.schema_version != "1.0.0"
+            or (
+                record.output is not None
+                and (
+                    record.output.ref.schema_id != contract.output_type.__name__
+                    or record.output.ref.schema_version != "1.0.0"
+                )
+            )
+        ):
+            raise replay_incompatible()
+        supplied_hash = _canonical_hash(request.payload.model_dump(mode="json"))
+        if supplied_hash != record.input.ref.hash or supplied_hash != stored.input_hash:
+            raise replay_incompatible()
+
+        policy = self._resolve_policy(request.payload)
+        if (
+            policy.decision.model_dump(mode="json")
+            != record.manifest.data_policy.model_dump(mode="json")
+            or not policy.full_recording_allowed
+        ):
+            raise replay_incompatible()
+
+        refs = [record.manifest.configuration.ref, record.input.ref]
+        if record.output is not None:
+            refs.append(record.output.ref)
+        for dependency in record.dependencies:
+            refs.append(dependency.request.ref)
+            if dependency.response is not None:
+                refs.append(dependency.response.ref)
+        if len({ref.artifact_id for ref in refs}) != len(refs):
+            raise replay_miss()
+        try:
+            contents = self._runs_repository.read_replay_artifacts(
+                source_run_id,
+                tuple(refs),
+                tenant_id=principal.tenant_id,
+                sandbox_id=request.sandbox_id,
+            )
+        except OSError as exc:
+            raise SafeExecutionError(
+                status_code=503,
+                code="HISTORY_UNAVAILABLE",
+                category="unavailable",
+                safe_message="Execution history is temporarily unavailable.",
+                retryable=True,
+            ) from exc
+        if contents is None or len(contents) != len(refs):
+            raise replay_miss()
+
+        source_record = record.model_copy(deep=True)
+        views = [source_record.manifest.configuration, source_record.input]
+        if source_record.output is not None:
+            views.append(source_record.output)
+        for dependency in source_record.dependencies:
+            views.append(dependency.request)
+            if dependency.response is not None:
+                views.append(dependency.response)
+        try:
+            for view in views:
+                view.content_json = contents[view.ref.artifact_id]
+                view.availability = "available"
+            config_json = verified_artifact_json(
+                source_record.manifest.configuration,
+                expected_schema_id="RuntimeConfiguration",
+                expected_classification=record.manifest.data_classification,
+            )
+            expected_config = {
+                "implementation": implementation.id,
+                "version": implementation.version,
+                "configuration_hash": configuration_hash,
+            }
+            if config_json != _canonical_json(expected_config):
+                raise ValueError("configuration artifact does not match its hash")
+            input_json = verified_artifact_json(
+                source_record.input,
+                expected_schema_id=contract.input_type.__name__,
+                expected_classification=record.manifest.data_classification,
+            )
+            payload = contract.input_type.model_validate(json.loads(input_json))
+            expected_output = None
+            if source_record.output is not None:
+                output_json = verified_artifact_json(
+                    source_record.output,
+                    expected_schema_id=contract.output_type.__name__,
+                    expected_classification=record.manifest.data_classification,
+                )
+                expected_output = contract.output_type.model_validate(
+                    json.loads(output_json)
+                )
+            for dependency in source_record.dependencies:
+                verified_artifact_json(
+                    dependency.request,
+                    expected_schema_id=dependency.request.ref.schema_id,
+                    expected_classification=record.manifest.data_classification,
+                )
+                if dependency.response is not None:
+                    verified_artifact_json(
+                        dependency.response,
+                        expected_schema_id=dependency.response.ref.schema_id,
+                        expected_classification=record.manifest.data_classification,
+                    )
+        except (KeyError, ValueError, ValidationError, json.JSONDecodeError) as exc:
+            raise replay_miss() from exc
+
+        if _canonical_hash(payload.model_dump(mode="json")) != record.input.ref.hash:
+            raise replay_miss()
+        if not cassette_replayable(
+            source_record.dependencies, self._dependency_sensitive_values_by_port()
+        ):
+            raise replay_miss()
+        return _ReplaySource(
+            stored=StoredRun(
+                tenant_id=stored.tenant_id,
+                sandbox_id=stored.sandbox_id,
+                record=source_record,
+                input_hash=stored.input_hash,
+                started_at=stored.started_at,
+                updated_at=stored.updated_at,
+                writer_status=stored.writer_status,
+            ),
+            payload=payload,
+            output=expected_output,
+            expected_error=expected_error,
+            policy=policy,
+        )
 
     @staticmethod
     def _validate_scenario(payload: object, parameters: object) -> None:
@@ -439,28 +767,35 @@ class ExecutionService:
         principal: TrustedPrincipal,
         implementation: RegisteredImplementation,
         policy: ResolvedPolicy,
+        *,
+        payload: BaseModel,
+        replay_source: _ReplaySource | None,
     ) -> _RunState:
         run_id = uuid4().hex
-        analytical_time = request.execution.analytical_time
+        execution_mode: Literal["live", "replay"] = request.execution.mode
+        analytical_time = (
+            replay_source.stored.record.analytical_time
+            if replay_source is not None
+            else request.execution.analytical_time
+        )
         analytical_clock = parse_utc_timestamp(analytical_time)
-        seed = request.execution.random_seed
-        params = request.implementation.parameters.model_dump(mode="json")
-        configuration_hash = _canonical_hash(
-            {
-                "implementation": implementation.id,
-                "version": implementation.version,
-                "configuration": implementation.configuration,
-                "parameters": params,
-            }
+        seed = (
+            replay_source.stored.record.random_seed
+            if replay_source is not None
+            else request.execution.random_seed
+        )
+        configuration_hash = self._configuration_hash(
+            implementation, request.implementation.parameters
         )
         if policy.processing_allowed:
-            input_hash = _canonical_hash(request.payload.model_dump(mode="json"))
+            input_hash = _canonical_hash(payload.model_dump(mode="json"))
         else:
             # A denied payload is not hashed or retained; only a safe marker is recorded.
             input_hash = _canonical_hash({"policy_denied": True})
         recorder = InMemoryTraceRecorder()
         cancellation = Event()
         dependencies: list[DependencyRecord] = []
+        sequence = DependencySequence()
         context = OperationContext(
             principal=principal,
             tenant_id=principal.tenant_id,
@@ -483,13 +818,45 @@ class ExecutionService:
             cancellation_event=cancellation,
             limits=self._limits,
         )
-        context.dependency_gateway = ControlledDependencyGateway(
-            definitions=self._registry.dependencies,
-            declared_ids=implementation.dependency_ids,
-            context=context,
-            policy=policy,
-            on_record=dependencies.append,
-        )
+        replay_cassette = None
+        replay_of = replay_source.stored.run_id if replay_source is not None else None
+        if replay_source is None:
+            context.dependency_gateway = ControlledDependencyGateway(
+                definitions=self._registry.dependencies,
+                declared_ids=implementation.dependency_ids,
+                context=context,
+                policy=policy,
+                on_record=dependencies.append,
+                sequence=sequence,
+            )
+            context.domain_clock = RecordingDomainClock(
+                context=context,
+                policy=policy,
+                sequence=sequence,
+                on_record=dependencies.append,
+            )
+        else:
+            replay_cassette = ReplayCassette(
+                source_run_id=replay_of,
+                entries=replay_source.stored.record.dependencies,
+                context=context,
+                policy=policy,
+                sequence=sequence,
+                on_record=dependencies.append,
+            )
+            context.dependency_gateway = ReplayDependencyGateway(
+                definitions=self._registry.dependencies,
+                declared_ids=implementation.dependency_ids,
+                context=context,
+                cassette=replay_cassette,
+                sequence=sequence,
+                on_record=dependencies.append,
+            )
+            context.domain_clock = ReplayDomainClock(
+                context=context,
+                cassette=replay_cassette,
+                sequence=sequence,
+            )
         root_span_id = recorder.start(operation_id, "operation")
         operation_span_id = recorder.start(
             f"{implementation.id}.execute",
@@ -512,11 +879,19 @@ class ExecutionService:
             operation_span_id=operation_span_id,
             started_at=_utc_now(),
             started_ns=perf_counter_ns(),
-            payload=request.payload,
+            payload=payload,
             scenario_id=(
                 request.implementation.parameters.scenario.value
                 if isinstance(request.implementation.parameters, MockParameters)
                 else None
+            ),
+            execution_mode=execution_mode,
+            replay_of=replay_of,
+            sequence=sequence,
+            replay_cassette=replay_cassette,
+            expected_output=replay_source.output if replay_source is not None else None,
+            expected_error=(
+                replay_source.expected_error if replay_source is not None else None
             ),
         )
 
@@ -534,6 +909,104 @@ class ExecutionService:
             state.root_span_id, status=status, safe_detail=safe_detail
         )
 
+    @staticmethod
+    def _terminal_dependency_error(
+        dependencies: list[DependencyRecord],
+    ) -> ErrorInfo | None:
+        if not dependencies:
+            return None
+        error = dependencies[-1].error
+        if (
+            error is None
+            or error.code != "DEPENDENCY_FAILED"
+            or error.category != "dependency"
+            or error.outcome not in {"unknown", "not_applied"}
+        ):
+            return None
+        return error
+
+    def _recording_supports_replay(
+        self,
+        state: _RunState,
+        output: BaseModel | None,
+        *,
+        error: SafeExecutionError | None = None,
+    ) -> bool:
+        if not state.policy.full_recording_allowed:
+            return False
+        if output is None:
+            expected_error = self._terminal_dependency_error(state.dependencies)
+            if (
+                error is None
+                or expected_error is None
+                or error.code != expected_error.code
+                or error.category != expected_error.category
+                or error.retryable != expected_error.retryable
+                or error.outcome != expected_error.outcome
+            ):
+                return False
+        values = [state.payload.model_dump(mode="json")]
+        if output is not None:
+            values.append(output.model_dump(mode="json"))
+        for value in values:
+            if (
+                len(_canonical_json(value).encode("utf-8"))
+                > MAX_ARTIFACT_RESPONSE_BYTES
+            ):
+                return False
+        profile = self._registry.contract(state.operation_id).descriptor.replay_profile
+        profile_value = getattr(profile, "value", profile)
+        if profile_value not in {"fixed_input", "recorded_dependencies"}:
+            return False
+        if not self._dependencies_have_replayable_model_identities(state.dependencies):
+            return False
+        return cassette_replayable(
+            state.dependencies, self._dependency_sensitive_values_by_port()
+        )
+
+    def _model_identities_for_dependencies(
+        self, dependencies: list[DependencyRecord]
+    ) -> list[ModelIdentity]:
+        identities: dict[str, ModelIdentity] = {}
+        for dependency in dependencies:
+            if dependency.kind != "model":
+                continue
+            definition = self._registry.dependencies.get(dependency.port_id)
+            identity = definition.model_identity if definition is not None else None
+            if identity is not None:
+                identities[_canonical_json(identity.model_dump(mode="json"))] = identity
+        return [identities[key] for key in sorted(identities)]
+
+    def _dependencies_have_replayable_model_identities(
+        self, dependencies: list[DependencyRecord]
+    ) -> bool:
+        for dependency in dependencies:
+            if dependency.kind != "model":
+                continue
+            definition = self._registry.dependencies.get(dependency.port_id)
+            identity = definition.model_identity if definition is not None else None
+            if (
+                identity is None
+                or identity.provider_revision is None
+                or identity.unknown_revision_reason is not None
+            ):
+                return False
+        return True
+
+    def _dependency_sensitive_values_by_port(
+        self,
+    ) -> dict[str, tuple[str, ...] | None]:
+        values: dict[str, tuple[str, ...] | None] = {
+            dependency_id: (
+                definition.sensitive_values
+                if definition.secret_inventory_complete
+                else None
+            )
+            for dependency_id, definition in self._registry.dependencies.items()
+        }
+        values["clock.domain.now"] = ()
+        return values
+
     def _build_meta(
         self, state: _RunState, *, elapsed_ns: int, completed: bool = True
     ) -> ExecutionMeta:
@@ -549,7 +1022,7 @@ class ExecutionService:
                 version=state.implementation.version,
                 hash=implementation_hash,
             ),
-            execution_mode="live",
+            execution_mode=state.execution_mode,
             environment=self._environment,
             configuration_hash=state.configuration_hash,
             duration_ms=max(0, elapsed_ns // 1_000_000),
@@ -570,7 +1043,13 @@ class ExecutionService:
                 if completed
                 else TraceStatus.partial
             ),
-            replay_status="unavailable",
+            replay_status=(
+                "available"
+                if state.recording_complete
+                else "incomplete"
+                if not completed and state.policy.full_recording_allowed
+                else "unavailable"
+            ),
             measurements=[
                 Measurement(
                     name="duration_ms",
@@ -659,7 +1138,7 @@ class ExecutionService:
         )
         configuration_ref = ArtifactRef(
             artifact_id=f"artifact-{state.run_id}-configuration",
-            hash=_canonical_hash(configuration_json),
+            hash=hash_text(configuration_json),
             schema_id="RuntimeConfiguration",
             schema_version="1.0.0",
             size_bytes=len(configuration_json.encode("utf-8")),
@@ -668,8 +1147,12 @@ class ExecutionService:
         )
         configuration_view = ArtifactView(
             ref=configuration_ref,
-            content_json=None,
-            availability="metadata_only",
+            content_json=(
+                configuration_json if state.policy.full_recording_allowed else None
+            ),
+            availability=(
+                "available" if state.policy.full_recording_allowed else "metadata_only"
+            ),
         )
         output_view = self._artifact_for_output(state, output)
         contract = self._registry.contract(state.operation_id)
@@ -696,7 +1179,7 @@ class ExecutionService:
             hash_format="canonical-json-v1",
             implementation=meta.implementation,
             configuration=configuration_view,
-            models=[],
+            models=self._model_identities_for_dependencies(state.dependencies),
             prompts=[],
             taxonomies=[],
             ontologies=[],
@@ -710,7 +1193,7 @@ class ExecutionService:
             random_seed=state.random_seed,
             recording=state.policy.decision.recording,
             state_capture=None,
-            replay_of=None,
+            replay_of=state.replay_of,
             data_classification=state.policy.decision.classification,
             data_policy=state.policy.decision,
         )

@@ -31,6 +31,7 @@ class ResolvedPolicy:
     processing_allowed: bool
     egress_allowed: bool
     full_recording_allowed: bool
+    export_allowed: bool
 
 
 class TrustedDataPolicyResolver:
@@ -74,7 +75,11 @@ class TrustedDataPolicyResolver:
                 egress_allowed=False,
                 recording="metadata_only",
                 export_allowed=False,
-                reason="DATA_POLICY_DENIED",
+                reason=(
+                    "CLOSED_DATA_DENIED"
+                    if source.classification == "closed"
+                    else "SECRET_DATA_DENIED"
+                ),
             )
         return self._decision(
             classification=source.classification,
@@ -139,6 +144,7 @@ class TrustedDataPolicyResolver:
             processing_allowed=processing_allowed,
             egress_allowed=egress_allowed,
             full_recording_allowed=full_allowed,
+            export_allowed=export_allowed,
         )
 
 

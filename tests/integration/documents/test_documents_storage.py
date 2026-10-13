@@ -386,6 +386,82 @@ def test_documents_read_rejects_corrupt_oversized_size_before_disk_read(
     assert read_calls == []
 
 
+def test_documents_read_uses_bounded_fallback_for_legacy_null_size(
+    documents_storage,
+    admin_dsn,
+    monkeypatch,
+    tmp_path,
+):
+    documents_storage._artifacts = ArtifactStore(tmp_path)
+    tenant, sandbox = _new_scope()
+    document_id = f"legacy-bounded-{uuid.uuid4().hex}"
+    _register(
+        documents_storage,
+        tenant,
+        sandbox,
+        _payload(document_id, 0, "Legacy artifact content", with_prepared=False),
+        f"key-{uuid.uuid4().hex}",
+    )
+    admin_engine = create_engine(admin_dsn, pool_pre_ping=True, echo=False)
+    try:
+        with admin_engine.begin() as connection:
+            version = (
+                connection.execute(
+                    select(versions).where(
+                        versions.c.tenant_id == tenant,
+                        versions.c.sandbox_id == sandbox,
+                        versions.c.document_id == document_id,
+                    )
+                )
+                .mappings()
+                .one()
+            )
+            connection.execute(
+                versions.update()
+                .where(
+                    versions.c.tenant_id == tenant,
+                    versions.c.sandbox_id == sandbox,
+                    versions.c.document_id == document_id,
+                )
+                .values(raw_artifact_size_bytes=None)
+            )
+    finally:
+        admin_engine.dispose()
+
+    artifact_hash = version["raw_artifact_hash"]
+    artifact_path = (
+        tmp_path
+        / "testing"
+        / tenant
+        / sandbox
+        / f"{artifact_hash.removeprefix('sha256:')}.json"
+    )
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    legacy_cap = 32
+    artifact_path.write_bytes(b"x" * (legacy_cap + 1))
+    monkeypatch.setattr(
+        "alfalab.modules.documents.storage.service.MAX_LEGACY_DOCUMENT_ARTIFACT_READ_BYTES",
+        legacy_cap,
+    )
+
+    expected_reads = []
+    original_read_json = ArtifactStore.read_json
+
+    def tracked_read_json(self, scope, value_hash, *, expected_size_bytes=None):
+        expected_reads.append(expected_size_bytes)
+        return original_read_json(
+            self,
+            scope,
+            value_hash,
+            expected_size_bytes=expected_size_bytes,
+        )
+
+    monkeypatch.setattr(ArtifactStore, "read_json", tracked_read_json)
+    with pytest.raises(ArtifactIntegrityError):
+        _read(documents_storage, tenant, sandbox, document_id)
+    assert expected_reads == [legacy_cap]
+
+
 def test_as_of_uses_publication_and_recorded_time_and_rejects_mixed_selector(
     documents_storage,
 ):

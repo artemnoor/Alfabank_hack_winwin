@@ -244,6 +244,8 @@ def test_postgres_preserves_failed_runs_and_partial_history_after_final_write_fa
         failed_body = _prepare_request("t05-pg-failed-operation")
         failed_response = _post(app, "/api/v1/documents/prepare", failed_body)
         assert failed_response.status_code == 403, failed_response.text
+        assert "T05_PRIVATE_CANARY_t05-pg-failed-operation" not in failed_response.text
+        assert "T05_EGRESS_PRIVATE_CANARY" not in failed_response.text
         assert dependency_calls == []
         failed_payload = failed_response.json()
         failed_run_id = failed_payload["meta"]["run_id"]
@@ -786,6 +788,116 @@ def test_runs_query_rejects_over_budget_before_reading_artifact_files(
         monkeypatch.setattr(ArtifactStore, "read_json", tracked_read)
         payload = QueryRunsInput.model_validate(
             _query_request(["t05-over-budget-run"])["payload"]
+        )
+        with pytest.raises(SafeExecutionError) as oversized:
+            repository.query(
+                payload,
+                tenant_id="t05-test-tenant",
+                sandbox_id="t05-sandbox",
+                exclude_run_id="t05-query-run",
+                include_artifacts=True,
+            )
+        assert oversized.value.code == "LIMIT_EXCEEDED"
+        assert read_calls == []
+    finally:
+        repository.close()
+
+
+def test_runs_query_checks_aggregate_artifact_budget_before_any_file_read(
+    runs_database_url: str,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    settings = _settings(runs_database_url, tmp_path)
+    fixture = json.loads(
+        (
+            ROOT / "fixtures/approved/Documents.prepare/normalize/manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    body = fixture["request"]
+    body["request_id"] = "t05-aggregate-large-source"
+    body["sandbox_id"] = "t05-sandbox"
+    app = create_app(settings)
+    try:
+        response = _post(app, "/api/v1/documents/prepare", body)
+        assert response.status_code == 200, response.text
+        source_run_id = response.json()["meta"]["run_id"]
+    finally:
+        app.state.execution_runtime.close()
+
+    repository = PostgresRunsRepository(
+        create_runs_engine(runs_database_url),
+        environment="testing",
+        artifact_root=tmp_path,
+    )
+    try:
+        source = repository.get(
+            source_run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert source is not None and source.record.input is not None
+        content_json = json.dumps(
+            {"large": "x" * 900_000},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        encoded = content_json.encode("utf-8")
+        assert len(encoded) < 2 * 1024 * 1024
+
+        requested_run_ids = []
+        for index in range(2):
+            record = source.record.model_copy(deep=True)
+            artifact_hash = "sha256:" + hashlib.sha256(encoded).hexdigest()
+            input_view = record.input
+            record.input = input_view.model_copy(
+                update={
+                    "ref": input_view.ref.model_copy(
+                        update={
+                            "artifact_id": f"t05-aggregate-artifact-{index}",
+                            "hash": artifact_hash,
+                            "size_bytes": len(encoded),
+                        }
+                    ),
+                    "content_json": content_json,
+                    "availability": Availability.available,
+                }
+            )
+            configuration = record.manifest.configuration.model_copy(
+                update={
+                    "content_json": None,
+                    "availability": Availability.metadata_only,
+                }
+            )
+            record.manifest = record.manifest.model_copy(
+                update={"configuration": configuration}
+            )
+            record.output = None
+            record.run_id = f"t05-aggregate-over-budget-{index}"
+            requested_run_ids.append(record.run_id)
+            repository.write(
+                StoredRun(
+                    tenant_id=source.tenant_id,
+                    sandbox_id=source.sandbox_id,
+                    record=record,
+                    input_hash=source.input_hash,
+                    started_at=source.started_at,
+                    updated_at=source.updated_at,
+                    writer_status=source.writer_status,
+                )
+            )
+
+        read_calls: list[str] = []
+        original_read = ArtifactStore.read_json
+
+        def tracked_read(self, scope, artifact_hash, **kwargs):
+            read_calls.append(artifact_hash)
+            return original_read(self, scope, artifact_hash, **kwargs)
+
+        monkeypatch.setattr(ArtifactStore, "read_json", tracked_read)
+        payload = QueryRunsInput.model_validate(
+            _query_request(requested_run_ids)["payload"]
         )
         with pytest.raises(SafeExecutionError) as oversized:
             repository.query(

@@ -637,11 +637,12 @@ class PostgresRunsRepository:
         if eligible_views:
             base_response = QueryRunsOutput(runs=records, next_cursor=next_cursor)
             reserved_bytes = len(base_response.model_dump_json().encode("utf-8"))
-            scope = TrustedScope(tenant_id, sandbox_id, self._environment)
             for view, artifact_hash in eligible_views:
                 reserved_bytes = _reserve_artifact_response_bytes(
                     reserved_bytes, view.ref.size_bytes
                 )
+            scope = TrustedScope(tenant_id, sandbox_id, self._environment)
+            for view, artifact_hash in eligible_views:
                 try:
                     raw = self._artifact_store.read_json(
                         scope,

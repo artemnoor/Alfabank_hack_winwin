@@ -1,40 +1,39 @@
-"""Opaque, scope- and filter-bound Runs pagination cursors."""
+"""Opaque, scope- and filter-bound Runs snapshot cursors."""
 
 from __future__ import annotations
 
 import base64
 import hashlib
 import json
+import re
 from dataclasses import dataclass
-from datetime import datetime
 
 
 def _digest(value: object) -> str:
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    raw = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
 class CursorState:
-    snapshot_at: datetime
-    after_created_at: datetime
-    after_run_id: str
+    snapshot_id: str
+    after_position: int
 
 
 def encode_cursor(
     *,
-    snapshot_at: datetime,
-    after_created_at: datetime,
-    after_run_id: str,
+    snapshot_id: str,
+    after_position: int,
     tenant_id: str,
     sandbox_id: str,
     query_fingerprint: str,
 ) -> str:
     body = {
-        "v": 1,
-        "snapshot_at": snapshot_at.isoformat(),
-        "after_created_at": after_created_at.isoformat(),
-        "after_run_id": after_run_id,
+        "v": 2,
+        "snapshot_id": snapshot_id,
+        "after_position": after_position,
         "scope": _digest([tenant_id, sandbox_id]),
         "query": query_fingerprint,
     }
@@ -52,19 +51,20 @@ def decode_cursor(
     try:
         raw = base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
         data = json.loads(raw)
+        snapshot_id = data.get("snapshot_id") if isinstance(data, dict) else None
+        after_position = data.get("after_position") if isinstance(data, dict) else None
         if (
             not isinstance(data, dict)
-            or data.get("v") != 1
+            or data.get("v") != 2
             or data.get("scope") != _digest([tenant_id, sandbox_id])
             or data.get("query") != query_fingerprint
-            or not isinstance(data.get("after_run_id"), str)
+            or not isinstance(snapshot_id, str)
+            or re.fullmatch(r"[0-9a-f]{32}", snapshot_id) is None
+            or type(after_position) is not int
+            or after_position < 1
         ):
             return None
-        snapshot_at = datetime.fromisoformat(data["snapshot_at"])
-        after_created_at = datetime.fromisoformat(data["after_created_at"])
-        if snapshot_at.tzinfo is None or after_created_at.tzinfo is None:
-            return None
-        return CursorState(snapshot_at, after_created_at, data["after_run_id"])
+        return CursorState(snapshot_id, after_position)
     except (ValueError, TypeError, KeyError, json.JSONDecodeError):
         return None
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import uuid
 from pathlib import Path, PurePosixPath
 
 from alfalab_contracts import ArtifactView, QueryRunsInput, QueryRunsOutput, RunRecord
@@ -29,6 +30,20 @@ from alfalab.modules.runs.storage.repository import StoredRun
 
 class ContentPolicyViolation(RuntimeError):
     """Raised if a full artifact crosses the owner boundary without trusted policy."""
+
+
+_MAX_RUN_QUERY_SNAPSHOT_ROWS = 10_000
+_MAX_RUN_QUERY_SNAPSHOT_BYTES = 64 * 1024 * 1024
+_MAX_ACTIVE_RUN_QUERY_SNAPSHOTS = 8
+
+
+def _snapshot_limit_error() -> SafeExecutionError:
+    return SafeExecutionError(
+        status_code=429,
+        code="LIMIT_EXCEEDED",
+        category="validation",
+        safe_message="The run history snapshot exceeds its safe limit; narrow the query or retry later.",
+    )
 
 
 def _reserve_artifact_response_bytes(current_size: int, artifact_size: int) -> int:
@@ -213,6 +228,28 @@ class PostgresRunsRepository:
                         ),
                     },
                 )
+                connection.execute(
+                    text(
+                        "DELETE FROM runs.spans WHERE tenant_id=:tenant_id "
+                        "AND sandbox_id=:sandbox_id AND run_id=:run_id"
+                    ),
+                    {
+                        "tenant_id": entry.tenant_id,
+                        "sandbox_id": entry.sandbox_id,
+                        "run_id": entry.run_id,
+                    },
+                )
+                connection.execute(
+                    text(
+                        "DELETE FROM runs.dependencies WHERE tenant_id=:tenant_id "
+                        "AND sandbox_id=:sandbox_id AND run_id=:run_id"
+                    ),
+                    {
+                        "tenant_id": entry.tenant_id,
+                        "sandbox_id": entry.sandbox_id,
+                        "run_id": entry.run_id,
+                    },
+                )
                 for span in entry.record.spans:
                     connection.execute(
                         text(
@@ -305,107 +342,243 @@ class PostgresRunsRepository:
                 raise invalid_input("payload.cursor")
 
         try:
-            with self._engine.begin() as connection:
+            with self._engine.connect() as connection, connection.begin():
+                connection.exec_driver_sql(
+                    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+                )
                 _set_scope(connection, tenant_id, sandbox_id)
-                snapshot_at = (
-                    cursor.snapshot_at
-                    if cursor is not None
-                    else connection.execute(
-                        text("SELECT clock_timestamp()")
-                    ).scalar_one()
-                )
-                clauses = [
-                    "tenant_id = :tenant_id",
-                    "sandbox_id = :sandbox_id",
-                    "run_id <> :exclude_run_id",
-                    "created_at <= :snapshot_at",
-                ]
-                values: dict[str, object] = {
-                    "tenant_id": tenant_id,
-                    "sandbox_id": sandbox_id,
-                    "exclude_run_id": exclude_run_id,
-                    "snapshot_at": snapshot_at,
-                    "limit": payload.limit + 1,
-                }
-                if payload.run_ids:
-                    clauses.append("run_id IN :run_ids")
-                    values["run_ids"] = list(payload.run_ids)
-                if payload.operation_id is not None:
-                    clauses.append("operation_id = :operation_id")
-                    values["operation_id"] = payload.operation_id
-                if payload.scenario_id is not None:
-                    clauses.append("scenario_id = :scenario_id")
-                    values["scenario_id"] = payload.scenario_id
-                if cursor is not None:
-                    clauses.append(
-                        "(created_at < :after_created_at OR (created_at = :after_created_at AND run_id < :after_run_id))"
+                if cursor is None:
+                    connection.execute(
+                        text(
+                            "DELETE FROM runs.query_snapshots "
+                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                            "AND expires_at <= clock_timestamp()"
+                        ),
+                        {"tenant_id": tenant_id, "sandbox_id": sandbox_id},
                     )
-                    values["after_created_at"] = cursor.after_created_at
-                    values["after_run_id"] = cursor.after_run_id
-                query = text(
-                    "SELECT run_id, record_json, input_hash, created_at, updated_at, status "
-                    "FROM runs.runs WHERE "
-                    + " AND ".join(clauses)
-                    + " ORDER BY created_at DESC, run_id DESC LIMIT :limit"
-                )
-                if payload.run_ids:
-                    query = query.bindparams(bindparam("run_ids", expanding=True))
-                rows = list(connection.execute(query, values).mappings())
-                has_more = len(rows) > payload.limit
-                rows = rows[: payload.limit]
-                run_ids = [row["run_id"] for row in rows]
-                spans_by_run: dict[str, list[object]] = {}
-                dependencies_by_run: dict[str, list[object]] = {}
-                if run_ids:
-                    span_rows = connection.execute(
+                    clauses = [
+                        "tenant_id = :tenant_id",
+                        "sandbox_id = :sandbox_id",
+                        "run_id <> :exclude_run_id",
+                    ]
+                    values: dict[str, object] = {
+                        "tenant_id": tenant_id,
+                        "sandbox_id": sandbox_id,
+                        "exclude_run_id": exclude_run_id,
+                        "limit": _MAX_RUN_QUERY_SNAPSHOT_ROWS + 1,
+                    }
+                    if payload.run_ids:
+                        clauses.append("run_id IN :run_ids")
+                        values["run_ids"] = list(payload.run_ids)
+                    if payload.operation_id is not None:
+                        clauses.append("operation_id = :operation_id")
+                        values["operation_id"] = payload.operation_id
+                    if payload.scenario_id is not None:
+                        clauses.append("scenario_id = :scenario_id")
+                        values["scenario_id"] = payload.scenario_id
+                    select_runs = text(
+                        "SELECT run_id, record_json FROM runs.runs WHERE "
+                        + " AND ".join(clauses)
+                        + " ORDER BY created_at DESC, run_id DESC LIMIT :limit"
+                    )
+                    if payload.run_ids:
+                        select_runs = select_runs.bindparams(
+                            bindparam("run_ids", expanding=True)
+                        )
+                    run_rows = list(connection.execute(select_runs, values).mappings())
+                    if len(run_rows) > _MAX_RUN_QUERY_SNAPSHOT_ROWS:
+                        raise _snapshot_limit_error()
+
+                    run_ids = [row["run_id"] for row in run_rows]
+                    spans_by_run: dict[str, list[object]] = {}
+                    dependencies_by_run: dict[str, list[object]] = {}
+                    if run_ids:
+                        span_rows = connection.execute(
+                            text(
+                                "SELECT run_id, span_json FROM runs.spans "
+                                "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                                "AND run_id IN :run_ids ORDER BY run_id, sequence"
+                            ).bindparams(bindparam("run_ids", expanding=True)),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "run_ids": run_ids,
+                            },
+                        ).mappings()
+                        for span in span_rows:
+                            spans_by_run.setdefault(span["run_id"], []).append(
+                                span["span_json"]
+                            )
+                        dependency_rows = connection.execute(
+                            text(
+                                "SELECT run_id, dependency_json FROM runs.dependencies "
+                                "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                                "AND run_id IN :run_ids ORDER BY run_id, sequence"
+                            ).bindparams(bindparam("run_ids", expanding=True)),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "run_ids": run_ids,
+                            },
+                        ).mappings()
+                        for dependency in dependency_rows:
+                            dependencies_by_run.setdefault(
+                                dependency["run_id"], []
+                            ).append(dependency["dependency_json"])
+
+                    storage_keys_by_run: dict[str, dict[str, str | None]] = {}
+                    if run_ids and include_artifacts:
+                        artifact_rows = connection.execute(
+                            text(
+                                "SELECT run_id, artifact_id, storage_key "
+                                "FROM runs.artifacts WHERE tenant_id=:tenant_id "
+                                "AND sandbox_id=:sandbox_id AND run_id IN :run_ids"
+                            ).bindparams(bindparam("run_ids", expanding=True)),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "run_ids": run_ids,
+                            },
+                        ).mappings()
+                        for artifact in artifact_rows:
+                            storage_keys_by_run.setdefault(artifact["run_id"], {})[
+                                artifact["artifact_id"]
+                            ] = artifact["storage_key"]
+
+                    snapshot_items: list[dict[str, object]] = []
+                    snapshot_bytes = 0
+                    for row in run_rows:
+                        record_payload = dict(row["record_json"])
+                        record_payload["spans"] = spans_by_run.get(row["run_id"], [])
+                        record_payload["dependencies"] = dependencies_by_run.get(
+                            row["run_id"], []
+                        )
+                        record_json = RunRecord.model_validate(
+                            record_payload
+                        ).model_dump(mode="json")
+                        artifact_keys_json = storage_keys_by_run.get(row["run_id"], {})
+                        snapshot_item = {
+                            "run_id": row["run_id"],
+                            "record_json": record_json,
+                            "artifact_keys_json": artifact_keys_json,
+                        }
+                        snapshot_bytes += len(
+                            json.dumps(
+                                snapshot_item,
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                            ).encode("utf-8")
+                        )
+                        snapshot_items.append(snapshot_item)
+
+                    snapshot_id = None
+                    if len(snapshot_items) > payload.limit:
+                        if snapshot_bytes > _MAX_RUN_QUERY_SNAPSHOT_BYTES:
+                            raise _snapshot_limit_error()
+                        active_snapshots = connection.execute(
+                            text(
+                                "SELECT count(*) FROM runs.query_snapshots "
+                                "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                                "AND expires_at > clock_timestamp()"
+                            ),
+                            {"tenant_id": tenant_id, "sandbox_id": sandbox_id},
+                        ).scalar_one()
+                        if active_snapshots >= _MAX_ACTIVE_RUN_QUERY_SNAPSHOTS:
+                            raise _snapshot_limit_error()
+                        snapshot_id = uuid.uuid4().hex
+                        connection.execute(
+                            text(
+                                "INSERT INTO runs.query_snapshots "
+                                "(tenant_id, sandbox_id, snapshot_id, query_fingerprint, expires_at) "
+                                "VALUES (:tenant_id, :sandbox_id, :snapshot_id, :fingerprint, "
+                                "clock_timestamp() + interval '15 minutes')"
+                            ),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "snapshot_id": snapshot_id,
+                                "fingerprint": fingerprint,
+                            },
+                        )
+                        connection.execute(
+                            text(
+                                "INSERT INTO runs.query_snapshot_items "
+                                "(tenant_id, sandbox_id, snapshot_id, position, run_id, "
+                                "record_json, artifact_keys_json) VALUES "
+                                "(:tenant_id, :sandbox_id, :snapshot_id, :position, :run_id, "
+                                "CAST(:record_json AS jsonb), CAST(:artifact_keys_json AS jsonb))"
+                            ),
+                            [
+                                {
+                                    "tenant_id": tenant_id,
+                                    "sandbox_id": sandbox_id,
+                                    "snapshot_id": snapshot_id,
+                                    "position": position,
+                                    "run_id": str(item["run_id"]),
+                                    "record_json": json.dumps(
+                                        item["record_json"],
+                                        ensure_ascii=False,
+                                        separators=(",", ":"),
+                                    ),
+                                    "artifact_keys_json": json.dumps(
+                                        item["artifact_keys_json"],
+                                        ensure_ascii=False,
+                                        separators=(",", ":"),
+                                    ),
+                                }
+                                for position, item in enumerate(snapshot_items)
+                            ],
+                        )
+                    page_items = snapshot_items[: payload.limit]
+                    has_more = len(snapshot_items) > payload.limit
+                    after_position = 0
+                else:
+                    snapshot = connection.execute(
                         text(
-                            "SELECT run_id, span_json FROM runs.spans "
-                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id AND run_id IN :run_ids "
-                            "ORDER BY run_id, sequence"
-                        ).bindparams(bindparam("run_ids", expanding=True)),
+                            "SELECT 1 FROM runs.query_snapshots "
+                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                            "AND snapshot_id=:snapshot_id AND query_fingerprint=:fingerprint "
+                            "AND expires_at > clock_timestamp()"
+                        ),
                         {
                             "tenant_id": tenant_id,
                             "sandbox_id": sandbox_id,
-                            "run_ids": run_ids,
+                            "snapshot_id": cursor.snapshot_id,
+                            "fingerprint": fingerprint,
                         },
-                    ).mappings()
-                    for span in span_rows:
-                        spans_by_run.setdefault(span["run_id"], []).append(
-                            span["span_json"]
-                        )
-                    dependency_rows = connection.execute(
-                        text(
-                            "SELECT run_id, dependency_json FROM runs.dependencies "
-                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id AND run_id IN :run_ids "
-                            "ORDER BY run_id, sequence"
-                        ).bindparams(bindparam("run_ids", expanding=True)),
+                    ).first()
+                    if snapshot is None:
+                        raise invalid_input("payload.cursor")
+                    item_rows = list(
+                        connection.execute(
+                            text(
+                                "SELECT position, run_id, record_json, artifact_keys_json "
+                                "FROM runs.query_snapshot_items WHERE tenant_id=:tenant_id "
+                                "AND sandbox_id=:sandbox_id AND snapshot_id=:snapshot_id "
+                                "AND position >= :after_position ORDER BY position LIMIT :limit"
+                            ),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "snapshot_id": cursor.snapshot_id,
+                                "after_position": cursor.after_position,
+                                "limit": payload.limit + 1,
+                            },
+                        ).mappings()
+                    )
+                    if not item_rows:
+                        raise invalid_input("payload.cursor")
+                    has_more = len(item_rows) > payload.limit
+                    page_items = [
                         {
-                            "tenant_id": tenant_id,
-                            "sandbox_id": sandbox_id,
-                            "run_ids": run_ids,
-                        },
-                    ).mappings()
-                    for dependency in dependency_rows:
-                        dependencies_by_run.setdefault(dependency["run_id"], []).append(
-                            dependency["dependency_json"]
-                        )
-                storage_keys: dict[tuple[str, str], str | None] = {}
-                if run_ids and include_artifacts:
-                    artifact_stmt = text(
-                        "SELECT run_id, artifact_id, storage_key FROM runs.artifacts "
-                        "WHERE tenant_id = :tenant_id AND sandbox_id = :sandbox_id AND run_id IN :run_ids"
-                    ).bindparams(bindparam("run_ids", expanding=True))
-                    for artifact in connection.execute(
-                        artifact_stmt,
-                        {
-                            "tenant_id": tenant_id,
-                            "sandbox_id": sandbox_id,
-                            "run_ids": run_ids,
-                        },
-                    ).mappings():
-                        storage_keys[(artifact["run_id"], artifact["artifact_id"])] = (
-                            artifact["storage_key"]
-                        )
+                            "run_id": row["run_id"],
+                            "record_json": row["record_json"],
+                            "artifact_keys_json": row["artifact_keys_json"],
+                        }
+                        for row in item_rows[: payload.limit]
+                    ]
+                    snapshot_id = cursor.snapshot_id
+                    after_position = cursor.after_position
         except SafeExecutionError:
             raise
         except SQLAlchemyError as exc:
@@ -413,11 +586,11 @@ class PostgresRunsRepository:
 
         records: list[RunRecord] = []
         eligible_views: list[tuple[ArtifactView, str]] = []
-        for row in rows:
-            record_payload = dict(row["record_json"])
-            record_payload["spans"] = spans_by_run.get(row["run_id"], [])
-            record_payload["dependencies"] = dependencies_by_run.get(row["run_id"], [])
-            record = RunRecord.model_validate(record_payload)
+        for item in page_items:
+            record = RunRecord.model_validate(item["record_json"])
+            artifact_keys = item["artifact_keys_json"]
+            if not isinstance(artifact_keys, dict):
+                artifact_keys = {}
             for view in _artifact_views(record):
                 view.content_json = None
                 view.availability = Availability.metadata_only
@@ -430,7 +603,7 @@ class PostgresRunsRepository:
                     and decision.classification in {"synthetic", "public"}
                     and view.ref.classification in {"synthetic", "public"}
                 )
-                storage_key = storage_keys.get((row["run_id"], view.ref.artifact_id))
+                storage_key = artifact_keys.get(view.ref.artifact_id)
                 if export_allowed and storage_key is not None:
                     if self._artifact_store is None:
                         view.availability = Availability.missing
@@ -452,12 +625,10 @@ class PostgresRunsRepository:
             records.append(record)
 
         next_cursor = None
-        if has_more and rows:
-            last = rows[-1]
+        if has_more and page_items and snapshot_id is not None:
             next_cursor = encode_cursor(
-                snapshot_at=snapshot_at,
-                after_created_at=last["created_at"],
-                after_run_id=last["run_id"],
+                snapshot_id=snapshot_id,
+                after_position=after_position + len(page_items),
                 tenant_id=tenant_id,
                 sandbox_id=sandbox_id,
                 query_fingerprint=fingerprint,
@@ -499,7 +670,10 @@ class PostgresRunsRepository:
         if tenant_id is None or sandbox_id is None:
             return None
         try:
-            with self._engine.begin() as connection:
+            with self._engine.connect() as connection, connection.begin():
+                connection.exec_driver_sql(
+                    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+                )
                 _set_scope(connection, tenant_id, sandbox_id)
                 row = (
                     connection.execute(
@@ -516,12 +690,46 @@ class PostgresRunsRepository:
                     .mappings()
                     .first()
                 )
-            if row is None:
-                return None
+                if row is None:
+                    return None
+                spans = (
+                    connection.execute(
+                        text(
+                            "SELECT span_json FROM runs.spans WHERE tenant_id=:tenant_id "
+                            "AND sandbox_id=:sandbox_id AND run_id=:run_id ORDER BY sequence"
+                        ),
+                        {
+                            "tenant_id": tenant_id,
+                            "sandbox_id": sandbox_id,
+                            "run_id": run_id,
+                        },
+                    )
+                    .scalars()
+                    .all()
+                )
+                dependencies = (
+                    connection.execute(
+                        text(
+                            "SELECT dependency_json FROM runs.dependencies "
+                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                            "AND run_id=:run_id ORDER BY sequence"
+                        ),
+                        {
+                            "tenant_id": tenant_id,
+                            "sandbox_id": sandbox_id,
+                            "run_id": run_id,
+                        },
+                    )
+                    .scalars()
+                    .all()
+                )
+                record_payload = dict(row["record_json"])
+                record_payload["spans"] = spans
+                record_payload["dependencies"] = dependencies
             return StoredRun(
                 tenant_id=tenant_id,
                 sandbox_id=sandbox_id,
-                record=RunRecord.model_validate(row["record_json"]),
+                record=RunRecord.model_validate(record_payload),
                 input_hash=row["input_hash"],
                 started_at=row["created_at"],
                 updated_at=row["updated_at"],

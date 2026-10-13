@@ -1,14 +1,35 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from sqlalchemy import event, select
-
+from alembic import command
+from alembic.config import Config
+from alfalab.common.limits import MAX_ARTIFACT_RESPONSE_BYTES
+from alfalab.modules.documents.operations.read import ReadOperation
+from alfalab.modules.documents.operations.register import RegisterOperation
+from alfalab.modules.documents.storage.artifacts import (
+    ArtifactIntegrityError,
+    ArtifactStore,
+)
+from alfalab.modules.documents.storage.context import TrustedScope
+from alfalab.modules.documents.storage.errors import (
+    DocumentsStorageError,
+    ExpectedRevisionConflict,
+    IdempotencyConflict,
+    ScopeDenied,
+)
+from alfalab.modules.documents.storage.schema import (
+    audit_entries,
+    command_receipts,
+    versions,
+)
+from alfalab.modules.documents.storage.service import DocumentsStorage
 from alfalab_contracts import (
     DocumentSelection,
     PreparedMaterial,
@@ -20,26 +41,55 @@ from alfalab_contracts import (
     SpanMap,
     TimeSlice,
 )
-from alfalab.modules.documents.storage.artifacts import ArtifactIntegrityError, ArtifactStore
-from alfalab.modules.documents.storage.context import TrustedScope
-from alfalab.modules.documents.storage.errors import (
-    ExpectedRevisionConflict,
-    IdempotencyConflict,
-    ScopeDenied,
-)
-from alfalab.modules.documents.storage.schema import audit_entries, command_receipts, versions
-from alfalab.modules.documents.storage.service import DocumentsStorage
-from alfalab.modules.documents.operations.read import ReadOperation
-from alfalab.modules.documents.operations.register import RegisterOperation
+from sqlalchemy import create_engine, event, select, text
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_documents_migrations_upgrade_downgrade_upgrade(admin_dsn):
+    previous_url = os.environ.get("ALFALAB_MIGRATION_DATABASE_URL")
+    os.environ["ALFALAB_MIGRATION_DATABASE_URL"] = admin_dsn
+    config = Config(str(ROOT / "infra" / "alembic.ini"))
+    try:
+        command.downgrade(config, "base")
+        command.upgrade(config, "head")
+        engine = create_engine(admin_dsn, pool_pre_ping=True, echo=False)
+        try:
+            with engine.connect() as connection:
+                assert (
+                    connection.execute(
+                        text("SELECT to_regclass('documents.versions')")
+                    ).scalar_one()
+                    == "documents.versions"
+                )
+                columns = (
+                    connection.execute(
+                        text(
+                            "SELECT column_name FROM information_schema.columns "
+                            "WHERE table_schema='documents' AND table_name='versions'"
+                        )
+                    )
+                    .scalars()
+                    .all()
+                )
+                assert "raw_artifact_size_bytes" in columns
+                assert "prepared_artifact_size_bytes" in columns
+        finally:
+            engine.dispose()
+    finally:
+        if previous_url is None:
+            os.environ.pop("ALFALAB_MIGRATION_DATABASE_URL", None)
+        else:
+            os.environ["ALFALAB_MIGRATION_DATABASE_URL"] = previous_url
 
 
 def _hash_text(text: str) -> str:
     return f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
 
 
-def _raw(material_id: str, text: str, *, published_at: str | None = None) -> RawMaterial:
+def _raw(
+    material_id: str, text: str, *, published_at: str | None = None
+) -> RawMaterial:
     provenance = Provenance(
         origin="synthetic",
         source_refs=[],
@@ -73,14 +123,23 @@ def _payload(
 ):
     raw = _raw(f"raw-{document_id}", text, published_at=published_at)
     prepared_text = text.strip()
-    prepared_material = _raw(f"prepared-{document_id}", prepared_text, published_at=published_at)
+    prepared_material = _raw(
+        f"prepared-{document_id}", prepared_text, published_at=published_at
+    )
     prepared = PreparedMaterial(
         material=prepared_material,
         raw_hash=raw.content_hash,
         prepared_hash=prepared_material.content_hash,
         quality="valid" if prepared_text else "rejected",
         span_map=(
-            [SpanMap(prepared_start=0, prepared_end=len(prepared_text), raw_start=0, raw_end=len(text))]
+            [
+                SpanMap(
+                    prepared_start=0,
+                    prepared_end=len(prepared_text),
+                    raw_start=0,
+                    raw_end=len(text),
+                )
+            ]
             if prepared_text
             else []
         ),
@@ -94,7 +153,14 @@ def _payload(
     )
 
 
-def _context(tenant_id: str, sandbox_id: str, *, key: str | None, operation_id: str, run_id: str | None = None):
+def _context(
+    tenant_id: str,
+    sandbox_id: str,
+    *,
+    key: str | None,
+    operation_id: str,
+    run_id: str | None = None,
+):
     return SimpleNamespace(
         tenant_id=tenant_id,
         sandbox_id=sandbox_id,
@@ -122,7 +188,15 @@ def _new_scope() -> tuple[str, str]:
     return f"t04-{suffix}", f"s04-{suffix}"
 
 
-def _read(storage: DocumentsStorage, tenant_id: str, sandbox_id: str, document_id: str, *, revision=None, as_of=None):
+def _read(
+    storage: DocumentsStorage,
+    tenant_id: str,
+    sandbox_id: str,
+    document_id: str,
+    *,
+    revision=None,
+    as_of=None,
+):
     request = ReadDocumentsInput(
         query=DocumentSelection(
             kind="documents",
@@ -131,7 +205,10 @@ def _read(storage: DocumentsStorage, tenant_id: str, sandbox_id: str, document_i
             as_of=as_of,
         )
     )
-    return storage.read(request, _context(tenant_id, sandbox_id, key=None, operation_id="Documents.read"))
+    return storage.read(
+        request,
+        _context(tenant_id, sandbox_id, key=None, operation_id="Documents.read"),
+    )
 
 
 def _register(storage, tenant_id, sandbox_id, payload, key, *, run_id=None):
@@ -150,7 +227,9 @@ def test_register_read_revision_receipt_and_as_of_roundtrip(documents_storage):
     document_id = f"doc-{uuid.uuid4().hex}"
     initial = _payload(document_id, 0, "Кириллица и документ")
 
-    first = _register(documents_storage, tenant, sandbox, initial, f"key-{uuid.uuid4().hex}")
+    first = _register(
+        documents_storage, tenant, sandbox, initial, f"key-{uuid.uuid4().hex}"
+    )
     assert first.version.ref.revision == 1
     assert first.version.kind == "prepared"
     assert first.version.prepared is not None
@@ -162,17 +241,36 @@ def test_register_read_revision_receipt_and_as_of_roundtrip(documents_storage):
     assert latest.missing_ids == []
 
     revised = _payload(document_id, 1, "Исправленный текст")
-    second = _register(documents_storage, tenant, sandbox, revised, f"key-{uuid.uuid4().hex}")
+    second = _register(
+        documents_storage, tenant, sandbox, revised, f"key-{uuid.uuid4().hex}"
+    )
     assert second.version.ref.revision == 2
     assert second.version.parent_ref == first.version.ref
-    assert _read(documents_storage, tenant, sandbox, document_id, revision=1).versions == [first.version]
-    assert _read(documents_storage, tenant, sandbox, document_id).versions == [second.version]
+    assert _read(
+        documents_storage, tenant, sandbox, document_id, revision=1
+    ).versions == [first.version]
+    assert _read(documents_storage, tenant, sandbox, document_id).versions == [
+        second.version
+    ]
 
     unknown_publication = _payload(f"unknown-{uuid.uuid4().hex}", 0, "Неизвестная дата")
     unknown_id = unknown_publication.document_id
-    _register(documents_storage, tenant, sandbox, unknown_publication, f"key-{uuid.uuid4().hex}")
-    as_of = TimeSlice(valid_as_of="2099-01-01T00:00:00Z", known_as_of="2099-01-01T00:00:00Z")
-    assert _read(documents_storage, tenant, sandbox, unknown_id, as_of=as_of).versions[0].raw.published_at is None
+    _register(
+        documents_storage,
+        tenant,
+        sandbox,
+        unknown_publication,
+        f"key-{uuid.uuid4().hex}",
+    )
+    as_of = TimeSlice(
+        valid_as_of="2099-01-01T00:00:00Z", known_as_of="2099-01-01T00:00:00Z"
+    )
+    assert (
+        _read(documents_storage, tenant, sandbox, unknown_id, as_of=as_of)
+        .versions[0]
+        .raw.published_at
+        is None
+    )
 
     missing = _read(documents_storage, tenant, sandbox, "not-present")
     assert missing.versions == []
@@ -191,7 +289,106 @@ def test_register_read_revision_receipt_and_as_of_roundtrip(documents_storage):
     assert receipt_result.receipt == first.receipt
 
 
-def test_as_of_uses_publication_and_recorded_time_and_rejects_mixed_selector(documents_storage):
+@pytest.mark.parametrize(
+    ("artifact_hash_field", "artifact_size_field"),
+    [
+        ("raw_artifact_hash", "raw_artifact_size_bytes"),
+        ("prepared_artifact_hash", "prepared_artifact_size_bytes"),
+    ],
+)
+def test_documents_read_bounds_artifact_read_to_persisted_size(
+    documents_storage,
+    documents_engine,
+    monkeypatch,
+    artifact_hash_field,
+    artifact_size_field,
+):
+    tenant, sandbox = _new_scope()
+    document_id = f"bounded-{uuid.uuid4().hex}"
+    _register(
+        documents_storage,
+        tenant,
+        sandbox,
+        _payload(document_id, 0, "Bounded artifact content"),
+        f"key-{uuid.uuid4().hex}",
+    )
+    with documents_engine.connect() as connection:
+        version = (
+            connection.execute(
+                select(versions).where(
+                    versions.c.tenant_id == tenant,
+                    versions.c.sandbox_id == sandbox,
+                    versions.c.document_id == document_id,
+                )
+            )
+            .mappings()
+            .one()
+        )
+    artifact_hash = version[artifact_hash_field]
+    expected_size = version[artifact_size_field]
+    assert artifact_hash is not None
+    assert expected_size > 0
+
+    artifact_path = (
+        ROOT
+        / ".local"
+        / "artifacts"
+        / "testing"
+        / tenant
+        / sandbox
+        / f"{artifact_hash.removeprefix('sha256:')}.json"
+    )
+    artifact_path.write_bytes(b"x" * (expected_size + 4096))
+
+    expected_reads = []
+    original_read_json = ArtifactStore.read_json
+
+    def tracked_read_json(self, scope, value_hash, *, expected_size_bytes=None):
+        expected_reads.append(expected_size_bytes)
+        return original_read_json(
+            self,
+            scope,
+            value_hash,
+            expected_size_bytes=expected_size_bytes,
+        )
+
+    monkeypatch.setattr(ArtifactStore, "read_json", tracked_read_json)
+    with pytest.raises(ArtifactIntegrityError):
+        _read(documents_storage, tenant, sandbox, document_id)
+    if artifact_hash_field == "raw_artifact_hash":
+        assert expected_reads == [expected_size]
+    else:
+        assert expected_reads == [version["raw_artifact_size_bytes"], expected_size]
+
+
+def test_documents_read_rejects_corrupt_oversized_size_before_disk_read(
+    documents_storage,
+    monkeypatch,
+):
+    tenant, sandbox = _new_scope()
+    read_calls = []
+
+    def forbidden_read(*args, **kwargs):
+        read_calls.append((args, kwargs))
+        raise AssertionError("artifact file must not be opened for an invalid size")
+
+    monkeypatch.setattr(ArtifactStore, "read_json", forbidden_read)
+    record = {
+        "raw_artifact_hash": "sha256:" + "a" * 64,
+        "raw_artifact_size_bytes": MAX_ARTIFACT_RESPONSE_BYTES + 1,
+    }
+    with pytest.raises(DocumentsStorageError, match="artifact size is invalid"):
+        documents_storage._materialize_version(
+            None,
+            TrustedScope(tenant, sandbox, "testing"),
+            record,
+        )
+    assert read_calls == []
+
+
+def test_as_of_uses_publication_and_recorded_time_and_rejects_mixed_selector(
+    documents_storage,
+):
     tenant, sandbox = _new_scope()
     document_id = f"doc-{uuid.uuid4().hex}"
     published = _payload(
@@ -202,10 +399,23 @@ def test_as_of_uses_publication_and_recorded_time_and_rejects_mixed_selector(doc
     )
     _register(documents_storage, tenant, sandbox, published, f"key-{uuid.uuid4().hex}")
 
-    before_publication = TimeSlice(valid_as_of="2026-10-09T00:00:00Z", known_as_of="2099-01-01T00:00:00Z")
-    after_publication = TimeSlice(valid_as_of="2026-10-11T00:00:00Z", known_as_of="2099-01-01T00:00:00Z")
-    assert _read(documents_storage, tenant, sandbox, document_id, as_of=before_publication).missing_ids == [document_id]
-    assert len(_read(documents_storage, tenant, sandbox, document_id, as_of=after_publication).versions) == 1
+    before_publication = TimeSlice(
+        valid_as_of="2026-10-09T00:00:00Z", known_as_of="2099-01-01T00:00:00Z"
+    )
+    after_publication = TimeSlice(
+        valid_as_of="2026-10-11T00:00:00Z", known_as_of="2099-01-01T00:00:00Z"
+    )
+    assert _read(
+        documents_storage, tenant, sandbox, document_id, as_of=before_publication
+    ).missing_ids == [document_id]
+    assert (
+        len(
+            _read(
+                documents_storage, tenant, sandbox, document_id, as_of=after_publication
+            ).versions
+        )
+        == 1
+    )
 
     invalid = ReadDocumentsInput(
         query=DocumentSelection(
@@ -216,7 +426,9 @@ def test_as_of_uses_publication_and_recorded_time_and_rejects_mixed_selector(doc
         )
     )
     with pytest.raises(ValueError, match="revision and as_of"):
-        documents_storage.read(invalid, _context(tenant, sandbox, key=None, operation_id="Documents.read"))
+        documents_storage.read(
+            invalid, _context(tenant, sandbox, key=None, operation_id="Documents.read")
+        )
 
 
 def test_idempotency_conflicts_and_same_content_noop(documents_storage):
@@ -225,8 +437,12 @@ def test_idempotency_conflicts_and_same_content_noop(documents_storage):
     key = f"key-{uuid.uuid4().hex}"
     payload = _payload(document_id, 0, "Один и тот же текст")
 
-    first = _register(documents_storage, tenant, sandbox, payload, key, run_id="run-first")
-    retry = _register(documents_storage, tenant, sandbox, payload, key, run_id="run-retry")
+    first = _register(
+        documents_storage, tenant, sandbox, payload, key, run_id="run-first"
+    )
+    retry = _register(
+        documents_storage, tenant, sandbox, payload, key, run_id="run-retry"
+    )
     assert retry == first
     assert retry.receipt.original_run_id == "run-first"
 
@@ -269,7 +485,9 @@ def test_idempotency_conflicts_and_same_content_noop(documents_storage):
     assert duplicate.receipt.changed_refs == []
 
     with pytest.raises(ExpectedRevisionConflict):
-        _register(documents_storage, tenant, sandbox, payload, f"key-{uuid.uuid4().hex}")
+        _register(
+            documents_storage, tenant, sandbox, payload, f"key-{uuid.uuid4().hex}"
+        )
 
 
 def test_register_requires_documents_register_permission(documents_storage):
@@ -285,7 +503,9 @@ def test_register_requires_documents_register_permission(documents_storage):
 
     with pytest.raises(ScopeDenied):
         documents_storage.register(_payload(document_id, 0, "Denied write"), context)
-    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [document_id]
+    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [
+        document_id
+    ]
 
 
 def test_register_rejects_span_map_outside_raw_text_before_commit(documents_storage):
@@ -318,7 +538,9 @@ def test_register_rejects_span_map_outside_raw_text_before_commit(documents_stor
     with pytest.raises(ValueError, match="span map exceeds registered raw text"):
         documents_storage.register(invalid_payload, context)
 
-    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [document_id]
+    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [
+        document_id
+    ]
     receipt = documents_storage.read(
         ReadDocumentsInput(
             query=ReceiptQuery(
@@ -332,7 +554,9 @@ def test_register_rejects_span_map_outside_raw_text_before_commit(documents_stor
     assert receipt.receipt is None
 
 
-def test_documents_and_receipt_reads_require_documents_read_permission(documents_storage):
+def test_documents_and_receipt_reads_require_documents_read_permission(
+    documents_storage,
+):
     tenant, sandbox = _new_scope()
     context = _context(
         tenant,
@@ -370,7 +594,9 @@ def test_concurrent_duplicate_returns_one_atomic_commit(documents_storage):
     payload = _payload(document_id, 0, "Одновременная регистрация")
 
     def call(run_id: str):
-        return _register(documents_storage, tenant, sandbox, payload, key, run_id=run_id)
+        return _register(
+            documents_storage, tenant, sandbox, payload, key, run_id=run_id
+        )
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         first_future = pool.submit(call, "run-concurrent-a")
@@ -419,7 +645,9 @@ def test_failure_after_commit_replays_saved_response(documents_storage):
     with pytest.raises(RuntimeError, match="response loss after commit"):
         deliver_response()
 
-    retry = _register(documents_storage, tenant, sandbox, payload, key, run_id="run-after-commit")
+    retry = _register(
+        documents_storage, tenant, sandbox, payload, key, run_id="run-after-commit"
+    )
     assert retry == committed_response
     with documents_storage._engine.connect() as connection:
         version_count = connection.execute(
@@ -453,8 +681,14 @@ def test_failure_before_commit_rolls_back_and_same_key_can_retry(
     key = f"key-{uuid.uuid4().hex}"
     payload = _payload(document_id, 0, "Откат до фиксации")
 
-    def fail_before_receipt(_conn, _cursor, statement, _parameters, _context, _executemany):
-        if statement.lstrip().lower().startswith("insert into documents.command_receipts"):
+    def fail_before_receipt(
+        _conn, _cursor, statement, _parameters, _context, _executemany
+    ):
+        if (
+            statement.lstrip()
+            .lower()
+            .startswith("insert into documents.command_receipts")
+        ):
             raise RuntimeError("simulated failure before commit")
 
     event.listen(documents_engine, "before_cursor_execute", fail_before_receipt)
@@ -464,16 +698,20 @@ def test_failure_before_commit_rolls_back_and_same_key_can_retry(
     finally:
         event.remove(documents_engine, "before_cursor_execute", fail_before_receipt)
 
-    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [document_id]
+    assert _read(documents_storage, tenant, sandbox, document_id).missing_ids == [
+        document_id
+    ]
     retry = _register(documents_storage, tenant, sandbox, payload, key)
     assert retry.version.ref.revision == 1
     assert retry.receipt.applied is True
 
 
-def test_same_document_id_isolated_by_tenant_and_sandbox(documents_storage, documents_engine):
+def test_same_document_id_isolated_by_tenant_and_sandbox(
+    documents_storage, documents_engine
+):
     tenant, sandbox = _new_scope()
     document_id = f"doc-{uuid.uuid4().hex}"
-    registered = _register(
+    _register(
         documents_storage,
         tenant,
         sandbox,
@@ -482,19 +720,27 @@ def test_same_document_id_isolated_by_tenant_and_sandbox(documents_storage, docu
     )
 
     other_sandbox = f"other-{uuid.uuid4().hex}"
-    same_tenant_context = _context(tenant, sandbox, key=None, operation_id="Documents.read")
+    same_tenant_context = _context(
+        tenant, sandbox, key=None, operation_id="Documents.read"
+    )
     same_tenant_context.sandbox_id = other_sandbox
-    same_tenant_context.principal.allowed_sandboxes = frozenset({sandbox, other_sandbox})
+    same_tenant_context.principal.allowed_sandboxes = frozenset(
+        {sandbox, other_sandbox}
+    )
     result = documents_storage.read(
         ReadDocumentsInput(
-            query=DocumentSelection(kind="documents", document_ids=[document_id], revision=None, as_of=None)
+            query=DocumentSelection(
+                kind="documents", document_ids=[document_id], revision=None, as_of=None
+            )
         ),
         same_tenant_context,
     )
     assert result.missing_ids == [document_id]
 
     other_tenant = f"other-{uuid.uuid4().hex}"
-    assert _read(documents_storage, other_tenant, sandbox, document_id).missing_ids == [document_id]
+    assert _read(documents_storage, other_tenant, sandbox, document_id).missing_ids == [
+        document_id
+    ]
 
     with documents_engine.connect() as connection:
         raw_hash = connection.execute(
@@ -539,7 +785,9 @@ def test_operation_adapters_preserve_typed_register_read_contract(documents_stor
     read_context = _context(tenant, sandbox, key=None, operation_id="Documents.read")
     read = ReadOperation(documents_storage).execute(
         ReadDocumentsInput(
-            query=DocumentSelection(kind="documents", document_ids=[document_id], revision=None, as_of=None)
+            query=DocumentSelection(
+                kind="documents", document_ids=[document_id], revision=None, as_of=None
+            )
         ),
         read_context,
     )

@@ -5,7 +5,10 @@ import hashlib
 import io
 import json
 import os
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
+from threading import Event
 
 import httpx
 import pytest
@@ -20,10 +23,10 @@ from alfalab.execution.gateway import DependencyDefinition
 from alfalab.modules.runs.storage.database import create_runs_engine
 from alfalab.modules.runs.storage.postgres import PostgresRunsRepository
 from alfalab.modules.runs.storage.repository import StoredRun
-from alfalab_contracts import QueryRunsInput
-from alfalab_contracts._generated import Availability
+from alfalab_contracts import DependencyRecord, ErrorInfo, QueryRunsInput, SpanRecord
+from alfalab_contracts._generated import Availability, Status3
 from pydantic import BaseModel
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, event, text
 
 ROOT = Path(__file__).resolve().parents[3]
 TOKEN = "t05-test-token"
@@ -89,6 +92,68 @@ def _query_request(
     return body
 
 
+def _concurrently_updated_run(stored: StoredRun) -> StoredRun:
+    record = stored.record.model_copy(deep=True)
+    configuration = record.manifest.configuration
+    next_sequence = max((span.sequence for span in record.spans), default=-1) + 1
+    if record.spans:
+        updated_span = record.spans[-1].model_copy(
+            update={
+                "sequence": next_sequence,
+                "span_id": f"race-{uuid.uuid4().hex}",
+                "name": "concurrent.trace.update",
+            }
+        )
+    else:
+        updated_span = SpanRecord(
+            sequence=next_sequence,
+            span_id=f"race-{uuid.uuid4().hex}",
+            parent_span_id=None,
+            name="concurrent.trace.update",
+            kind="operation",
+            started_at=record.analytical_time,
+            duration_ms=7,
+            status="error",
+            safe_detail="Concurrent test update.",
+        )
+    dependency = DependencyRecord(
+        sequence=0,
+        port_id="model.private",
+        kind="model",
+        request=configuration.model_copy(deep=True),
+        response=None,
+        error=ErrorInfo(
+            code="DEPENDENCY_FAILED",
+            category="dependency",
+            retryable=False,
+            safe_message="The declared dependency could not be completed.",
+            field_paths=[],
+            dependency_id="model.private",
+            outcome="unknown",
+        ),
+        duration_ms=7,
+        request_hash=configuration.ref.hash,
+        substitution="live",
+        original_run_id=None,
+    )
+    record = record.model_copy(
+        update={
+            "status": Status3.failed,
+            "spans": [*record.spans, updated_span],
+            "dependencies": [dependency],
+        }
+    )
+    return StoredRun(
+        tenant_id=stored.tenant_id,
+        sandbox_id=stored.sandbox_id,
+        record=record,
+        input_hash=stored.input_hash,
+        started_at=stored.started_at,
+        updated_at=datetime.now(UTC),
+        writer_status="error",
+    )
+
+
 def _settings(database_url: str, artifact_root: Path) -> ApiSettings:
     return ApiSettings(
         developer_token=TOKEN,
@@ -132,9 +197,130 @@ def test_runs_migrations_upgrade_downgrade_upgrade(runs_migration_config) -> Non
         engine.dispose()
 
 
+def test_postgres_preserves_failed_runs_and_partial_history_after_final_write_failure(
+    runs_database_url: str,
+    runs_artifact_root: Path,
+    runs_test_database,
+) -> None:
+    settings = _settings(runs_database_url, runs_artifact_root)
+    app = create_app(settings)
+    repository = app.state.execution_runtime.runs_repository
+    admin_engine = create_engine(
+        str(runs_test_database.admin_url), pool_pre_ping=True, echo=False
+    )
+    trigger_created = False
+    try:
+        runtime = app.state.execution_runtime
+        implementation_key = ("Documents.prepare", "real.prepare", "1.0.0")
+        original = runtime.registry.implementations[implementation_key]
+        dependency_calls = []
+        runtime.registry.dependencies["model.private"] = DependencyDefinition(
+            dependency_id="model.private",
+            kind="model",
+            request_type=DependencyRequest,
+            response_type=DependencyResponse,
+            invoke=lambda _request, _context: (
+                dependency_calls.append(True) or DependencyResponse(value="blocked")
+            ),
+        )
+
+        def call_policy_blocked_dependency(payload, context, /):
+            context.dependency_gateway.invoke(
+                "model.private", DependencyRequest(value="T05_EGRESS_PRIVATE_CANARY")
+            )
+            return original.execute(payload, context)
+
+        runtime.registry.implementations[implementation_key] = RegisteredImplementation(
+            id=original.id,
+            version=original.version,
+            kind=original.kind,
+            parameter_type=original.parameter_type,
+            payload_type=original.payload_type,
+            output_type=original.output_type,
+            execute=call_policy_blocked_dependency,
+            configuration=original.configuration,
+            dependency_ids=frozenset({"model.private"}),
+        )
+        failed_body = _prepare_request("t05-pg-failed-operation")
+        failed_response = _post(app, "/api/v1/documents/prepare", failed_body)
+        assert failed_response.status_code == 403, failed_response.text
+        assert dependency_calls == []
+        failed_payload = failed_response.json()
+        failed_run_id = failed_payload["meta"]["run_id"]
+        failed_run = repository.get(
+            failed_run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert failed_run is not None
+        assert failed_run.record.status == "failed"
+        assert failed_run.record.spans
+        assert all(span.duration_ms >= 0 for span in failed_run.record.spans)
+        assert failed_run.record.dependencies
+        assert failed_run.record.dependencies[0].error is not None
+        assert failed_run.record.dependencies[0].error.code == "DATA_POLICY_DENIED"
+        assert all(
+            attempt.duration_ms >= 0 for attempt in failed_run.record.dependencies
+        )
+
+        runtime.registry.implementations[implementation_key] = original
+
+        with admin_engine.begin() as connection:
+            connection.exec_driver_sql(
+                """CREATE FUNCTION runs.t05_fail_success_transition()
+                RETURNS trigger LANGUAGE plpgsql AS $function$
+                BEGIN
+                    IF OLD.status = 'running' AND NEW.status = 'success' THEN
+                        RAISE EXCEPTION 'injected final Runs write failure';
+                    END IF;
+                    RETURN NEW;
+                END
+                $function$"""
+            )
+            connection.exec_driver_sql(
+                """CREATE TRIGGER t05_fail_success_transition
+                BEFORE UPDATE ON runs.runs
+                FOR EACH ROW EXECUTE FUNCTION runs.t05_fail_success_transition()"""
+            )
+        trigger_created = True
+
+        response = _post(
+            app,
+            "/api/v1/documents/prepare",
+            _prepare_request("t05-pg-final-history-failure"),
+        )
+        assert response.status_code == 503, response.text
+        assert response.json()["error"]["code"] == "HISTORY_UNAVAILABLE"
+        assert response.json()["meta"]["trace_status"] == "partial"
+        assert "injected final Runs write failure" not in response.text
+        partial_run_id = response.json()["meta"]["run_id"]
+        partial_run = repository.get(
+            partial_run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert partial_run is not None
+        assert partial_run.status == "unknown"
+        assert partial_run.record.trace_status == "partial"
+        assert partial_run.record.spans
+        assert all(span.status == "success" for span in partial_run.record.spans)
+    finally:
+        if trigger_created:
+            with admin_engine.begin() as connection:
+                connection.exec_driver_sql(
+                    "DROP TRIGGER IF EXISTS t05_fail_success_transition ON runs.runs"
+                )
+                connection.exec_driver_sql(
+                    "DROP FUNCTION IF EXISTS runs.t05_fail_success_transition()"
+                )
+        admin_engine.dispose()
+        app.state.execution_runtime.close()
+
+
 def test_runs_query_persists_http_and_cli_runs_and_does_not_record_unknown_content(
     runs_database_url: str,
     runs_artifact_root: Path,
+    caplog,
 ) -> None:
     settings = _settings(runs_database_url, runs_artifact_root)
     runtime = create_execution_runtime(
@@ -216,6 +402,7 @@ def test_runs_query_persists_http_and_cli_runs_and_does_not_record_unknown_conte
         assert all(record["status"] == "success" for record in records)
         assert all(record["input"]["content_json"] is None for record in records)
         assert all(record["output"]["content_json"] is None for record in records)
+        assert "T05_PRIVATE_CANARY" not in query_result.text
         assert all(
             record["input"]["availability"] == "metadata_only" for record in records
         )
@@ -285,6 +472,8 @@ def test_runs_query_persists_http_and_cli_runs_and_does_not_record_unknown_conte
         serialized = "".join([*records_json, *dependency_json])
         assert "T05_PRIVATE_CANARY" not in serialized
         assert "T05_EGRESS_PRIVATE_CANARY" not in serialized
+        assert "T05_PRIVATE_CANARY" not in caplog.text
+        assert "T05_EGRESS_PRIVATE_CANARY" not in caplog.text
     finally:
         repository.close()
 
@@ -310,6 +499,7 @@ def test_approved_fixture_artifacts_are_local_and_query_is_metadata_only_by_defa
         assert prepared.status_code == 200, prepared.text
         run_id = prepared.json()["meta"]["run_id"]
         assert prepared.json()["meta"]["data_policy"]["classification"] == "synthetic"
+        assert prepared.json()["meta"]["trace_status"] == "complete"
 
         query_body = _query_request([run_id])
         query_body["payload"]["include_artifacts"] = False
@@ -328,6 +518,7 @@ def test_approved_fixture_artifacts_are_local_and_query_is_metadata_only_by_defa
         assert full_record["input"]["content_json"] == json.dumps(
             body["payload"], ensure_ascii=False, sort_keys=True, separators=(",", ":")
         )
+        assert full_record["trace_status"] == "complete"
     finally:
         app.state.execution_runtime.close()
 
@@ -370,6 +561,144 @@ def test_approved_fixture_artifacts_are_local_and_query_is_metadata_only_by_defa
             assert "T05_PRIVATE_CANARY" not in path.read_text(encoding="utf-8")
     finally:
         engine.dispose()
+
+
+def test_runs_query_keeps_one_snapshot_during_concurrent_updates_and_new_runs(
+    runs_database_url: str,
+    runs_artifact_root: Path,
+) -> None:
+    settings = _settings(runs_database_url, runs_artifact_root)
+    app = create_app(settings)
+    repository = PostgresRunsRepository(
+        create_runs_engine(runs_database_url),
+        environment="testing",
+        artifact_root=runs_artifact_root,
+    )
+    try:
+        created_ids = []
+        for request_id in ("t05-snapshot-first", "t05-snapshot-second"):
+            created = _post(
+                app,
+                "/api/v1/documents/prepare",
+                _prepare_request(request_id),
+            )
+            assert created.status_code == 200, created.text
+            created_ids.append(created.json()["meta"]["run_id"])
+
+        originals = {
+            run_id: repository.get(
+                run_id,
+                tenant_id="t05-test-tenant",
+                sandbox_id="t05-sandbox",
+            )
+            for run_id in created_ids
+        }
+        assert all(item is not None for item in originals.values())
+        original_span_counts = {
+            run_id: len(item.record.spans)
+            for run_id, item in originals.items()
+            if item is not None
+        }
+        replacements = {
+            run_id: _concurrently_updated_run(item)
+            for run_id, item in originals.items()
+            if item is not None
+        }
+
+        updated_during_read = Event()
+
+        def update_after_parent_rows(
+            connection, cursor, statement, parameters, context, executemany
+        ):
+            del connection, cursor, parameters, context, executemany
+            if (
+                not updated_during_read.is_set()
+                and "SELECT run_id, record_json FROM runs.runs" in statement
+            ):
+                updated_during_read.set()
+                for replacement in replacements.values():
+                    repository.write(replacement)
+
+        event.listen(
+            repository._engine, "after_cursor_execute", update_after_parent_rows
+        )
+        query_payload = QueryRunsInput.model_validate(
+            _query_request(created_ids)["payload"]
+        ).model_copy(update={"limit": 1, "include_artifacts": False})
+        try:
+            first_page, cursor = repository.query(
+                query_payload,
+                tenant_id="t05-test-tenant",
+                sandbox_id="t05-sandbox",
+                exclude_run_id="t05-current-query-run",
+                include_artifacts=False,
+            )
+        finally:
+            event.remove(
+                repository._engine, "after_cursor_execute", update_after_parent_rows
+            )
+        assert updated_during_read.is_set()
+        assert cursor is not None
+        assert len(first_page) == 1
+        first = first_page[0]
+        assert first.status == "success"
+        assert len(first.spans) == original_span_counts[first.run_id]
+        assert first.dependencies == []
+
+        late = _post(
+            app,
+            "/api/v1/documents/prepare",
+            _prepare_request("t05-snapshot-late-run"),
+        )
+        assert late.status_code == 200, late.text
+        late_run_id = late.json()["meta"]["run_id"]
+
+        second_page, next_cursor = repository.query(
+            query_payload.model_copy(update={"cursor": cursor}),
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+            exclude_run_id="t05-current-query-run",
+            include_artifacts=False,
+        )
+        assert next_cursor is None
+        assert len(second_page) == 1
+        second = second_page[0]
+        assert second.run_id in created_ids
+        assert second.run_id != first.run_id
+        assert second.status == "success"
+        assert len(second.spans) == original_span_counts[second.run_id]
+        assert second.dependencies == []
+        assert late_run_id not in {first.run_id, second.run_id}
+
+        current = repository.get(
+            second.run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert current is not None
+        assert current.record.status == "failed"
+        assert len(current.record.spans) == original_span_counts[second.run_id] + 1
+        assert len(current.record.dependencies) == 1
+
+        isolated, _ = repository.query(
+            query_payload,
+            tenant_id="t05-test-tenant",
+            sandbox_id="other-sandbox",
+            exclude_run_id="t05-current-query-run",
+            include_artifacts=False,
+        )
+        assert isolated == []
+
+        self_query_body = _query_request([])
+        self_query_body["payload"]["operation_id"] = None
+        self_query_body["payload"]["include_artifacts"] = False
+        self_query = _post(app, "/api/v1/runs/query", self_query_body)
+        assert self_query.status_code == 200, self_query.text
+        returned_ids = {item["run_id"] for item in self_query.json()["payload"]["runs"]}
+        assert self_query.json()["meta"]["run_id"] not in returned_ids
+    finally:
+        repository.close()
+        app.state.execution_runtime.close()
 
 
 def test_runs_query_rejects_over_budget_before_reading_artifact_files(

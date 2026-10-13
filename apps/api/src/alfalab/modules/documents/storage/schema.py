@@ -29,8 +29,12 @@ documents = Table(
     Column("sandbox_id", Text, nullable=False),
     Column("document_id", Text, nullable=False),
     Column("current_revision", BigInteger, nullable=False),
-    PrimaryKeyConstraint("tenant_id", "sandbox_id", "document_id", name="pk_documents_scope"),
-    CheckConstraint("current_revision >= 0", name="ck_documents_current_revision_nonnegative"),
+    PrimaryKeyConstraint(
+        "tenant_id", "sandbox_id", "document_id", name="pk_documents_scope"
+    ),
+    CheckConstraint(
+        "current_revision >= 0", name="ck_documents_current_revision_nonnegative"
+    ),
 )
 
 versions = Table(
@@ -42,7 +46,9 @@ versions = Table(
     Column("revision", BigInteger, nullable=False),
     Column("kind", Text, nullable=False),
     Column("raw_artifact_hash", Text, nullable=False),
+    Column("raw_artifact_size_bytes", BigInteger, nullable=True),
     Column("prepared_artifact_hash", Text, nullable=True),
+    Column("prepared_artifact_size_bytes", BigInteger, nullable=True),
     Column("raw_content_hash", Text, nullable=False),
     Column("semantic_hash", Text, nullable=False),
     Column("version_hash", Text, nullable=False),
@@ -74,16 +80,37 @@ versions = Table(
         ondelete="RESTRICT",
     ),
     CheckConstraint("revision >= 1", name="ck_versions_revision_positive"),
-    CheckConstraint("parent_revision IS NULL OR parent_revision >= 1", name="ck_versions_parent_revision_positive"),
+    CheckConstraint(
+        "parent_revision IS NULL OR parent_revision >= 1",
+        name="ck_versions_parent_revision_positive",
+    ),
     CheckConstraint("kind IN ('raw', 'prepared')", name="ck_versions_kind"),
-    CheckConstraint("raw_artifact_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_raw_artifact_hash"),
+    CheckConstraint(
+        "raw_artifact_hash ~ '^sha256:[0-9a-f]{64}$'",
+        name="ck_versions_raw_artifact_hash",
+    ),
     CheckConstraint(
         "prepared_artifact_hash IS NULL OR prepared_artifact_hash ~ '^sha256:[0-9a-f]{64}$'",
         name="ck_versions_prepared_artifact_hash",
     ),
-    CheckConstraint("raw_content_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_raw_content_hash"),
-    CheckConstraint("semantic_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_semantic_hash"),
-    CheckConstraint("version_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_version_hash"),
+    CheckConstraint(
+        "raw_artifact_size_bytes IS NULL OR raw_artifact_size_bytes BETWEEN 0 AND 2097152",
+        name="ck_versions_raw_artifact_size",
+    ),
+    CheckConstraint(
+        "prepared_artifact_size_bytes IS NULL OR prepared_artifact_size_bytes BETWEEN 0 AND 2097152",
+        name="ck_versions_prepared_artifact_size",
+    ),
+    CheckConstraint(
+        "raw_content_hash ~ '^sha256:[0-9a-f]{64}$'",
+        name="ck_versions_raw_content_hash",
+    ),
+    CheckConstraint(
+        "semantic_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_semantic_hash"
+    ),
+    CheckConstraint(
+        "version_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_versions_version_hash"
+    ),
 )
 Index(
     "ix_versions_scope_recorded_revision",
@@ -138,7 +165,9 @@ command_receipts = Table(
         "idempotency_key",
         name="pk_command_receipts_scope",
     ),
-    UniqueConstraint("tenant_id", "sandbox_id", "audit_id", name="uq_command_receipts_audit_scope"),
+    UniqueConstraint(
+        "tenant_id", "sandbox_id", "audit_id", name="uq_command_receipts_audit_scope"
+    ),
     ForeignKeyConstraint(
         ["tenant_id", "sandbox_id", "audit_id"],
         [
@@ -150,8 +179,14 @@ command_receipts = Table(
         ondelete="RESTRICT",
     ),
     CheckConstraint("contract_major >= 1", name="ck_command_receipts_major_positive"),
-    CheckConstraint("command_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_command_receipts_command_hash"),
-    CheckConstraint("response_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_command_receipts_response_hash"),
+    CheckConstraint(
+        "command_hash ~ '^sha256:[0-9a-f]{64}$'",
+        name="ck_command_receipts_command_hash",
+    ),
+    CheckConstraint(
+        "response_hash ~ '^sha256:[0-9a-f]{64}$'",
+        name="ck_command_receipts_response_hash",
+    ),
 )
 
 audit_entries = Table(
@@ -166,6 +201,10 @@ audit_entries = Table(
     Column("before_refs", JSONB, nullable=False),
     Column("after_refs", JSONB, nullable=False),
     Column("committed_at", DateTime(timezone=True), nullable=False),
-    PrimaryKeyConstraint("tenant_id", "sandbox_id", "audit_id", name="pk_audit_entries_scope"),
-    CheckConstraint("command_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_audit_entries_command_hash"),
+    PrimaryKeyConstraint(
+        "tenant_id", "sandbox_id", "audit_id", name="pk_audit_entries_scope"
+    ),
+    CheckConstraint(
+        "command_hash ~ '^sha256:[0-9a-f]{64}$'", name="ck_audit_entries_command_hash"
+    ),
 )

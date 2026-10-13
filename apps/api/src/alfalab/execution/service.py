@@ -221,7 +221,7 @@ class ExecutionService:
                 meta=meta,
             )
 
-        initial_meta = self._build_meta(state, elapsed_ns=0)
+        initial_meta = self._build_meta(state, elapsed_ns=0, completed=False)
         try:
             self._write_run(state, initial_meta, status="in_progress", output=None)
         except OSError as exc:
@@ -534,7 +534,9 @@ class ExecutionService:
             state.root_span_id, status=status, safe_detail=safe_detail
         )
 
-    def _build_meta(self, state: _RunState, *, elapsed_ns: int) -> ExecutionMeta:
+    def _build_meta(
+        self, state: _RunState, *, elapsed_ns: int, completed: bool = True
+    ) -> ExecutionMeta:
         implementation_hash = _canonical_hash(
             {"id": state.implementation.id, "version": state.implementation.version}
         )
@@ -557,7 +559,17 @@ class ExecutionService:
                 unknown_origin=state.policy.decision.classification == "unknown",
                 source_refs=[],
             ),
-            trace_status="metadata_only",
+            trace_status=(
+                TraceStatus.metadata_only
+                if not (
+                    state.policy.decision.classification in {"synthetic", "public"}
+                    and state.policy.decision.processing_allowed
+                    and state.policy.decision.recording == "full"
+                )
+                else TraceStatus.complete
+                if completed
+                else TraceStatus.partial
+            ),
             replay_status="unavailable",
             measurements=[
                 Measurement(

@@ -19,6 +19,7 @@ from alfalab.execution.gateway import ControlledDependencyGateway, DependencyDef
 from alfalab.execution.policy import TrustedDataPolicyResolver, TrustedSource
 from alfalab.execution.tracing import InMemoryTraceRecorder
 from alfalab.modules.runs.storage.postgres import _reserve_artifact_response_bytes
+from alfalab_contracts import ModelIdentity
 from pydantic import BaseModel
 
 
@@ -162,6 +163,16 @@ def test_gateway_accepts_only_declared_dependencies_and_records_retry_outcomes()
                 response_type=Response,
                 invoke=invoke,
                 max_attempts=2,
+                sensitive_values=(),
+                secret_inventory_complete=True,
+                model_identity=ModelIdentity(
+                    provider_id="test-provider",
+                    model_id="test-model",
+                    provider_revision="test-r1",
+                    unknown_revision_reason=None,
+                    configuration_hash="sha256:" + "e" * 64,
+                    prompt=None,
+                ),
             )
         },
         declared_ids=frozenset({"model.declared"}),

@@ -6,9 +6,10 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from threading import RLock
 
-from alfalab_contracts import ArtifactView, QueryRunsInput, RunRecord
+from alfalab_contracts import ArtifactRef, ArtifactView, QueryRunsInput, RunRecord
 from alfalab_contracts._generated import Availability
 
+from alfalab.common.artifacts import verified_artifact_json
 from alfalab.execution.errors import invalid_input
 from alfalab.modules.runs.storage.cursor import (
     decode_cursor,
@@ -74,6 +75,41 @@ class InMemoryRunsRepository:
                 ),
                 None,
             )
+
+    def read_replay_artifacts(
+        self,
+        run_id: str,
+        refs: tuple[ArtifactRef, ...],
+        *,
+        tenant_id: str,
+        sandbox_id: str,
+    ) -> dict[str, str] | None:
+        with self._lock:
+            stored = self._records.get((tenant_id, sandbox_id, run_id))
+            if stored is None:
+                return None
+            decision = stored.record.manifest.data_policy
+            if (
+                decision.classification not in {"synthetic", "public"}
+                or not decision.processing_allowed
+                or decision.recording != "full"
+            ):
+                return None
+            available = {view.ref.artifact_id: view for view in _views(stored.record)}
+            loaded: dict[str, str] = {}
+            try:
+                for ref in refs:
+                    view = available.get(ref.artifact_id)
+                    if view is None or view.ref != ref:
+                        return None
+                    loaded[ref.artifact_id] = verified_artifact_json(
+                        view,
+                        expected_schema_id=ref.schema_id,
+                        expected_classification=decision.classification,
+                    )
+            except ValueError:
+                return None
+            return loaded
 
     def query(
         self,

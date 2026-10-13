@@ -35,7 +35,14 @@ class TrustedPrincipal(Protocol):
 
 @runtime_checkable
 class AnalyticalClock(Protocol):
-    """Deterministic domain time; wall-clock telemetry is kept separately."""
+    """Frozen analytical as-of time, separate from measurements and domain time."""
+
+    def now(self) -> datetime: ...
+
+
+@runtime_checkable
+class DomainClockPort(Protocol):
+    """Recorded time for domain facts; replay supplies the recorded value."""
 
     def now(self) -> datetime: ...
 
@@ -143,6 +150,9 @@ class OperationContext(Protocol):
     def analytical_clock(self) -> AnalyticalClock: ...
 
     @property
+    def domain_clock(self) -> DomainClockPort: ...
+
+    @property
     def rng(self) -> RandomSource: ...
 
     @property
@@ -194,6 +204,7 @@ __all__ = [
     "AnalyticalClock",
     "ArtifactReadPort",
     "DependencyGateway",
+    "DomainClockPort",
     "EvidenceReadPort",
     "ExecutionLimits",
     "OperationContext",

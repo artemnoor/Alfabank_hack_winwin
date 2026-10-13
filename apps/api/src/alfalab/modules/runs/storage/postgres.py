@@ -7,7 +7,13 @@ import json
 import uuid
 from pathlib import Path, PurePosixPath
 
-from alfalab_contracts import ArtifactView, QueryRunsInput, QueryRunsOutput, RunRecord
+from alfalab_contracts import (
+    ArtifactRef,
+    ArtifactView,
+    QueryRunsInput,
+    QueryRunsOutput,
+    RunRecord,
+)
 from alfalab_contracts._generated import Availability
 from sqlalchemy import Engine, bindparam, text
 from sqlalchemy.exc import SQLAlchemyError
@@ -153,7 +159,7 @@ class PostgresRunsRepository:
                 if self._artifact_store is None:
                     raise OSError("Runs artifact storage is unavailable")
                 raw = view.content_json.encode("utf-8")
-                if len(raw) > 2 * 1024 * 1024:
+                if len(raw) > MAX_ARTIFACT_RESPONSE_BYTES:
                     raise ContentPolicyViolation(
                         "artifact exceeds the approved storage limit"
                     )
@@ -741,6 +747,109 @@ class PostgresRunsRepository:
                     "unknown": "unknown",
                 }.get(row["status"], "unknown"),
             )
+        except SQLAlchemyError as exc:
+            raise OSError("Runs history is unavailable") from exc
+
+    def read_replay_artifacts(
+        self,
+        run_id: str,
+        refs: tuple[ArtifactRef, ...],
+        *,
+        tenant_id: str,
+        sandbox_id: str,
+    ) -> dict[str, str] | None:
+        """Load recorded artifacts for internal replay, independent of export rights."""
+        if self._artifact_store is None:
+            return None
+        scope = TrustedScope(tenant_id, sandbox_id, self._environment)
+        try:
+            with self._engine.connect() as connection, connection.begin():
+                connection.exec_driver_sql(
+                    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+                )
+                _set_scope(connection, tenant_id, sandbox_id)
+                row = (
+                    connection.execute(
+                        text(
+                            "SELECT record_json FROM runs.runs "
+                            "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id AND run_id=:run_id"
+                        ),
+                        {
+                            "tenant_id": tenant_id,
+                            "sandbox_id": sandbox_id,
+                            "run_id": run_id,
+                        },
+                    )
+                    .mappings()
+                    .first()
+                )
+                if row is None:
+                    return None
+                record = RunRecord.model_validate(row["record_json"])
+                decision = record.manifest.data_policy
+                if (
+                    decision.classification not in {"synthetic", "public"}
+                    or not decision.processing_allowed
+                    or decision.recording != "full"
+                ):
+                    return None
+                loaded: dict[str, str] = {}
+                for ref in refs:
+                    if (
+                        ref.classification != decision.classification
+                        or ref.size_bytes > MAX_ARTIFACT_RESPONSE_BYTES
+                    ):
+                        return None
+                    artifact = (
+                        connection.execute(
+                            text(
+                                "SELECT artifact_hash, schema_id, schema_version, size_bytes, "
+                                "classification, media_type, storage_key FROM runs.artifacts "
+                                "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                                "AND run_id=:run_id AND artifact_id=:artifact_id"
+                            ),
+                            {
+                                "tenant_id": tenant_id,
+                                "sandbox_id": sandbox_id,
+                                "run_id": run_id,
+                                "artifact_id": ref.artifact_id,
+                            },
+                        )
+                        .mappings()
+                        .first()
+                    )
+                    expected_key = PurePosixPath(
+                        self._environment,
+                        tenant_id,
+                        sandbox_id,
+                        f"{ref.hash.removeprefix('sha256:')}.json",
+                    ).as_posix()
+                    if (
+                        artifact is None
+                        or artifact["artifact_hash"] != ref.hash
+                        or artifact["schema_id"] != ref.schema_id
+                        or artifact["schema_version"] != ref.schema_version
+                        or artifact["size_bytes"] != ref.size_bytes
+                        or artifact["classification"] != ref.classification
+                        or artifact["media_type"] != ref.media_type
+                        or artifact["storage_key"] != expected_key
+                    ):
+                        return None
+                    raw = self._artifact_store.read_json(
+                        scope, ref.hash, expected_size_bytes=ref.size_bytes
+                    )
+                    if len(raw) != ref.size_bytes:
+                        return None
+                    try:
+                        content = raw.decode("utf-8")
+                    except UnicodeDecodeError:
+                        return None
+                    if "sha256:" + hashlib.sha256(raw).hexdigest() != ref.hash:
+                        return None
+                    loaded[ref.artifact_id] = content
+                return loaded
+        except (ArtifactIntegrityError, OSError, ValueError):
+            return None
         except SQLAlchemyError as exc:
             raise OSError("Runs history is unavailable") from exc
 

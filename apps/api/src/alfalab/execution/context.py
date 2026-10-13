@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from threading import Event
 from typing import Literal, NoReturn, Protocol
 
 from alfalab_contracts import ArtifactRef, ArtifactView, EvidenceRecord, ObjectRef
-from alfalab.common.protocols import TraceRecorder as SafeTraceRecorder
+
+from alfalab.common.protocols import (
+    DomainClockPort,
+)
+from alfalab.common.protocols import (
+    TraceRecorder as SafeTraceRecorder,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,12 +52,21 @@ class FixedAnalyticalClock:
         return self.value
 
 
+@dataclass(frozen=True, slots=True)
+class SystemDomainClock:
+    """Real domain clock used by direct test contexts without runtime recording."""
+
+    def now(self) -> datetime:
+        return datetime.now(UTC)
+
+
 class TraceRecorder(SafeTraceRecorder, Protocol):
     """Safe metadata-only trace sink used by an operation invocation."""
 
     def start(self, name: str, kind: str, parent_span_id: str | None = None) -> str: ...
 
     def finish(self, span_id: str, *, status: str, safe_detail: str) -> None: ...
+
 
 class ArtifactReader(Protocol):
     """Typed artifact read boundary; no implementation is wired in T03."""
@@ -78,19 +93,25 @@ class ContextPortUnavailable(RuntimeError):
 class _DisabledArtifactReader:
     def read(self, ref: ArtifactRef, /) -> NoReturn:
         del ref
-        raise ContextPortUnavailable("artifact reads are unavailable in this execution slice")
+        raise ContextPortUnavailable(
+            "artifact reads are unavailable in this execution slice"
+        )
 
 
 class _DisabledEvidenceReader:
     def read(self, ref: ObjectRef, /) -> NoReturn:
         del ref
-        raise ContextPortUnavailable("evidence reads are unavailable in this execution slice")
+        raise ContextPortUnavailable(
+            "evidence reads are unavailable in this execution slice"
+        )
 
 
 class _DisabledDependencyGateway:
     def invoke(self, dependency_id: str, request: object, /) -> NoReturn:
         del dependency_id, request
-        raise ContextPortUnavailable("external dependencies are unavailable in this execution slice")
+        raise ContextPortUnavailable(
+            "external dependencies are unavailable in this execution slice"
+        )
 
 
 DISABLED_ARTIFACT_READER = _DisabledArtifactReader()
@@ -122,6 +143,7 @@ class OperationContext:
     trace_recorder: TraceRecorder
     cancellation_event: Event
     limits: ExecutionLimits
+    domain_clock: DomainClockPort = field(default_factory=SystemDomainClock)
 
     @property
     def cancelled(self) -> bool:

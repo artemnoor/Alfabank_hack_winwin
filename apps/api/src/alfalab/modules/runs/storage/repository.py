@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal, Protocol
 
-from alfalab_contracts import QueryRunsInput, RunRecord, SpanRecord
+from alfalab_contracts import ArtifactRef, QueryRunsInput, RunRecord, SpanRecord
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,5 +66,14 @@ class RunsRepository(Protocol):
         tenant_id: str | None = None,
         sandbox_id: str | None = None,
     ) -> StoredRun | None: ...
+
+    def read_replay_artifacts(
+        self,
+        run_id: str,
+        refs: tuple[ArtifactRef, ...],
+        *,
+        tenant_id: str,
+        sandbox_id: str,
+    ) -> dict[str, str] | None: ...
 
     def close(self) -> None: ...

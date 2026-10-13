@@ -20,10 +20,18 @@ from alfalab.cli import run_cli
 from alfalab.common.artifacts import ArtifactStore
 from alfalab.execution.errors import SafeExecutionError
 from alfalab.execution.gateway import DependencyDefinition
+from alfalab.execution.policy import TrustedDataPolicyResolver, TrustedSource
+from alfalab.execution.recording import canonical_hash
 from alfalab.modules.runs.storage.database import create_runs_engine
 from alfalab.modules.runs.storage.postgres import PostgresRunsRepository
 from alfalab.modules.runs.storage.repository import StoredRun
-from alfalab_contracts import DependencyRecord, ErrorInfo, QueryRunsInput, SpanRecord
+from alfalab_contracts import (
+    DependencyRecord,
+    ErrorInfo,
+    ModelIdentity,
+    QueryRunsInput,
+    SpanRecord,
+)
 from alfalab_contracts._generated import Availability, Status3
 from pydantic import BaseModel
 from sqlalchemy import create_engine, event, text
@@ -911,3 +919,184 @@ def test_runs_query_checks_aggregate_artifact_budget_before_any_file_read(
         assert read_calls == []
     finally:
         repository.close()
+
+
+def test_t06_postgres_artifacts_support_strict_replay_and_detect_tampering(
+    runs_database_url: str,
+    runs_artifact_root: Path,
+) -> None:
+    settings = _settings(runs_database_url, runs_artifact_root)
+    fixture = json.loads(
+        (
+            ROOT / "fixtures/approved/Documents.prepare/normalize/manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    live = fixture["request"]
+    live["request_id"] = f"t06-pg-live-{uuid.uuid4().hex}"
+    live["sandbox_id"] = "t05-sandbox"
+    live["implementation"] = {
+        "id": "real.prepare",
+        "version": "1.0.0",
+        "parameters": {},
+    }
+    app = create_app(settings)
+    try:
+        first = _post(app, "/api/v1/documents/prepare", live)
+        assert first.status_code == 200, first.text
+        source_run_id = first.json()["meta"]["run_id"]
+        assert first.json()["meta"]["replay_status"] == "available"
+
+        replay = json.loads(json.dumps(live))
+        replay["request_id"] = f"t06-pg-replay-{uuid.uuid4().hex}"
+        replay["execution"] = {
+            "mode": "replay",
+            "recording": "full",
+            "source_run_id": source_run_id,
+            "strict": True,
+            "timeout_ms": 30_000,
+        }
+        replay_response = _post(app, "/api/v1/documents/prepare", replay)
+        assert replay_response.status_code == 200, replay_response.text
+        replay_body = replay_response.json()
+        assert replay_body["meta"]["execution_mode"] == "replay"
+        assert replay_body["meta"]["run_id"] != source_run_id
+        assert replay_body["payload"] == first.json()["payload"]
+
+        source = app.state.runs_writer.get(
+            source_run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert source is not None and source.record.input is not None
+        input_ref = source.record.input.ref
+        artifact_path = (
+            runs_artifact_root
+            / "testing"
+            / "t05-test-tenant"
+            / "t05-sandbox"
+            / f"{input_ref.hash.removeprefix('sha256:')}.json"
+        )
+        artifact_path.write_bytes(b'{"tampered":true}')
+
+        denied = _post(app, "/api/v1/documents/prepare", replay)
+        assert denied.status_code == 409
+        assert denied.json()["error"]["code"] == "REPLAY_MISS"
+        assert live["payload"]["material"]["text"] not in denied.text
+    finally:
+        app.state.execution_runtime.close()
+
+
+def test_t06_postgres_secret_dependency_response_is_not_persisted(
+    runs_database_url: str,
+    runs_artifact_root: Path,
+    caplog,
+) -> None:
+    canary = "T06_POSTGRES_DEPENDENCY_RESPONSE_CANARY"
+    app = create_app(_settings(runs_database_url, runs_artifact_root))
+    runtime = app.state.execution_runtime
+    implementation_key = ("Documents.prepare", "real.prepare", "1.0.0")
+    implementation = runtime.registry.implementations[implementation_key]
+    body = _prepare_request(f"t06-pg-secret-{uuid.uuid4().hex}")
+    material_id = body["payload"]["material"]["material_id"]
+    payload_hash = canonical_hash(body["payload"])
+    runtime.execution_service._policy_resolver = TrustedDataPolicyResolver(
+        {
+            material_id: TrustedSource(
+                classification="synthetic",
+                processing_allowed=True,
+                egress_allowed=True,
+                recording="full",
+                export_allowed=True,
+                approved_payload_hashes=frozenset({payload_hash}),
+            )
+        }
+    )
+    runtime.registry.dependencies["model.canary"] = DependencyDefinition(
+        dependency_id="model.canary",
+        kind="model",
+        request_type=DependencyRequest,
+        response_type=DependencyResponse,
+        invoke=lambda _request, _context: DependencyResponse(
+            value=f"private response: {canary}"
+        ),
+        sensitive_values=(canary,),
+        secret_inventory_complete=True,
+        model_identity=ModelIdentity(
+            provider_id="test-provider",
+            model_id="test-model",
+            provider_revision="test-r1",
+            unknown_revision_reason=None,
+            configuration_hash="sha256:" + "d" * 64,
+            prompt=None,
+        ),
+    )
+
+    def execute_with_canary(payload, context, /):
+        context.dependency_gateway.invoke(
+            "model.canary", DependencyRequest(value="approved")
+        )
+        return implementation.execute(payload, context)
+
+    runtime.registry.implementations[implementation_key] = RegisteredImplementation(
+        id=implementation.id,
+        version=implementation.version,
+        kind=implementation.kind,
+        parameter_type=implementation.parameter_type,
+        payload_type=implementation.payload_type,
+        output_type=implementation.output_type,
+        execute=execute_with_canary,
+        configuration=implementation.configuration,
+        dependency_ids=frozenset({"model.canary"}),
+    )
+
+    try:
+        response = _post(app, "/api/v1/documents/prepare", body)
+        assert response.status_code == 502, response.text
+        assert response.json()["error"]["code"] == "DEPENDENCY_FAILED"
+        assert canary not in response.text
+        assert canary not in caplog.text
+
+        run_id = response.json()["meta"]["run_id"]
+        stored = runtime.runs_writer.get(
+            run_id,
+            tenant_id="t05-test-tenant",
+            sandbox_id="t05-sandbox",
+        )
+        assert stored is not None
+        assert stored.record.dependencies[0].response is None
+        assert canary not in stored.record.model_dump_json()
+
+        with runtime.runs_repository._engine.connect() as connection:
+            connection.execute(
+                text(
+                    "SELECT set_config('alfalab.tenant_id', :tenant_id, true), "
+                    "set_config('alfalab.sandbox_id', :sandbox_id, true)"
+                ),
+                {"tenant_id": "t05-test-tenant", "sandbox_id": "t05-sandbox"},
+            )
+            persisted_dependencies = (
+                connection.execute(
+                    text(
+                        "SELECT dependency_json::text FROM runs.dependencies "
+                        "WHERE tenant_id=:tenant_id AND sandbox_id=:sandbox_id "
+                        "AND run_id=:run_id"
+                    ),
+                    {
+                        "tenant_id": "t05-test-tenant",
+                        "sandbox_id": "t05-sandbox",
+                        "run_id": run_id,
+                    },
+                )
+                .scalars()
+                .all()
+            )
+        assert persisted_dependencies
+        assert canary not in "".join(persisted_dependencies)
+
+        persisted_files = [
+            path for path in runs_artifact_root.rglob("*") if path.is_file()
+        ]
+        assert persisted_files
+        assert all(canary.encode() not in path.read_bytes() for path in persisted_files)
+    finally:
+        runtime.close()

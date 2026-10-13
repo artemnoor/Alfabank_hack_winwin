@@ -2,17 +2,54 @@
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from alfalab_contracts import ArtifactRef
+from alfalab_contracts import ArtifactRef, ArtifactView
 
 from alfalab.common.canonical import canonical_json_bytes, sha256_hash
+from alfalab.common.limits import MAX_ARTIFACT_RESPONSE_BYTES
 from alfalab.common.scope import TrustedScope, validate_scope
 from alfalab.common.storage_errors import ArtifactIntegrityError
+
+ARTIFACT_SCHEMA_VERSION = "1.0.0"
+
+
+def verified_artifact_json(
+    view: ArtifactView,
+    *,
+    expected_schema_id: str,
+    expected_classification: str,
+) -> str:
+    """Check an artifact view's contract, canonical bytes, size, and digest."""
+    content = view.content_json
+    raw = content.encode("utf-8") if content is not None else b""
+    if (
+        content is None
+        or view.availability != "available"
+        or view.ref.schema_id != expected_schema_id
+        or view.ref.schema_version != ARTIFACT_SCHEMA_VERSION
+        or view.ref.media_type != "application/json"
+        or view.ref.classification != expected_classification
+        or view.ref.size_bytes != len(raw)
+        or len(raw) > MAX_ARTIFACT_RESPONSE_BYTES
+        or view.ref.hash != sha256_hash(raw)
+    ):
+        raise ValueError("recorded artifact is unavailable or incompatible")
+    try:
+        value = json.loads(content)
+        canonical = canonical_json_bytes(value).decode("utf-8")
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
+        raise ValueError(
+            "recorded artifact is malformed or not canonical JSON"
+        ) from exc
+    if canonical != content:
+        raise ValueError("recorded artifact is not canonical JSON")
+    return content
 
 
 @dataclass(frozen=True, slots=True)

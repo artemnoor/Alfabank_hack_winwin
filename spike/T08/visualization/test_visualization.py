@@ -518,6 +518,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
         screenshots = Path(screenshot_tempdir.name)
         external_requests: list[str] = []
         page_errors: list[str] = []
+        console_errors: list[str] = []
         with self.sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
@@ -534,6 +535,12 @@ class BrowserAcceptanceTests(unittest.TestCase):
                     if request.url.startswith(("http:", "https:"))
                     else None
                 ),
+            )
+            page.on(
+                "console",
+                lambda message: console_errors.append(message.text)
+                if message.type == "error"
+                else None,
             )
             page.on(
                 "pageerror", lambda error: page_errors.append(f"{error}\n{error.stack}")
@@ -979,6 +986,11 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 external_requests,
                 [],
                 f"unexpected network requests: {external_requests}",
+            )
+            self.assertEqual(
+                console_errors,
+                [],
+                f"unexpected browser console errors: {console_errors}",
             )
             self.assertEqual(page_errors, [], f"browser errors: {page_errors}")
             expected_screenshots = {

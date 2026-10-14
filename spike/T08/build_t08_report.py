@@ -353,6 +353,7 @@ def build_report(
             "filter_selection_consistency": "detail and comparison selection always tracks the filtered case list; no-match filters clear stale details",
             "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
             "python_browser_policy_parity_cases": 45,
+            "browser_console_errors": "clean Playwright context reports no console errors, page errors, or external requests",
             "mobile_reading_order": ["case list", "Jev analysis", "preliminary labels"],
         },
         "independent_review": {
@@ -476,6 +477,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "- Фильтр теперь синхронизирует открытую новость и сравнение; при отсутствии совпадений детали очищаются.",
         "- Для insufficient-evidence интерфейс отдельно показывает достижение порога и факт удержания кандидатов; высокий сигнал без кандидатов больше не называется review.",
         "- Playwright сравнивает браузерную Policy v2.1 с Python-реализацией по всем 45 сохранённым ответам.",
+        "- Browser acceptance проверяет, что в чистом Chromium нет ошибок консоли, ошибок страницы и внешних сетевых запросов.",
         "- На узком экране сначала идут список, разбор Jev, затем предварительная разметка.",
         "",
         "## Риски и решение",

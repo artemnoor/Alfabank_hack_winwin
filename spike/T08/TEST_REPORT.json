@@ -336,6 +336,7 @@
     "filter_selection_consistency": "detail and comparison selection always tracks the filtered case list; no-match filters clear stale details",
     "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
     "python_browser_policy_parity_cases": 45,
+    "browser_console_errors": "clean Playwright context reports no console errors, page errors, or external requests",
     "mobile_reading_order": [
       "case list",
       "Jev analysis",

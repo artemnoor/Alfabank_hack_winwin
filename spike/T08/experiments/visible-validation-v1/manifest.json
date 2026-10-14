@@ -1,0 +1,27 @@
+{
+  "dataset_id": "t08-visible-validation-candidates",
+  "version": "1.1.0",
+  "status": "awaiting_human_annotation",
+  "case_count": 60,
+  "news_path": "spike/T08/experiments/visible-validation-v1/news.json",
+  "input_sha256": "ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7",
+  "synthetic": true,
+  "new_jev_api_requests": 0,
+  "gold_label_status": "not_created",
+  "eligible_for_model_scoring": false,
+  "benchmark_role": "visible_validation_candidate",
+  "eligible_as_blind_test": false,
+  "is_genuinely_blind": false,
+  "blind_to_inputs": false,
+  "excluded_from_current_reports": true,
+  "blind_to_model_outputs": true,
+  "taxonomy_to_freeze_before_annotation": "pending human decision",
+  "independent_annotation_required": true,
+  "limitations": [
+    "The stories are synthetic and do not estimate performance on real news.",
+    "The corpus author and developers have seen the texts; this set can never serve as the final blind test, even if labels are kept private.",
+    "Use it only as a visible validation candidate after human labels are adjudicated; keep labels separately controlled until the validation protocol is frozen.",
+    "A final blind test requires new inputs created and held by an independent custodian after taxonomy, prompt, and policy are frozen.",
+    "Do not use this set for taxonomy edits, threshold selection, prompt tuning, or current quality metrics."
+  ]
+}

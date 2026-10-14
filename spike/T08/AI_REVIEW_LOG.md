@@ -25,3 +25,9 @@ The review caught two stale-document issues and one explanation issue: README om
 ## Limits
 
 AI agents do not replace an independent human annotator, adjudicator, security audit or provider evidence. The AI label review is explicitly not gold. The reviewer tasks all used the same repository contents and are not independent real-world validation samples.
+
+## Finalization review — 2026-10-15
+
+`/root/t08_final_audit` performed a new read-only review of the final error report, report builder, validation-set rename and full-baseline annotation packet. It confirmed the 60-story set is consistently marked as visible validation (not blind), the `validation-v1-*` IDs and manifest hashes agree, the 49-story packet omits source IDs/draft labels/model outputs, and the original corpus, v0.3 taxonomy and Jev aggregate hashes remain pinned. The reviewer found two documentation drifts (stale test count and generic holdout wording); these were corrected, then the reviewer confirmed there were no remaining findings. The reviewer did not run tests.
+
+The primary run on this revision executed 118 unit tests and 19 Policy/visualization/Playwright tests (all passed), Ruff check/format, offline runner, quality-analysis and deep-corpus report reproducibility, final report reproducibility and `git diff --check`. The exhausted live-budget guard refused classification before network access. No new Jev API request was made. These engineering checks do not make AI review a human gold label or establish model quality.

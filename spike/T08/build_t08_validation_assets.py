@@ -16,10 +16,10 @@ V04_DIR = ROOT / "experiments" / "taxonomy-v0.4-proposal"
 V041_DIR = ROOT / "experiments" / "taxonomy-v0.4.1-proposal"
 V041_TAXONOMY = V041_DIR / "taxonomy.json"
 V041_MANIFEST = V041_DIR / "manifest.json"
-BLIND_DIR = ROOT / "experiments" / "blind-candidate-v1"
-BLIND_NEWS = BLIND_DIR / "news.json"
-BLIND_MANIFEST = BLIND_DIR / "manifest.json"
-BLIND_GUIDE = BLIND_DIR / "ANNOTATION_GUIDE.md"
+VALIDATION_DIR = ROOT / "experiments" / "visible-validation-v1"
+VALIDATION_NEWS = VALIDATION_DIR / "news.json"
+VALIDATION_MANIFEST = VALIDATION_DIR / "manifest.json"
+VALIDATION_GUIDE = VALIDATION_DIR / "ANNOTATION_GUIDE.md"
 ERROR_ANALYSIS = ROOT / "ERROR_ANALYSIS_V2.1.json"
 ERROR_ANALYSIS_MD = ROOT / "ERROR_ANALYSIS_V2.1.md"
 ERROR_MANIFEST = ROOT / "ERROR_ANALYSIS_V2.1.manifest.json"
@@ -41,8 +41,8 @@ EXPECTED_AGGREGATE_SHA256 = (
 EXPECTED_V041_SHA256 = (
     "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230"
 )
-EXPECTED_BLIND_INPUT_SHA256 = (
-    "3d1f3c6cca97437216c8b023c008fccc630cda6aa23249724e60a9d9c64c9e6d"
+EXPECTED_VALIDATION_INPUT_SHA256 = (
+    "ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7"
 )
 
 
@@ -257,7 +257,7 @@ def _taxonomy_proposal() -> tuple[dict[str, Any], dict[str, Any]]:
     return taxonomy, proposal_manifest
 
 
-def _blind_stories() -> list[dict[str, str]]:
+def _validation_stories() -> list[dict[str, str]]:
     rows = [
         (
             "После ремонта сортировочного узла отправка партий с терминала «Северный тракт» возобновилась, однако двенадцать вагонов, задержанных на прошлой неделе, будут доставлены покупателям позже первоначального графика.",
@@ -501,7 +501,7 @@ def _blind_stories() -> list[dict[str, str]]:
         ),
     ]
     return [
-        {"id": f"blind-v1-{index:03d}", "title": title, "text": text}
+        {"id": f"validation-v1-{index:03d}", "title": title, "text": text}
         for index, (text, title) in enumerate(rows, start=1)
     ]
 
@@ -741,104 +741,149 @@ def _render_error_markdown(report: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _render_model_blind_packet(report: dict[str, Any]) -> str:
-    case_ids = dict.fromkeys(
+def _render_model_blind_packet() -> str:
+    corpus = _read_json(CORPUS)["cases"]
+    taxonomy = _read_json(TAXONOMY)
+    cases = [case for case in corpus if case.get("text", "").strip()]
+    cases.sort(
+        key=lambda case: hashlib.sha256(
+            f"{EXPECTED_CORPUS_SHA256}:{case['id']}".encode("utf-8")
+        ).hexdigest()
+    )
+    lines = [
+        "# Пакет независимой разметки: полный базовый набор",
+        "",
+        "Включены все 49 непустых новостей исходного baseline в перемешанном порядке; не только кейсы, на которых Jev расходился с draft labels. Алиасы нейтральные. Здесь нет исходных ID, gold labels, Jev outputs, scores или отметок наличия ответа модели.",
+        "",
+        f"Источник: синтетический baseline, SHA-256 `{EXPECTED_CORPUS_SHA256}`. Для первой разметки зафиксирована taxonomy `{taxonomy['version']}`, SHA-256 `{EXPECTED_TAXONOMY_SHA256}`. Предложение v0.4.1 не использовать, пока владелец не заморозит его отдельно.",
+        "",
+        "Это слепота к сохранённым ответам модели и первоначальным меткам, а не полная слепота владельца: корпус уже виден владельцу репозитория. Передайте annotator-ам только этот пакет и инструкции; не отправляйте им соседние отчёты/репозиторий. AI-review и draft gold не являются утверждённым эталоном.",
+        "",
+        "## Правила",
+        "",
+        "- Два человека размечают независимо, не видят ответы друг друга и не обсуждают кейсы до сдачи обеих копий.",
+        "- Ставьте только метки с прямым основанием в тексте; не выводите последствия и причинность.",
+        "- Для каждой метки укажите точную цитату из новости; фиксируйте статус: факт, официальное решение, план, слух, отрицание или противоречие.",
+        "- Unknown/insufficient evidence и событие вне списка — разные ответы. Отсутствие метки не заменяйте догадкой.",
+        "- Разногласия сохраняются и решаются третьим человеком; первоначальные ответы не перезаписываются.",
+        "- Сначала заморозьте обе разметки и их hashes. Только после adjudication сопоставляйте с исходными метками и ответами Jev.",
+        "",
+        "## Темы (выбрать одну)",
+        "",
+        "| Код | Название | Критерий |",
+        "|---|---|---|",
+    ]
+    for topic in taxonomy["topics"]:
+        lines.append(
+            f"| `{topic['code']}` | {topic['label']} | {topic['definition']} |"
+        )
+    lines.extend(
         [
-            *(row["case_id"] for row in report["false_positives"]),
-            *(row["case_id"] for row in report["false_negatives"]),
-            "e35-multi-labor-investment",
+            "",
+            "## События (независимые метки; несколько допустимы)",
+            "",
+            "| Код | Название | Включать | Не включать |",
+            "|---|---|---|---|",
         ]
     )
-    corpus = _read_json(CORPUS)["cases"]
-    cases = {row["id"]: row for row in corpus}
-    lines = [
-        "# Model-blind packet: первичная проверка спорных меток",
-        "",
-        "Это отдельный лист для человеческой разметки до просмотра сохранённых оценок Jev и текущих expected labels. Сначала заполните лист, зафиксируйте автора/время/taxonomy SHA, затем сравнивайте с `ERROR_ANALYSIS_V2.1.md`. AI-review и draft gold не являются утверждённым эталоном.",
-        "",
-        "Используйте исходную taxonomy v0.3.0-spike, если владелец не утвердил другую версию до начала разметки. Для каждого события нужен отдельный точный фрагмент текста; не выводите скрытые последствия. e35 включён только для проверки gold: сохранённого ответа Jev для него нет.",
-        "",
-        "## Форма ответа для каждого кейса",
-        "",
-        "- Основная тема: ______",
-        "- Бизнес-события: ______",
-        "- Unknown / insufficient evidence: ______",
-        "- Статус утверждений: факт / официальное решение / план / слух / отрицание / противоречие",
-        "- Evidence span для каждой метки: ______",
-        "- Разногласие с другим человеком: да / нет; обоснование: ______",
-        "",
-    ]
-    for case_id in case_ids:
-        case = cases[case_id]
+    for event in taxonomy["events"]:
+        lines.append(
+            f"| `{event['code']}` | {event['label']} | {event['include']} | {event['exclude']} |"
+        )
+    lines.extend(
+        [
+            "",
+            f"Сигнал вне списка `{taxonomy['unlisted_event_code']}`: {taxonomy['unlisted_event_question']}",
+            "",
+            f"Сигнал недостаточности данных `{taxonomy['uncertainty_signal_code']}`: {taxonomy['uncertainty_question']}",
+            "",
+            "## Новости",
+            "",
+        ]
+    )
+    for index, case in enumerate(cases, start=1):
         lines.extend(
             [
-                f"## {case_id}",
+                f"### Случай {index:02d}",
                 "",
                 f"**{case['title']}**",
                 "",
                 case["text"],
                 "",
-                "Human annotation: ____________________",
+                "- Тема: ______",
+                "- События: ______",
+                "- Событие вне списка: да / нет / сомнение — основание: ______",
+                "- Недостаточно данных: да / нет / сомнение — основание: ______",
+                "- Статус утверждения: факт / официальное решение / план / слух / отрицание / противоречие",
+                "- Точные evidence quotes по каждой метке: ______",
+                "- Обоснование / спор для adjudication: ______",
                 "",
             ]
         )
     return "\n".join(lines)
 
 
-def _write_blind_assets() -> dict[str, Any]:
-    cases = _blind_stories()
+def _write_validation_assets() -> dict[str, Any]:
+    cases = _validation_stories()
     document = {
-        "dataset_id": "t08-blind-candidate-inputs",
-        "version": "1.0.0",
+        "dataset_id": "t08-visible-validation-candidates",
+        "version": "1.1.0",
         "status": "awaiting_human_annotation",
         "synthetic": True,
         "cases": cases,
     }
-    _write_json(BLIND_NEWS, document)
-    digest = _sha256(BLIND_NEWS.read_bytes())
-    if digest != EXPECTED_BLIND_INPUT_SHA256:
-        raise ValueError("blind candidate inputs changed; create a new dataset version")
+    _write_json(VALIDATION_NEWS, document)
+    digest = _sha256(VALIDATION_NEWS.read_bytes())
+    if digest != EXPECTED_VALIDATION_INPUT_SHA256:
+        raise ValueError(
+            "visible validation inputs changed; create a new dataset version"
+        )
     manifest = {
         "dataset_id": document["dataset_id"],
         "version": document["version"],
         "status": "awaiting_human_annotation",
         "case_count": len(cases),
-        "news_path": "spike/T08/experiments/blind-candidate-v1/news.json",
+        "news_path": "spike/T08/experiments/visible-validation-v1/news.json",
         "input_sha256": digest,
         "synthetic": True,
         "new_jev_api_requests": 0,
         "gold_label_status": "not_created",
         "eligible_for_model_scoring": False,
+        "benchmark_role": "visible_validation_candidate",
+        "eligible_as_blind_test": False,
+        "is_genuinely_blind": False,
+        "blind_to_inputs": False,
         "excluded_from_current_reports": True,
         "blind_to_model_outputs": True,
         "taxonomy_to_freeze_before_annotation": "pending human decision",
         "independent_annotation_required": True,
         "limitations": [
             "The stories are synthetic and do not estimate performance on real news.",
-            "The corpus author can see the texts; independent blind labels do not yet exist.",
-            "Keep labels in a separately controlled file unavailable to policy/taxonomy developers until the benchmark is frozen.",
+            "The corpus author and developers have seen the texts; this set can never serve as the final blind test, even if labels are kept private.",
+            "Use it only as a visible validation candidate after human labels are adjudicated; keep labels separately controlled until the validation protocol is frozen.",
+            "A final blind test requires new inputs created and held by an independent custodian after taxonomy, prompt, and policy are frozen.",
             "Do not use this set for taxonomy edits, threshold selection, prompt tuning, or current quality metrics.",
         ],
     }
-    _write_json(BLIND_MANIFEST, manifest)
-    BLIND_GUIDE.write_text(
+    _write_json(VALIDATION_MANIFEST, manifest)
+    VALIDATION_GUIDE.write_text(
         """# Инструкция для будущей слепой разметки T08
 
-Набор содержит 60 новых синтетических текстов. Сейчас он не размечен, не запускался на Jev и исключён из всех текущих отчётов и подборов порогов. Это подготовка материала, а не завершённый blind benchmark.
+Набор содержит 60 новых синтетических текстов. Сейчас он не размечен, не запускался на Jev и исключён из всех текущих отчётов и подборов порогов. Тексты уже видели автор и разработчики, поэтому этот набор навсегда остаётся visible validation candidate и не может стать финальным blind benchmark.
 
 ## Перед разметкой
 
 1. Владелец фиксирует конкретную версию taxonomy и её SHA-256 до просмотра ответов Jev. Предложение v0.4.1 нельзя считать утверждённым автоматически.
-2. Два независимых человека получают только тексты и зафиксированные определения меток. Им не показывают ответы Jev, текущие метрики, разметку исходных e01–e49 и мнение другого аннотатора.
+2. Для validation двое независимых людей получают только тексты и зафиксированные определения меток. Им не показывают ответы Jev, текущие метрики, разметку исходных e01–e49 и мнение другого аннотатора.
 3. Для каждой метки указываются точный evidence span, статус (факт/официальное решение/план/слух/отрицание), тема, события, unknown и достаточность данных. Нет опоры в тексте — нет метки.
 4. Разногласия решает третий человек; сохраняются первоначальные оценки и обоснование adjudication. AI-review не является human gold.
-5. Заморозить labels и manifest отдельным хешем и хранить labels вне доступа разработчиков до выбора taxonomy, порогов и политики. Потом один разрешённый live-прогон проводится без изменений frozen inputs.
+5. Заморозить validation labels и manifest отдельным хешем. Для blind evaluation создать другой набор: независимый custodian формирует и хранит inputs и labels вне доступа разработчиков после freeze taxonomy/prompt/policy; только затем проводится один разрешённый прогон.
 
 ## Шаблон разметки на кейс
 
 ```json
 {
-  "case_id": "blind-v1-NNN",
+  "case_id": "validation-v1-NNN",
   "annotator_id": "",
   "taxonomy_version": "",
   "topic": null,
@@ -852,7 +897,7 @@ def _write_blind_assets() -> dict[str, Any]:
 }
 ```
 
-Не публиковать labels вместе с текстами до окончания blind-проверки. Поскольку эта версия корпуса уже видна владельцу репозитория, она пока только **candidate holdout**; полноценная слепая проверка начнётся после независимой разметки и контролируемого хранения gold.
+Не публиковать labels вместе с текстами до окончания validation. Поскольку эти тексты уже видны владельцу и разработчикам, даже независимо adjudicated labels не сделают этот набор blind. Для подтверждающего blind-теста нужен новый набор от независимого custodian, которого разработчики не видели до фиксации эксперимента.
 """,
         encoding="utf-8",
     )
@@ -868,32 +913,39 @@ def build() -> tuple[dict[str, Any], dict[str, Any]]:
         raise ValueError("v0.4.1 proposal changed; create a new proposal version")
     _write_json(V041_MANIFEST, proposal_manifest)
 
-    blind_manifest = _write_blind_assets()
+    validation_manifest = _write_validation_assets()
     errors = _error_audit()
     _write_json(ERROR_ANALYSIS, errors)
     ERROR_ANALYSIS_MD.write_text(_render_error_markdown(errors), encoding="utf-8")
-    GOLD_REVIEW_PACKET.write_text(_render_model_blind_packet(errors), encoding="utf-8")
+    GOLD_REVIEW_PACKET.write_text(_render_model_blind_packet(), encoding="utf-8")
     error_manifest = {
         "analysis_path": "spike/T08/ERROR_ANALYSIS_V2.1.json",
         "analysis_sha256": _sha256(ERROR_ANALYSIS.read_bytes()),
         "model_blind_review_packet_path": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
         "model_blind_review_packet_sha256": _sha256(GOLD_REVIEW_PACKET.read_bytes()),
+        "packet_case_count": 49,
+        "packet_selection": "all non-empty baseline cases; not selected by model disagreement",
+        "packet_contains_source_ids": False,
+        "packet_contains_draft_labels_or_model_outputs": False,
+        "owner_blind": False,
         "policy_version": "2.1.0-spike",
         "saved_answer_count": 45,
         "false_positive_disagreements": 6,
         "false_negative_disagreements": 7,
         "gold_status": "preliminary_single_author_unadjudicated",
-        "blind_corpus_excluded": True,
+        "visible_validation_set_excluded": True,
     }
     _write_json(ERROR_MANIFEST, error_manifest)
-    return proposal_manifest, blind_manifest
+    return proposal_manifest, validation_manifest
 
 
 if __name__ == "__main__":
-    proposal, blind = build()
+    proposal, validation = build()
     print(f"TAXONOMY={proposal['version']} {proposal['proposal_sha256']}")
-    print(f"BLIND_CASES={blind['case_count']} {blind['input_sha256']}")
     print(
-        f"BLIND_STATUS={blind['status']} SCORING={blind['eligible_for_model_scoring']}"
+        f"VISIBLE_VALIDATION_CASES={validation['case_count']} {validation['input_sha256']}"
+    )
+    print(
+        f"VALIDATION_STATUS={validation['status']} SCORING={validation['eligible_for_model_scoring']}"
     )
     print("ERROR_AUDIT=6 FP disagreements, 7 FN disagreements; human gold pending")

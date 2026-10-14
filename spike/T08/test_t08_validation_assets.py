@@ -7,8 +7,8 @@ from difflib import SequenceMatcher
 from pathlib import Path
 
 from build_t08_validation_assets import (
-    BLIND_MANIFEST,
-    BLIND_NEWS,
+    VALIDATION_MANIFEST,
+    VALIDATION_NEWS,
     ERROR_ANALYSIS,
     ERROR_MANIFEST,
     GOLD_REVIEW_PACKET,
@@ -79,34 +79,46 @@ class T08ValidationAssetsTests(unittest.TestCase):
         self.assertIn("trade_restriction", rules)
         self.assertIn("legal_enforcement", rules)
 
-    def test_blind_candidate_has_new_unlabeled_inputs_only(self) -> None:
-        manifest = json.loads(BLIND_MANIFEST.read_text(encoding="utf-8"))
-        document = json.loads(BLIND_NEWS.read_text(encoding="utf-8"))
+    def test_visible_validation_candidate_has_new_unlabeled_inputs_only(self) -> None:
+        manifest = json.loads(VALIDATION_MANIFEST.read_text(encoding="utf-8"))
+        document = json.loads(VALIDATION_NEWS.read_text(encoding="utf-8"))
         cases = document["cases"]
         self.assertEqual(len(cases), 60)
+        self.assertEqual(manifest["dataset_id"], "t08-visible-validation-candidates")
+        self.assertEqual(manifest["version"], "1.1.0")
         self.assertEqual(manifest["case_count"], 60)
         self.assertEqual(manifest["status"], "awaiting_human_annotation")
         self.assertFalse(manifest["eligible_for_model_scoring"])
+        self.assertEqual(manifest["benchmark_role"], "visible_validation_candidate")
+        self.assertFalse(manifest["eligible_as_blind_test"])
+        self.assertFalse(manifest["is_genuinely_blind"])
+        self.assertFalse(manifest["blind_to_inputs"])
+        self.assertTrue(manifest["blind_to_model_outputs"])
         self.assertEqual(manifest["gold_label_status"], "not_created")
         self.assertEqual(
-            hashlib.sha256(BLIND_NEWS.read_bytes()).hexdigest(),
+            hashlib.sha256(VALIDATION_NEWS.read_bytes()).hexdigest(),
             manifest["input_sha256"],
         )
         ids = [case["id"] for case in cases]
         texts = [case["text"] for case in cases]
         self.assertEqual(len(ids), len(set(ids)))
+        self.assertTrue(all(case_id.startswith("validation-v1-") for case_id in ids))
         self.assertEqual(len(texts), len(set(texts)))
         for case in cases:
             self.assertEqual(set(case), {"id", "title", "text"})
             self.assertTrue(case["title"].strip())
             self.assertTrue(case["text"].strip())
 
-    def test_blind_candidate_is_not_a_current_evaluation_input(self) -> None:
-        manifest = json.loads(BLIND_MANIFEST.read_text(encoding="utf-8"))
+    def test_visible_validation_candidate_is_excluded_from_current_scoring(
+        self,
+    ) -> None:
+        manifest = json.loads(VALIDATION_MANIFEST.read_text(encoding="utf-8"))
         error_report = json.loads(ERROR_ANALYSIS.read_text(encoding="utf-8"))
         error_manifest = json.loads(ERROR_MANIFEST.read_text(encoding="utf-8"))
         quality_report = (ROOT / "QUALITY_ANALYSIS.json").read_text(encoding="utf-8")
-        blind_cases = json.loads(BLIND_NEWS.read_text(encoding="utf-8"))["cases"]
+        validation_cases = json.loads(VALIDATION_NEWS.read_text(encoding="utf-8"))[
+            "cases"
+        ]
         self.assertEqual(manifest["excluded_from_current_reports"], True)
         self.assertEqual(error_report["saved_answer_count"], 45)
         self.assertEqual(len(error_report["false_positives"]), 6)
@@ -115,10 +127,14 @@ class T08ValidationAssetsTests(unittest.TestCase):
             hashlib.sha256(ERROR_ANALYSIS.read_bytes()).hexdigest(),
             error_manifest["analysis_sha256"],
         )
-        self.assertTrue(all(case["id"] not in quality_report for case in blind_cases))
+        self.assertTrue(
+            all(case["id"] not in quality_report for case in validation_cases)
+        )
 
-    def test_blind_candidate_texts_are_new_against_existing_spike_corpora(self) -> None:
-        blind = json.loads(BLIND_NEWS.read_text(encoding="utf-8"))["cases"]
+    def test_validation_candidate_texts_are_new_against_existing_spike_corpora(
+        self,
+    ) -> None:
+        validation = json.loads(VALIDATION_NEWS.read_text(encoding="utf-8"))["cases"]
         old_texts = {
             " ".join(case["text"].casefold().split())
             for case in json.loads((ROOT / "corpus.json").read_text(encoding="utf-8"))[
@@ -139,13 +155,13 @@ class T08ValidationAssetsTests(unittest.TestCase):
                 for case in document["cases"]
                 if case.get("text", "").strip()
             )
-        new_texts = {" ".join(case["text"].casefold().split()) for case in blind}
+        new_texts = {" ".join(case["text"].casefold().split()) for case in validation}
         self.assertFalse(new_texts & old_texts)
 
-    def test_blind_candidate_has_no_high_text_similarity_to_existing_corpora(
+    def test_validation_candidate_has_no_high_text_similarity_to_existing_corpora(
         self,
     ) -> None:
-        blind = json.loads(BLIND_NEWS.read_text(encoding="utf-8"))["cases"]
+        validation = json.loads(VALIDATION_NEWS.read_text(encoding="utf-8"))["cases"]
         existing = [
             " ".join(case["text"].casefold().split())
             for case in json.loads((ROOT / "corpus.json").read_text(encoding="utf-8"))[
@@ -170,11 +186,13 @@ class T08ValidationAssetsTests(unittest.TestCase):
             SequenceMatcher(
                 None, " ".join(case["text"].casefold().split()), old_text
             ).ratio()
-            for case in blind
+            for case in validation
             for old_text in existing
         )
         self.assertLess(maximum, 0.72)
-        candidate_texts = [" ".join(case["text"].casefold().split()) for case in blind]
+        candidate_texts = [
+            " ".join(case["text"].casefold().split()) for case in validation
+        ]
         internal_maximum = max(
             SequenceMatcher(
                 None, candidate_texts[index], candidate_texts[other]
@@ -184,18 +202,33 @@ class T08ValidationAssetsTests(unittest.TestCase):
         )
         self.assertLess(internal_maximum, 0.72)
 
-    def test_gold_review_packet_hides_model_scores_and_includes_missing_e35(
+    def test_human_packet_blinds_all_baseline_cases_to_model_and_draft_labels(
         self,
     ) -> None:
         packet = GOLD_REVIEW_PACKET.read_text(encoding="utf-8")
         manifest = json.loads(ERROR_MANIFEST.read_text(encoding="utf-8"))
-        self.assertIn("e03-shortage-cells", packet)
-        self.assertIn("e34-multi-insolvency-legal", packet)
-        self.assertIn("e35-multi-labor-investment", packet)
-        self.assertIn("сохранённого ответа Jev для него нет", packet)
-        self.assertNotIn("0.87", packet)
+        corpus_cases = json.loads((ROOT / "corpus.json").read_text(encoding="utf-8"))[
+            "cases"
+        ]
+        nonempty = [case for case in corpus_cases if case.get("text", "").strip()]
+        aliases = [
+            line for line in packet.splitlines() if line.startswith("### Случай ")
+        ]
+        self.assertEqual(len(aliases), len(nonempty))
+        self.assertIn("не только кейсы, на которых Jev расходился", packet)
+        self.assertIn("корпус уже виден владельцу", packet)
+        for case in nonempty:
+            self.assertIn(case["title"], packet)
+            self.assertIn(case["text"], packet)
+            self.assertNotIn(case["id"], packet)
         self.assertNotIn("expected_events", packet)
         self.assertNotIn("candidate_codes", packet)
+        self.assertNotIn("topic_confidence", packet)
+        self.assertNotIn("0.87", packet)
+        self.assertEqual(manifest["packet_case_count"], 49)
+        self.assertFalse(manifest["packet_contains_source_ids"])
+        self.assertFalse(manifest["packet_contains_draft_labels_or_model_outputs"])
+        self.assertFalse(manifest["owner_blind"])
         self.assertEqual(
             hashlib.sha256(GOLD_REVIEW_PACKET.read_bytes()).hexdigest(),
             manifest["model_blind_review_packet_sha256"],

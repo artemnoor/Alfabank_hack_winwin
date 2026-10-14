@@ -1,5 +1,14 @@
 # T08 spike plan — Jev Russian news classification
 
+## Current status — 2026-10-15
+
+- Policy v2.1 is frozen as an experimental routing rule for the saved pilot. It produced 40 unconfirmed candidates in 32/45 successful responses and no evidence/unlisted review tasks at the configured 0.80 cutoffs. It also produced 6 candidate FP and 7 FN disagreements with preliminary labels; this does not establish safe automation.
+- Offline error audit covers all 6/7 disagreements. Taxonomy 0.4.1 is a separate unapproved, untested proposal; source taxonomy 0.3 and saved Jev outputs remain unchanged.
+- The human annotation packet now contains all 49 non-empty baseline stories without source IDs, draft labels, or model outputs. It is blind to saved model answers, but not to the repository owner; no human annotators have completed it.
+- The separate 60-story visible validation set is unlabelled, unscored, and cannot become a blind benchmark because its inputs were visible to developers.
+- **Ready for T09 experimental handoff only. Not production-ready.** No runtime/OpenAPI integration or new Jev requests were made.
+- Latest checks: 118 offline unit tests and 19 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
+
 ## Quality improvement pass — 2026-10-14
 
 - Reproduced v4 from stored outputs and preserved original corpus/taxonomy hashes. No live API calls were made.
@@ -7,7 +16,7 @@
 - Added counterfactual coverage/risk tables; they are not threshold recommendations and are not production-ready.
 - Added detailed error review, human adjudication packet, deep-v1 structural audit, benchmark freeze plan and a separate v0.4 taxonomy proposal. Source v0.3, original corpus and saved responses remain unchanged.
 - Added offline regression tests for aggregation, missing cases, review triggers, tri-state boundaries, no-network analysis, spent-budget refusal, corpus hashes and proposal separation.
-- Current statuses after the final offline pass: engineering quality **PASS** (110 tests, Ruff, offline runner and artifact checks); API compatibility **historically confirmed with limits, not live-rechecked here**; model quality **NOT MEASURED** for integration; integration readiness **NOT READY**.
+- Current statuses after the final offline pass: engineering quality **PASS** (118 unit tests, 19 browser/policy tests, Ruff, offline runner and artifact checks); current-revision API compatibility **BLOCKED** pending an authorized live verification; model quality **NOT MEASURED FOR DECISION**; T09 experimental candidate handoff **READY**, production integration **NOT READY**.
 
 ## Goal and limits
 
@@ -33,7 +42,7 @@
 - That historical run is preserved in `results/archive/TEST_REPORT-2.1.0-pre-quality.*`.
 - Historical 451 diagnosis remains unknown.
 
-Current tests and calculations are recorded in `TEST_REPORT.md`, `TEST_REPORT.json`, and `QUALITY_ANALYSIS.json`. The current report preserves the pre-quality report in `results/archive/` and records the fresh run from 2026-10-14.
+Current tests and calculations are recorded in `TEST_REPORT.md`, `TEST_REPORT.json`, and `QUALITY_ANALYSIS.json`. Report version 3.0.0 is preserved in `results/archive/TEST_REPORT-3.0.0-pre-policy-v2.1-handoff.*`; the current report records the 2026-10-15 T09-handoff preparation.
 
 Detailed results: TEST_REPORT.md; machine details and metrics: TEST_REPORT.json.
 

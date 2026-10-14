@@ -2,15 +2,25 @@
 
 Изолированный эксперимент для русскоязычных synthetic business news через Jev на Polza AI. Jev остаётся единственным classifier. Spike не подключён к runtime, не меняет OpenAPI и не является production policy.
 
-## Последний offline quality pass — 2026-10-14
+## Текущее состояние — 2026-10-15
 
-- **Engineering quality:** см. актуальные результаты в `TEST_REPORT.md` и `TEST_REPORT.json`. Тесты анализируют сохранённые ответы v4; live запросов в этой работе не было.
+- **Engineering quality:** PASS по текущим офлайн-проверкам, см. `TEST_REPORT.md` и `TEST_REPORT.json`.
+- **API compatibility:** текущий клиент live не проверялся; BLOCKED для интеграционного решения. Исторические ответы через Polza — ограниченное свидетельство, не проверка нынешнего source revision.
+- **Model quality:** не доказано для production. Сохранённые метрики описательные, синтетические и основаны на предварительной односторонней разметке.
+- **Передача в T09:** подготовлена только для исследования неподтверждённых event-кандидатов; runtime-интеграции нет.
 - **Причины review 93,3%:** у 42 из 45 сохранённых ответов сработал текущий rule gate. Активные причины перекрываются: Choice=5, event score в серой зоне=24, insufficient-evidence score >0.2=17, unlisted score >0.2=32. 28 review-кейсов имеют несколько причин.
 - **Это не значит, что Jev ошибся в 93,3% случаев.** В среднем диапазоне Noul может означать abstain, а текущая логика превращает это в review. У всех 33 unlisted scores выше 0.2 состояние было `abstain`; positive ≥0.8 не было.
 - **Сохранённые метрики остаются предварительными:** 45/49 ответов, topic accuracy 31/45 = 68,9%, event micro-F1 0,840, exact event-set 34/45 = 75,6%. Эталонные метки составлены одним автором, часть спорна; 4 ответа отсутствуют.
-- **Model quality:** NOT MEASURED для интеграционного решения. На малом черновом synthetic set нельзя безопасно обещать снижение ручных проверок.
-- **Интеграция:** NOT READY. Runtime, production code и контракты не менялись.
-- **Live API:** исторический отчёт описывает 45 сохранённых успешных ответов через Polza. В текущем quality pass запросов не было. Общий известный исторический след — до 53 вызовов, если три прежних HTTP 451 проверки считать с 50 попытками пилота; новые запросы требуют отдельного решения.
+- **Интеграция:** T09 handoff готов только как экспериментальная заметка. Runtime, production code и контракты не менялись.
+- **Live API:** в этой работе запросов не было. Известно 50 попыток пилота и 3 отдельные проверки, вернувшие HTTP 451; их причина неизвестна.
+
+## Policy v2.1 и передача кандидатов
+
+- Событие с оценкой ≥0,80 передаётся как неподтверждённый кандидат. Choice и `abstain` сохраняются, но не блокируют отдельного кандидата.
+- `insufficient_evidence ≥0,80` удерживает уже найденные кандидаты. `unlisted_event ≥0,80` создаёт отдельную задачу проверки и не блокирует известные события.
+- На тех же 45 ответах: 32 новости с 40 кандидатами; 0 review-задач по сигналам evidence/unlisted; 6 FP и 7 FN-расхождений с предварительными метками. В provisional risk group — 3 FP.
+- Ноль review на этой выборке не доказывает безопасность. Кандидаты — не подтверждённые факты, а labels не утверждены человеком.
+- Разбор причин — `ERROR_ANALYSIS_V2.1.md`/`.json`; граница передачи — `T09_HANDOFF.md`.
 
 ## Артефакты этого разбора
 
@@ -46,8 +56,10 @@
 ## Подготовка к следующему этапу
 
 - Разбор всех 6 FP-кандидатов и 7 FN-кандидатов Policy v2.1: `ERROR_ANALYSIS_V2.1.md` и `ERROR_ANALYSIS_V2.1.json`. Это расхождения с предварительными метками одного автора, не adjudicated model errors.
-- `HUMAN_REVIEW_PACKET_V2.1.md` — отдельный model-blind первичный лист для e03/e09/e10/e18/e25/e26/e27/e28/e32/e33/e34/e35. В нём нет draft labels и Jev scores; e35 отмечен как кейс без сохранённого ответа.
+- `HUMAN_REVIEW_PACKET_V2.1.md` — нейтральный пакет по всем 49 непустым baseline-новостям, без исходных ID, draft labels и Jev scores. Он слеп к результатам модели, но не к владельцу репозитория; независимых человеческих разметчиков пока нет.
 - Предложение taxonomy `0.4.1-spike`: `experiments/taxonomy-v0.4.1-proposal/`. Оно уточняет только границы и правила разметки, сохраняет коды и вопросы, не меняет v0.3/v0.4, не тестировалось live и ждёт решения владельца.
-- Candidate holdout из 60 новых синтетических текстов: `experiments/blind-candidate-v1/`. В корпусе нет model outputs и gold labels, он исключён из текущих отчётов и sweeps. Он ждёт независимой разметки и пока не является завершённым blind benchmark.
+- Набор из 60 новых синтетических текстов: `experiments/visible-validation-v1/`. Это только visible validation: тексты уже видели авторы/разработчики, поэтому набор не может стать финальным blind test, даже если labels держать отдельно. Для blind evaluation нужен новый корпус от независимого custodian после фиксации taxonomy, prompt и policy.
 - `T09_HANDOFF.md` описывает экспериментальную передачу неподтверждённых event-кандидатов. Это не DTO и не runtime-интеграция; T09 должен привязать свои утверждения к источнику и evidence spans.
-- Проверка материалов: `python -m unittest discover -s spike/T08 -p "test*.py" -v`; сборка proposal/report: `python spike/T08/build_t08_validation_assets.py`.
+- Проверка: `py -m unittest discover -s spike/T08 -p 'test*.py' -v`; Policy/Playwright: `py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v`.
+- Пересобрать proposal, visible validation и error audit: `py spike/T08/build_t08_validation_assets.py`.
+- Пересобрать TEST_REPORT после прогонов: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 19`; проверить байтовую воспроизводимость: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 19 --check`.

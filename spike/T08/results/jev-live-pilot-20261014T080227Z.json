@@ -1,0 +1,24 @@
+{
+  "mode": "live_synthetic_pilot",
+  "timestamp_utc": "2026-10-14T08:02:27+00:00",
+  "endpoint_host": "api.typesafe.ai",
+  "endpoint_path": "/v1/systemone",
+  "corpus_id": "synthetic-ru-news-48",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.1.0-spike",
+  "taxonomy_hash": "bc0169c32a4cfe96a28db6127137f185cfcb90d2e56f6d5ca86ac1ca09d81cf5",
+  "requested_model_alias": "jev-latest",
+  "attempted_calls": 1,
+  "successful_calls": 0,
+  "control_calls": 0,
+  "controls": {},
+  "failures": [
+    {
+      "case_id": "e01-supply-rail",
+      "error": "http_status_451"
+    }
+  ],
+  "results": [],
+  "metrics": null,
+  "note": "Synthetic-only pilot; raw articles, prompts, provider response bodies, credentials, and exception details are not saved."
+}

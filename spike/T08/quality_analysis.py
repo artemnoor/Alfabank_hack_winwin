@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -11,11 +10,12 @@ from typing import Any
 
 from jev_spike import SPIKE_DIR, evaluate, load_verified_inputs
 from quality_policy import POLICY_VERSION, decision_states, historical_review_reasons
+from stable_hash import sha256_text_file
 
 AGGREGATE_PATH = SPIKE_DIR / "results" / "jev-live-aggregate-20261014-v4.json"
 OUTPUT_PATH = SPIKE_DIR / "QUALITY_ANALYSIS.json"
 TRUSTED_AGGREGATE_SHA256 = (
-    "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+    "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129"
 )
 HIGH_CONSEQUENCE_EVENT_CODES = {
     # Provisional audit grouping only; the project has not approved a risk
@@ -30,7 +30,7 @@ HIGH_CONSEQUENCE_EVENT_CODES = {
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def _load(path: Path) -> dict[str, Any]:

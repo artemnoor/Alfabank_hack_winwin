@@ -65,11 +65,11 @@
   function bindFilters() {
     setOptions($("filterTopic"), DATA.taxonomy.topics.map((row) => ({ value: row.code, label: row.label })), "Любая тема");
     setOptions($("filterEvent"), DATA.taxonomy.events.map((row) => ({ value: row.code, label: row.label })), "Любое событие");
-    $("filterSearch").addEventListener("input", (event) => { filters.search = event.target.value.trim().toLocaleLowerCase("ru"); renderCaseList(); });
-    $("filterTopic").addEventListener("change", (event) => { filters.topic = event.target.value; renderCaseList(); });
-    $("filterEvent").addEventListener("change", (event) => { filters.event = event.target.value; renderCaseList(); });
-    $("filterState").addEventListener("change", (event) => { filters.state = event.target.value; renderCaseList(); });
-    $("filterSort").addEventListener("change", (event) => { filters.sort = event.target.value; renderCaseList(); });
+    $("filterSearch").addEventListener("input", (event) => { filters.search = event.target.value.trim().toLocaleLowerCase("ru"); renderAll(); });
+    $("filterTopic").addEventListener("change", (event) => { filters.topic = event.target.value; renderAll(); });
+    $("filterEvent").addEventListener("change", (event) => { filters.event = event.target.value; renderAll(); });
+    $("filterState").addEventListener("change", (event) => { filters.state = event.target.value; renderAll(); });
+    $("filterSort").addEventListener("change", (event) => { filters.sort = event.target.value; renderAll(); });
   }
 
   function bindNavigation() {
@@ -495,13 +495,20 @@
     }
   }
 
+  function reconcileSelection() {
+    const rows = visibleCases();
+    if (selectedId && rows.some((row) => row.id === selectedId)) return;
+    selectedId = rows[0]?.id ?? null;
+  }
+
   function labelChip(text, kind = "") { return node("span", `label-chip${kind ? ` ${kind}` : ""}`, text); }
 
   function renderComparison() {
     const root = $("comparisonBody");
     root.replaceChildren();
     const row = caseById(selectedId);
-    if (!row) return;
+    if (!row) { delete root.dataset.caseId; return; }
+    root.dataset.caseId = row.id;
     const gold = currentGold(row);
     const evaluated = activeDecision(row);
     const error = row.result ? rowError(row, evaluated) : null;
@@ -710,7 +717,8 @@
     const root = $("detailBody");
     root.replaceChildren();
     const row = caseById(selectedId);
-    if (!row) return;
+    if (!row) { delete root.dataset.caseId; return; }
+    root.dataset.caseId = row.id;
     const result = row.result;
     const evaluated = activeDecision(row);
     const error = result ? rowError(row, evaluated) : null;
@@ -837,6 +845,7 @@
         ? evaluated.eventStates[event.code]
         : noulState(score);
       const detail = node("details", "event-item");
+      detail.dataset.eventCode = event.code;
       const summary = node("summary", "event-summary");
       append(summary, node("span", "event-name", event.label));
       const track = node("div", "bar-track");
@@ -844,6 +853,7 @@
       fill.style.width = `${score * 100}%`;
       track.append(fill);
       append(summary, track, node("span", "bar-value", scoreText(score)), node("span", `state-chip ${state}`, state === "positive" ? "positive" : state === "negative" ? "negative" : "abstain"));
+      summary.querySelector(".state-chip").dataset.state = state;
       const extra = node("div", "event-extra");
       if (activePolicyMode === "policy_v2") {
         const routing = evaluated.predictions.has(event.code)
@@ -853,7 +863,10 @@
           : state === "abstain"
               ? "Оценка сохранена как abstain. По этой схеме она сама по себе не создаёт проверку и не блокирует другие категории."
               : "По текущему порогу кандидат не формируется.";
-        extra.append(node("div", `candidate-routing${evaluated.predictions.has(event.code) ? " candidate" : evaluated.blockedCodes.includes(event.code) ? " blocked" : state === "abstain" ? " saved-state" : ""}`, routing));
+        const route = evaluated.predictions.has(event.code) ? "candidate" : evaluated.blockedCodes.includes(event.code) ? "blocked" : state === "abstain" ? "abstain" : "none";
+        const routeNode = node("div", `candidate-routing${route === "candidate" ? " candidate" : route === "blocked" ? " blocked" : route === "abstain" ? " saved-state" : ""}`, routing);
+        routeNode.dataset.route = route;
+        extra.append(routeNode);
       }
       append(extra, node("div", "event-def", event.definition));
       const criteria = node("div", "include-exclude");
@@ -880,15 +893,25 @@
     ];
     for (const signal of signals) {
       const card = node("div", "signal-card");
+      card.dataset.signal = signal.key;
+      card.dataset.thresholdReached = String(signal.triggered);
+      const reviewCreated = activePolicyMode === "policy_v2"
+        ? (signal.key === "evidence" ? evaluated.evidenceReview : evaluated.unlistedReview)
+        : signal.triggered;
+      card.dataset.reviewCreated = String(reviewCreated);
       const top = node("div", "signal-value-row");
       append(top, node("span", "", signal.title), node("strong", "signal-value", scoreText(signal.score)));
       card.append(top);
-      const state = signal.triggered ? "сработал" : "ниже порога";
+      const state = signal.triggered
+        ? activePolicyMode === "policy_v2" && signal.key === "evidence" && !reviewCreated
+          ? "порог достигнут · кандидатов нет"
+          : "порог достигнут"
+        : "ниже порога";
       card.append(makeBar(`Порог ${scoreText(signal.cutoff)}`, signal.score, signal.triggered ? "event-abstain" : "topic"));
       card.append(node("div", "signal-copy", signal.copy));
       card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
         ? (signal.key === "evidence"
-          ? `Score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} порога ${scoreText(signal.cutoff)}. ${evaluated.candidateBlocked ? "В локальной симуляции есть event-кандидаты — они удержаны для проверки." : evaluated.positiveCodes?.length ? "Этот сигнал не удержал кандидаты в локальной симуляции." : "Положительных event-кандидатов нет, поэтому удерживать нечего и отдельная задача в симуляции не создаётся."}`
+          ? `Score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} порога ${scoreText(signal.cutoff)}. ${evaluated.candidateBlocked ? "Кандидаты удержаны для проверки в локальной симуляции." : evaluated.positiveCodes?.length ? "Этот сигнал не удержал кандидаты в локальной симуляции." : signal.triggered ? "Порог достигнут, но кандидатов нет — проверка не создаётся." : "Положительных event-кандидатов нет, удерживать нечего."}`
           : `${state}: score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} ${scoreText(signal.cutoff)}. ${signal.triggered ? "В симуляции показана отдельная задача проверки; известные event-кандидаты не блокируются." : "Отдельная задача в симуляции не создаётся."}`)
         : `${state}; Legacy review gate ${settings.gates[signal.key === "unlisted" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
       grid.append(card);
@@ -925,6 +948,9 @@
 
   function renderDecisionV2(row, evaluated) {
     const card = node("div", `decision-card${evaluated.needsReview ? " uncertain" : " classified"}`);
+    card.dataset.needsReview = String(evaluated.needsReview);
+    card.dataset.candidateCount = String(evaluated.predictions.size);
+    card.dataset.heldCount = String(evaluated.blockedCodes.length);
     const title = evaluated.blockedCodes.length
       ? `${evaluated.blockedCodes.length} кандидат(а) удержаны для проверки`
       : evaluated.predictions.size
@@ -1285,6 +1311,7 @@
 
   function renderAll() {
     syncSliders();
+    reconcileSelection();
     renderTop();
     renderCaseList();
     renderDetail();
@@ -1297,8 +1324,7 @@
     const detail = $("detailPanel");
     const comparison = $("goldPanel");
     if (!grid || !detail || !comparison) return;
-    if (window.matchMedia("(max-width: 850px)").matches) grid.insertBefore(comparison, detail);
-    else grid.insertBefore(detail, comparison);
+    grid.insertBefore(detail, comparison);
   }
 
   const responsivePanelQuery = window.matchMedia("(max-width: 850px)");

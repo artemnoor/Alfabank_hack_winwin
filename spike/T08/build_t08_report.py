@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_file
 
 from jev_spike import SPIKE_DIR
 
@@ -37,7 +38,7 @@ def _read(path: Path) -> dict[str, Any]:
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def _pct(value: float) -> str:
@@ -347,6 +348,13 @@ def build_report(
             "new_jev_api_requests": 0,
             "status_source": "explicit command-line run evidence; unprovided checks remain NOT_RUN",
         },
+        "post_review_regressions": {
+            "portable_text_hashes": "UTF-8 source hashes normalize CRLF/CR to LF; saved Jev answers remain unchanged",
+            "filter_selection_consistency": "detail and comparison selection always tracks the filtered case list; no-match filters clear stale details",
+            "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
+            "python_browser_policy_parity_cases": 45,
+            "mobile_reading_order": ["case list", "Jev analysis", "preliminary labels"],
+        },
         "independent_review": {
             "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",
             "reviewer": "AI Factory read-only reviews",
@@ -461,6 +469,14 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: {tests['ruff_check']}/{tests['ruff_format_check']}/{tests['offline_runner_status']}/{tests['quality_analysis_reproducibility']}/{tests['deep_corpus_audit_reproducibility']}/{tests['validation_asset_builder']}/{tests['javascript_syntax']}/{tests['git_diff_checks']}.",
         "- Отчёт не запускает эти команды: статусы переданы явно после запусков; если аргумент не указан, он остаётся NOT_RUN.",
         "- Новых Jev/Polza AI запросов: 0.",
+        "",
+        "## Исправления после независимого ревью",
+        "",
+        "- Хеши UTF-8 текстовых артефактов нормализуют CRLF/CR к LF, поэтому pin не зависит от Windows или Linux checkout. Исторические ответы Jev не переписывались.",
+        "- Фильтр теперь синхронизирует открытую новость и сравнение; при отсутствии совпадений детали очищаются.",
+        "- Для insufficient-evidence интерфейс отдельно показывает достижение порога и факт удержания кандидатов; высокий сигнал без кандидатов больше не называется review.",
+        "- Playwright сравнивает браузерную Policy v2.1 с Python-реализацией по всем 45 сохранённым ответам.",
+        "- На узком экране сначала идут список, разбор Jev, затем предварительная разметка.",
         "",
         "## Риски и решение",
         "",

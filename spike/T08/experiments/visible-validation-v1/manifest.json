@@ -4,7 +4,7 @@
   "status": "awaiting_human_annotation",
   "case_count": 60,
   "news_path": "spike/T08/experiments/visible-validation-v1/news.json",
-  "input_sha256": "ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7",
+  "input_sha256": "8d3eebd7e8c200bb88ed58bc49d11a6ece049425c233fdc819ab67998e504cd9",
   "synthetic": true,
   "new_jev_api_requests": 0,
   "gold_label_status": "not_created",

@@ -20,6 +20,7 @@ from build import (  # noqa: E402
     build_payload,
     render_html,
 )
+from stable_hash import sha256_text_bytes, sha256_text_file  # noqa: E402
 
 
 class VisualizationDataTests(unittest.TestCase):
@@ -58,7 +59,7 @@ class VisualizationDataTests(unittest.TestCase):
         )
         self.assertEqual(
             self.payload["meta"]["aggregateHash"],
-            "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286",
+            "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129",
         )
         self.assertTrue(
             CORPUS_PATH.is_file()
@@ -94,6 +95,20 @@ class VisualizationDataTests(unittest.TestCase):
         self.assertNotIn("innerHTML", (HERE / "app.js").read_text(encoding="utf-8"))
         self.assertNotIn("fetch(", (HERE / "app.js").read_text(encoding="utf-8"))
         self.assertIn('type="application/json"', html)
+
+    def test_text_hashes_are_independent_of_windows_line_endings(self) -> None:
+        logical_text = "first line\nкириллица\nlast line\n".encode("utf-8")
+        windows_text = logical_text.replace(b"\n", b"\r\n")
+        legacy_mac_text = logical_text.replace(b"\n", b"\r")
+        self.assertEqual(
+            sha256_text_bytes(logical_text), sha256_text_bytes(windows_text)
+        )
+        self.assertEqual(
+            sha256_text_bytes(logical_text), sha256_text_bytes(legacy_mac_text)
+        )
+        self.assertEqual(
+            sha256_text_file(AGGREGATE_PATH), self.payload["meta"]["aggregateHash"]
+        )
 
     def test_untrusted_news_text_cannot_break_the_embedded_data_block(self) -> None:
         modified = copy.deepcopy(self.payload)
@@ -291,6 +306,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
 
             # A proposed label edit must immediately alter the active v2 FP/FN chart.
             page.locator("#labTab").click()
+
             page.locator("#filterSearch").fill("e01-supply-rail")
             page.locator("#caseList .case-card").click()
             page.locator("#comparisonBody details.edit-gold summary").click()
@@ -344,6 +360,155 @@ class BrowserAcceptanceTests(unittest.TestCase):
             browser.close()
         self.assertEqual(external_requests, [])
         self.assertEqual(page_errors, [])
+
+    def test_filter_selection_stays_aligned_and_empty_results_clear_details(
+        self,
+    ) -> None:
+        with self.sync_playwright() as playwright:
+            browser = playwright.chromium.launch(
+                headless=True,
+                executable_path=str(self.chrome),
+                args=["--no-sandbox"],
+            )
+            page = browser.new_page(viewport={"width": 1440, "height": 1000})
+            page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
+            page.locator("#filterSearch").fill("e10-trade-import")
+            self.assertEqual(
+                page.locator("#caseList [aria-current='true']").get_attribute(
+                    "data-case-id"
+                ),
+                "e10-trade-import",
+            )
+            self.assertEqual(
+                page.locator("#detailBody").get_attribute("data-case-id"),
+                "e10-trade-import",
+            )
+            self.assertEqual(
+                page.locator("#comparisonBody").get_attribute("data-case-id"),
+                "e10-trade-import",
+            )
+            page.locator("#filterSearch").fill("case-with-no-match")
+            self.assertEqual(page.locator("#caseList .case-card").count(), 0)
+            self.assertIsNone(page.locator("#detailBody").get_attribute("data-case-id"))
+            self.assertIsNone(
+                page.locator("#comparisonBody").get_attribute("data-case-id")
+            )
+            self.assertIn("Ничего не найдено", page.locator("#caseList").inner_text())
+            page.locator("#filterSearch").fill("")
+            self.assertEqual(
+                page.locator("#detailBody").get_attribute("data-case-id"),
+                "e01-supply-rail",
+            )
+            browser.close()
+
+    def test_policy_v2_browser_decisions_match_python_for_all_saved_answers(
+        self,
+    ) -> None:
+        from policy_v2 import evaluate_case
+
+        payload = build_payload()
+        observed = [row for row in payload["cases"] if row["result"]]
+        with self.sync_playwright() as playwright:
+            browser = playwright.chromium.launch(
+                headless=True,
+                executable_path=str(self.chrome),
+                args=["--no-sandbox"],
+            )
+            page = browser.new_page(viewport={"width": 1440, "height": 1000})
+            page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            for row in observed:
+                page.locator("#filterSearch").fill(row["id"])
+                self.assertEqual(
+                    page.locator("#detailBody").get_attribute("data-case-id"), row["id"]
+                )
+                expected = evaluate_case(
+                    row,
+                    payload["taxonomy"],
+                    negative_cutoff=0.2,
+                    positive_cutoff=0.8,
+                    evidence_cutoff=0.8,
+                    unlisted_cutoff=0.8,
+                )
+                actual_states = {
+                    item["code"]: item["state"]
+                    for item in page.locator("#detailBody .event-item").evaluate_all(
+                        "items => items.map(item => ({code:item.dataset.eventCode,state:item.querySelector('.state-chip').dataset.state}))"
+                    )
+                }
+                self.assertEqual(actual_states, expected["event_states"], row["id"])
+                actual_routes = {
+                    item["code"]: item["route"]
+                    for item in page.locator("#detailBody .event-item").evaluate_all(
+                        "items => items.map(item => ({code:item.dataset.eventCode,route:item.querySelector('.candidate-routing').dataset.route}))"
+                    )
+                }
+                expected_routes = {
+                    code: (
+                        "candidate"
+                        if code in expected["candidate_codes"]
+                        else "blocked"
+                        if code in expected["candidate_blocked_codes"]
+                        else "abstain"
+                        if expected["event_states"][code] == "abstain"
+                        else "none"
+                    )
+                    for code in expected["event_states"]
+                }
+                self.assertEqual(actual_routes, expected_routes, row["id"])
+                self.assertEqual(
+                    page.locator("#detailBody .decision-card").get_attribute(
+                        "data-needs-review"
+                    ),
+                    str(expected["needs_any_review"]).lower(),
+                    row["id"],
+                )
+                actual_signals = {
+                    item["signal"]: (item["threshold"], item["review"])
+                    for item in page.locator("#detailBody .signal-card").evaluate_all(
+                        "items => items.map(item => ({signal:item.dataset.signal,threshold:item.dataset.thresholdReached,review:item.dataset.reviewCreated}))"
+                    )
+                }
+                self.assertEqual(
+                    actual_signals,
+                    {
+                        "unlisted": (
+                            str(expected["unlisted_event_threshold_reached"]).lower(),
+                            str(expected["unlisted_review"]).lower(),
+                        ),
+                        "evidence": (
+                            str(
+                                expected["insufficient_evidence_threshold_reached"]
+                            ).lower(),
+                            str(expected["evidence_review"]).lower(),
+                        ),
+                    },
+                    row["id"],
+                )
+            browser.close()
+
+    def test_evidence_threshold_without_candidates_is_not_called_a_review(self) -> None:
+        with self.sync_playwright() as playwright:
+            browser = playwright.chromium.launch(
+                headless=True,
+                executable_path=str(self.chrome),
+                args=["--no-sandbox"],
+            )
+            page = browser.new_page(viewport={"width": 1440, "height": 1000})
+            page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            page.locator("#filterSearch").fill("e40-uncertain-strike-forecast")
+            evidence = page.locator("#detailBody .signal-card[data-signal='evidence']")
+            self.assertEqual(evidence.get_attribute("data-threshold-reached"), "true")
+            self.assertEqual(evidence.get_attribute("data-review-created"), "false")
+            self.assertIn("Порог достигнут, но кандидатов нет", evidence.inner_text())
+            self.assertEqual(
+                page.locator("#detailBody .decision-card").get_attribute(
+                    "data-needs-review"
+                ),
+                "false",
+            )
+            browser.close()
 
     def test_browser_scenarios_and_responsive_screenshots(self) -> None:
         screenshot_tempdir = tempfile.TemporaryDirectory(
@@ -556,7 +721,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.locator("#labTab").click()
             page.set_viewport_size({"width": 390, "height": 844})
             page.wait_for_function(
-                "() => [...document.querySelector('#labGrid').children].map(el => el.id).join(',') === 'caseSidebar,goldPanel,detailPanel'"
+                "() => [...document.querySelector('#labGrid').children].map(el => el.id).join(',') === 'caseSidebar,detailPanel,goldPanel'"
             )
             page.locator('[data-policy-mode="policy_v2"]').click()
             mobile_overflow = page.evaluate(
@@ -579,10 +744,12 @@ class BrowserAcceptanceTests(unittest.TestCase):
                   searchHeight: document.querySelector('#filterSearch').getBoundingClientRect().height
                 })"""
             )
-            self.assertLess(mobile_layout["comparisonTop"], mobile_layout["detailTop"])
+            self.assertGreater(
+                mobile_layout["comparisonTop"], mobile_layout["detailTop"]
+            )
             self.assertEqual(
                 mobile_layout["readingOrder"],
-                ["caseSidebar", "goldPanel", "detailPanel"],
+                ["caseSidebar", "detailPanel", "goldPanel"],
             )
             self.assertEqual(mobile_layout["inputFontSize"], "16px")
             self.assertGreaterEqual(mobile_layout["searchHeight"], 44)

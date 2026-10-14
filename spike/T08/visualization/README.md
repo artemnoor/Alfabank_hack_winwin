@@ -63,6 +63,6 @@ python -m ruff format --check spike/T08/visualization/build.py spike/T08/visuali
 |---|---|
 | `corpus.json` | `592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7` |
 | `taxonomy.json` | `855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d` |
-| `results/jev-live-aggregate-20261014-v4.json` | `a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286` |
+| `results/jev-live-aggregate-20261014-v4.json` | `9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129` |
 
 160 дополнительных синтетических записей не включены в графики: для них нет сохранённых ответов Jev, поэтому они не являются протестированными классификатором примерами.

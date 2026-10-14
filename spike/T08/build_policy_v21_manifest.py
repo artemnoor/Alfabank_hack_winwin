@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_bytes
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "visualization" / "policy-v2-results.json"
@@ -18,7 +19,7 @@ OUTPUT = ROOT / "POLICY_V2.1.manifest.json"
 
 
 def _sha256(raw: bytes) -> str:
-    return hashlib.sha256(raw).hexdigest()
+    return sha256_text_bytes(raw)
 
 
 def _read(path: Path) -> dict[str, Any]:

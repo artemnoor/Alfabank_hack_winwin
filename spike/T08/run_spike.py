@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import sys
@@ -30,6 +29,7 @@ from jev_spike import (
     taxonomy_hash,
 )
 from live_ledger import AttemptLedger
+from stable_hash import sha256_text_file
 
 _OFFICIAL_JEV_CLIENT_CLASS = JevClient
 
@@ -42,7 +42,7 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def _sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def _safe_failure(case_id: str, error: Exception) -> dict[str, str]:

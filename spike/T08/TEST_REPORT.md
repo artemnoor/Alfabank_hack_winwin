@@ -47,7 +47,7 @@
 
 Пакет первичной разметки содержит все 49 непустых baseline-текстов, а не только расхождения модели. В нём нейтральные алиасы, нет исходных ID, draft labels и scores. Он слеп к ответам Jev, но не к владельцу репозитория; человеческих разметчиков пока 0.
 
-Набор из 60 новых синтетических текстов имеет роль visible_validation_candidate, hash ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7. Нет labels/ответов Jev; набор исключён из метрик. Его тексты видели разработчики, поэтому он не может стать финальным blind test.
+Набор из 60 новых синтетических текстов имеет роль visible_validation_candidate, hash 8d3eebd7e8c200bb88ed58bc49d11a6ece049425c233fdc819ab67998e504cd9. Нет labels/ответов Jev; набор исключён из метрик. Его тексты видели разработчики, поэтому он не может стать финальным blind test.
 
 Создан отдельный пул из 40 новых inputs, hash ac3b8582c0f228b35259c3dcbba0e1dc3070e079c00fa4d97e0961bc7bd15f7c; он не основан на текущих Jev ошибках и исключён из scoring. Labels и outputs отсутствуют; поскольку тексты уже видимы в репозитории, это пока не blind benchmark. Требуются две human разметки и независимый custodian.
 
@@ -56,10 +56,18 @@ AI-review — вспомогательное мнение, не человече
 ## Проверки этого состояния
 
 - Unit suite: 132 passed, 0 failed, 0 skipped.
-- Policy/visualization/Playwright suite: 23 passed, 0 failed, 0 skipped.
+- Policy/visualization/Playwright suite: 27 passed, 0 failed, 0 skipped.
 - Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: PASS/PASS/PASS/PASS/PASS/PASS/PASS/PASS.
 - Отчёт не запускает эти команды: статусы переданы явно после запусков; если аргумент не указан, он остаётся NOT_RUN.
 - Новых Jev/Polza AI запросов: 0.
+
+## Исправления после независимого ревью
+
+- Хеши UTF-8 текстовых артефактов нормализуют CRLF/CR к LF, поэтому pin не зависит от Windows или Linux checkout. Исторические ответы Jev не переписывались.
+- Фильтр теперь синхронизирует открытую новость и сравнение; при отсутствии совпадений детали очищаются.
+- Для insufficient-evidence интерфейс отдельно показывает достижение порога и факт удержания кандидатов; высокий сигнал без кандидатов больше не называется review.
+- Playwright сравнивает браузерную Policy v2.1 с Python-реализацией по всем 45 сохранённым ответам.
+- На узком экране сначала идут список, разбор Jev, затем предварительная разметка.
 
 ## Риски и решение
 

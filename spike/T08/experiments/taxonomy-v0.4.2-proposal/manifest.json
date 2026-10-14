@@ -5,8 +5,8 @@
   "parent": {
     "version": "0.4.1-spike",
     "path": "spike/T08/experiments/taxonomy-v0.4.1-proposal/taxonomy.json",
-    "sha256": "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230",
-    "manifest_sha256": "0a002a129b7d1fcf711ac194ffaad6f63f087e6e3df9557bff1a8d63b36aadd5"
+    "sha256": "80d40bbccd0c50220e26112418f571f3e883d162f5a5e40f94064719697e4a19",
+    "manifest_sha256": "9776bdd6c6cf90872afed92cbb3608d1a0124c186642593d504f966b2aedc396"
   },
   "baseline": {
     "version": "0.3.0-spike",

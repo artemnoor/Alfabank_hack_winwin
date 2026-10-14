@@ -12,7 +12,7 @@
   "baseline_version": "0.3.0-spike",
   "baseline_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
   "proposal_path": "spike/T08/experiments/taxonomy-v0.4.1-proposal/taxonomy.json",
-  "proposal_sha256": "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230",
+  "proposal_sha256": "80d40bbccd0c50220e26112418f571f3e883d162f5a5e40f94064719697e4a19",
   "live_requests": 0,
   "approval": "awaiting_user_review",
   "evaluation_status": "not_evaluated_no_new_live_requests",

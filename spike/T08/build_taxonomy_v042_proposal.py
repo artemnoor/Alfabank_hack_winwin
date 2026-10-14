@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_bytes
 
 ROOT = Path(__file__).resolve().parent
 PARENT_DIR = ROOT / "experiments" / "taxonomy-v0.4.1-proposal"
@@ -14,15 +15,15 @@ PARENT_MANIFEST = PARENT_DIR / "manifest.json"
 TARGET_DIR = ROOT / "experiments" / "taxonomy-v0.4.2-proposal"
 TARGET = TARGET_DIR / "taxonomy.json"
 MANIFEST = TARGET_DIR / "manifest.json"
-PARENT_SHA256 = "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230"
+PARENT_SHA256 = "80d40bbccd0c50220e26112418f571f3e883d162f5a5e40f94064719697e4a19"
 PARENT_MANIFEST_SHA256 = (
-    "0a002a129b7d1fcf711ac194ffaad6f63f087e6e3df9557bff1a8d63b36aadd5"
+    "9776bdd6c6cf90872afed92cbb3608d1a0124c186642593d504f966b2aedc396"
 )
 BASELINE_SHA256 = "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d"
 
 
 def _sha256(raw: bytes) -> str:
-    return hashlib.sha256(raw).hexdigest()
+    return sha256_text_bytes(raw)
 
 
 def build() -> tuple[dict[str, Any], dict[str, Any]]:

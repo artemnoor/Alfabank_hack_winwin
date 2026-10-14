@@ -15,7 +15,7 @@ class T08FinalReportTests(unittest.TestCase):
     def test_checked_in_report_reproduces_current_evidence_and_verdicts(self) -> None:
         report = build_report(
             unit_tests_passed=132,
-            browser_tests_passed=23,
+            browser_tests_passed=27,
             check_statuses={
                 "ruff_check": "PASS",
                 "ruff_format_check": "PASS",

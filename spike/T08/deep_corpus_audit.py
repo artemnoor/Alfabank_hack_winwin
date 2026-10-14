@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 from collections import Counter
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_file
 
 from jev_spike import SPIKE_DIR
 
@@ -20,7 +21,7 @@ NEAR_DUPLICATE_THRESHOLD = 0.92
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def _load_object(path: Path) -> dict[str, Any]:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import unittest
 from difflib import SequenceMatcher
@@ -16,6 +15,7 @@ from build_t08_validation_assets import (
     VALIDATION_NEWS,
     build,
 )
+from stable_hash import sha256_text_file
 
 ROOT = Path(__file__).resolve().parent
 
@@ -53,7 +53,7 @@ class T08ValidationAssetsTests(unittest.TestCase):
         ):
             self.assertEqual(proposed[field], v04[field])
         self.assertEqual(
-            hashlib.sha256(V041_TAXONOMY.read_bytes()).hexdigest(),
+            sha256_text_file(V041_TAXONOMY),
             manifest["proposal_sha256"],
         )
 
@@ -96,7 +96,7 @@ class T08ValidationAssetsTests(unittest.TestCase):
         self.assertTrue(manifest["blind_to_model_outputs"])
         self.assertEqual(manifest["gold_label_status"], "not_created")
         self.assertEqual(
-            hashlib.sha256(VALIDATION_NEWS.read_bytes()).hexdigest(),
+            sha256_text_file(VALIDATION_NEWS),
             manifest["input_sha256"],
         )
         ids = [case["id"] for case in cases]
@@ -124,7 +124,7 @@ class T08ValidationAssetsTests(unittest.TestCase):
         self.assertEqual(len(error_report["false_positives"]), 6)
         self.assertEqual(len(error_report["false_negatives"]), 7)
         self.assertEqual(
-            hashlib.sha256(ERROR_ANALYSIS.read_bytes()).hexdigest(),
+            sha256_text_file(ERROR_ANALYSIS),
             error_manifest["analysis_sha256"],
         )
         self.assertTrue(
@@ -230,7 +230,7 @@ class T08ValidationAssetsTests(unittest.TestCase):
         self.assertFalse(manifest["packet_contains_draft_labels_or_model_outputs"])
         self.assertFalse(manifest["owner_blind"])
         self.assertEqual(
-            hashlib.sha256(GOLD_REVIEW_PACKET.read_bytes()).hexdigest(),
+            sha256_text_file(GOLD_REVIEW_PACKET),
             manifest["model_blind_review_packet_sha256"],
         )
 

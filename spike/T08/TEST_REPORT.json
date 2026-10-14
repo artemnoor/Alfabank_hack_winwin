@@ -27,7 +27,7 @@
       "corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
       "taxonomy_version": "0.3.0-spike",
       "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
-      "aggregate_sha256": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286",
+      "aggregate_sha256": "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129",
       "nonempty_stories": 49,
       "saved_answers": 45,
       "missing_answer_ids": [
@@ -100,7 +100,7 @@
     "source_hashes": {
       "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
       "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
-      "aggregate": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+      "aggregate": "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129"
     },
     "thresholds": {
       "event_candidate_at_or_above": 0.8,
@@ -269,7 +269,7 @@
   },
   "human_annotation": {
     "packet_path": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
-    "packet_sha256": "68239d0ffb89eaf0f785599f63ee0a6b2ad586513940c4542d86cb7769b5ebf2",
+    "packet_sha256": "b034f98b5e4eca93070e00f38585a8a44a4faa7ba78fbae8486998aa4f766b9d",
     "case_count": 49,
     "selection": "all non-empty baseline cases; not selected by model disagreement",
     "source_ids_in_packet": false,
@@ -282,7 +282,7 @@
     "dataset_id": "t08-visible-validation-candidates",
     "version": "1.1.0",
     "case_count": 60,
-    "input_sha256": "ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7",
+    "input_sha256": "8d3eebd7e8c200bb88ed58bc49d11a6ece049425c233fdc819ab67998e504cd9",
     "status": "awaiting_human_annotation",
     "gold_label_status": "not_created",
     "eligible_for_model_scoring": false,
@@ -313,7 +313,7 @@
     },
     "policy_and_browser_tests": {
       "command": "py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v",
-      "passed": 23,
+      "passed": 27,
       "failed": 0,
       "skipped": 0,
       "status": "PASS",
@@ -330,6 +330,17 @@
     "git_diff_checks": "PASS",
     "new_jev_api_requests": 0,
     "status_source": "explicit command-line run evidence; unprovided checks remain NOT_RUN"
+  },
+  "post_review_regressions": {
+    "portable_text_hashes": "UTF-8 source hashes normalize CRLF/CR to LF; saved Jev answers remain unchanged",
+    "filter_selection_consistency": "detail and comparison selection always tracks the filtered case list; no-match filters clear stale details",
+    "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
+    "python_browser_policy_parity_cases": 45,
+    "mobile_reading_order": [
+      "case list",
+      "Jev analysis",
+      "preliminary labels"
+    ]
   },
   "independent_review": {
     "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",

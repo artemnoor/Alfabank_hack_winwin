@@ -7,7 +7,7 @@
 - The human annotation packet now contains all 49 non-empty baseline stories without source IDs, draft labels, or model outputs. It is blind to saved model answers, but not to the repository owner; no human annotators have completed it.
 - The separate 60-story visible validation set is unlabelled, unscored, and cannot become a blind benchmark because its inputs were visible to developers.
 - **Ready for T09 experimental handoff only. Not production-ready.** No runtime/OpenAPI integration or new Jev requests were made.
-- Latest checks: 132 offline unit tests and 23 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
+- Latest checks: 132 offline unit tests and 27 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. Browser Policy v2.1 matches Python on all 45 saved answers. See `TEST_REPORT.md` and `TEST_REPORT.json`.
 
 ## Quality improvement pass — 2026-10-14
 

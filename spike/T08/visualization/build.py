@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import sys
@@ -14,6 +13,7 @@ SPIKE_DIR = HERE.parent
 sys.path.insert(0, str(SPIKE_DIR))
 
 from jev_spike import load_verified_inputs  # noqa: E402
+from stable_hash import sha256_text_file  # noqa: E402
 from policy_v2 import compare_policies  # noqa: E402
 from quality_analysis import build_quality_analysis  # noqa: E402
 from quality_policy import historical_review_reasons  # noqa: E402
@@ -29,7 +29,7 @@ POLICY_REPORT_PATH = HERE / "policy-v2-results.json"
 
 
 def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def compact_result(row: dict[str, Any]) -> dict[str, Any]:

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_bytes
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "experiments" / "future-blind-candidate-v1"
@@ -18,7 +19,7 @@ BASELINE_TAXONOMY_SHA256 = (
 
 
 def _sha256(raw: bytes) -> str:
-    return hashlib.sha256(raw).hexdigest()
+    return sha256_text_bytes(raw)
 
 
 def _all_existing_texts() -> list[str]:

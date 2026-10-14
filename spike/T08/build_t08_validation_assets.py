@@ -11,6 +11,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from stable_hash import sha256_text_bytes
+
 ROOT = Path(__file__).resolve().parent
 V04_DIR = ROOT / "experiments" / "taxonomy-v0.4-proposal"
 V041_DIR = ROOT / "experiments" / "taxonomy-v0.4.1-proposal"
@@ -36,18 +38,18 @@ EXPECTED_TAXONOMY_SHA256 = (
     "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d"
 )
 EXPECTED_AGGREGATE_SHA256 = (
-    "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+    "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129"
 )
 EXPECTED_V041_SHA256 = (
-    "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230"
+    "80d40bbccd0c50220e26112418f571f3e883d162f5a5e40f94064719697e4a19"
 )
 EXPECTED_VALIDATION_INPUT_SHA256 = (
-    "ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7"
+    "8d3eebd7e8c200bb88ed58bc49d11a6ece049425c233fdc819ab67998e504cd9"
 )
 
 
 def _sha256(raw: bytes) -> str:
-    return hashlib.sha256(raw).hexdigest()
+    return sha256_text_bytes(raw)
 
 
 def _read_json(path: Path) -> dict[str, Any]:

@@ -8,13 +8,13 @@
   "source_hashes": {
     "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
     "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
-    "aggregate": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+    "aggregate": "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129"
   },
   "implementation_hashes": {
     "python_policy": "721b38a2e14891f1006be1293cc7cc615686558c482bd6cf6e19856f455750ed",
-    "browser_policy_and_presentation": "7fdb6c2de13cdede9ff6935080c1cf70620a52743bd47c05c8480b1378f02e3f"
+    "browser_policy_and_presentation": "d7932f6bb88dfa1286ba27416f7e7ee915ef568696d6b9f04c5f09f1d7b7fcfb"
   },
-  "saved_policy_report_sha256": "0e807af565151bf4bec861c8e238b4ce69c0ac08d19b9359084f4e6b37adb4ea",
+  "saved_policy_report_sha256": "2b00a37ce7b7454e08d0484287c766a9e2784acbdd594016c79d50bf26b116c5",
   "thresholds": {
     "candidate_positive_at_or_above": 0.8,
     "noul_negative_at_or_below": 0.2,

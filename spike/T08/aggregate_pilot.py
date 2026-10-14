@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import re
@@ -11,6 +10,8 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from stable_hash import sha256_text_file
 
 from jev_spike import (
     CORPUS_PATH,
@@ -42,18 +43,18 @@ SAFE_FAILURE_CODES = {
 }
 HISTORICAL_SMOKE_PATH = SPIKE_DIR / "results" / "jev-live-pilot-20261014T094655Z.json"
 HISTORICAL_SMOKE_SHA256 = (
-    "2c08601efae297f58df6de808d87e1c255a61778a3a4bf66a781a6eb6057fcff"
+    "9918c5d3ad8dad1337ce7b4d2295d9cf4567c0de1f6b02725e228acaea95a98f"
 )
 HISTORICAL_LEGACY_FAILURE_PATH = (
     SPIKE_DIR / "results" / "jev-live-pilot-20261014T094544Z.json"
 )
 HISTORICAL_LEGACY_FAILURE_SHA256 = (
-    "129faa1b0b9e7f05aa06dcaffcf7f6eec20c97052ac5ed11b4a32ab5dce27cfa"
+    "bd8be1b1376a8cdd0c00074b7407f624865859f5429c6b28b1208a5c0c37fa23"
 )
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_text_file(path)
 
 
 def _number(value: Any) -> bool:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import unittest
 
@@ -14,6 +13,7 @@ from build_taxonomy_v042_proposal import (
     TARGET,
     write,
 )
+from stable_hash import sha256_text_file
 
 ROOT = TARGET.parents[2]
 
@@ -29,13 +29,13 @@ class TaxonomyV042ProposalTests(unittest.TestCase):
         saved_manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(proposed["version"], "0.4.2-spike")
         self.assertEqual(manifest, saved_manifest)
-        self.assertEqual(hashlib.sha256(PARENT.read_bytes()).hexdigest(), PARENT_SHA256)
+        self.assertEqual(sha256_text_file(PARENT), PARENT_SHA256)
         self.assertEqual(
-            hashlib.sha256(PARENT_MANIFEST.read_bytes()).hexdigest(),
+            sha256_text_file(PARENT_MANIFEST),
             PARENT_MANIFEST_SHA256,
         )
         self.assertEqual(
-            hashlib.sha256((ROOT / "taxonomy.json").read_bytes()).hexdigest(),
+            sha256_text_file(ROOT / "taxonomy.json"),
             BASELINE_SHA256,
         )
         self.assertEqual(

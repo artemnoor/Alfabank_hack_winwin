@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from typing import Any
 
 from jev_spike import SPIKE_DIR
+from stable_hash import sha256_text_bytes
 
 SOURCE = SPIKE_DIR / "taxonomy.json"
 TARGET_DIR = SPIKE_DIR / "experiments" / "taxonomy-v0.4-proposal"
@@ -77,7 +77,7 @@ EVENT_CHANGES = {
 
 
 def _sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
+    return sha256_text_bytes(data)
 
 
 def build() -> tuple[dict[str, Any], dict[str, Any]]:

@@ -20,6 +20,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from stable_hash import sha256_text_bytes
+
 SPIKE_DIR = Path(__file__).resolve().parent
 TAXONOMY_PATH = SPIKE_DIR / "taxonomy.json"
 CORPUS_PATH = SPIKE_DIR / "corpus.json"
@@ -78,7 +80,7 @@ def load_pinned_json(path: Path, expected_sha256: str) -> JsonObject:
         raw = path.read_bytes()
     except OSError as exc:
         raise SpikeError(f"Cannot read spike data file: {path.name}") from exc
-    actual_sha256 = hashlib.sha256(raw).hexdigest()
+    actual_sha256 = sha256_text_bytes(raw)
     if actual_sha256 != expected_sha256:
         raise SpikeError(f"Unapproved changes in spike data file: {path.name}")
     try:

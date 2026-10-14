@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import unittest
 
 from build_future_blind_candidate import DATA_DIR, MANIFEST, NEWS, build_manifest
+from stable_hash import sha256_text_file
 
 
 class FutureBlindCandidateTests(unittest.TestCase):
@@ -21,9 +21,7 @@ class FutureBlindCandidateTests(unittest.TestCase):
         self.assertFalse(manifest["eligible_for_current_scoring"])
         self.assertFalse(manifest["genuinely_blind_now"])
         self.assertEqual(manifest["new_jev_requests"], 0)
-        self.assertEqual(
-            hashlib.sha256(NEWS.read_bytes()).hexdigest(), manifest["news_sha256"]
-        )
+        self.assertEqual(sha256_text_file(NEWS), manifest["news_sha256"])
         self.assertEqual(build_manifest(), manifest)
 
     def test_candidate_set_is_novel_against_existing_t08_corpora(self) -> None:

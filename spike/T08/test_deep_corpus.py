@@ -7,7 +7,6 @@ never fed to an evaluator or threshold sweep.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import unittest
 from collections import Counter, defaultdict
@@ -20,6 +19,7 @@ from jev_spike import (
     load_pinned_json,
     validate_taxonomy,
 )
+from stable_hash import sha256_text_file
 
 DEEP_DIR = Path(__file__).resolve().parent / "experiments" / "deep-v1"
 MANIFEST_PATH = DEEP_DIR / "manifest.json"
@@ -61,7 +61,7 @@ class DeepCorpusIntegrityTests(unittest.TestCase):
         entry = self.manifest["splits"][key]
         path = DEEP_DIR / entry["path"]
         raw = path.read_bytes()
-        self.assertEqual(hashlib.sha256(raw).hexdigest(), entry["sha256"])
+        self.assertEqual(sha256_text_file(path), entry["sha256"])
         document = json.loads(raw.decode("utf-8"))
         self.assertEqual(document["split"], key)
         self.assertEqual(document["taxonomy_version"], self.taxonomy["version"])
@@ -73,7 +73,7 @@ class DeepCorpusIntegrityTests(unittest.TestCase):
 
     def test_deep_corpus_has_160_cases_and_pins_unchanged_baseline(self) -> None:
         self.assertEqual(
-            hashlib.sha256(MANIFEST_PATH.read_bytes()).hexdigest(),
+            sha256_text_file(MANIFEST_PATH),
             TRUSTED_DEEP_MANIFEST_SHA256,
         )
         self.assertEqual(self.manifest["total_cases"], 160)
@@ -143,7 +143,7 @@ class DeepCorpusIntegrityTests(unittest.TestCase):
     def test_holdout_d_is_digest_checked_but_never_loaded_for_scoring(self) -> None:
         entry = self.manifest["splits"]["D"]
         raw = (DEEP_DIR / entry["path"]).read_bytes()
-        self.assertEqual(hashlib.sha256(raw).hexdigest(), entry["sha256"])
+        self.assertEqual(sha256_text_file(DEEP_DIR / entry["path"]), entry["sha256"])
         declared = json.loads(raw.decode("utf-8"))
         self.assertEqual(declared["split"], "D")
         self.assertEqual(len(declared["cases"]), entry["cases"])

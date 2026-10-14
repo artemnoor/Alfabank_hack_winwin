@@ -68,7 +68,15 @@ h1 { margin: 3px 0 0; font-size: clamp(27px, 4vw, 40px); line-height: 1.12; lett
 .policy-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .policy-title { font-weight: 720; }
 .policy-caption { margin-top: 2px; color: var(--muted); font-size: 11px; }
+.mode-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line-soft); }
+.mode-label { font-size: 11px; font-weight: 700; }
+.mode-help { margin-top: 2px; color: var(--quiet); font-size: 10px; }
+.mode-switch { display: flex; flex-wrap: wrap; gap: 6px; }
+.mode-button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: #0d0f13; font-size: 10px; font-weight: 650; }
+.mode-button.active { color: white; border-color: #8e2934; background: #35161a; }
+.preset-note { margin-top: 10px; color: var(--quiet); font-size: 10px; }
 .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+.preset-row[hidden], #legacyPresetNote[hidden] { display: none !important; }
 .preset { padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: #0d0f13; font-size: 11px; transition: border-color .16s, color .16s, background .16s; }
 .preset:hover { color: var(--text); border-color: #555b67; }
 .preset.active { color: white; border-color: #8e2934; background: #35161a; }
@@ -152,6 +160,11 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 .state-chip.negative { color: #bbc1cb; background: #252931; }
 .state-chip.abstain { color: var(--amber); background: var(--amber-soft); }
 .event-extra { padding: 0 10px 11px; color: var(--muted); font-size: 10px; }
+.candidate-routing { margin-bottom: 9px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: #ffffff04; font-size: 10px; }
+.candidate-routing.candidate { color: var(--green); border-color: #28543f; background: var(--green-soft); }
+.candidate-routing.blocked, .candidate-routing.needs-review { color: var(--amber); border-color: #63502f; background: var(--amber-soft); }
+.review-task-list { display: grid; gap: 6px; margin-top: 9px; }
+.review-task { padding: 8px 10px; border-left: 2px solid var(--amber); border-radius: 5px; color: #e8d4b0; background: #ffffff05; font-size: 10px; }
 .event-def { margin: 3px 0 8px; color: #d4d7dd; }
 .include-exclude { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .criterion { border-left: 2px solid var(--green); padding-left: 7px; }
@@ -217,6 +230,13 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 .policy-table th, .policy-table td { padding: 9px 8px; border-bottom: 1px solid var(--line-soft); text-align: right; white-space: nowrap; }
 .policy-table th:first-child, .policy-table td:first-child { text-align: left; }
 .policy-table th { color: var(--quiet); font-weight: 600; }
+.policy-v2-comparison { margin: 0 0 13px; }
+.policy-v2-table { min-width: 980px; }
+.policy-v2-table td { min-width: 70px; white-space: normal; vertical-align: top; }
+.policy-v2-table td:nth-child(2), .policy-v2-table td:last-child { min-width: 170px; text-align: left; }
+.policy-v2-row { color: #f4d7a1; }
+.policy-v2-note, .policy-v2-caveat { margin-top: 9px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: #ffffff04; font-size: 10px; }
+.policy-v2-caveat { color: #e8d4b0; border-color: #63502f; background: var(--amber-soft); }
 .policy-row { cursor: pointer; }
 .policy-row:hover td { background: #ffffff05; }
 .policy-row.selected td:first-child { color: #ff9aa4; }
@@ -249,6 +269,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   .gold-panel .gold-block { padding: 0 0 12px; border: 0; border-bottom: 1px solid var(--line-soft); }
   .gold-panel .gold-block:last-child { padding: 0; border: 0; }
   .threshold-grid { grid-template-columns: repeat(2, 1fr); }
+  .mode-row { align-items: flex-start; flex-direction: column; }
   .threshold-control:last-child { grid-column: 1 / -1; }
   .metric-strip, .stats-screen .metric-strip { grid-template-columns: repeat(3, 1fr); }
   .charts-grid { grid-template-columns: 1fr; }

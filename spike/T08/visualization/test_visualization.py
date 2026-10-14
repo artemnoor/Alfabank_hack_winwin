@@ -10,10 +10,11 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from build import (
+from build import (  # noqa: E402
     AGGREGATE_PATH,
     CORPUS_PATH,
     OUTPUT_PATH,
+    POLICY_REPORT_PATH,
     TAXONOMY_PATH,
     build_payload,
     render_html,
@@ -111,6 +112,24 @@ class VisualizationDataTests(unittest.TestCase):
             OUTPUT_PATH.read_text(encoding="utf-8"), render_html(self.payload)
         )
 
+    def test_policy_v2_report_is_generated_from_the_same_pinned_sources(self) -> None:
+        self.assertTrue(
+            POLICY_REPORT_PATH.is_file(), "run build.py before this regression test"
+        )
+        report = json.loads(POLICY_REPORT_PATH.read_text(encoding="utf-8"))
+        self.assertTrue(report["generated_from_saved_outputs_only"])
+        self.assertEqual(report["new_jev_api_requests"], 0)
+        self.assertEqual(
+            report["source_hashes"]["corpus"], self.payload["meta"]["corpusHash"]
+        )
+        self.assertEqual(
+            report["source_hashes"]["taxonomy"], self.payload["meta"]["taxonomyHash"]
+        )
+        self.assertEqual(
+            report["source_hashes"]["aggregate"], self.payload["meta"]["aggregateHash"]
+        )
+        self.assertEqual(report["policy_comparison"], self.payload["meta"]["policyV2"])
+
 
 class BrowserAcceptanceTests(unittest.TestCase):
     @classmethod
@@ -162,6 +181,104 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertIn("84.0%", page.locator("#topMetrics").inner_text())
             self.assertIn("3/45", page.locator("#topMetrics").inner_text())
             page.screenshot(path=str(screenshots / "lab-desktop.png"), full_page=True)
+
+            # The comparison table is pinned to Legacy Current Strict even if
+            # the user last selected a relaxed Legacy preset before v2.
+            page.locator('[data-preset="ignore_unlisted_gate"]').click()
+
+            # Policy v2 is a browser-only alternate policy over the exact same
+            # 45 saved results. A clear event survives unrelated abstain and
+            # unlisted signals, while evidence abstain holds its own candidate.
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            self.assertIn("Policy v2", page.locator("#policyName").inner_text())
+            self.assertTrue(page.locator("#presetButtons").is_hidden())
+            page.locator("#filterSearch").fill("e01-supply-rail")
+            page.locator("#caseList .case-card").click()
+            supply_event = page.locator("#detailBody .event-item").filter(
+                has_text="Сбой поставок"
+            )
+            supply_event.locator("summary").click()
+            self.assertIn("Кандидат для следующего этапа", supply_event.inner_text())
+            production_event = page.locator("#detailBody .event-item").filter(
+                has_text="Операционный сбой производства"
+            )
+            production_event.locator("summary").click()
+            self.assertIn(
+                "не блокирует другие категории", production_event.inner_text()
+            )
+            self.assertIn(
+                "событие вне списка", page.locator("#detailBody").inner_text().lower()
+            )
+            self.assertIn(
+                "кандидаты + точечная проверка",
+                page.locator("#detailBody").inner_text(),
+            )
+            page.screenshot(path=str(screenshots / "policy-v2-e01.png"), full_page=True)
+
+            page.locator("#filterSearch").fill("e04-shortage-ports")
+            page.locator("#caseList .case-card").click()
+            positive_score = page.locator(
+                "#detailBody .event-item .state-chip.positive"
+            ).first
+            blocked_event = positive_score.locator("xpath=../..")
+            blocked_event.locator("summary").click()
+            self.assertEqual(
+                blocked_event.locator(".candidate-routing.blocked").count(), 1
+            )
+
+            page.locator("#statsTab").click()
+            comparison = page.locator("#policyComparison")
+            legacy_row = comparison.locator(".policy-v2-table tbody tr").first
+            self.assertIn("Legacy · Current Strict", legacy_row.inner_text())
+            self.assertIn("2 / 1 / 39", legacy_row.inner_text())
+            self.assertIn("23/45 новостей", comparison.inner_text())
+            self.assertIn("22 / 4 / 19", comparison.inner_text())
+            self.assertIn("e03-shortage-cells", comparison.inner_text())
+            self.assertIn("e25-legal-fine", comparison.inner_text())
+            self.assertIn("42/45", comparison.inner_text())
+            page.screenshot(
+                path=str(screenshots / "policy-v2-comparison.png"), full_page=True
+            )
+            previous_candidate_metrics = page.locator("#topMetrics").inner_text()
+            page.locator("#threshold-positive").evaluate(
+                "el => { el.value = '0.95'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            self.assertNotEqual(
+                page.locator("#topMetrics").inner_text(), previous_candidate_metrics
+            )
+            self.assertEqual(
+                page.locator("#threshold-uncertainty").get_attribute("max"), "0.94"
+            )
+            page.locator("#threshold-uncertainty").evaluate(
+                "el => { el.value = '1'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            self.assertEqual(
+                page.locator("#threshold-uncertainty").input_value(), "0.94"
+            )
+            page.locator("#resetThresholds").click()
+            page.locator("[data-policy-mode='legacy']").click()
+            self.assertIn("42/45", comparison.inner_text())
+            page.locator("#labTab").click()
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            mobile_overflow = page.evaluate(
+                "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+            )
+            self.assertLessEqual(mobile_overflow, 1)
+            page.screenshot(
+                path=str(screenshots / "policy-v2-mobile.png"), full_page=True
+            )
+            page.set_viewport_size({"width": 320, "height": 800})
+            self.assertLessEqual(
+                page.evaluate(
+                    "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+                ),
+                1,
+            )
+            page.set_viewport_size({"width": 1440, "height": 1050})
+            page.locator('[data-policy-mode="legacy"]').click()
+            page.locator("#resetThresholds").click()
+            page.locator("#filterSearch").fill("")
 
             # The browser's default historical policy matches the frozen Python policy table.
             page.locator("#statsTab").click()
@@ -275,7 +392,8 @@ class BrowserAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(page.locator("#threshold-positive").input_value(), "0.9")
             self.assertIn(
-                "Пользовательские пороги", page.locator("#policyName").inner_text()
+                "Legacy · пользовательские пороги",
+                page.locator("#policyName").inner_text(),
             )
             page.locator("#resetThresholds").click()
 

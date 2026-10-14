@@ -17,6 +17,7 @@
     gates: { choice: true, event_band: true, uncertainty: true, unlisted: true },
     preset: "current_strict",
   };
+  let activePolicyMode = "legacy";
   let selectedId = DATA.cases[0]?.id ?? null;
   let activeTab = "lab";
 
@@ -84,6 +85,16 @@
   }
 
   function bindPolicy() {
+    for (const button of document.querySelectorAll("[data-policy-mode]")) {
+      button.addEventListener("click", () => {
+        activePolicyMode = button.dataset.policyMode;
+        for (const option of document.querySelectorAll("[data-policy-mode]")) {
+          option.classList.toggle("active", option.dataset.policyMode === activePolicyMode);
+          option.setAttribute("aria-pressed", String(option.dataset.policyMode === activePolicyMode));
+        }
+        renderAll();
+      });
+    }
     for (const preset of PRESETS) {
       const button = node("button", "preset", preset.label);
       button.type = "button";
@@ -108,7 +119,12 @@
         let value = Math.round(Number(input.value) * 100) / 100;
         if (field === "negative") value = Math.min(value, settings.positive - 0.01);
         if (field === "positive") value = Math.max(value, settings.negative + 0.01);
+        if (field === "uncertainty" || field === "unlisted") value = Math.min(value, settings.positive - 0.01);
         settings[field] = value;
+        if (field === "positive") {
+          settings.uncertainty = Math.min(settings.uncertainty, value - 0.01);
+          settings.unlisted = Math.min(settings.unlisted, value - 0.01);
+        }
         settings.gates = { choice: true, event_band: true, uncertainty: true, unlisted: true };
         settings.preset = "custom";
         syncSliders();
@@ -141,11 +157,19 @@
     }
     $("threshold-negative").max = Math.max(0, settings.positive - 0.01).toFixed(2);
     $("threshold-positive").min = Math.min(1, settings.negative + 0.01).toFixed(2);
+    $("threshold-uncertainty").max = Math.max(0, settings.positive - 0.01).toFixed(2);
+    $("threshold-unlisted").max = Math.max(0, settings.positive - 0.01).toFixed(2);
     for (const button of document.querySelectorAll(".preset")) button.classList.toggle("active", button.dataset.preset === settings.preset);
-    $("policyName").textContent = settings.preset === "custom" ? "Пользовательские пороги" : PRESETS.find((row) => row.id === settings.preset)?.label ?? "A · Current Strict";
-    $("policyCaption").textContent = settings.preset === "custom"
-      ? "Локальный пересчёт сохранённых оценок; все сигналы включены. Это не новый запуск Jev."
-      : "Экспериментальная диагностическая политика · настройки применяются только в этом браузере.";
+    $("presetButtons").hidden = activePolicyMode === "policy_v2";
+    $("legacyPresetNote").hidden = activePolicyMode !== "policy_v2";
+    $("policyName").textContent = activePolicyMode === "policy_v2"
+      ? "Policy v2 · независимые сигналы"
+      : settings.preset === "custom" ? "Legacy · пользовательские пороги" : PRESETS.find((row) => row.id === settings.preset)?.label ?? "A · Current Strict";
+    $("policyCaption").textContent = activePolicyMode === "policy_v2"
+      ? "Положительные события идут только как кандидаты; Choice, abstain, evidence и unlisted проверяются отдельно."
+      : settings.preset === "custom"
+        ? "Локальный пересчёт сохранённых оценок; историческая Legacy-логика. Это не новый запуск Jev."
+        : "Legacy: экспериментальные сигналы сводятся к общему статусу новости; настройки применяются только в этом браузере.";
   }
 
   function currentGold(row) {
@@ -189,6 +213,40 @@
     const status = uncertain ? "uncertain" : isOtherTopic ? "other" : "classified";
     const predictions = new Set(DATA.taxonomy.events.filter((event) => result.event_scores[event.code] >= settings.positive).map((event) => event.code));
     return { status, reasons, raw, active, predictions, grayEvents };
+  }
+
+  function decisionV2(row) {
+    const result = row.result;
+    if (!result) return { status: row.text?.trim() ? "missing" : "no_content", reasons: [], active: {}, predictions: new Set(), eventStates: {}, eventReviewCodes: [], blockedCodes: [], reviewTasks: [] };
+    const eventStates = Object.fromEntries(DATA.taxonomy.events.map((event) => [event.code, noulState(result.event_scores[event.code])]));
+    const evidenceState = noulState(result.uncertainty_score, settings.uncertainty, settings.positive);
+    const unlistedState = noulState(result.unlisted_event_score, settings.unlisted, settings.positive);
+    const choiceReview = result.topic_confidence < settings.choice;
+    const eventReviewCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "abstain").map((event) => event.code);
+    const positiveCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "positive").map((event) => event.code);
+    const evidenceReview = evidenceState !== "negative";
+    const unlistedReview = unlistedState !== "negative";
+    const candidateBlocked = evidenceReview;
+    const predictions = new Set(candidateBlocked ? [] : positiveCodes);
+    const blockedCodes = candidateBlocked ? positiveCodes : [];
+    const reviewTasks = [];
+    if (choiceReview) reviewTasks.push("Choice: основная тема требует проверки.");
+    for (const code of eventReviewCodes) reviewTasks.push(`Событие «${eventLabel(code)}»: оценка между порогами, проверить эту метку.`);
+    if (evidenceReview) reviewTasks.push(`Недостаточность доказательств: состояние ${evidenceState}; кандидаты удержаны до проверки доказательств.`);
+    if (unlistedReview) reviewTasks.push(`Событие вне списка: состояние ${unlistedState}; проверить необходимость новой метки.`);
+    const needsReview = reviewTasks.length > 0;
+    const status = predictions.size ? (needsReview ? "candidates_review" : "candidates") : (needsReview ? "review" : "no_candidate");
+    const reasons = reviewTasks;
+    return {
+      status, reasons, predictions, eventStates, eventReviewCodes, positiveCodes,
+      blockedCodes, evidenceState, unlistedState, choiceReview, evidenceReview,
+      unlistedReview, candidateBlocked, needsReview,
+      active: { choice: choiceReview, event_scores: eventReviewCodes.length > 0, uncertainty: evidenceReview, unlisted: unlistedReview },
+    };
+  }
+
+  function activeDecision(row, gates = settings.gates) {
+    return activePolicyMode === "policy_v2" ? decisionV2(row) : decision(row, gates);
   }
 
   function rowError(row, evaluated = decision(row)) {
@@ -246,22 +304,76 @@
     };
   }
 
-  function caseStatusLabel(row, evaluated = decision(row)) {
+  function metricSetV2(rows) {
+    const observed = rows.filter((row) => row.result);
+    let tp = 0; let fp = 0; let fn = 0; let exact = 0; let candidateStories = 0;
+    let reviewStories = 0; let eventAbstains = 0; let choiceReviews = 0; let evidenceReviews = 0; let unlistedReviews = 0;
+    let evidenceBlockedStories = 0; let topicCorrect = 0;
+    for (const row of observed) {
+      const evaluated = decisionV2(row);
+      const gold = currentGold(row);
+      const predicted = evaluated.predictions;
+      const truePositive = [...predicted].filter((code) => gold.events.has(code));
+      const falsePositive = [...predicted].filter((code) => !gold.events.has(code));
+      const falseNegative = [...gold.events].filter((code) => !predicted.has(code));
+      tp += truePositive.length; fp += falsePositive.length; fn += falseNegative.length;
+      exact += Number(falsePositive.length === 0 && falseNegative.length === 0);
+      candidateStories += Number(predicted.size > 0);
+      reviewStories += Number(evaluated.needsReview);
+      eventAbstains += evaluated.eventReviewCodes.length;
+      choiceReviews += Number(evaluated.choiceReview);
+      evidenceReviews += Number(evaluated.evidenceReview);
+      unlistedReviews += Number(evaluated.unlistedReview);
+      evidenceBlockedStories += Number(evaluated.blockedCodes.length > 0);
+      topicCorrect += Number(row.result.topic === gold.topic);
+    }
+    const precision = tp + fp ? tp / (tp + fp) : null;
+    const recall = tp + fn ? tp / (tp + fn) : null;
+    const f1 = 2 * tp + fp + fn ? 2 * tp / (2 * tp + fp + fn) : null;
+    return {
+      total: observed.length, tp, fp, fn, precision, recall, f1, exact,
+      exactRate: observed.length ? exact / observed.length : null,
+      candidateStories, candidateCoverage: observed.length ? candidateStories / observed.length : null,
+      reviewStories, noReviewStories: observed.length - reviewStories,
+      eventAbstains, choiceReviews, evidenceReviews, unlistedReviews,
+      scopedReviewItems: eventAbstains + choiceReviews + evidenceReviews + unlistedReviews,
+      evidenceBlockedStories, topicCorrect, topicAccuracy: observed.length ? topicCorrect / observed.length : null,
+    };
+  }
+
+  function caseStatusLabel(row, evaluated = activeDecision(row)) {
     if (!row.result) return row.text?.trim() ? "Нет ответа Jev" : "Пустой текст";
+    if (activePolicyMode === "policy_v2") {
+      if (evaluated.predictions.size && evaluated.needsReview) return `${evaluated.predictions.size} кандидат(а) · нужна проверка`;
+      if (evaluated.predictions.size) return `${evaluated.predictions.size} кандидат(а) · без review`;
+      return evaluated.needsReview ? "Точечная проверка" : "Нет кандидатов";
+    }
     if (evaluated.status === "uncertain") return "Нужна проверка";
     if (evaluated.status === "other") return "Другая тема";
     return "Автоматически принято";
   }
 
   function renderTop() {
-    const metrics = metricSet(DATA.cases, settings.gates);
-    const cards = [
-      ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
-      ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
-      ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
-      ["Event micro-F1", pct(metrics.f1), `${metrics.tp} TP · ${metrics.fp} FP · ${metrics.fn} FN`],
-      ["Автопринято", `${metrics.accepted}/45`, `${pct(metrics.coverage)} среди ответов`],
-    ];
+    const cards = activePolicyMode === "policy_v2" ? (() => {
+      const metrics = metricSetV2(DATA.cases);
+      const candidateCount = liveCaseRows().reduce((count, row) => count + decisionV2(row).predictions.size, 0);
+      return [
+        ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
+        ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
+        ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
+        ["Event F1 кандидатов", pct(metrics.f1), `${metrics.tp} TP · ${metrics.fp} FP · ${metrics.fn} FN`],
+        ["Истории с кандидатами", `${metrics.candidateStories}/45`, `${candidateCount} меток · все только кандидаты`],
+      ];
+    })() : (() => {
+      const metrics = metricSet(DATA.cases, settings.gates);
+      return [
+        ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
+        ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
+        ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
+        ["Event micro-F1", pct(metrics.f1), `${metrics.tp} TP · ${metrics.fp} FP · ${metrics.fn} FN`],
+        ["Автопринято", `${metrics.accepted}/45`, `${pct(metrics.coverage)} среди ответов`],
+      ];
+    })();
     const root = $("topMetrics");
     root.replaceChildren();
     for (const [label, value, sub] of cards) {
@@ -276,7 +388,7 @@
     let rows = DATA.cases.filter((row) => {
       const searchText = `${row.id} ${row.title ?? ""} ${row.text ?? ""}`.toLocaleLowerCase("ru");
       if (filters.search && !searchText.includes(filters.search)) return false;
-      const evaluated = decision(row);
+      const evaluated = activeDecision(row);
       const gold = currentGold(row);
       const hasTopic = (row.result?.topic === filters.topic) || gold.topic === filters.topic;
       if (filters.topic && !hasTopic) return false;
@@ -284,8 +396,8 @@
       if (filters.event && !hasEvent) return false;
       const error = row.result ? rowError(row, evaluated).any : false;
       const status = evaluated.status;
-      if (filters.state === "review" && status !== "uncertain") return false;
-      if (filters.state === "auto" && status === "uncertain") return false;
+      if (filters.state === "review" && (activePolicyMode === "policy_v2" ? !evaluated.needsReview : status !== "uncertain")) return false;
+      if (filters.state === "auto" && (activePolicyMode === "policy_v2" ? evaluated.needsReview : status === "uncertain")) return false;
       if (filters.state === "error" && !error) return false;
       if (filters.state === "clean" && (!row.result || error)) return false;
       if (filters.state === "missing" && (!row.text?.trim() || row.result)) return false;
@@ -297,8 +409,8 @@
     });
     if (filters.sort === "confidence_low") rows.sort((a, b) => (a.result?.topic_confidence ?? 2) - (b.result?.topic_confidence ?? 2));
     if (filters.sort === "events_high") rows.sort((a, b) => (b.result?.predicted_events?.length ?? -1) - (a.result?.predicted_events?.length ?? -1));
-    if (filters.sort === "review_first") rows.sort((a, b) => Number(decision(b).status === "uncertain") - Number(decision(a).status === "uncertain"));
-    if (filters.sort === "errors_first") rows.sort((a, b) => Number(b.result ? rowError(b).any : false) - Number(a.result ? rowError(a).any : false));
+    if (filters.sort === "review_first") rows.sort((a, b) => Number(activeDecision(b).needsReview ?? activeDecision(b).status === "uncertain") - Number(activeDecision(a).needsReview ?? activeDecision(a).status === "uncertain"));
+    if (filters.sort === "errors_first") rows.sort((a, b) => Number(b.result ? rowError(b, activeDecision(b)).any : false) - Number(a.result ? rowError(a, activeDecision(a)).any : false));
     return rows;
   }
 
@@ -309,7 +421,7 @@
     $("visibleCaseCount").textContent = `${rows.length} из ${DATA.cases.length}`;
     if (!rows.length) { root.append(node("div", "empty-state", "Ничего не найдено. Измените фильтры.")); return; }
     for (const row of rows) {
-      const evaluated = decision(row);
+      const evaluated = activeDecision(row);
       const card = node("button", `case-card${row.id === selectedId ? " selected" : ""}`);
       card.type = "button";
       card.setAttribute("aria-current", String(row.id === selectedId));
@@ -320,10 +432,10 @@
       const title = node("div", "case-title", row.title || "Пустой текст");
       const summary = node("div", "case-summary", row.text || "Текст отсутствует.");
       const meta = node("div", "case-meta");
-      const status = node("span", `case-status${evaluated.status === "uncertain" ? " review" : ""}${evaluated.status === "missing" ? " missing" : ""}`, caseStatusLabel(row, evaluated));
+      const status = node("span", `case-status${(activePolicyMode === "policy_v2" ? evaluated.needsReview : evaluated.status === "uncertain") ? " review" : ""}${evaluated.status === "missing" ? " missing" : ""}`, caseStatusLabel(row, evaluated));
       meta.append(status);
       if (row.result) {
-        meta.append(node("span", "badge small", `${evaluated.predictions.size} событий`));
+        meta.append(node("span", "badge small", activePolicyMode === "policy_v2" ? `${evaluated.predictions.size} кандидатов` : `${evaluated.predictions.size} событий`));
         if (rowError(row, evaluated).any) meta.append(node("span", "badge red small", "есть расхождение"));
       } else if (row.text?.trim()) meta.append(node("span", "badge red small", "без результата"));
       append(card, top, title, summary, meta);
@@ -339,7 +451,7 @@
     const row = caseById(selectedId);
     if (!row) return;
     const gold = currentGold(row);
-    const evaluated = decision(row);
+    const evaluated = activeDecision(row);
     const error = row.result ? rowError(row, evaluated) : null;
     const original = node("div", "gold-block");
     const originalHeading = node("div", "gold-heading");
@@ -354,7 +466,10 @@
     const eventHead = node("div", "subsection-label", `Ожидались события · ${row.expected_events.length}`);
     original.append(eventHead);
     const originalEvents = node("div", "label-list");
-    for (const code of row.expected_events) originalEvents.append(labelChip(eventLabel(code), error?.fn.includes(code) ? "fn" : error?.fp.includes(code) ? "fp" : "correct"));
+    for (const code of row.expected_events) {
+      const v2Held = activePolicyMode === "policy_v2" && (evaluated.blockedCodes.includes(code) || evaluated.eventReviewCodes.includes(code));
+      originalEvents.append(labelChip(eventLabel(code), v2Held ? "review" : error?.fn.includes(code) ? "fn" : error?.fp.includes(code) ? "fp" : "correct"));
+    }
     if (!row.expected_events.length) originalEvents.append(labelChip("Событий нет"));
     original.append(originalEvents);
     if (gold.changed) {
@@ -386,13 +501,21 @@
       jevTopicValue.textContent += error.topicMismatch ? " · ошибка темы" : " · совпало";
       model.append(jevTopic);
       const stored = node("div", "compare-line");
-      append(stored, node("span", "compare-key", "Сохранённый статус"), node("span", `compare-val ${row.result.classification_status === "uncertain" ? "" : ""}`, row.result.classification_status));
+      append(stored, node("span", "compare-key", activePolicyMode === "policy_v2" ? "Сохранённый Legacy status" : "Сохранённый статус"), node("span", `compare-val ${row.result.classification_status === "uncertain" ? "" : ""}`, row.result.classification_status));
       model.append(stored);
-      model.append(node("div", "subsection-label", "События Jev при моих порогах"));
+      model.append(node("div", "subsection-label", activePolicyMode === "policy_v2" ? "Event-кандидаты, переданные по Policy v2" : "События Jev при моих порогах"));
       const pred = node("div", "label-list");
       for (const code of evaluated.predictions) pred.append(labelChip(eventLabel(code), gold.events.has(code) ? "correct" : "fp"));
-      if (!evaluated.predictions.size) pred.append(labelChip("Положительных событий нет"));
+      if (!evaluated.predictions.size) pred.append(labelChip(activePolicyMode === "policy_v2" ? "Кандидаты не переданы" : "Положительных событий нет"));
       model.append(pred);
+      if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.length) {
+        const blocked = node("div", "gold-block");
+        blocked.append(node("div", "subsection-label", "Положительная оценка удержана сигналом доказательств"));
+        const held = node("div", "label-list");
+        for (const code of evaluated.blockedCodes) held.append(labelChip(eventLabel(code), "review"));
+        blocked.append(held);
+        model.append(blocked);
+      }
       const signals = node("div", "gold-block");
       const signalRows = [
         ["Событие вне списка", row.expected_unlisted_event, row.result.unlisted_event_score],
@@ -407,8 +530,12 @@
       model.append(signals);
       const diffs = node("div", "diff-list");
       if (error.topicMismatch) diffs.append(node("div", "", `Ошибка темы: Jev выбрал «${topicLabel(row.result.topic)}».`));
-      for (const code of error.fp) diffs.append(node("div", "", `Ложное срабатывание · ${eventLabel(code)}`));
-      for (const code of error.fn) diffs.append(node("div", "", `Пропущено · ${eventLabel(code)}`));
+      for (const code of error.fp) diffs.append(node("div", "", activePolicyMode === "policy_v2" ? `Ложный кандидат (не факт) · ${eventLabel(code)}` : `Ложное срабатывание · ${eventLabel(code)}`));
+      for (const code of error.fn) {
+        if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.includes(code)) diffs.append(node("div", "", `Не передан: положительная оценка удержана по доказательствам · ${eventLabel(code)}`));
+        else if (activePolicyMode === "policy_v2" && evaluated.eventReviewCodes.includes(code)) diffs.append(node("div", "", `Не передан: эта категория требует проверки · ${eventLabel(code)}`));
+        else diffs.append(node("div", "", activePolicyMode === "policy_v2" ? `Не передан кандидатом (состояние negative) · ${eventLabel(code)}` : `Пропущено · ${eventLabel(code)}`));
+      }
       if (!error.any) diffs.append(node("div", "", "По текущим меткам и порогу событий расхождений нет."));
       model.append(diffs);
       model.append(node("div", "editor-note", `Сохранённый Jev: ${row.result.predicted_events.length} positive-категорий при исходном пороге ${scoreText(DATA.taxonomy.thresholds.noul_positive_at_or_above)}. Текущие метки считаются локально.`));
@@ -528,12 +655,13 @@
     const row = caseById(selectedId);
     if (!row) return;
     const result = row.result;
-    const evaluated = decision(row);
+    const evaluated = activeDecision(row);
     const error = result ? rowError(row, evaluated) : null;
     const heading = node("div", "detail-title-row");
     const left = node("div");
     append(left, node("div", "detail-id", row.id), node("h2", "detail-title", row.title || "Пустой текст"));
-    const headStatus = node("span", `badge${!result ? " red" : evaluated.status === "uncertain" ? " amber" : " green"}`, caseStatusLabel(row, evaluated));
+    const isReview = activePolicyMode === "policy_v2" ? evaluated.needsReview : evaluated.status === "uncertain";
+    const headStatus = node("span", `badge${!result ? " red" : isReview ? " amber" : " green"}`, caseStatusLabel(row, evaluated));
     append(heading, left, headStatus);
     root.append(heading);
     const badgeRow = node("div", "detail-badges");
@@ -558,16 +686,16 @@
     const summary = node("div", "summary-grid");
     const topic = topicByCode.get(result.topic);
     summary.append(summaryCell("Тема Jev", topic?.label ?? result.topic, `Choice ${scoreText(result.topic_confidence)}`));
-    summary.append(summaryCell("Положительные события", String(evaluated.predictions.size), `по порогу ${scoreText(settings.positive)}`));
-    summary.append(summaryCell("Решение сейчас", evaluated.status, evaluated.status === "uncertain" ? `${evaluated.reasons.length} активных причин` : "пороговая проверка пройдена"));
+    summary.append(summaryCell(activePolicyMode === "policy_v2" ? "Event-кандидаты" : "Положительные события", String(evaluated.predictions.size), activePolicyMode === "policy_v2" ? "не подтверждённые факты" : `по порогу ${scoreText(settings.positive)}`));
+    summary.append(summaryCell("Решение сейчас", activePolicyMode === "policy_v2" ? (evaluated.needsReview ? "кандидаты + точечная проверка" : "без review-сигналов") : evaluated.status, activePolicyMode === "policy_v2" ? `${evaluated.reasons.length} отдельных причин` : evaluated.status === "uncertain" ? `${evaluated.reasons.length} активных причин` : "пороговая проверка пройдена"));
     root.append(summary);
     root.append(storyCard(row));
     root.append(sectionHeading("Choice · основная тема", "Choice выбирает одну главную тему. Значения показывают ответ и сохранённые оценки; это не калиброванные вероятности."));
     root.append(renderChoice(result));
     root.append(sectionHeading("Noul · бизнес-события", "Каждый тип события оценивается отдельно. Между отрицательным и положительным порогами состояние — abstain."));
-    root.append(renderEvents(result));
+    root.append(renderEvents(result, evaluated));
     root.append(sectionHeading("Дополнительные сигналы", "Не смешиваем событие вне списка с недостаточностью доказательств."));
-    root.append(renderSignals(result));
+    root.append(renderSignals(result, evaluated));
     root.append(sectionHeading("Итоговая проверка приложения", "Это наблюдаемая логика наших порогов, а не скрытое объяснение Jev."));
     root.append(renderDecision(row, evaluated));
   }
@@ -610,7 +738,9 @@
     append(meta, chosen, badge);
     card.append(meta);
     const accepted = result.topic_confidence >= settings.choice;
-    card.append(node("div", "editor-note", accepted ? "Confidence не ниже порога: проверка Choice пройдена." : "Confidence ниже порога: приложение отправит тему на ручную проверку."));
+    card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
+      ? (accepted ? "Choice прошёл отдельную проверку темы. Это не подтверждает события." : "Тема требует отдельной проверки; положительные события-кандидаты могут пройти дальше независимо.")
+      : (accepted ? "Confidence не ниже порога: проверка Choice пройдена." : "Confidence ниже порога: приложение отправит тему на ручную проверку.")));
     const entries = DATA.taxonomy.topics.map((item) => ({ item, score: result.topic_probabilities[item.code] })).sort((a, b) => b.score - a.score);
     const bars = node("div", "bars");
     for (const { item, score } of entries) bars.append(makeBar(item.label, score, "topic"));
@@ -629,7 +759,7 @@
     return row;
   }
 
-  function renderEvents(result) {
+  function renderEvents(result, evaluated = activePolicyMode === "policy_v2" ? decisionV2({ result }) : null) {
     const root = node("div", "event-list");
     for (const event of DATA.taxonomy.events) {
       const score = result.event_scores[event.code];
@@ -643,6 +773,16 @@
       track.append(fill);
       append(summary, track, node("span", "bar-value", scoreText(score)), node("span", `state-chip ${state}`, state === "positive" ? "positive" : state === "negative" ? "negative" : "abstain"));
       const extra = node("div", "event-extra");
+      if (activePolicyMode === "policy_v2") {
+        const routing = evaluated.predictions.has(event.code)
+          ? "Кандидат для следующего этапа · не подтверждённый факт."
+          : evaluated.blockedCodes.includes(event.code)
+            ? "Положительная оценка есть, но кандидат удержан из-за сигнала недостаточности доказательств."
+            : state === "abstain"
+              ? "Эту категорию нужно проверить; она не блокирует другие категории с положительной оценкой."
+              : "Не передаётся как кандидат по текущему порогу.";
+        extra.append(node("div", `candidate-routing${evaluated.predictions.has(event.code) ? " candidate" : evaluated.blockedCodes.includes(event.code) ? " blocked" : state === "abstain" ? " needs-review" : ""}`, routing));
+      }
       append(extra, node("div", "event-def", event.definition));
       const criteria = node("div", "include-exclude");
       const include = node("div", "criterion");
@@ -658,11 +798,11 @@
     return root;
   }
 
-  function renderSignals(result) {
+  function renderSignals(result, evaluated = activePolicyMode === "policy_v2" ? decisionV2({ result }) : null) {
     const grid = node("div", "signal-grid");
     const signals = [
-      { title: "Событие вне списка", score: result.unlisted_event_score, cutoff: settings.unlisted, state: noulState(result.unlisted_event_score), copy: "Оценивает, есть ли описанное событие, которому не нашлось подходящей метки в нашем справочнике." },
-      { title: "Недостаточно доказательств", score: result.uncertainty_score, cutoff: settings.uncertainty, state: noulState(result.uncertainty_score), copy: "Отдельный сигнал о расплывчатом, неполном, слуховом или противоречивом сообщении." },
+      { title: "Событие вне списка", score: result.unlisted_event_score, cutoff: settings.unlisted, state: activePolicyMode === "policy_v2" ? evaluated.unlistedState : noulState(result.unlisted_event_score), copy: "Оценивает, есть ли описанное событие, которому не нашлось подходящей метки в нашем справочнике." },
+      { title: "Недостаточно доказательств", score: result.uncertainty_score, cutoff: settings.uncertainty, state: activePolicyMode === "policy_v2" ? evaluated.evidenceState : noulState(result.uncertainty_score), copy: "Отдельный сигнал о расплывчатом, неполном, слуховом или противоречивом сообщении." },
     ];
     for (const signal of signals) {
       const card = node("div", "signal-card");
@@ -671,13 +811,18 @@
       card.append(top);
       card.append(makeBar(`Порог review ${scoreText(signal.cutoff)}`, signal.score, signal.state === "positive" ? "event-positive" : signal.state === "abstain" ? "event-abstain" : "topic"));
       card.append(node("div", "signal-copy", signal.copy));
-      card.append(node("div", "editor-note", `${signal.state}; review gate ${settings.gates[signal.title === "Событие вне списка" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
+      card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
+        ? (signal.title === "Недостаточно доказательств"
+          ? `${signal.state}; кандидаты передаются только при negative. Сейчас ${evaluated.candidateBlocked ? "кандидаты удержаны" : "сигнал не блокирует кандидатов"}.`
+          : `${signal.state}; создаёт отдельную проверку и не блокирует известные event-кандидаты.`)
+        : `${signal.state}; review gate ${settings.gates[signal.title === "Событие вне списка" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
       grid.append(card);
     }
     return grid;
   }
 
   function renderDecision(row, evaluated) {
+    if (activePolicyMode === "policy_v2") return renderDecisionV2(row, evaluated);
     const card = node("div", `decision-card${evaluated.status === "uncertain" ? " uncertain" : evaluated.status === "classified" ? " classified" : ""}`);
     const head = node("div", "decision-title");
     append(head, node("span", "", evaluated.status === "uncertain" ? "Ручная проверка нужна" : evaluated.status === "other" ? "Другая тема" : "Результат принят порогами"), node("span", `badge${evaluated.status === "uncertain" ? " amber" : evaluated.status === "classified" ? " green" : ""}`, evaluated.status));
@@ -703,23 +848,67 @@
     return card;
   }
 
+  function renderDecisionV2(row, evaluated) {
+    const card = node("div", `decision-card${evaluated.needsReview ? " uncertain" : " classified"}`);
+    const title = evaluated.predictions.size
+      ? `${evaluated.predictions.size} event-кандидат(а) доступны для передачи`
+      : evaluated.needsReview ? "Кандидатов для передачи сейчас нет" : "Положительных event-кандидатов нет";
+    const head = node("div", "decision-title");
+    append(head, node("span", "", title), node("span", `badge${evaluated.needsReview ? " amber" : " green"}`, evaluated.needsReview ? "точечная проверка" : "нет review-сигналов"));
+    card.append(head);
+    card.append(node("div", "decision-explain", "Положительная метка — только кандидат для следующего этапа, а не подтверждённое событие."));
+    const topics = [
+      ["Тема (Choice)", evaluated.choiceReview ? "проверить тему" : "порог пройден"],
+      ["Категории событий", `${evaluated.eventReviewCodes.length} категорий требуют отдельной проверки`],
+      ["Недостаточность доказательств", `${evaluated.evidenceState}${evaluated.candidateBlocked ? " · блокирует кандидаты" : " · не блокирует кандидаты"}`],
+      ["Событие вне списка", `${evaluated.unlistedState} · отдельная проверка`],
+    ];
+    const list = node("ul", "reason-list");
+    for (const [label, value] of topics) list.append(node("li", "", `${label}: ${value}.`));
+    card.append(list);
+    if (evaluated.reasons.length) {
+      const tasks = node("div", "review-task-list");
+      for (const reason of evaluated.reasons) tasks.append(node("div", "review-task", reason));
+      card.append(tasks);
+    }
+    if (evaluated.blockedCodes.length) {
+      card.append(node("div", "decision-explain", `Удержаны положительные оценки: ${evaluated.blockedCodes.map(eventLabel).join(", ")}.`));
+    }
+    card.append(node("div", "editor-note", "Policy v2 не переводит отрицание/неопределённость в факт: события передаются только как помеченные кандидаты, а решение требует последующей проверки."));
+    return card;
+  }
+
   function renderStats() {
-    const metrics = metricSet(DATA.cases, settings.gates);
+    const legacyMetrics = metricSet(DATA.cases, settings.gates);
+    const v2Metrics = metricSetV2(DATA.cases);
+    const metrics = activePolicyMode === "policy_v2" ? v2Metrics : legacyMetrics;
     const root = $("statsMetrics");
     root.replaceChildren();
-    const items = [
-      ["Topic Accuracy", pct(metrics.topicAccuracy), `${metrics.topicCorrect}/${metrics.total} ответов`],
-      ["Event Precision", pct(metrics.precision), `${metrics.tp} TP · ${metrics.fp} FP`],
-      ["Event Recall", pct(metrics.recall), `${metrics.tp} TP · ${metrics.fn} FN`],
-      ["Event micro-F1", pct(metrics.f1), "по текущему порогу positive"],
-      ["Exact Event-Set", pct(metrics.exact), `${metrics.exactCount}/${metrics.total} новостей`],
-      ["Auto Coverage", pct(metrics.coverage), `${metrics.accepted}/${metrics.total} без review`],
-      ["Review Rate", pct(metrics.reviewRate), `${metrics.review}/${metrics.total} ответов`],
-      ["False Positives", String(metrics.fp), "среди 15 категорий событий"],
-      ["False Negatives", String(metrics.fn), "относительно черновой разметки"],
-      ["Ошибки среди auto", pct(metrics.autoErrorRate), `${metrics.acceptedError}/${metrics.accepted} принятых`],
+    const items = activePolicyMode === "policy_v2" ? [
+      ["Topic Accuracy", pct(v2Metrics.topicAccuracy), `${v2Metrics.topicCorrect}/${v2Metrics.total} ответов`],
+      ["Event Precision", pct(v2Metrics.precision), `${v2Metrics.tp} TP · ${v2Metrics.fp} FP`],
+      ["Event Recall", pct(v2Metrics.recall), `${v2Metrics.tp} TP · ${v2Metrics.fn} не передано`],
+      ["Event F1 кандидатов", pct(v2Metrics.f1), "среди автоматически переданных event-кандидатов"],
+      ["Exact Event-Set", pct(v2Metrics.exactRate), `${v2Metrics.exact}/${v2Metrics.total} выходных наборов`],
+      ["Candidate Coverage", pct(v2Metrics.candidateCoverage), `${v2Metrics.candidateStories}/${v2Metrics.total} с кандидатами`],
+      ["Есть задача review", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} историй`],
+      ["False Positives", String(v2Metrics.fp), "ложные кандидаты по draft gold"],
+      ["Не передано", String(v2Metrics.fn), "включая policy hold и negative"],
+      ["Точечные задачи", String(v2Metrics.scopedReviewItems), `${v2Metrics.eventAbstains} event-категорий в abstain`],
+    ] : [
+      ["Topic Accuracy", pct(legacyMetrics.topicAccuracy), `${legacyMetrics.topicCorrect}/${legacyMetrics.total} ответов`],
+      ["Event Precision", pct(legacyMetrics.precision), `${legacyMetrics.tp} TP · ${legacyMetrics.fp} FP`],
+      ["Event Recall", pct(legacyMetrics.recall), `${legacyMetrics.tp} TP · ${legacyMetrics.fn} FN`],
+      ["Event micro-F1", pct(legacyMetrics.f1), "по текущему порогу positive"],
+      ["Exact Event-Set", pct(legacyMetrics.exact), `${legacyMetrics.exactCount}/${legacyMetrics.total} новостей`],
+      ["Auto Coverage", pct(legacyMetrics.coverage), `${legacyMetrics.accepted}/${legacyMetrics.total} без review`],
+      ["Review Rate", pct(legacyMetrics.reviewRate), `${legacyMetrics.review}/${legacyMetrics.total} ответов`],
+      ["False Positives", String(legacyMetrics.fp), "среди 15 категорий событий"],
+      ["False Negatives", String(legacyMetrics.fn), "относительно черновой разметки"],
+      ["Ошибки среди auto", pct(legacyMetrics.autoErrorRate), `${legacyMetrics.acceptedError}/${legacyMetrics.accepted} принятых`],
     ];
     for (const [label, value, sub] of items) root.append(summaryMetric(label, value, sub));
+    $("policyComparison").replaceChildren(policyComparisonCard(v2Metrics));
     const charts = $("chartsGrid");
     charts.replaceChildren();
     charts.append(chartCard("Основные темы Jev", "Распределение только по 45 сохранённым ответам.", topicDistribution()));
@@ -728,7 +917,82 @@
     charts.append(chartCard("Причины ручной проверки", "Счётчики перекрываются: одна новость может иметь несколько причин.", triggerDistribution()));
     charts.append(scatterCard());
     charts.append(policyTableCard());
-    $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и предварительных метках. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Модельные оценки не калиброваны. Результаты не доказывают качество на реальном новостном потоке.`;
+    $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и предварительных метках. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Модельные оценки не калиброваны. Диаграммы и пресеты A–E ниже остаются Legacy-диагностикой; таблица выше сравнивает реальную передачу Legacy и Policy v2. Результаты не доказывают качество на реальном новостном потоке.`;
+  }
+
+  function legacyOutputMetrics() {
+    // The comparison baseline is always Legacy Current Strict. Preset gates
+    // remain available for the interactive Legacy diagnostics elsewhere, but
+    // must not silently change the named baseline after switching to v2.
+    const currentStrictGates = { choice: true, event_band: true, uncertainty: true, unlisted: true };
+    const observed = liveCaseRows();
+    let tp = 0; let fp = 0; let fn = 0; let exact = 0; let emittedStories = 0; let emittedEvents = 0;
+    const falsePositives = [];
+    for (const row of observed) {
+      const legacy = decision(row, currentStrictGates);
+      const predicted = legacy.status === "uncertain" ? new Set() : legacy.predictions;
+      const gold = currentGold(row).events;
+      const truePositives = [...predicted].filter((code) => gold.has(code));
+      const falsePositive = [...predicted].filter((code) => !gold.has(code));
+      const falseNegative = [...gold].filter((code) => !predicted.has(code));
+      tp += truePositives.length; fp += falsePositive.length; fn += falseNegative.length;
+      emittedEvents += predicted.size;
+      emittedStories += Number(predicted.size > 0);
+      exact += Number(falsePositive.length === 0 && falseNegative.length === 0);
+      for (const code of falsePositive) falsePositives.push({ case_id: row.id, code });
+    }
+    const precision = tp + fp ? tp / (tp + fp) : null;
+    const recall = tp + fn ? tp / (tp + fn) : null;
+    return {
+      total: observed.length, tp, fp, fn,
+      precision, recall, f1: 2 * tp + fp + fn ? 2 * tp / (2 * tp + fp + fn) : null,
+      exact: observed.length ? exact / observed.length : null,
+      emittedStories, emittedEvents, acceptedStories: metricSet(DATA.cases, currentStrictGates).accepted,
+      reviewStories: metricSet(DATA.cases, currentStrictGates).review,
+      falsePositives,
+    };
+  }
+
+  function policyComparisonCard(v2Metrics) {
+    const card = node("section", "chart-card policy-v2-comparison");
+    append(card, node("div", "chart-title", "Legacy vs Policy v2 · один и тот же набор из 45 ответов"));
+    card.append(node("div", "chart-desc", "Считается только то, что реально прошло бы дальше. Legacy передаёт целиком только прошедшие новости; v2 — отдельные event-кандидаты. 4 запроса без ответа исключены."));
+    const legacy = legacyOutputMetrics();
+    const v2 = v2Metrics;
+    const riskyCodes = new Set(["sanctions", "trade_restriction", "legal_enforcement", "insolvency_default", "product_recall_quality_safety", "production_operational_disruption"]);
+    const dangerous = (rows) => rows.filter((row) => riskyCodes.has(row.code));
+    const legacyDanger = dangerous(legacy.falsePositives);
+    const v2Danger = dangerous(liveCaseRows().flatMap((row) => {
+      const gold = currentGold(row).events;
+      return [...decisionV2(row).predictions].filter((code) => !gold.has(code)).map((code) => ({ case_id: row.id, code }));
+    }));
+    const table = node("table", "policy-table policy-v2-table");
+    const head = node("thead");
+    const header = node("tr");
+    for (const label of ["Режим", "Передано дальше", "P", "R", "F1", "Точные наборы", "TP / FP / FN", "Stories с review", "Условно значимые FP*"]) header.append(node("th", "", label));
+    head.append(header); table.append(head);
+    const body = node("tbody");
+    const rows = [
+      { name: "Legacy · Current Strict", output: `${legacy.acceptedStories}/45 целых новостей · ${legacy.emittedEvents} меток`, p: legacy.precision, r: legacy.recall, f1: legacy.f1, exact: `${Math.round(legacy.exact * legacy.total)}/${legacy.total} · ${pct(legacy.exact)}`, counts: `${legacy.tp} / ${legacy.fp} / ${legacy.fn}`, review: `${legacy.reviewStories}/45`, danger: legacyDanger },
+      { name: "Policy v2", output: `${v2.candidateStories}/45 новостей · ${v2MetricsCandidateCount(v2)} event-меток`, p: v2.precision, r: v2.recall, f1: v2.f1, exact: `${Math.round(v2.exactRate * v2.total)}/${v2.total} · ${pct(v2.exactRate)}`, counts: `${v2.tp} / ${v2.fp} / ${v2.fn}`, review: `${v2.reviewStories}/45`, danger: v2Danger },
+    ];
+    for (const row of rows) {
+      const tr = node("tr", `policy-row${row.name === "Policy v2" ? " policy-v2-row" : ""}`);
+      const dangerousLabel = `${row.danger.length}${row.danger.length ? ` · ${row.danger.map((item) => `${item.case_id}: ${item.code}`).join(", ")}` : ""}`;
+      for (const value of [row.name, row.output, pct(row.p), pct(row.r), pct(row.f1), row.exact, row.counts, row.review, dangerousLabel]) tr.append(node("td", "", value));
+      body.append(tr);
+    }
+    table.append(body);
+    const wrap = node("div", "chart-body policy-table-wrap");
+    wrap.append(table);
+    card.append(wrap);
+    card.append(node("div", "policy-v2-note", `Policy v2: ${v2Metrics.choiceReviews} Choice review · ${v2Metrics.evidenceReviews} evidence review · ${v2Metrics.unlistedReviews} unlisted review · ${v2Metrics.eventAbstains} отдельных event-abstain задач. Итого ${v2Metrics.reviewStories}/45 новостей имеют хотя бы один сигнал; причины пересекаются. *Группа «условно значимых» категорий не утверждена и служит только исследовательским индикатором.`));
+    card.append(node("div", "policy-v2-caveat", "Важно: Legacy F1=0.840 в старом отчёте считается по всем сырым оценкам 45 ответов. Эта таблица считает фактическую передачу дальше: Legacy блокирует review-новости, а v2 считает удержанные категории как не переданные автоматически. Это не сравнение качества самой модели."));
+    return card;
+  }
+
+  function v2MetricsCandidateCount(metrics) {
+    return liveCaseRows().reduce((count, row) => count + decisionV2(row).predictions.size, 0);
   }
 
   function summaryMetric(label, value, sub) {

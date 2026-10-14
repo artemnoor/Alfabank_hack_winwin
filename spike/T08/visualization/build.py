@@ -13,8 +13,10 @@ HERE = Path(__file__).resolve().parent
 SPIKE_DIR = HERE.parent
 sys.path.insert(0, str(SPIKE_DIR))
 
-from jev_spike import load_verified_inputs
-from quality_analysis import build_quality_analysis
+from jev_spike import load_verified_inputs  # noqa: E402
+from quality_analysis import build_quality_analysis  # noqa: E402
+from quality_policy import historical_review_reasons  # noqa: E402
+from policy_v2 import compare_policies  # noqa: E402
 
 CORPUS_PATH = SPIKE_DIR / "corpus.json"
 TAXONOMY_PATH = SPIKE_DIR / "taxonomy.json"
@@ -23,6 +25,7 @@ HUMAN_PACKET_PATH = SPIKE_DIR / "HUMAN_REVIEW_PACKET.md"
 CSS_PATH = HERE / "style.css"
 JS_PATH = HERE / "app.js"
 OUTPUT_PATH = HERE / "index.html"
+POLICY_REPORT_PATH = HERE / "policy-v2-results.json"
 
 
 def sha256(path: Path) -> str:
@@ -102,6 +105,33 @@ def build_payload() -> dict[str, Any]:
         row["result"] = compact_result(saved) if saved else None
         rows.append(row)
 
+    # Policy v2 is an additional interpretation of the pinned responses. The
+    # Legacy output below is limited to cases that pass its historical gates;
+    # it is intentionally different from the historical all-score metrics.
+    legacy_predictions: dict[str, set[str]] = {}
+    legacy_review_ids: set[str] = set()
+    event_codes = [event["code"] for event in taxonomy["events"]]
+    positive_cutoff = taxonomy["thresholds"]["noul_positive_at_or_above"]
+    for case in rows:
+        saved = case["result"]
+        if saved is None:
+            continue
+        legacy_decision = historical_review_reasons(saved, taxonomy)
+        if any(legacy_decision["active"].values()):
+            legacy_review_ids.add(case["id"])
+            continue
+        legacy_predictions[case["id"]] = {
+            code
+            for code in event_codes
+            if saved["event_scores"][code] >= positive_cutoff
+        }
+    policy_v2 = compare_policies(
+        rows,
+        taxonomy,
+        legacy_predictions=legacy_predictions,
+        legacy_review_ids=legacy_review_ids,
+    )
+
     legacy = quality["reproduction"]["legacy_metrics"]
     if legacy["case_count"] != 50 or legacy["non_empty_case_total"] != 49:
         raise ValueError("Reproduced legacy metrics do not describe the pinned corpus")
@@ -135,6 +165,7 @@ def build_payload() -> dict[str, Any]:
             "legacyMetrics": legacy,
             "policies": quality["policies"],
             "noNewApiCalls": True,
+            "policyV2": policy_v2,
         },
         "taxonomy": {
             "id": taxonomy["id"],
@@ -188,6 +219,8 @@ def render_html(payload: dict[str, Any]) -> str:
     <nav class="section-nav" aria-label="Разделы"><button id="labTab" class="tab" type="button" data-tab="lab" aria-selected="true">Разбор новостей</button><button id="statsTab" class="tab" type="button" data-tab="stats" aria-selected="false">Общая статистика</button></nav>
     <section class="policy-bar" aria-label="Экспериментальные пороги">
       <div class="policy-top"><div><div id="policyName" class="policy-title">A · Current Strict</div><div id="policyCaption" class="policy-caption"></div></div><button id="resetThresholds" class="reset-button" type="button">Вернуть исходные пороги</button></div>
+      <div class="mode-row"><div><div class="mode-label">Способ обработки результата</div><div class="mode-help">Переключает только локальные правила; Jev не запускается повторно.</div></div><div class="mode-switch" role="group" aria-label="Режим политики"><button type="button" class="mode-button active" data-policy-mode="legacy" aria-pressed="true">Legacy · всё вместе</button><button type="button" class="mode-button" data-policy-mode="policy_v2" aria-pressed="false">Policy v2 · отдельно по сигналам</button></div></div>
+      <div id="legacyPresetNote" class="preset-note" hidden>Режимы A–E применяются только к Legacy. В Policy v2 используются общие числовые пороги выше.</div>
       <div id="presetButtons" class="preset-row" aria-label="Готовые диагностические режимы"></div>
       <details class="threshold-details"><summary>Настроить пороги вручную</summary>
         <div class="threshold-grid">
@@ -217,6 +250,7 @@ def render_html(payload: dict[str, Any]) -> str:
     </section>
     <section id="statsScreen" class="stats-screen" hidden>
       <div id="statsMetrics" class="metric-strip" aria-label="Интерактивные метрики"></div>
+      <div id="policyComparison"></div>
       <div class="charts-grid" id="chartsGrid"></div>
       <div id="statsFootnote" class="warning-foot"></div>
     </section>
@@ -233,6 +267,24 @@ def render_html(payload: dict[str, Any]) -> str:
 def main() -> int:
     payload = build_payload()
     OUTPUT_PATH.write_text(render_html(payload), encoding="utf-8", newline="\n")
+    report = {
+        "schema_version": "t08-policy-v2-offline-report-v1",
+        "policy_version": payload["meta"]["policyV2"]["policy_version"],
+        "generated_from_saved_outputs_only": True,
+        "new_jev_api_requests": 0,
+        "source_hashes": {
+            "corpus": payload["meta"]["corpusHash"],
+            "taxonomy": payload["meta"]["taxonomyHash"],
+            "aggregate": payload["meta"]["aggregateHash"],
+        },
+        "preliminary_gold_is_not_human_approved": True,
+        "policy_comparison": payload["meta"]["policyV2"],
+    }
+    POLICY_REPORT_PATH.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     print(f"HTML={OUTPUT_PATH}")
     print(
         f"CASES={len(payload['cases'])} RESULTS={payload['meta']['resultCount']} MISSING={len(payload['meta']['missingIds'])}"
@@ -240,6 +292,7 @@ def main() -> int:
     print(f"CORPUS_SHA256={payload['meta']['corpusHash']}")
     print(f"TAXONOMY_SHA256={payload['meta']['taxonomyHash']}")
     print(f"AGGREGATE_SHA256={payload['meta']['aggregateHash']}")
+    print(f"POLICY_V2_REPORT={POLICY_REPORT_PATH}")
     return 0
 
 

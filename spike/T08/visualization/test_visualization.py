@@ -373,6 +373,22 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertIn("3/45", page.locator("#topMetrics").inner_text())
             page.screenshot(path=str(screenshots / "lab-desktop.png"), full_page=True)
 
+            # Legacy score cards use raw Noul threshold labels, while the
+            # comparison row measures only outputs that passed whole-story review.
+            page.locator("#statsTab").click()
+            raw_score_card = page.locator("#statsMetrics .metric").filter(
+                has_text="Баланс по оценкам Noul"
+            )
+            self.assertIn("84.0%", raw_score_card.inner_text())
+            strict_delivery_row = page.locator(
+                "#policyComparison .policy-v2-table tbody tr"
+            ).first
+            self.assertIn("9.1%", strict_delivery_row.inner_text())
+            self.assertIn(
+                "до блокировки новости", page.locator("#statsFootnote").inner_text()
+            )
+            page.locator("#labTab").click()
+
             # The comparison table is pinned to Legacy Current Strict even if
             # the user last selected a relaxed Legacy preset before v2.
             page.locator('[data-preset="ignore_unlisted_gate"]').click()

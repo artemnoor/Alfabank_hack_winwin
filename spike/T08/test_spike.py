@@ -107,7 +107,7 @@ def _valid_response(
     return {
         "model": "jev-1.13.0",
         "answers": answers,
-        "usage": {"input_tokens": 1, "output_tokens": 1},
+        "usage": {"input_tokens": 1, "output_tokens": 1, "cost_rub": 0.002},
     }
 
 
@@ -249,9 +249,11 @@ class RequestAndResponseTests(unittest.TestCase):
 
     def test_request_has_no_free_form_category_generation(self) -> None:
         request_json = json.dumps(self.request, ensure_ascii=False)
-        self.assertEqual(set(self.request), {"state", "model", "questions"})
+        self.assertEqual(API_ENDPOINT, "https://polza.ai/api/v1/systemone")
+        self.assertEqual(set(self.request), {"state", "model", "questions", "provider"})
         self.assertEqual(set(self.request["state"]), {"title", "text"})
-        self.assertEqual(self.request["model"], "jev-latest")
+        self.assertEqual(self.request["model"], "typesafe/jev")
+        self.assertEqual(self.request["provider"], {"allow_fallbacks": False})
         self.assertEqual(
             set(self.request["questions"][TAXONOMY["topic_choice_id"]]),
             {"type", "instructions", "criteria"},
@@ -284,7 +286,7 @@ class RequestAndResponseTests(unittest.TestCase):
             make_request(CASES[0], oversized)
 
     def test_only_approved_jev_alias_is_allowed(self) -> None:
-        self.assertEqual(SUPPORTED_MODEL_ALIASES, {"jev-latest"})
+        self.assertEqual(SUPPORTED_MODEL_ALIASES, {"typesafe/jev"})
         with self.assertRaisesRegex(SpikeError, "invalid model alias"):
             make_request(self.case, TAXONOMY, model="some-other-model")
 
@@ -314,11 +316,10 @@ class RequestAndResponseTests(unittest.TestCase):
         with self.assertRaisesRegex(SpikeError, "not a maximum-probability"):
             validate_response(response, self.request, TAXONOMY)
 
-    def test_choice_confidence_must_match_documented_probability_formula(self) -> None:
+    def test_choice_confidence_does_not_assume_an_undocumented_formula(self) -> None:
         response = _valid_response(self.request)
-        response["answers"][TAXONOMY["topic_choice_id"]]["confidence"] = 0.0
-        with self.assertRaisesRegex(SpikeError, "confidence does not match"):
-            validate_response(response, self.request, TAXONOMY)
+        response["answers"][TAXONOMY["topic_choice_id"]]["confidence"] = 0.47
+        validate_response(response, self.request, TAXONOMY)
 
     def test_choice_confidence_allows_documented_example_rounding(self) -> None:
         request = copy.deepcopy(self.request)
@@ -382,11 +383,29 @@ class RequestAndResponseTests(unittest.TestCase):
         with self.assertRaisesRegex(SpikeError, "usage metadata"):
             validate_response(response, self.request, TAXONOMY)
 
+        response = _valid_response(self.request)
+        response["usage"].pop("input_tokens")
+        with self.assertRaisesRegex(SpikeError, "usage metadata"):
+            validate_response(response, self.request, TAXONOMY)
+
+        response = _valid_response(self.request)
+        response["usage"].pop("cost_rub")
+        with self.assertRaisesRegex(SpikeError, "usage metadata"):
+            validate_response(response, self.request, TAXONOMY)
+
     def test_usage_token_counts_must_be_non_negative_integers(self) -> None:
         for invalid in (-1, 1.5, True, "3"):
             with self.subTest(invalid=invalid):
                 response = _valid_response(self.request)
                 response["usage"]["input_tokens"] = invalid
+                with self.assertRaisesRegex(SpikeError, "usage metadata"):
+                    validate_response(response, self.request, TAXONOMY)
+
+    def test_usage_cost_must_be_finite_non_negative_number(self) -> None:
+        for invalid in (-0.01, True, float("nan"), float("inf"), "0.01"):
+            with self.subTest(invalid=invalid):
+                response = _valid_response(self.request)
+                response["usage"]["cost_rub"] = invalid
                 with self.assertRaisesRegex(SpikeError, "usage metadata"):
                     validate_response(response, self.request, TAXONOMY)
 
@@ -548,11 +567,54 @@ class TransportSafetyTests(unittest.TestCase):
         with (
             patch.dict(
                 os.environ,
-                {"TYPESAFE_API_KEY": "", "JEV_API_KEY": "legacy-test-fixture"},
+                {
+                    "POLZA_AI_API_KEY": "",
+                    "TYPESAFE_API_KEY": "legacy-test-fixture",
+                },
             ),
-            self.assertRaisesRegex(SpikeError, "TYPESAFE_API_KEY"),
+            self.assertRaisesRegex(SpikeError, "POLZA_AI_API_KEY"),
         ):
             run_live(args, TAXONOMY, CORPUS, CASES)
+
+    def test_partial_live_run_saves_observation_without_quality_metrics(self) -> None:
+        from argparse import Namespace
+
+        import run_spike
+        from jev_spike import SPIKE_DIR
+
+        class OfflineJevClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                pass
+
+            def classify(self, request: dict[str, Any]) -> dict[str, Any]:
+                return _valid_response(request)
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            output_path = Path(temporary) / "partial-live.json"
+            args = Namespace(
+                max_calls=1,
+                model=DEFAULT_MODEL,
+                output=str(output_path),
+            )
+            with (
+                patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+                patch.object(run_spike, "JevClient", OfflineJevClient),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                report = run_spike.run_live(args, TAXONOMY, CORPUS, CASES)
+
+            self.assertEqual(report["successful_calls"], 1)
+            self.assertEqual(
+                report["quality_metrics_status"], "NOT_MEASURED_INCOMPLETE_RUN"
+            )
+            self.assertIsNone(report["metrics"])
+            saved = json.loads(output_path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["endpoint_host"], "polza.ai")
+            self.assertEqual(saved["requested_model_id"], "typesafe/jev")
+            self.assertIsNone(saved["metrics"])
+            serialized = output_path.read_text(encoding="utf-8")
+            self.assertNotIn("unit-test-fixture", serialized)
+            self.assertNotIn(CASES[0]["text"], serialized)
 
     def test_offline_cli_runs_with_network_guard_active(self) -> None:
         from run_spike import main
@@ -564,6 +626,22 @@ class TransportSafetyTests(unittest.TestCase):
         ):
             self.assertEqual(main(), 0)
         self.assertIn('"classifier_calls": 0', output.getvalue())
+
+    def test_live_cli_defaults_to_one_call_without_network(self) -> None:
+        from run_spike import main
+
+        captured: list[int] = []
+
+        def fake_run_live(args: Any, *_: Any) -> dict[str, Any]:
+            captured.append(args.max_calls)
+            return {"failures": []}
+
+        with (
+            patch.object(sys, "argv", ["run_spike.py", "--live"]),
+            patch("run_spike.run_live", side_effect=fake_run_live),
+        ):
+            self.assertEqual(main(), 0)
+        self.assertEqual(captured, [1])
 
     def test_provider_exception_text_is_suppressed(self) -> None:
         def broken_transport(*_: Any) -> bytes:
@@ -622,14 +700,28 @@ class TransportSafetyTests(unittest.TestCase):
         self.assertEqual(opener.calls, 1)
 
     def test_http_error_body_is_suppressed(self) -> None:
+        trace_id = "550e8400-e29b-41d4-a716-446655440000"
+        provider_canary = "ARTICLE_SECRET"
+        trace_canary = "123e4567-e89b-12d3-a456-426614174000"
+        body = json.dumps(
+            {
+                "error": {
+                    "code": provider_canary,
+                    "message": "provider echoed canary-secret and article text",
+                    "trace_id": trace_canary,
+                },
+                "trace_id": trace_id,
+            }
+        ).encode()
+
         class FailingOpener:
             def open(self, *_: Any, **__: Any) -> bytes:
                 raise HTTPError(
                     API_ENDPOINT,
-                    451,
+                    400,
                     "Unavailable",
                     hdrs=None,
-                    fp=io.BytesIO(b"provider echoed canary-secret"),
+                    fp=io.BytesIO(body),
                 )
 
         with (
@@ -637,8 +729,26 @@ class TransportSafetyTests(unittest.TestCase):
             self.assertRaises(LiveRequestError) as captured,
         ):
             https_transport(API_ENDPOINT, b"safe synthetic request", {}, 30)
-        self.assertEqual(str(captured.exception), "http_status_451")
+        self.assertEqual(str(captured.exception), "http_status_400")
         self.assertNotIn("canary-secret", str(captured.exception))
+
+        from run_spike import _safe_failure
+
+        saved = json.dumps(_safe_failure("synthetic-case", captured.exception))
+        self.assertNotIn(provider_canary, saved)
+        self.assertNotIn(trace_canary, saved)
+        self.assertNotIn(trace_id, saved)
+        self.assertNotIn("canary-secret", saved)
+        self.assertNotIn("article text", saved)
+
+    def test_http_error_failure_record_contains_only_case_and_status(self) -> None:
+        from run_spike import _safe_failure
+
+        error = LiveRequestError("http_status_451")
+        self.assertEqual(
+            _safe_failure("synthetic-case", error),
+            {"case_id": "synthetic-case", "error": "http_status_451"},
+        )
 
     def test_expected_http_status_errors_are_sanitized_without_retry(self) -> None:
         for status in (400, 401, 403, 429, 451, 500, 502, 503, 529):
@@ -793,7 +903,7 @@ class TransportSafetyTests(unittest.TestCase):
                     client.classify(request)
 
     def test_timeout_is_fixed_and_bounded(self) -> None:
-        self.assertEqual(make_request(CASES[0], TAXONOMY)["model"], "jev-latest")
+        self.assertEqual(make_request(CASES[0], TAXONOMY)["model"], "typesafe/jev")
         seen: list[int] = []
 
         def fake_transport(
@@ -944,6 +1054,7 @@ class EvaluationTests(unittest.TestCase):
         )
         self.assertEqual(metrics["latency"]["n"], 49)
         self.assertEqual(metrics["token_usage"]["total_tokens"], 98)
+        self.assertAlmostEqual(metrics["token_usage"]["cost_rub"], 0.098)
         self.assertEqual(metrics["expected_unlisted_event_count"], 1)
         self.assertTrue(metrics["unlisted_event_exact"])
         self.assertEqual(metrics["expected_uncertainty_signal_count"], 6)

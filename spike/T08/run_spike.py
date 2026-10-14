@@ -97,8 +97,8 @@ def run_live(
     corpus: dict[str, Any],
     cases: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    # TYPESAFE_API_KEY is the variable used by TypeSafe's official examples.
-    api_key = os.environ.get("TYPESAFE_API_KEY", "")
+    # The project account is hosted by Polza AI; do not fall back to direct TypeSafe keys.
+    api_key = os.environ.get("POLZA_AI_API_KEY", "")
     if not 1 <= args.max_calls <= 50:
         raise SpikeError("--max-calls must be between 1 and 50")
     client = JevClient(
@@ -137,8 +137,8 @@ def run_live(
     report: dict[str, Any] = {
         "mode": "live_synthetic_pilot",
         "timestamp_utc": datetime.now(UTC).isoformat(timespec="seconds"),
-        "endpoint_host": "api.typesafe.ai",
-        "endpoint_path": "/v1/systemone",
+        "endpoint_host": "polza.ai",
+        "endpoint_path": "/api/v1/systemone",
         "corpus_id": corpus["corpus_id"],
         "taxonomy_id": taxonomy["id"],
         "taxonomy_version": taxonomy["version"],
@@ -147,7 +147,8 @@ def run_live(
         "corpus_sha256": _sha256_file(CORPUS_PATH),
         "client_sha256": _sha256_file(Path(__file__).with_name("jev_spike.py")),
         "runner_sha256": _sha256_file(Path(__file__)),
-        "requested_model_alias": args.model,
+        "requested_model_id": args.model,
+        "max_calls_per_invocation": args.max_calls,
         "attempted_calls": attempted,
         "successful_calls": len(results),
         "control_calls": 0,
@@ -155,8 +156,13 @@ def run_live(
         "failures": failures,
         "request_sha256_by_case": request_hashes,
         "results": results,
-        "metrics": evaluate(cases, results, taxonomy) if results else None,
-        "note": "Synthetic-only pilot; raw articles, prompts, provider response bodies, credentials, and exception details are not saved.",
+        "quality_metrics_status": "MEASURED_FULL_BASELINE"
+        if not failures and len(results) == len(all_news_cases)
+        else "NOT_MEASURED_INCOMPLETE_RUN",
+        "metrics": evaluate(cases, results, taxonomy)
+        if not failures and len(results) == len(all_news_cases)
+        else None,
+        "note": "Synthetic-only run; aggregate quality metrics are withheld until all 49 non-empty baseline cases complete. Raw articles, prompts, provider response bodies, credentials, and exception details are not saved.",
     }
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output_path = (
@@ -189,19 +195,19 @@ def main() -> int:
     parser.add_argument(
         "--live",
         action="store_true",
-        help="send only the embedded synthetic corpus to the official TypeSafe API",
+        help="send only the pinned synthetic corpus to the official Polza AI Jev API",
     )
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
         choices=sorted(SUPPORTED_MODEL_ALIASES),
-        help="approved TypeSafe Jev alias; exact resolved version is recorded",
+        help="approved Polza AI Jev model id; exact resolved model version is recorded",
     )
     parser.add_argument(
         "--max-calls",
         type=int,
-        default=50,
-        help="hard cap for live calls; one call per synthetic news case",
+        default=1,
+        help="per-invocation live-call cap (default 1; hard maximum 50)",
     )
     parser.add_argument("--output", help="optional sanitized JSON report path")
     args = parser.parse_args()

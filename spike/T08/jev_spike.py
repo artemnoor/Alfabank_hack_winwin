@@ -1,4 +1,4 @@
-"""Standalone, opt-in TypeSafe Jev harness for the T08 taxonomy spike.
+"""Standalone, opt-in Polza AI Jev harness for the T08 taxonomy spike.
 
 This module deliberately does not import or register the production runtime.
 It accepts only the repository's hand-authored synthetic corpus for live calls.
@@ -23,8 +23,8 @@ from typing import Any
 SPIKE_DIR = Path(__file__).resolve().parent
 TAXONOMY_PATH = SPIKE_DIR / "taxonomy.json"
 CORPUS_PATH = SPIKE_DIR / "corpus.json"
-API_ENDPOINT = "https://api.typesafe.ai/v1/systemone"
-DEFAULT_MODEL = "jev-latest"
+API_ENDPOINT = "https://polza.ai/api/v1/systemone"
+DEFAULT_MODEL = "typesafe/jev"
 SUPPORTED_MODEL_ALIASES = frozenset({DEFAULT_MODEL})
 RESOLVED_JEV_MODEL = re.compile(r"^jev-[0-9]+\.[0-9]+\.[0-9]+$")
 TRUSTED_TAXONOMY_SHA256 = (
@@ -36,11 +36,8 @@ TRUSTED_CORPUS_SHA256 = (
 MAX_ARTICLE_CHARS = 10_000
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_RESPONSE_BYTES = 1_000_000
-# The public confidence examples are rounded to two decimals. A 0.02 absolute
-# tolerance accepts that displayed precision while rejecting inconsistent data.
-CHOICE_CONFIDENCE_ROUNDING_TOLERANCE = 0.02
 MAX_TOTAL_QUESTIONS = (
-    20  # Spike-local cost guard; TypeSafe documents no total-count limit.
+    20  # Spike-local cost guard; Polza allows 1–256 questions per request.
 )
 
 JsonObject = dict[str, Any]
@@ -268,7 +265,7 @@ def make_request(
         },
     }
     if len(topic_criteria) > 255:
-        raise SpikeError("Choice exceeds TypeSafe's documented 255-option limit")
+        raise SpikeError("Choice exceeds the documented 255-option limit")
     if len(questions) > MAX_TOTAL_QUESTIONS:
         raise SpikeError(
             "Jev System One request exceeds the spike-local question budget"
@@ -277,6 +274,7 @@ def make_request(
         "state": {"title": title, "text": text},
         "model": model,
         "questions": questions,
+        "provider": {"allow_fallbacks": False},
     }
 
 
@@ -348,19 +346,8 @@ def validate_response(
         raise SpikeError("Jev Choice probabilities do not sum to one")
     if probabilities[choice] + 1e-8 < max(probabilities.values()):
         raise SpikeError("Jev Choice label is not a maximum-probability option")
-    option_count = len(probabilities)
-    if option_count < 2:
+    if len(probabilities) < 2:
         raise SpikeError("Jev Choice needs at least two probability options")
-    expected_confidence = (max(probabilities.values()) - 1 / option_count) / (
-        1 - 1 / option_count
-    )
-    if not math.isclose(
-        confidence,
-        expected_confidence,
-        rel_tol=0,
-        abs_tol=CHOICE_CONFIDENCE_ROUNDING_TOLERANCE,
-    ):
-        raise SpikeError("Jev Choice confidence does not match its probabilities")
 
     for question_id in requested:
         if question_id == topic_id:
@@ -376,9 +363,11 @@ def validate_response(
             raise SpikeError("Jev returned an invalid Noul answer")
 
     usage = response.get("usage")
-    if not isinstance(usage, dict) or not {"input_tokens", "output_tokens"}.issubset(
-        usage
-    ):
+    if not isinstance(usage, dict) or not {
+        "input_tokens",
+        "output_tokens",
+        "cost_rub",
+    }.issubset(usage):
         raise SpikeError("Jev returned invalid usage metadata")
     for key in ("input_tokens", "output_tokens"):
         if (
@@ -387,6 +376,8 @@ def validate_response(
             or usage[key] < 0
         ):
             raise SpikeError("Jev returned invalid usage metadata")
+    if not _number(usage["cost_rub"]) or usage["cost_rub"] < 0:
+        raise SpikeError("Jev returned invalid usage metadata")
     return response
 
 
@@ -428,7 +419,7 @@ def https_transport(
     except LiveRequestError:
         raise
     except urllib.error.HTTPError as exc:
-        # Suppress provider text: it may echo prompt fragments or request metadata.
+        # Discard the entire body and every provider-supplied field; they may echo input data.
         raise LiveRequestError(f"http_status_{exc.code}") from None
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         # Do not include the raw exception: it can contain URLs, headers, or payload fragments.
@@ -452,7 +443,7 @@ class JevClient:
         transport: Transport = https_transport,
     ) -> None:
         if not api_key or not api_key.strip():
-            raise SpikeError("TYPESAFE_API_KEY is required for live mode")
+            raise SpikeError("POLZA_AI_API_KEY is required for live mode")
         if not allowed_request_hashes or any(
             not re.fullmatch(r"[0-9a-f]{64}", value) for value in allowed_request_hashes
         ):
@@ -562,9 +553,9 @@ def interpret_response(
         "predicted_events": positive_events,
         "classification_status": status,
         "usage": {
-            key: int(response["usage"][key])
-            for key in ("input_tokens", "output_tokens")
-            if key in response.get("usage", {})
+            "input_tokens": int(response["usage"]["input_tokens"]),
+            "output_tokens": int(response["usage"]["output_tokens"]),
+            "cost_rub": float(response["usage"]["cost_rub"]),
         },
         "elapsed_ms": int(response.get("_local_elapsed_ms", 0)),
     }
@@ -952,6 +943,17 @@ def evaluate(
         else None
         for key in ("input_tokens", "output_tokens")
     }
+    usage_cost_total = (
+        sum(float(by_id[case["id"]]["usage"]["cost_rub"]) for case in evaluated)
+        if evaluated
+        and all(
+            isinstance(by_id[case["id"]].get("usage"), dict)
+            and _number(by_id[case["id"]]["usage"].get("cost_rub"))
+            and by_id[case["id"]]["usage"]["cost_rub"] >= 0
+            for case in evaluated
+        )
+        else None
+    )
     review_count = sum(
         by_id[case["id"]]["classification_status"] == "uncertain" for case in evaluated
     )
@@ -1053,6 +1055,7 @@ def evaluate(
             "total_tokens": sum(usage_totals.values())
             if all(value is not None for value in usage_totals.values())
             else None,
+            "cost_rub": usage_cost_total,
         },
         "note": "Pilot corpus metrics only; synthetic and small. Threshold sweep is descriptive and must not be treated as production calibration.",
     }

@@ -1,5 +1,14 @@
 # T08 spike plan — Jev Russian news classification
 
+## Quality improvement pass — 2026-10-14
+
+- Reproduced v4 from stored outputs and preserved original corpus/taxonomy hashes. No live API calls were made.
+- Added a versioned offline tri-state Noul interpretation and case-level calculation of current review triggers. Exact status: 42/45 review; active reasons overlap (Choice 5, event band 24, insufficient evidence 17, unlisted 32); 28/42 have multiple reasons.
+- Added counterfactual coverage/risk tables; they are not threshold recommendations and are not production-ready.
+- Added detailed error review, human adjudication packet, deep-v1 structural audit, benchmark freeze plan and a separate v0.4 taxonomy proposal. Source v0.3, original corpus and saved responses remain unchanged.
+- Added offline regression tests for aggregation, missing cases, review triggers, tri-state boundaries, no-network analysis, spent-budget refusal, corpus hashes and proposal separation.
+- Current statuses after the final offline pass: engineering quality **PASS** (110 tests, Ruff, offline runner and artifact checks); API compatibility **historically confirmed with limits, not live-rechecked here**; model quality **NOT MEASURED** for integration; integration readiness **NOT READY**.
+
 ## Goal and limits
 
 Оценить единственный classifier Jev с project-owned taxonomy: одна общая тема через Choice и независимые бизнес-события через Noul. Изолированно в spike/T08. Только synthetic stories; никакого main runtime, OpenAPI, другого classifier или live real news.
@@ -17,14 +26,14 @@
 - Added concurrent ledger reservation regression test (24 parallel local reservations, no network).
 - Copied previous report v1.2.0 unchanged into results/archive before writing final versioned report.
 
-## Current final checks
+## Earlier API pilot verification (historical snapshot; superseded by current quality pass)
 
-- unittest: 86 passed, 0 failed, 0 skipped.
-- Ruff check / format check: PASS.
-- Offline runner: PASS; 0 classifier calls.
+- At that time: unittest 86 passed, Ruff and offline runner passed.
 - Aggregate v4: 45 valid outputs, 50 pilot attempts, five failures including one legacy TypeSafe failure; metrics match v3.
-- No live calls made in this final correction pass.
+- That historical run is preserved in `results/archive/TEST_REPORT-2.1.0-pre-quality.*`.
 - Historical 451 diagnosis remains unknown.
+
+Current tests and calculations are recorded in `TEST_REPORT.md`, `TEST_REPORT.json`, and `QUALITY_ANALYSIS.json`. The current report preserves the pre-quality report in `results/archive/` and records the fresh run from 2026-10-14.
 
 Detailed results: TEST_REPORT.md; machine details and metrics: TEST_REPORT.json.
 

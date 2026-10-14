@@ -1,0 +1,1277 @@
+{
+  "report_version": "2.1.0",
+  "generated_at_utc": "2026-10-14T11:32:13+00:00",
+  "project": "AlfaBank Hackathon T08 Jev spike",
+  "branch": "codex/spike-t08-jev-news-classification",
+  "scope": "spike/T08 only; no runtime, OpenAPI or production integration changes",
+  "verdicts": {
+    "engineering_quality": {
+      "status": "PASS",
+      "scope": "offline implementation and sanitized report aggregation"
+    },
+    "api_compatibility": {
+      "status": "PASS",
+      "scope": "tested Polza System One request/response path for Jev client; not every provider failure mode or upstream routing"
+    },
+    "model_quality": {
+      "status": "NOT_MEASURED",
+      "meaning": "decision-grade quality is not established; partial descriptive metrics are included below"
+    },
+    "integration_readiness": {
+      "status": "NOT_READY"
+    }
+  },
+  "inputs": {
+    "baseline_corpus": {
+      "path": "spike/T08/corpus.json",
+      "sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+      "cases": 50,
+      "nonempty": 49,
+      "empty_locally_rejected": 1
+    },
+    "taxonomy": {
+      "path": "spike/T08/taxonomy.json",
+      "version": "0.3.0-spike",
+      "sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+      "topic_options": 11,
+      "event_types": 15
+    },
+    "deep_corpus": {
+      "path": "spike/T08/experiments/deep-v1",
+      "cases": 160,
+      "nonempty": 158,
+      "splits": {
+        "A": 76,
+        "B": 36,
+        "C": 24,
+        "D": 24
+      },
+      "jev_calls": 0,
+      "gold_status": "single-annotator draft; D visible, not blind; B24 unresolved"
+    }
+  },
+  "tests": {
+    "unittest": {
+      "command": "python -m unittest discover -s spike/T08 -p \"test*.py\" -q",
+      "passed": 86,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "ruff_check": {
+      "command": "ruff check spike/T08",
+      "status": "PASS"
+    },
+    "ruff_format": {
+      "command": "ruff format --check spike/T08",
+      "status": "PASS",
+      "python_files": 16
+    },
+    "offline_runner": {
+      "command": "python spike/T08/run_spike.py",
+      "status": "PASS",
+      "classifier_calls": 0,
+      "nonempty_news": 49,
+      "empty_local_validation": 1
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    "aggregate": {
+      "path": "spike/T08/results/jev-live-aggregate-20261014-v4.json",
+      "status": "PASS",
+      "sha256": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+    },
+    "choice_confidence_validation": {
+      "status": "PASS",
+      "stored_provider_outputs_checked": 45,
+      "maximum_absolute_difference": 0.005,
+      "tolerance": 0.02,
+      "method": "official TypeSafe Choice formula against stored Polza answer values; no network calls"
+    }
+  },
+  "live_api": {
+    "status": "POLZA_PATH_CONFIRMED_WITH_PARTIAL_RESPONSES",
+    "endpoint": "https://polza.ai/api/v1/systemone",
+    "requested_model": "typesafe/jev",
+    "reported_resolved_model": "jev-1.13.0",
+    "known_pilot_attempts": 50,
+    "polza_attempts": 49,
+    "polza_valid_outputs": 45,
+    "staged_polza_attempts": 48,
+    "staged_valid_outputs": 44,
+    "staged_failures": 4,
+    "all_failures": [
+      "e23-recall-battery",
+      "e35-multi-labor-investment",
+      "e41-uncertain-sanctions-talk",
+      "e43-uncertain-vague-delivery"
+    ],
+    "legacy_typesafe_failed_attempts": 1,
+    "historical_type_safe_451_checks_outside_pilot_accounting": 3,
+    "failure_cause": "unknown; raw provider bodies and exception detail were discarded",
+    "source_provenance": {
+      "current_client_sha256": "47505feb083e6c34f1e3621b67cbf8e8ca2425c288cf3f83589e4f9f5444fb82",
+      "staged_client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+      "staged_runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754",
+      "current_runner_sha256": "3134f30321a28a9b71612f1c86afb2226f4dcec1f8728bc3a8ed68001e120120",
+      "client_hash_matches_staged": false,
+      "runner_hash_matches_staged": false,
+      "response_authenticity": "NOT_CRYPTOGRAPHICALLY_ATTESTED",
+      "current_client_post_live_change": "Choice confidence formula validation only; request construction unchanged",
+      "request_hashes_match_staged": true,
+      "stored_output_formula_revalidation": "45/45 pass; max absolute delta 0.005"
+    },
+    "provider_fallback_requested_disabled": true,
+    "provider_upstream_attestation": "NOT_AVAILABLE",
+    "additional_calls_during_final_corrections": 0,
+    "overall_known_historical_attempts_if_route_checks_counted": 53,
+    "attempt_accounting_scope": "known_pilot_attempts=50; plus three earlier TypeSafe HTTP 451 route checks outside the pilot ledger gives 53 known historical API calls if all share one cap",
+    "known_pilot_attempts_scope": "Pilot accounting only; the 50 attempts comprise 49 Polza attempts and one legacy TypeSafe POST."
+  },
+  "observed_partial_metrics": {
+    "status": "COMPUTED_PARTIAL_BASELINE_PROVENANCE_UNATTESTED",
+    "gold": "single-author draft labels; independent adjudication pending",
+    "metrics": {
+      "case_count": 50,
+      "non_empty_case_count": 45,
+      "non_empty_case_total": 49,
+      "evaluation_complete": false,
+      "evaluation_coverage": 0.9184,
+      "topic_accuracy": 0.6889,
+      "topic_correct": 31,
+      "topic_total": 45,
+      "topic_confusion_matrix": {
+        "economy_finance": {
+          "economy_finance": 2,
+          "politics_government": 0,
+          "business_companies": 1,
+          "industry_trade_supply": 1,
+          "technology_telecom": 0,
+          "energy_resources": 1,
+          "law_regulation": 1,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "politics_government": {
+          "economy_finance": 0,
+          "politics_government": 2,
+          "business_companies": 0,
+          "industry_trade_supply": 1,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 1,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "business_companies": {
+          "economy_finance": 0,
+          "politics_government": 1,
+          "business_companies": 5,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 1,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "industry_trade_supply": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 3,
+          "industry_trade_supply": 6,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "technology_telecom": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 3,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "energy_resources": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 1,
+          "law_regulation": 0,
+          "labor_employment": 0,
+          "environment_disasters": 1,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "law_regulation": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 1,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 5,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "labor_employment": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 2,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "environment_disasters": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 0,
+          "environment_disasters": 2,
+          "health": 0,
+          "other_uncertain": 0
+        },
+        "health": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 1,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 1,
+          "other_uncertain": 0
+        },
+        "other_uncertain": {
+          "economy_finance": 0,
+          "politics_government": 0,
+          "business_companies": 0,
+          "industry_trade_supply": 0,
+          "technology_telecom": 0,
+          "energy_resources": 0,
+          "law_regulation": 0,
+          "labor_employment": 0,
+          "environment_disasters": 0,
+          "health": 0,
+          "other_uncertain": 2
+        }
+      },
+      "topic_misclassifications": [
+        {
+          "case_id": "e06-production-fire",
+          "expected": "industry_trade_supply",
+          "predicted": "business_companies"
+        },
+        {
+          "case_id": "e07-price-polymer",
+          "expected": "economy_finance",
+          "predicted": "business_companies"
+        },
+        {
+          "case_id": "e09-trade-export",
+          "expected": "politics_government",
+          "predicted": "industry_trade_supply"
+        },
+        {
+          "case_id": "e10-trade-import",
+          "expected": "law_regulation",
+          "predicted": "industry_trade_supply"
+        },
+        {
+          "case_id": "e12-sanctions-assets",
+          "expected": "politics_government",
+          "predicted": "law_regulation"
+        },
+        {
+          "case_id": "e14-regulation-tax",
+          "expected": "economy_finance",
+          "predicted": "law_regulation"
+        },
+        {
+          "case_id": "e18-labor-layoffs",
+          "expected": "business_companies",
+          "predicted": "labor_employment"
+        },
+        {
+          "case_id": "e24-recall-food",
+          "expected": "health",
+          "predicted": "law_regulation"
+        },
+        {
+          "case_id": "e28-disaster-drought",
+          "expected": "energy_resources",
+          "predicted": "environment_disasters"
+        },
+        {
+          "case_id": "e29-investment-plant",
+          "expected": "industry_trade_supply",
+          "predicted": "business_companies"
+        },
+        {
+          "case_id": "e33-multi-price-shortage",
+          "expected": "economy_finance",
+          "predicted": "industry_trade_supply"
+        },
+        {
+          "case_id": "e42-uncertain-price-forecast",
+          "expected": "economy_finance",
+          "predicted": "energy_resources"
+        },
+        {
+          "case_id": "e45-injection-rumor",
+          "expected": "industry_trade_supply",
+          "predicted": "business_companies"
+        },
+        {
+          "case_id": "e47-unlisted-contract-award",
+          "expected": "business_companies",
+          "predicted": "politics_government"
+        }
+      ],
+      "classification_status_confusion_matrix": {
+        "classified": {
+          "classified": 3,
+          "uncertain": 36,
+          "other": 0
+        },
+        "uncertain": {
+          "classified": 0,
+          "uncertain": 5,
+          "other": 0
+        },
+        "other": {
+          "classified": 0,
+          "uncertain": 1,
+          "other": 0
+        }
+      },
+      "case_type_slices": {
+        "ambiguous_or_speculative": {
+          "count": 3,
+          "topic_accuracy": 0.6667,
+          "event_micro_precision": null,
+          "event_micro_recall": null,
+          "event_micro_f1": null,
+          "event_exact_match_rate": 1.0
+        },
+        "multi_event": {
+          "count": 8,
+          "topic_accuracy": 0.625,
+          "event_micro_precision": 0.8571,
+          "event_micro_recall": 0.75,
+          "event_micro_f1": 0.8,
+          "event_exact_match_rate": 0.25
+        },
+        "negation_or_rumor": {
+          "count": 2,
+          "topic_accuracy": 0.5,
+          "event_micro_precision": null,
+          "event_micro_recall": null,
+          "event_micro_f1": null,
+          "event_exact_match_rate": 1.0
+        },
+        "no_listed_event": {
+          "count": 5,
+          "topic_accuracy": 1.0,
+          "event_micro_precision": null,
+          "event_micro_recall": null,
+          "event_micro_f1": null,
+          "event_exact_match_rate": 1.0
+        },
+        "out_of_taxonomy": {
+          "count": 1,
+          "topic_accuracy": 1.0,
+          "event_micro_precision": null,
+          "event_micro_recall": null,
+          "event_micro_f1": null,
+          "event_exact_match_rate": 1.0
+        },
+        "out_of_taxonomy_business_event": {
+          "count": 1,
+          "topic_accuracy": 0.0,
+          "event_micro_precision": null,
+          "event_micro_recall": null,
+          "event_micro_f1": null,
+          "event_exact_match_rate": 1.0
+        },
+        "single_event": {
+          "count": 25,
+          "topic_accuracy": 0.68,
+          "event_micro_precision": 0.8462,
+          "event_micro_recall": 0.88,
+          "event_micro_f1": 0.8627,
+          "event_exact_match_rate": 0.8
+        }
+      },
+      "event_exact_match_rate": 0.7556,
+      "event_exact_match_count": 34,
+      "event_false_positives": [
+        {
+          "case_id": "e03-shortage-cells",
+          "code": "production_operational_disruption"
+        },
+        {
+          "case_id": "e27-disaster-flood",
+          "code": "production_operational_disruption"
+        },
+        {
+          "case_id": "e25-legal-fine",
+          "code": "sanctions"
+        },
+        {
+          "case_id": "e09-trade-export",
+          "code": "regulation_tax_change"
+        },
+        {
+          "case_id": "e10-trade-import",
+          "code": "regulation_tax_change"
+        },
+        {
+          "case_id": "e32-multi-fire-supply",
+          "code": "environment_disaster_impact"
+        }
+      ],
+      "event_false_negatives": [
+        {
+          "case_id": "e03-shortage-cells",
+          "code": "shortage_capacity_constraint"
+        },
+        {
+          "case_id": "e33-multi-price-shortage",
+          "code": "shortage_capacity_constraint"
+        },
+        {
+          "case_id": "e18-labor-layoffs",
+          "code": "corporate_transaction_restructuring"
+        },
+        {
+          "case_id": "e25-legal-fine",
+          "code": "legal_enforcement"
+        },
+        {
+          "case_id": "e26-legal-investigation",
+          "code": "legal_enforcement"
+        },
+        {
+          "case_id": "e34-multi-insolvency-legal",
+          "code": "legal_enforcement"
+        },
+        {
+          "case_id": "e28-disaster-drought",
+          "code": "environment_disaster_impact"
+        }
+      ],
+      "event_micro_precision": 0.85,
+      "event_micro_recall": 0.8293,
+      "event_micro_f1": 0.8395,
+      "event_macro_f1": 0.8083,
+      "event_macro_f1_supported_classes": 15,
+      "event_threshold": 0.8,
+      "threshold_sweep_type": "event positive cutoff; negative cutoff fixed, scores between cutoffs route to review",
+      "event_review_band_sweep": [
+        {
+          "negative_cutoff": 0.1,
+          "positive_cutoff": 0.6,
+          "fixed_as_review_band": true,
+          "review_cells": 49,
+          "review_cell_rate": 0.0726
+        },
+        {
+          "negative_cutoff": 0.1,
+          "positive_cutoff": 0.7,
+          "fixed_as_review_band": true,
+          "review_cells": 55,
+          "review_cell_rate": 0.0815
+        },
+        {
+          "negative_cutoff": 0.1,
+          "positive_cutoff": 0.8,
+          "fixed_as_review_band": true,
+          "review_cells": 62,
+          "review_cell_rate": 0.0919
+        },
+        {
+          "negative_cutoff": 0.1,
+          "positive_cutoff": 0.9,
+          "fixed_as_review_band": true,
+          "review_cells": 69,
+          "review_cell_rate": 0.1022
+        },
+        {
+          "negative_cutoff": 0.2,
+          "positive_cutoff": 0.6,
+          "fixed_as_review_band": true,
+          "review_cells": 30,
+          "review_cell_rate": 0.0444
+        },
+        {
+          "negative_cutoff": 0.2,
+          "positive_cutoff": 0.7,
+          "fixed_as_review_band": true,
+          "review_cells": 36,
+          "review_cell_rate": 0.0533
+        },
+        {
+          "negative_cutoff": 0.2,
+          "positive_cutoff": 0.8,
+          "fixed_as_review_band": true,
+          "review_cells": 43,
+          "review_cell_rate": 0.0637
+        },
+        {
+          "negative_cutoff": 0.2,
+          "positive_cutoff": 0.9,
+          "fixed_as_review_band": true,
+          "review_cells": 50,
+          "review_cell_rate": 0.0741
+        },
+        {
+          "negative_cutoff": 0.3,
+          "positive_cutoff": 0.6,
+          "fixed_as_review_band": true,
+          "review_cells": 13,
+          "review_cell_rate": 0.0193
+        },
+        {
+          "negative_cutoff": 0.3,
+          "positive_cutoff": 0.7,
+          "fixed_as_review_band": true,
+          "review_cells": 19,
+          "review_cell_rate": 0.0281
+        },
+        {
+          "negative_cutoff": 0.3,
+          "positive_cutoff": 0.8,
+          "fixed_as_review_band": true,
+          "review_cells": 26,
+          "review_cell_rate": 0.0385
+        },
+        {
+          "negative_cutoff": 0.3,
+          "positive_cutoff": 0.9,
+          "fixed_as_review_band": true,
+          "review_cells": 33,
+          "review_cell_rate": 0.0489
+        }
+      ],
+      "choice_review_threshold_sweep": [
+        {
+          "choice_review_below": 0.3,
+          "auto_cases": 45,
+          "review_cases": 0,
+          "review_rate": 0.0,
+          "auto_coverage": 1.0,
+          "auto_topic_accuracy": 0.6889,
+          "all_case_topic_accuracy": 0.6889
+        },
+        {
+          "choice_review_below": 0.4,
+          "auto_cases": 44,
+          "review_cases": 1,
+          "review_rate": 0.0222,
+          "auto_coverage": 0.9778,
+          "auto_topic_accuracy": 0.7045,
+          "all_case_topic_accuracy": 0.6889
+        },
+        {
+          "choice_review_below": 0.5,
+          "auto_cases": 40,
+          "review_cases": 5,
+          "review_rate": 0.1111,
+          "auto_coverage": 0.8889,
+          "auto_topic_accuracy": 0.75,
+          "all_case_topic_accuracy": 0.6889
+        },
+        {
+          "choice_review_below": 0.6,
+          "auto_cases": 35,
+          "review_cases": 10,
+          "review_rate": 0.2222,
+          "auto_coverage": 0.7778,
+          "auto_topic_accuracy": 0.8,
+          "all_case_topic_accuracy": 0.6889
+        },
+        {
+          "choice_review_below": 0.7,
+          "auto_cases": 31,
+          "review_cases": 14,
+          "review_rate": 0.3111,
+          "auto_coverage": 0.6889,
+          "auto_topic_accuracy": 0.8387,
+          "all_case_topic_accuracy": 0.6889
+        },
+        {
+          "choice_review_below": 0.8,
+          "auto_cases": 27,
+          "review_cases": 18,
+          "review_rate": 0.4,
+          "auto_coverage": 0.6,
+          "auto_topic_accuracy": 0.8519,
+          "all_case_topic_accuracy": 0.6889
+        }
+      ],
+      "unlisted_threshold_sweep": [
+        {
+          "threshold": 0.3,
+          "tp": 1,
+          "fp": 29,
+          "fn": 0,
+          "precision": 0.0333,
+          "recall": 1.0
+        },
+        {
+          "threshold": 0.4,
+          "tp": 1,
+          "fp": 26,
+          "fn": 0,
+          "precision": 0.037,
+          "recall": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "tp": 1,
+          "fp": 18,
+          "fn": 0,
+          "precision": 0.0526,
+          "recall": 1.0
+        },
+        {
+          "threshold": 0.6,
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        {
+          "threshold": 0.8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        }
+      ],
+      "uncertainty_threshold_sweep": [
+        {
+          "threshold_exclusive": 0.1,
+          "tp": 4,
+          "fp": 40,
+          "fn": 0,
+          "review_rate": 0.9778,
+          "precision": 0.0909,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.2,
+          "tp": 4,
+          "fp": 13,
+          "fn": 0,
+          "review_rate": 0.3778,
+          "precision": 0.2353,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.3,
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "review_rate": 0.1333,
+          "precision": 0.6667,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.4,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "review_rate": 0.0889,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.5,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "review_rate": 0.0889,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.6,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "review_rate": 0.0889,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.7,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "review_rate": 0.0889,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        {
+          "threshold_exclusive": 0.8,
+          "tp": 3,
+          "fp": 0,
+          "fn": 1,
+          "review_rate": 0.0667,
+          "precision": 1.0,
+          "recall": 0.75
+        },
+        {
+          "threshold_exclusive": 0.9,
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "review_rate": 0.0444,
+          "precision": 1.0,
+          "recall": 0.5
+        }
+      ],
+      "per_event": {
+        "supply_chain_disruption": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "support": 5
+        },
+        "shortage_capacity_constraint": {
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5,
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "support": 3
+        },
+        "production_operational_disruption": {
+          "precision": 0.6667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "support": 4
+        },
+        "price_cost_change": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "support": 3
+        },
+        "trade_restriction": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "support": 3
+        },
+        "sanctions": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571,
+          "tp": 3,
+          "fp": 1,
+          "fn": 0,
+          "support": 3
+        },
+        "regulation_tax_change": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "tp": 2,
+          "fp": 2,
+          "fn": 0,
+          "support": 2
+        },
+        "cyber_security_incident": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "support": 2
+        },
+        "labor_workforce_event": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "support": 2
+        },
+        "insolvency_default": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "support": 3
+        },
+        "corporate_transaction_restructuring": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1": 0.8,
+          "tp": 2,
+          "fp": 0,
+          "fn": 1,
+          "support": 3
+        },
+        "product_recall_quality_safety": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "support": 1
+        },
+        "legal_enforcement": {
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "support": 3
+        },
+        "environment_disaster_impact": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "support": 2
+        },
+        "investment_capacity_change": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "support": 2
+        }
+      },
+      "threshold_sweep": [
+        {
+          "threshold": 0.3,
+          "micro_f1": 0.7156,
+          "micro_precision": 0.5735,
+          "micro_recall": 0.9512,
+          "macro_f1": 0.7499,
+          "tp": 39,
+          "fp": 29,
+          "fn": 2,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 15,
+          "review_cell_rate": 0.0222
+        },
+        {
+          "threshold": 0.4,
+          "micro_f1": 0.78,
+          "micro_precision": 0.661,
+          "micro_recall": 0.9512,
+          "macro_f1": 0.7934,
+          "tp": 39,
+          "fp": 20,
+          "fn": 2,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 24,
+          "review_cell_rate": 0.0356
+        },
+        {
+          "threshold": 0.5,
+          "micro_f1": 0.8041,
+          "micro_precision": 0.6964,
+          "micro_recall": 0.9512,
+          "macro_f1": 0.8122,
+          "tp": 39,
+          "fp": 17,
+          "fn": 2,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 27,
+          "review_cell_rate": 0.04
+        },
+        {
+          "threshold": 0.6,
+          "micro_f1": 0.8085,
+          "micro_precision": 0.717,
+          "micro_recall": 0.9268,
+          "macro_f1": 0.7963,
+          "tp": 38,
+          "fp": 15,
+          "fn": 3,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 30,
+          "review_cell_rate": 0.0444
+        },
+        {
+          "threshold": 0.7,
+          "micro_f1": 0.8182,
+          "micro_precision": 0.766,
+          "micro_recall": 0.878,
+          "macro_f1": 0.7982,
+          "tp": 36,
+          "fp": 11,
+          "fn": 5,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 36,
+          "review_cell_rate": 0.0533
+        },
+        {
+          "threshold": 0.8,
+          "micro_f1": 0.8395,
+          "micro_precision": 0.85,
+          "micro_recall": 0.8293,
+          "macro_f1": 0.8083,
+          "tp": 34,
+          "fp": 6,
+          "fn": 7,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 43,
+          "review_cell_rate": 0.0637
+        },
+        {
+          "threshold": 0.9,
+          "micro_f1": 0.8378,
+          "micro_precision": 0.9394,
+          "micro_recall": 0.7561,
+          "macro_f1": 0.816,
+          "tp": 31,
+          "fp": 2,
+          "fn": 10,
+          "positive_support": 41,
+          "fixed_negative_threshold": 0.2,
+          "review_cells": 50,
+          "review_cell_rate": 0.0741
+        }
+      ],
+      "review_count": 42,
+      "review_rate": 0.9333,
+      "other_count": 0,
+      "other_rate": 0.0,
+      "review_or_other_count": 42,
+      "review_or_other_rate": 0.9333,
+      "expected_review_or_other_count": 6,
+      "expected_review_or_other_exact_matches": 5,
+      "expected_unlisted_event_count": 1,
+      "unlisted_event_precision": null,
+      "unlisted_event_recall": 0.0,
+      "unlisted_event_exact": false,
+      "expected_uncertainty_signal_count": 4,
+      "uncertainty_signal_precision": 0.2353,
+      "uncertainty_signal_recall": 1.0,
+      "uncertainty_signal_threshold": 0.2,
+      "latency": {
+        "n": 45,
+        "mean_ms": 1298.58,
+        "median_ms": 860.0,
+        "p95_nearest_rank_ms": 1313.0,
+        "p95_method": "nearest-rank; descriptive only; small-sample estimates are unstable"
+      },
+      "token_usage": {
+        "input_tokens": 263276,
+        "output_tokens": 22167,
+        "total_tokens": 285443,
+        "cost_rub": 4.63313107
+      },
+      "note": "Pilot corpus metrics only; synthetic and small. Threshold sweep is descriptive and must not be treated as production calibration."
+    },
+    "cost_interpretation": "metrics.token_usage.cost_rub is only the known sum from successful responses; failed attempts may also have been billed",
+    "statistics_warning": "n=45, only 49 baseline cases, 4 missing results, small per-category support; not representative, calibrated or production evidence"
+  },
+  "api_documentation": {
+    "sources": [
+      "https://polza.ai/docs/api-reference/systemone/create",
+      "https://polza.ai/jev",
+      "https://polza.ai/models/typesafe/jev",
+      "https://docs.typesafe.ai/confidence",
+      "https://polza.ai/docs/gaidy/jev"
+    ],
+    "request_fields": [
+      "state",
+      "model",
+      "questions",
+      "provider (optional)"
+    ],
+    "question_types": "one Choice for main topic and independent Noul questions for event labels",
+    "choice_option_limit": 255,
+    "systemone_question_limit": [
+      1,
+      256
+    ],
+    "confidence_formula": "(p_max - 1/n) / (1 - 1/n); verified against official TypeSafe docs; validator tolerance 0.02 for observed two-decimal response values",
+    "noul_scores_calibrated": false,
+    "confidence_formula_source": "https://docs.typesafe.ai/confidence"
+  },
+  "http_451": {
+    "confirmed": "Historical direct api.typesafe.ai GET /v1/models and two POST requests returned HTTP 451.",
+    "cause": "UNKNOWN; raw bodies and request ids unavailable.",
+    "applies_to_polza": false,
+    "bypass_attempted": false
+  },
+  "taxonomy_review": {
+    "status": "OPEN_FOR_HUMAN_ADJUDICATION",
+    "original_taxonomy_modified": false,
+    "disputed_case": "e33-multi-price-shortage",
+    "dispute": "independent blind reviewers disagreed whether shortage_capacity_constraint is directly supported; no post-hoc label change",
+    "topic_tie_cases": [
+      "e10",
+      "e14",
+      "e18",
+      "e28",
+      "e30",
+      "e45"
+    ],
+    "report": "spike/T08/experiments/deep-v1/TAXONOMY_REVIEW.md",
+    "independent_note": "spike/T08/experiments/2026-10-14-independent-review.md",
+    "event_label_disputes": [
+      "e33-multi-price-shortage",
+      "e34-multi-insolvency-legal",
+      "e35-multi-labor-investment"
+    ],
+    "matched_contrasts": [
+      [
+        "e09",
+        "e10"
+      ],
+      [
+        "e13",
+        "e14"
+      ]
+    ],
+    "jev_outputs_used_for_adjudication": false,
+    "review_note_sha256": "92ae2a073773fa64c55ad7e9b95307f8d57e9d96b6f80f4b2527443f9e20be78",
+    "review_manifest_sha256": "10d1ca74a537c96e59898cd8d0d2f383b87d56a1c6f8de0e6541b0b3b84e7e55"
+  },
+  "framework_compatibility": {
+    "normative_operation": "Understanding.classify",
+    "fully_compatible": [],
+    "partially_compatible": [
+      "Jev is the only classifier",
+      "Choice topic plus independent event Noul",
+      "finite registered output codes"
+    ],
+    "not_compatible": [
+      "ClassificationInput material/taxonomy/allowed_codes/multi_label DTO",
+      "ClassificationOutput topics/event_hints/status/missing_data DTO",
+      "runtime policy/provenance/history/replay"
+    ],
+    "not_verified": [
+      "representative model quality",
+      "provider-side prompt injection/privacy",
+      "runtime integration (out of spike scope)"
+    ]
+  },
+  "security": {
+    "key_source": "POLZA_AI_API_KEY environment variable; value not printed or persisted",
+    "only_fixed_https_endpoint": true,
+    "redirects_refused": true,
+    "proxy_environment_discovery_disabled": true,
+    "live_requests_allowlisted_by_hash": true,
+    "automatic_retries": false,
+    "provider_error_body_persisted": false,
+    "article_text_or_raw_prompt_persisted_in_results": false,
+    "offline_socket_guard": "standard Python socket entrypoints blocked in test process; not an OS/container firewall",
+    "ledger": "local best-effort accidental-repeat guard; mutable/deletable and state root can be changed; seeded with the known completed pilot budget"
+  },
+  "findings": [
+    {
+      "severity": "HIGH",
+      "status": "FIXED",
+      "file": "spike/T08/aggregate_pilot.py",
+      "reproduction": "Aggregate a complete segment marked custom_or_test_transport.",
+      "expected": "Mocks must not yield Jev quality metrics.",
+      "actual_before_fix": "Metrics were computed and marked as measured.",
+      "resolution": "Custom transport now produces NOT_MEASURED_CUSTOM_TRANSPORT and metrics=null; regression test added."
+    },
+    {
+      "severity": "HIGH",
+      "status": "FIXED",
+      "file": "spike/T08/live_ledger.py",
+      "reproduction": "Create a fresh ledger after the known 50 attempts.",
+      "expected": "The exhausted budget remains closed.",
+      "actual_before_fix": "Seed included only the e01 Polza smoke and permitted more requests.",
+      "resolution": "Seed now contains request hashes for all 49 baseline cases plus the known legacy TypeSafe attempt; test verifies 50. Current Windows ledger reconciled to 50."
+    },
+    {
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "file": "spike/T08/aggregate_pilot.py",
+      "reproduction": "Aggregate reports whose source metadata mode is live_synthetic_pilot.",
+      "expected": "Output mode says live_synthetic_pilot_aggregate.",
+      "actual_before_fix": "Source metadata overwrote the aggregate mode.",
+      "resolution": "Aggregate mode is set after metadata expansion; assertion added."
+    },
+    {
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "file": "spike/T08/aggregate_pilot.py",
+      "reproduction": "Sum usage cost while failures exist.",
+      "expected": "Successful response charges are separated from unknown failed-attempt billing.",
+      "actual_before_fix": "Cost could be read as total spend.",
+      "resolution": "Explicit known_successful_response_cost_rub and UNKNOWN_POSSIBLY_BILLED status."
+    },
+    {
+      "severity": "HIGH",
+      "status": "FIXED",
+      "file": "spike/T08/jev_spike.py; spike/T08/aggregate_pilot.py",
+      "lines": "jev_spike.py:315-328,372-373; aggregate_pilot.py:194-195; test_spike.py:433-463,1094-1110",
+      "reproduction": "Supply a Choice answer whose confidence is not consistent with its option probabilities (for example confidence 0.47 with a one-hot distribution).",
+      "expected": "Reject inconsistent Choice confidence under the official formula.",
+      "actual_before_fix": "Only numeric type/range and selected maximum were checked; inconsistent confidence passed.",
+      "resolution": "Shared validation now checks the official TypeSafe formula with 0.02 bounded tolerance for observed response rounding. Unit, rounding, rejection, aggregate regression tests added; all 45 stored provider outputs passed offline revalidation."
+    },
+    {
+      "severity": "HIGH",
+      "status": "OPEN",
+      "file": "spike/T08/results/jev-live-aggregate-20261014-v4.json",
+      "reproduction": "Inspect the four staged failure ids.",
+      "expected": "A complete pilot has outputs or known safe causes for every request.",
+      "actual": "Only sanitized_request_error is retained; causes unknown.",
+      "action": "Do not retry without a new explicit budget; keep these as missing outputs, not model errors."
+    },
+    {
+      "severity": "HIGH",
+      "status": "OPEN",
+      "file": "spike/T08/experiments/2026-10-14-independent-review.md",
+      "reproduction": "Compare blind reviewer notes for e33.",
+      "expected": "Gold has an adjudicated rationale.",
+      "actual": "The draft labels include unresolved event boundaries at e33/e34/e35 and open topic-boundary cases; the review note was corrected to separate the two kinds.",
+      "action": "Human adjudication with evidence spans and a new dataset version; never use Jev prediction to settle gold."
+    },
+    {
+      "severity": "HIGH",
+      "status": "OPEN",
+      "file": "spike/T08/results/jev-live-aggregate-20261014-v4.json",
+      "reproduction": "Read the coverage, review rate and per-event supports.",
+      "expected": "Decision-grade, representative model evaluation.",
+      "actual": "45/49 coverage; 42/45 review; single-author synthetic labels and small supports.",
+      "action": "No production use; separately adjudicate and budget a future blind evaluation."
+    },
+    {
+      "severity": "MEDIUM",
+      "status": "OPEN_LIMITATION",
+      "file": "spike/T08/run_spike.py",
+      "reproduction": "Compare current runner SHA with staged report hashes.",
+      "expected": "Same runner revision was live and is under acceptance.",
+      "actual": "Client validation and runner hashes differ from live-tested revisions; request hashes match; all 45 stored outputs were revalidated offline.",
+      "action": "No further live calls without a new explicit budget; preserve provenance and do not claim the current full revision had a live run."
+    },
+    {
+      "severity": "MEDIUM",
+      "status": "UNKNOWN",
+      "file": "spike/T08/results/route-check.json",
+      "reproduction": "Inspect historical TypeSafe status-only records.",
+      "expected": "Known cause of HTTP 451.",
+      "actual": "Status 451 only; no body/request id.",
+      "action": "Do not speculate or bypass; old TypeSafe route is not the Polza route."
+    },
+    {
+      "severity": "HIGH",
+      "status": "OPEN_BUDGET_ACCOUNTING",
+      "file": "spike/T08/results/route-check.json; spike/T08/TEST_REPORT.md",
+      "lines": "route-check.json:1-14; TEST_REPORT.md:47-50",
+      "reproduction": "Count the 50 pilot calls and the three earlier TypeSafe 451 route checks as one T08 live-request budget.",
+      "expected": "At most 50 total calls without separate approval.",
+      "actual": "53 known historical API calls if route checks share the same cap; the 50-call pilot ledger excluded those earlier checks.",
+      "action": "No further live requests without a new explicit budget. The historical count and ledger scope are disclosed; this cannot be corrected retroactively."
+    }
+  ],
+  "not_run_or_not_measured": [
+    "Jev on deep-v1 A/B/C/D corpus",
+    "live metamorphic/repeated stability",
+    "provider-side prompt injection and privacy behavior",
+    "per-category calibrated probabilities",
+    "representative real-world accuracy",
+    "root cause of TypeSafe HTTP 451",
+    "failed-request billing amount",
+    "provider upstream identity/fallback attestation",
+    "full Framework v1 runtime integration",
+    "Live run of the final source revision after Choice-confidence validator correction"
+  ],
+  "artifacts": {
+    "human_report": "spike/T08/TEST_REPORT.md",
+    "machine_report": "spike/T08/TEST_REPORT.json",
+    "aggregate": "spike/T08/results/jev-live-aggregate-20261014-v4.json",
+    "old_report_archive": "spike/T08/results/archive/TEST_REPORT-1.2.0.json",
+    "taxonomy_audit": "spike/T08/experiments/deep-v1/TAXONOMY_REVIEW.md",
+    "independent_label_review": "spike/T08/experiments/2026-10-14-independent-review.md",
+    "independent_label_review_manifest": "spike/T08/experiments/2026-10-14-independent-review.json",
+    "results_summary_ru": "spike/T08/RESULTS_SUMMARY_RU.md"
+  },
+  "recommendation": "Do not trust Jev for automatic Russian business-news classification and do not integrate yet. Polza request/response compatibility is evidenced for the tested path; model quality is not established."
+}

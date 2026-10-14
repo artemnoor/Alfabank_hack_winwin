@@ -1,40 +1,44 @@
-# T08 Jev classification spike
+# T08 — Jev classification spike
 
-Изолированная проверка Jev через Polza AI для русскоязычных синтетических бизнес-новостей. Spike не подключён к runtime, не меняет OpenAPI и не использует другой классификатор.
+Изолированный эксперимент для русскоязычных synthetic business news через Jev на Polza AI. Jev остаётся единственным classifier. Spike не подключён к runtime, не меняет OpenAPI и не является production policy.
 
-## Текущий результат — 2026-10-14
+## Последний offline quality pass — 2026-10-14
 
-- Engineering: **PASS** — 86 тестов, Ruff и offline runner прошли; сохранённые Choice ответы дополнительно сверены с официальной формулой confidence.
-- Polza API: **PASS в ограниченном объёме** — 44 staged ответа плюс один исторический smoke schema-valid на Jev 1.13.0. Все текущие staged отчёты совпадают с hash Jev клиента; runner изменился после live-партии.
-- Model quality: **NOT MEASURED для решения об интеграции**. Предварительные частичные числа по 45/49: тема 31/45 (68,9%), event micro-F1 0,840, multi-label exact 34/45, review 42/45 (93,3%). Gold — односторонний synthetic draft, есть спор e33, четыре ответа отсутствуют.
-- Integration: **NOT READY** — нет нормативного Understanding.classify adapter и runtime policy/provenance/history/replay integration.
-- Live budget: пилотный ledger содержит **50 попыток** (включая один legacy TypeSafe POST). Кроме них в истории есть три более ранних HTTP 451 route-check вызова; общий известный след — **53**, если считать их одним бюджетом. Ledger не включает старые route-check и является только локальной best-effort защитой. Никаких новых live вызовов без отдельного разрешения.
+- **Engineering quality:** см. актуальные результаты в `TEST_REPORT.md` и `TEST_REPORT.json`. Тесты анализируют сохранённые ответы v4; live запросов в этой работе не было.
+- **Причины review 93,3%:** у 42 из 45 сохранённых ответов сработал текущий rule gate. Активные причины перекрываются: Choice=5, event score в серой зоне=24, insufficient-evidence score >0.2=17, unlisted score >0.2=32. 28 review-кейсов имеют несколько причин.
+- **Это не значит, что Jev ошибся в 93,3% случаев.** В среднем диапазоне Noul может означать abstain, а текущая логика превращает это в review. У всех 33 unlisted scores выше 0.2 состояние было `abstain`; positive ≥0.8 не было.
+- **Сохранённые метрики остаются предварительными:** 45/49 ответов, topic accuracy 31/45 = 68,9%, event micro-F1 0,840, exact event-set 34/45 = 75,6%. Эталонные метки составлены одним автором, часть спорна; 4 ответа отсутствуют.
+- **Model quality:** NOT MEASURED для интеграционного решения. На малом черновом synthetic set нельзя безопасно обещать снижение ручных проверок.
+- **Интеграция:** NOT READY. Runtime, production code и контракты не менялись.
+- **Live API:** исторический отчёт описывает 45 сохранённых успешных ответов через Polza. В текущем quality pass запросов не было. Общий известный исторический след — до 53 вызовов, если три прежних HTTP 451 проверки считать с 50 попытками пилота; новые запросы требуют отдельного решения.
 
-Полные метрики и ограничения: TEST_REPORT.md и TEST_REPORT.json. Финальный aggregate v4: results/jev-live-aggregate-20261014-v4.json. Предыдущие агрегаты и отчёты сохранены без перезаписи.
+## Артефакты этого разбора
 
-## Offline commands
+- `ERROR_ANALYSIS.md` — topic/event mismatches, локальные synthetic texts, гипотезы причин и gold caveats.
+- `UNCERTAINTY_ANALYSIS.md` — полная матрица 45 ответов со всеми event scores и review triggers.
+- `THRESHOLD_COMPARISON.md` — counterfactual coverage/risk и раздельные Choice, event, insufficient-evidence и unlisted gate sweeps.
+- `QUALITY_ANALYSIS.json` — машинный подробный расчёт по pinned v4.
+- `HUMAN_REVIEW_PACKET.md` — спорная разметка на ручную adjudication; AI review не является human gold.
+- `experiments/taxonomy-v0.4-proposal/` и `TAXONOMY_PROPOSAL.md` — отдельная неутверждённая и непроверенная taxonomy proposal. Исходная v0.3 не менялась.
+- `DEEP_CORPUS_AUDIT.json` и `BENCHMARK_PLAN.md` — аудит 160 примеров и план настоящего blind set. D видим и не является blind.
+- `NEXT_STEPS.md` — следующий эксперимент; предложение на 20 matched calls требует отдельного бюджета и здесь не запускалось.
+- `AI_REVIEW_LOG.md` — роли субагентов и ограничения ревью.
+
+## Повторяемые offline команды
 
     python -m unittest discover -s spike/T08 -p "test*.py" -v
     ruff check spike/T08
     ruff format --check spike/T08
     python spike/T08/run_spike.py
+    python spike/T08/quality_analysis.py --check
+    python spike/T08/deep_corpus_audit.py --check
 
-Офлайн runner проверяет входы, taxonomy и corpus и не вызывает классификатор.
+`run_spike.py` без `--live` выполняет только локальную проверку. Тесты также блокируют network entrypoints; тест исчерпанного ledger доказывает, что over-budget run не доходит до `classify`.
 
-## Live API safety
+## Сохранённые данные
 
-Проектный маршрут — POST https://polza.ai/api/v1/systemone, Jev model ID typesafe/jev. Ключ читается только из POLZA_AI_API_KEY окружения Windows. Он не выводится и не сохраняется. Запросы фиксируют synthetic case hash; transport запрещает redirects и proxy discovery, автоматических повторов нет.
+- `corpus.json`: SHA-256 `592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7`.
+- `taxonomy.json` v0.3.0-spike: SHA-256 `855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d`.
+- Aggregate v4: `results/jev-live-aggregate-20261014-v4.json`; historical bytes and prior report copied to `results/archive/` before updates.
 
-Дополнительные вызовы требуют отдельного решения и нового бюджета; текущий пилот закрыт. Local ledger — только best-effort локальная защита, не защита от редактирования/удаления или смены LOCALAPPDATA/XDG_STATE_HOME.
-
-Старые HTTP 451 были на прямом TypeSafe host. Их точная причина неизвестна, и они не описывают Polza доступность. Географические/юридические ограничения не обходились. Все три таких route-check входят в общий исторический след из 53 вызовов, но не в 50-попытковый пилотный ledger.
-
-## Данные и taxonomy
-
-Исходный baseline неизменён: corpus hash 592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d. Taxonomy 0.3.0-spike неизменена: hash 855a61f9b6c199d8440b8b81bbd09234e376896121ed163af2ed7f0c1455d. Deep corpus содержит 160 synthetic cases; Jev на них не запускался. Gold labels остаются односторонними draft; D не blind, B24 спорный. Разногласие по e33 описано в experiments/2026-10-14-independent-review.md.
-
-Метки тем выбираются одним Jev Choice; события задаются независимыми Noul вопросами. IPTC, GDELT, Event Registry и RavenPack — только справочные источники, не запускаемые модели.
-
-## Следующий шаг
-
-Не интегрировать автоматически. Сначала провести human adjudication gold labels, создать отдельный versioned blind benchmark и согласовать новый live budget. Затем проектировать adapter к утверждённым input/output DTO и policy boundaries без изменения OpenAPI.
+Не сохранять ключи, raw provider responses или prompts. Изменения ограничены `spike/T08`; main runtime и OpenAPI остаются без изменений.

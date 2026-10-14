@@ -1,0 +1,148 @@
+{
+  "audit_version": "1.0.0-spike",
+  "manifest_sha256": "eb746655045ccb9ec6baabbc34cd3d396d13755c5b6548bfe8228349ea3fb0d0",
+  "source_corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+  "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "corpus_id": "t08-jevs-spike-deep",
+  "version": "1.0.0",
+  "total_cases": 160,
+  "nonempty_cases": 158,
+  "empty_case_ids": [
+    "a76-empty",
+    "d24-holdout-empty"
+  ],
+  "split_counts": {
+    "A": 76,
+    "B": 36,
+    "C": 24,
+    "D": 24
+  },
+  "split_audit": {
+    "A": {
+      "case_count": 76,
+      "nonempty_count": 75,
+      "sha256_verified": true,
+      "blind": false,
+      "holdout": false,
+      "scored_or_used_for_thresholds": false
+    },
+    "B": {
+      "case_count": 36,
+      "nonempty_count": 36,
+      "sha256_verified": true,
+      "blind": false,
+      "holdout": false,
+      "scored_or_used_for_thresholds": false
+    },
+    "C": {
+      "case_count": 24,
+      "nonempty_count": 24,
+      "sha256_verified": true,
+      "blind": false,
+      "holdout": false,
+      "scored_or_used_for_thresholds": false
+    },
+    "D": {
+      "case_count": 24,
+      "nonempty_count": 23,
+      "sha256_verified": true,
+      "blind": false,
+      "holdout": true,
+      "scored_or_used_for_thresholds": false
+    }
+  },
+  "topic_label_counts": {
+    "business_companies": 28,
+    "economy_finance": 7,
+    "energy_resources": 8,
+    "environment_disasters": 5,
+    "health": 5,
+    "industry_trade_supply": 34,
+    "labor_employment": 10,
+    "law_regulation": 28,
+    "other_uncertain": 3,
+    "politics_government": 18,
+    "technology_telecom": 12
+  },
+  "event_label_counts": {
+    "corporate_transaction_restructuring": 7,
+    "cyber_security_incident": 7,
+    "environment_disaster_impact": 6,
+    "insolvency_default": 9,
+    "investment_capacity_change": 7,
+    "labor_workforce_event": 9,
+    "legal_enforcement": 8,
+    "price_cost_change": 11,
+    "product_recall_quality_safety": 6,
+    "production_operational_disruption": 11,
+    "regulation_tax_change": 11,
+    "sanctions": 9,
+    "shortage_capacity_constraint": 7,
+    "supply_chain_disruption": 18,
+    "trade_restriction": 8
+  },
+  "uncovered_topic_codes": [],
+  "uncovered_event_codes": [],
+  "expected_status_counts": {
+    "classified": 134,
+    "no_content": 2,
+    "other": 3,
+    "uncertain": 21
+  },
+  "evidence_state_counts": {
+    "announced": 9,
+    "confirmed": 120,
+    "contradictory": 3,
+    "disputed": 1,
+    "informational": 12,
+    "no_content": 2,
+    "speculative": 9,
+    "unconfirmed": 4
+  },
+  "exact_duplicate_text_groups": [
+    [
+      "a76-empty",
+      "d24-holdout-empty"
+    ]
+  ],
+  "near_duplicate_pairs_at_or_above_threshold": [
+    {
+      "case_ids": [
+        "c03-base-shipment",
+        "c04-entity-swap-shipment"
+      ],
+      "similarity": 0.9448
+    },
+    {
+      "case_ids": [
+        "c05-base-price",
+        "c06-number-punctuation-price"
+      ],
+      "similarity": 0.9454
+    }
+  ],
+  "near_duplicate_threshold": 0.92,
+  "near_duplicate_method": "SequenceMatcher over casefolded Unicode word tokens from title+text; heuristic flags require human review.",
+  "known_annotation_ambiguities": [
+    {
+      "case_id": "b24-price-forecast-after-bill",
+      "issue": "taxonomy conflict: price event definition requires factual change; current request wording also permits an officially announced future change",
+      "scoring": "exclude until adjudicated"
+    }
+  ],
+  "original_baseline_unchanged": true,
+  "jev_calls": 0,
+  "gold_status": "experimental-synthetic-single-annotator-draft",
+  "d_split_status": "visible_nonblind_control; excluded from tuning and scoring",
+  "not_a_blind_holdout": true,
+  "source_baseline_metadata": {
+    "corpus_id": "synthetic-ru-news-50",
+    "version": "1.0.0"
+  },
+  "limitations": [
+    "All labels are single-author drafts; no independent human adjudication is present.",
+    "Deep split D is visible in the repository and has been seen by its author; it is not a blind test set.",
+    "Near-duplicate flags are lexical heuristics, not semantic duplicate judgments.",
+    "Coverage counts describe annotations only and are not classifier scores."
+  ]
+}

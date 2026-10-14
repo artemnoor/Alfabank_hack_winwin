@@ -526,11 +526,30 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertIn("42/45", page.locator("#policyComparison").inner_text())
             page.locator("#labTab").click()
             page.set_viewport_size({"width": 390, "height": 844})
+            page.wait_for_function(
+                "() => [...document.querySelector('#labGrid').children].map(el => el.id).join(',') === 'caseSidebar,goldPanel,detailPanel'"
+            )
             page.locator('[data-policy-mode="policy_v2"]').click()
             mobile_overflow = page.evaluate(
                 "document.documentElement.scrollWidth - document.documentElement.clientWidth"
             )
             self.assertLessEqual(mobile_overflow, 1)
+            mobile_layout = page.evaluate(
+                """() => ({
+                  comparisonTop: document.querySelector('.gold-panel').getBoundingClientRect().top + window.scrollY,
+                  detailTop: document.querySelector('.detail-panel').getBoundingClientRect().top + window.scrollY,
+                  readingOrder: [...document.querySelector('#labGrid').children].map(el => el.id),
+                  inputFontSize: getComputedStyle(document.querySelector('#filterSearch')).fontSize,
+                  searchHeight: document.querySelector('#filterSearch').getBoundingClientRect().height
+                })"""
+            )
+            self.assertLess(mobile_layout["comparisonTop"], mobile_layout["detailTop"])
+            self.assertEqual(
+                mobile_layout["readingOrder"],
+                ["caseSidebar", "goldPanel", "detailPanel"],
+            )
+            self.assertEqual(mobile_layout["inputFontSize"], "16px")
+            self.assertGreaterEqual(mobile_layout["searchHeight"], 44)
             page.screenshot(
                 path=str(screenshots / "policy-v2-mobile.png"), full_page=True
             )
@@ -542,6 +561,9 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 1,
             )
             page.set_viewport_size({"width": 1440, "height": 1050})
+            page.wait_for_function(
+                "() => [...document.querySelector('#labGrid').children].map(el => el.id).join(',') === 'caseSidebar,detailPanel,goldPanel'"
+            )
             page.locator('[data-policy-mode="legacy"]').click()
             page.locator("#resetThresholds").click()
             page.locator("#filterSearch").fill("")

@@ -1249,6 +1249,20 @@
     if (activeTab === "stats") renderStats();
   }
 
+  function syncResponsivePanelOrder() {
+    const grid = $("labGrid");
+    const detail = $("detailPanel");
+    const comparison = $("goldPanel");
+    if (!grid || !detail || !comparison) return;
+    if (window.matchMedia("(max-width: 850px)").matches) grid.insertBefore(comparison, detail);
+    else grid.insertBefore(detail, comparison);
+  }
+
+  const responsivePanelQuery = window.matchMedia("(max-width: 850px)");
+  syncResponsivePanelOrder();
+  if (responsivePanelQuery.addEventListener) responsivePanelQuery.addEventListener("change", syncResponsivePanelOrder);
+  else responsivePanelQuery.addListener(syncResponsivePanelOrder);
+
   bindFilters();
   bindNavigation();
   bindPolicy();

@@ -294,20 +294,41 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   .detail-title-row { align-items: start; flex-direction: column; }
   .choice-meta { align-items: start; flex-direction: column; }
   .choice-meta .badge { white-space: normal; }
+  .field { min-height: 44px; padding: 10px; font-size: 16px; }
+  .tab, .mode-button, .preset, .reset-button, .secondary-button, .primary-button { min-height: 42px; }
+  .mode-button, .preset, .reset-button, .secondary-button, .primary-button { padding: 9px 11px; font-size: 12px; }
   .metric-strip, .stats-screen .metric-strip { grid-template-columns: repeat(2, 1fr); gap: 7px; }
   .metric { min-height: 72px; padding: 10px; }
   .metric-value { font-size: 19px; }
+  .metric-label { font-size: 12px; }
+  .metric-sub { font-size: 11px; }
+  .notice { font-size: 13px; line-height: 1.5; }
   .section-nav { margin-top: 15px; }
   .tab { flex: 1; padding: 10px 8px; }
   .policy-top { align-items: start; flex-direction: column; }
+  .policy-caption, .mode-help, .preset-note, .threshold-help { font-size: 12px; }
+  .threshold-control label, .threshold-control output { font-size: 12px; }
+  .panel-subtitle { font-size: 11px; }
+  .case-title { font-size: 12px; }
+  .case-summary { font-size: 11px; line-height: 1.45; }
+  .case-status, .case-count { font-size: 11px; }
   .threshold-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .threshold-control:last-child { grid-column: auto; }
   .summary-grid { grid-template-columns: 1fr 1fr; }
   .summary-cell:last-child { grid-column: 1 / -1; }
   .pipeline { grid-template-columns: 1fr 1fr; }
+  .pipeline-step { font-size: 11px; line-height: 1.35; }
   .pipeline-step:not(:last-child)::after { content: none; }
   .event-summary { grid-template-columns: minmax(100px, 1fr) minmax(50px, .8fr) 34px; }
   .event-summary .state-chip { grid-column: 1 / -1; }
+  .event-name { font-size: 12px; }
+  .event-extra, .candidate-routing, .review-task, .signal-copy, .reason-list, .decision-explain { font-size: 12px; line-height: 1.5; }
+  .summary-note, .bar-label, .bar-value, .compare-line, .diff-list, .editor-label, .event-check, .editor-note, .chart-desc, .chart-num, .warning-foot { font-size: 11px; }
+  .story-label, .subsection-label, .criterion b, .label-chip, .state-chip, .edit-pill { font-size: 10px; }
+  .story-text { font-size: 14px; line-height: 1.6; }
+  .section-heading p, .gold-heading { font-size: 12px; }
+  .chart-title, .decision-title, .panel-title { font-size: 14px; }
+  .policy-table { font-size: 11px; }
   .include-exclude, .signal-grid { grid-template-columns: 1fr; }
   .bar-row { grid-template-columns: minmax(95px, 1.2fr) minmax(55px, 1fr) 35px; gap: 6px; }
   .filter-grid { grid-template-columns: 1fr 1fr; }
@@ -349,8 +370,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       </details>
     </section>
     <section id="labScreen" class="lab-screen">
-      <div class="lab-grid">
-        <aside class="panel case-sidebar" aria-label="Список новостей">
+      <div id="labGrid" class="lab-grid">
+        <aside id="caseSidebar" class="panel case-sidebar" aria-label="Список новостей">
           <div class="panel-head"><div><div class="panel-title">Новости корпуса</div><div class="panel-subtitle">Выберите пример для разбора</div></div><span id="visibleCaseCount" class="case-count"></span></div>
           <div class="sidebar-tools">
             <input id="filterSearch" class="field" type="search" placeholder="Поиск по тексту или ID" aria-label="Поиск по новостям">
@@ -359,8 +380,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
           </div>
           <div id="caseList" class="case-list"></div>
         </aside>
-        <main class="panel detail-panel" aria-label="Подробный анализ новости"><div class="panel-head"><div><div class="panel-title">Разбор выбранной новости</div><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></main>
-        <aside class="panel gold-panel" aria-label="Сравнение с предварительной разметкой"><div class="panel-head"><div><div class="panel-title">Сверка с разметкой</div><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
+        <main id="detailPanel" class="panel detail-panel" aria-label="Подробный анализ новости"><div class="panel-head"><div><div class="panel-title">Разбор выбранной новости</div><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></main>
+        <aside id="goldPanel" class="panel gold-panel" aria-label="Сравнение с предварительной разметкой"><div class="panel-head"><div><div class="panel-title">Сверка с разметкой</div><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
       </div>
     </section>
     <section id="statsScreen" class="stats-screen" hidden>
@@ -1622,6 +1643,20 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     renderComparison();
     if (activeTab === "stats") renderStats();
   }
+
+  function syncResponsivePanelOrder() {
+    const grid = $("labGrid");
+    const detail = $("detailPanel");
+    const comparison = $("goldPanel");
+    if (!grid || !detail || !comparison) return;
+    if (window.matchMedia("(max-width: 850px)").matches) grid.insertBefore(comparison, detail);
+    else grid.insertBefore(detail, comparison);
+  }
+
+  const responsivePanelQuery = window.matchMedia("(max-width: 850px)");
+  syncResponsivePanelOrder();
+  if (responsivePanelQuery.addEventListener) responsivePanelQuery.addEventListener("change", syncResponsivePanelOrder);
+  else responsivePanelQuery.addListener(syncResponsivePanelOrder);
 
   bindFilters();
   bindNavigation();

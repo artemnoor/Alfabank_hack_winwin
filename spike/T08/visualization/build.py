@@ -234,8 +234,8 @@ def render_html(payload: dict[str, Any]) -> str:
       </details>
     </section>
     <section id="labScreen" class="lab-screen">
-      <div class="lab-grid">
-        <aside class="panel case-sidebar" aria-label="Список новостей">
+      <div id="labGrid" class="lab-grid">
+        <aside id="caseSidebar" class="panel case-sidebar" aria-label="Список новостей">
           <div class="panel-head"><div><div class="panel-title">Новости корпуса</div><div class="panel-subtitle">Выберите пример для разбора</div></div><span id="visibleCaseCount" class="case-count"></span></div>
           <div class="sidebar-tools">
             <input id="filterSearch" class="field" type="search" placeholder="Поиск по тексту или ID" aria-label="Поиск по новостям">
@@ -244,8 +244,8 @@ def render_html(payload: dict[str, Any]) -> str:
           </div>
           <div id="caseList" class="case-list"></div>
         </aside>
-        <main class="panel detail-panel" aria-label="Подробный анализ новости"><div class="panel-head"><div><div class="panel-title">Разбор выбранной новости</div><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></main>
-        <aside class="panel gold-panel" aria-label="Сравнение с предварительной разметкой"><div class="panel-head"><div><div class="panel-title">Сверка с разметкой</div><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
+        <main id="detailPanel" class="panel detail-panel" aria-label="Подробный анализ новости"><div class="panel-head"><div><div class="panel-title">Разбор выбранной новости</div><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></main>
+        <aside id="goldPanel" class="panel gold-panel" aria-label="Сравнение с предварительной разметкой"><div class="panel-head"><div><div class="panel-title">Сверка с разметкой</div><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
       </div>
     </section>
     <section id="statsScreen" class="stats-screen" hidden>

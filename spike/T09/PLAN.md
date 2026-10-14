@@ -13,7 +13,7 @@
 | Negative, incomplete, contradiction, boundary, provenance, security, metamorphic tests | Done | See `tests/` and actual counts in `TEST_REPORT.md` |
 | Algorithm measurements | Done, preliminary | Metrics against hand-authored provisional case expectations only; see `results/metrics-v1.json` |
 | Real text-similarity/embedding/LLM comparison | Not measured | The normative input DTO does not carry raw title/body; no live model or egress was used |
-| Independent review and follow-up fixes | Remediation complete; re-review pending | HIGH regressions and MEDIUM lifecycle/ID findings addressed locally; independent reviewer must verify the final branch |
+| Independent review and follow-up fixes | Complete for reviewed probes | HIGH regressions and MEDIUM lifecycle/ID findings were independently re-checked; runtime policy-reference binding remains an integration gap (`results/RE_REVIEW.md`) |
 | Integration into Framework runtime or `Events.apply` | Out of spike scope | The prototype only proposes; no DB, mutation, or HTTP endpoint |
 
 ## Hypotheses checked

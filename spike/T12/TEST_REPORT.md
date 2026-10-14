@@ -73,7 +73,7 @@ All 15 shared T12 property cases are exercised across the tests and deterministi
 
 - **Engineering quality:** Offline unit/negative/boundary/contract tests pass. No package dependency, network access, model call, persistence, or production change is involved.
 - **Algorithm quality:** **PRELIMINARY / NOT ACCURACY-MEASURED.** The shared cases are hand-authored provisional properties, not independently approved labels. No precision, recall, edge coverage, or real supply-chain correctness metric can be claimed from these tests.
-- **Integration readiness:** **NOT READY.** Exact StatementRef/ObjectRef materialization and GraphEdge negative/time representation require Framework owner decisions. The original independent review reports are committed; an independent re-review of this lineage-safety remediation is pending. Scoped partition comparison now follows the operation card's unrelated-company rule; `StatementRef.aggregate_ref.hash` still cannot be compared with a `KnowledgeSlice` in the Graph.query DTO.
+- **Integration readiness:** **NOT READY.** Exact StatementRef/ObjectRef materialization and GraphEdge negative/time representation require Framework owner decisions. Final independent re-review closed the HIGH and MEDIUM findings; one LOW node-diagnostic gap is documented in `results/FINAL_RE_REVIEW_AGGREGATE_SCOPED_FRESHNESS.md`. Scoped partition comparison follows the operation card's unrelated-company rule; `StatementRef.aggregate_ref.hash` still cannot be compared with a `KnowledgeSlice` in the Graph.query DTO.
 - **Live model quality:** **NOT MEASURED.** The spike is deterministic and has no model adapter.
 
 ## Known limits

@@ -15,7 +15,7 @@
 | Shared scenario coverage | Done | All 22 shared T10 scenarios run with property assertions |
 | Strict contract compatibility | Prototype DTO compatibility checked | Typed request/response models and `validate_dto`; see `TEST_REPORT.md` |
 | Live model benchmark | Not run | No LLM adapter or network call; model quality `NOT MEASURED` |
-| Independent review | Initial independent review complete; remediation pending a separate re-review | initial review commit `a7f91ba` remains untouched; R1–R4 have regression coverage |
+| Independent review | Complete for reviewed findings | Initial review remains preserved; separate re-review verified the R1–R4 remediation with no open Critical/High finding; owner ontology and receipt-read gaps remain |
 | Framework integration | Not ready | Predicate registry/policy integration and owner review are outstanding |
 
 ## Experiment hypotheses

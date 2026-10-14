@@ -27,7 +27,7 @@
 | Exercise explicit test-only owner policy | Complete | Exact pinned id/version/canonical hash required; returns review eligibility only, never `confirmed`. |
 | Unit/negative/boundary/provenance/security/reproducibility tests | Complete | 53 passed; includes bitemporal and caller-edited policy regressions; details in `TEST_REPORT.md`. |
 | Research and limitations | Complete | Official sources and license distinction in `RESEARCH.md`. |
-| Independent author-independent review | Remediation complete, re-review pending | HIGH late-registration finding and MEDIUM mutable-policy finding were fixed locally; request a fresh independent review before integration. |
+| Independent author-independent review | Complete for reviewed findings | HIGH late-registration and MEDIUM mutable-policy findings were independently re-checked; confirmation still requires a trusted owner policy and governed persistence/read integration. |
 | Production Evidence owner integration | Out of scope | No storage/register/read implementation included. |
 
 ## Result classification

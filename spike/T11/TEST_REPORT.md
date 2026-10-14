@@ -38,7 +38,7 @@ Recorded result: 53 passed, 0 failed, 0 skipped. The updated result artifact for
 
 ## Interpretation
 
-These results establish repeatable engineering behavior for a provisional synthetic harness. They do not establish calibrated source trust, real-world factual accuracy, or the correctness of a production confirmation policy. The HIGH and MEDIUM independent-review findings have been remediated; independent re-review is pending.
+These results establish repeatable engineering behavior for a provisional synthetic harness. They do not establish calibrated source trust, real-world factual accuracy, or the correctness of a production confirmation policy. The independent re-review verified the HIGH and MEDIUM remediations; trusted owner policy and production Evidence ownership remain unresolved.
 ## Integration verification
 
 - Contract suite command: $env:PYTHONPATH='packages/contracts/src'; & 'C:\Users\Артём\Documents\ChatGPT\Хакатон Альфабанк\.venv\Scripts\python.exe' -B -m pytest -p no:cacheprovider -q tests/contracts. Result: 31 passed, 0 failed.

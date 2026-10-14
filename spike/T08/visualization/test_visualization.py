@@ -188,11 +188,15 @@ class BrowserAcceptanceTests(unittest.TestCase):
             # the user last selected a relaxed Legacy preset before v2.
             page.locator('[data-preset="ignore_unlisted_gate"]').click()
 
-            # Policy v2 is a browser-only alternate policy over the exact same
+            # Policy v2.1 is a browser-only alternate policy over the exact same
             # 45 saved results. Event abstain is retained without review; the
             # evidence and unlisted gates have independent 0.8 cutoffs.
             page.locator('[data-policy-mode="policy_v2"]').click()
-            self.assertIn("Policy v2", page.locator("#policyName").inner_text())
+            self.assertIn("Policy v2.1", page.locator("#policyName").inner_text())
+            self.assertIn(
+                "Policy v2.1",
+                page.locator('[data-policy-mode="policy_v2"]').inner_text(),
+            )
             self.assertTrue(page.locator("#presetButtons").is_hidden())
             page.locator(".threshold-details summary").click()
             page.locator("#filterSearch").fill("e01-supply-rail")
@@ -284,6 +288,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
 
             page.locator("#statsTab").click()
             comparison = page.locator("#policyComparison")
+            self.assertIn("Policy v2.1", comparison.inner_text())
             legacy_row = comparison.locator(".policy-v2-table tbody tr").first
             self.assertIn("Legacy · Current Strict", legacy_row.inner_text())
             self.assertIn("2 / 1 / 39", legacy_row.inner_text())

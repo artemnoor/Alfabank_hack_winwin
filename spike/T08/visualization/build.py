@@ -105,7 +105,7 @@ def build_payload() -> dict[str, Any]:
         row["result"] = compact_result(saved) if saved else None
         rows.append(row)
 
-    # Policy v2 is an additional interpretation of the pinned responses. The
+    # Policy v2.1 is an additional interpretation of the pinned responses. The
     # Legacy output below is limited to cases that pass its historical gates;
     # it is intentionally different from the historical all-score metrics.
     legacy_predictions: dict[str, set[str]] = {}
@@ -219,8 +219,8 @@ def render_html(payload: dict[str, Any]) -> str:
     <nav class="section-nav" aria-label="Разделы"><button id="labTab" class="tab" type="button" data-tab="lab" aria-selected="true">Разбор новостей</button><button id="statsTab" class="tab" type="button" data-tab="stats" aria-selected="false">Общая статистика</button></nav>
     <section class="policy-bar" aria-label="Экспериментальные пороги">
       <div class="policy-top"><div><div id="policyName" class="policy-title">A · Current Strict</div><div id="policyCaption" class="policy-caption"></div></div><button id="resetThresholds" class="reset-button" type="button">Вернуть исходные пороги</button></div>
-      <div class="mode-row"><div><div class="mode-label">Способ обработки результата</div><div class="mode-help">Переключает только локальные правила; Jev не запускается повторно.</div></div><div class="mode-switch" role="group" aria-label="Режим политики"><button type="button" class="mode-button active" data-policy-mode="legacy" aria-pressed="true">Legacy · всё вместе</button><button type="button" class="mode-button" data-policy-mode="policy_v2" aria-pressed="false">Policy v2 · отдельно по сигналам</button></div></div>
-      <div id="legacyPresetNote" class="preset-note" hidden>Режимы A–E применяются только к Legacy. В Policy v2 используются общие числовые пороги выше.</div>
+      <div class="mode-row"><div><div class="mode-label">Способ обработки результата</div><div class="mode-help">Переключает только локальные правила; Jev не запускается повторно.</div></div><div class="mode-switch" role="group" aria-label="Режим политики"><button type="button" class="mode-button active" data-policy-mode="legacy" aria-pressed="true">Legacy · всё вместе</button><button type="button" class="mode-button" data-policy-mode="policy_v2" aria-pressed="false">Policy v2.1 · отдельно по сигналам</button></div></div>
+      <div id="legacyPresetNote" class="preset-note" hidden>Режимы A–E применяются только к Legacy. В Policy v2.1 используются общие числовые пороги выше.</div>
       <div id="presetButtons" class="preset-row" aria-label="Готовые диагностические режимы"></div>
       <details class="threshold-details"><summary>Настроить пороги вручную</summary>
         <div class="threshold-grid">

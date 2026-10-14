@@ -310,19 +310,17 @@ class TransportSafetyTests(unittest.TestCase):
         case = CASES[0]
         request = make_request(case, TAXONOMY)
         client = JevClient(
-            "private-test-key-123",
+            "unit-test-fixture",
             allowed_request_hashes={request_hash(request)},
             transport=fake_transport,
         )
         response = client.classify(request)
         self.assertEqual(seen["url"], API_ENDPOINT)
         self.assertEqual(seen["timeout"], 30)
-        self.assertEqual(
-            seen["headers"]["Authorization"], "Bearer private-test-key-123"
-        )
-        self.assertNotIn(b"private-test-key-123", seen["payload"])
+        self.assertEqual(seen["headers"]["Authorization"], "Bearer unit-test-fixture")
+        self.assertNotIn(b"unit-test-fixture", seen["payload"])
         self.assertIn(case["text"].encode("utf-8"), seen["payload"])
-        self.assertNotIn("private-test-key-123", json.dumps(response))
+        self.assertNotIn("unit-test-fixture", json.dumps(response))
         self.assertNotIn(case["text"], json.dumps(response))
 
     def test_provider_exception_text_is_suppressed(self) -> None:

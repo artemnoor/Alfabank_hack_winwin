@@ -1,0 +1,1255 @@
+{
+  "schema": "alfalab.spike.t13-scenario-matrix/v1",
+  "dataset_ref": {
+    "dataset_id": "t09-t13-independent-v1",
+    "version": "1.0.1",
+    "canonical_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725"
+  },
+  "status": "provisional_not_gold_not_approved",
+  "origin": "synthetic",
+  "model_outputs_used_as_labels": false,
+  "description": "Materialized event/company test contexts for the T13 offline harness; scenario target mapping is explicit and reviewable.",
+  "scenario_count": 30,
+  "scenarios": [
+    {
+      "case_id": "export-b-direct",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Potential mechanism may be stated only along the explicit country/supplier/component path."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-b-direct",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:4cc209e518ec6491190d719f3fbd6a47ed023c40d3a46daf4d9e5b1eb8b1cb49"
+    },
+    {
+      "case_id": "export-a-unknown-supplier",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No direct path; preserve unknown sourcing and ask a targeted question."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-a-unknown-supplier",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:c765f44095cd4d674997ca97621ec4c5cca39046cbde355de91e8a8e81562c91"
+    },
+    {
+      "case_id": "port-b-known-route",
+      "event_id": "event-port-vega",
+      "event_type": "port_closure",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "port-vega"
+      ],
+      "event_evidence_ids": [
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Known route supports possible logistics exposure, not a quantified delay."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "port-b-known-route",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-port-vega",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:4f71279adf342efbfcc056515c8f9612fb44849b5500f5f9fcbc91260aa3415c"
+    },
+    {
+      "case_id": "port-c-known-route-stock-conflict",
+      "event_id": "event-port-vega",
+      "event_type": "port_closure",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "port-vega"
+      ],
+      "event_evidence_ids": [
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Use route path; keep inventory contradiction and avoid a single buffer number."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "port-c-known-route-stock-conflict",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-port-vega",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:88951a7bdd76903aeeabffba3a4e54b26450924009e463b696dacd3b5ca0be21"
+    },
+    {
+      "case_id": "nickel-price-c",
+      "event_id": "event-price-nickel-actual",
+      "event_type": "raw_material_price_increase",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "material-nickel"
+      ],
+      "event_evidence_ids": [
+        "ev-price-fact"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Material relation exists; purchase volume and financial impact remain unknown."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "nickel-price-c",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-price-nickel-actual",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-price-fact"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:6991af971065845372cda7b4f515afcecfa78b2d3e5278497d72c3a9f38e17d9"
+    },
+    {
+      "case_id": "nickel-price-a-no-material",
+      "event_id": "event-price-nickel-actual",
+      "event_type": "raw_material_price_increase",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "material-nickel"
+      ],
+      "event_evidence_ids": [
+        "ev-price-fact"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No material/supplier path; sector similarity alone is insufficient."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "nickel-price-a-no-material",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-price-nickel-actual",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-price-fact"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:c5f24e0ceb3b569474bc149b1e98440d6267a8927a9f89a975c54132244f4583"
+    },
+    {
+      "case_id": "sanction-b-supplier",
+      "event_id": "event-sanction-microkaskad",
+      "event_type": "sanctions",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "supplier-b-x"
+      ],
+      "event_evidence_ids": [
+        "ev-sanction"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Supplier path is direct, but transaction scope and operational effect remain conditional."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "sanction-b-supplier",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-sanction-microkaskad",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-sanction"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:ef2d0b1370a8933db8e8a7fb45fbaa75a6fd988b7f18bbf460e08ffd1a761239"
+    },
+    {
+      "case_id": "sanction-a-unknown",
+      "event_id": "event-sanction-microkaskad",
+      "event_type": "sanctions",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "supplier-b-x"
+      ],
+      "event_evidence_ids": [
+        "ev-sanction"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Unknown supplier does not prove exposure or non-exposure."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "sanction-a-unknown",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-sanction-microkaskad",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-sanction"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:88dcc35ad2e03148ad6386c73584354c6937d4f8305d6ff5cc606fcec0ec31c4"
+    },
+    {
+      "case_id": "fire-north-a",
+      "event_id": "event-fire-north-plant",
+      "event_type": "facility_fire",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "plant-north"
+      ],
+      "event_evidence_ids": [
+        "ev-fire-north"
+      ],
+      "factual_status": "reported",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No supported business path; do not infer from manufacturing/electronics sector."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "fire-north-a",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-fire-north-plant",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-fire-north"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:b261998af9c5d45f3836b30263915da0f4eb8dd5ebbc82f3a95ce4fcbafd7a18"
+    },
+    {
+      "case_id": "fire-east-b",
+      "event_id": "event-fire-east-plant",
+      "event_type": "facility_fire",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "plant-east"
+      ],
+      "event_evidence_ids": [
+        "ev-fire-east"
+      ],
+      "factual_status": "reported",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Near-name facility is not company-b without entity evidence."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "fire-east-b",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-fire-east-plant",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-fire-east"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:ac8890bdee8d8a02a43e89eb4e3dd0f5a315e19c97cd46b307d26c3218c42850"
+    },
+    {
+      "case_id": "supplier-default-rumor-b",
+      "event_id": "event-default-rumor",
+      "event_type": "supplier_default",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "supplier-b-y"
+      ],
+      "event_evidence_ids": [
+        "ev-rumor-default"
+      ],
+      "factual_status": "rumor",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Rumor and different supplier cannot support a confident impact."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "supplier-default-rumor-b",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-default-rumor",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-rumor-default"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:8b8810ed6ecc75c190c10f69e910e5017c8f29712a46170c7bba07ccd35c9a9b"
+    },
+    {
+      "case_id": "supplier-default-rumor-a",
+      "event_id": "event-default-rumor",
+      "event_type": "supplier_default",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "supplier-b-y"
+      ],
+      "event_evidence_ids": [
+        "ev-rumor-default"
+      ],
+      "factual_status": "rumor",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No supplier match and rumor status both lower factual support."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "supplier-default-rumor-a",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-default-rumor",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-rumor-default"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:01d319aefe1cbb4bb0191248247deb638f929c33fdfe415b7d92cae0306be0b7"
+    },
+    {
+      "case_id": "tax-lira-b",
+      "event_id": "event-tax-lira",
+      "event_type": "tax_change",
+      "company_id": "company-b",
+      "target_entity_ids": [],
+      "event_evidence_ids": [
+        "ev-tax"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No evidenced sourcing link to Lira; return unknown/none-found for supplied graph."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "tax-lira-b",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-tax-lira",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-tax"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:589d814f9f4cd949584d71389b6977c4fca5b00e6ef09e25b5516eff5537cce4"
+    },
+    {
+      "case_id": "cyber-b",
+      "event_id": "event-cyber-orbita",
+      "event_type": "cyber_incident",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "company-b"
+      ],
+      "event_evidence_ids": [
+        "ev-cyber"
+      ],
+      "factual_status": "under_investigation",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Direct company mention does not establish production stop or data loss."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "cyber-b",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-cyber-orbita",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-cyber"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:945ed6fcec8c614b94ccd2015758b4b5d45ec850361a263838f73d49863c4514"
+    },
+    {
+      "case_id": "line-stop-b-maintenance",
+      "event_id": "event-line-stop-orbita",
+      "event_type": "production_line_stop",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "company-b",
+        "plant-b"
+      ],
+      "event_evidence_ids": [
+        "ev-line-stop"
+      ],
+      "factual_status": "planned",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Planned maintenance stop is not a supply disruption; amount and duration unknown."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "line-stop-b-maintenance",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-line-stop-orbita",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-line-stop"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:bd8dcefb2baf3a53d9457ce2f24731115ee9b1c5936ca2b4bd4648dff34342b2"
+    },
+    {
+      "case_id": "investment-c",
+      "event_id": "event-investment-techno",
+      "event_type": "new_investment",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "company-c"
+      ],
+      "event_evidence_ids": [
+        "ev-investment"
+      ],
+      "factual_status": "announced",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Announcement is not proof of current production benefit or capacity."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "investment-c",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-investment-techno",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-investment"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:34f8f7cdc268876119417db9aefe03b1edf7224cf32c6ec2863e2c997c2659cc"
+    },
+    {
+      "case_id": "export-q-product-mismatch",
+      "event_id": "event-export-meridian-mk9",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-q",
+        "product-p17"
+      ],
+      "event_evidence_ids": [
+        "ev-unrelated-country"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Country/product mismatch prevents a positive conclusion from name/category overlap."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-q-product-mismatch",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-meridian-mk9",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-unrelated-country"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:d6ba8c570e1e8733948cde0dfc4e295b77aab78bc8f9cc4031cecc667e4c38ec"
+    },
+    {
+      "case_id": "stale-port-closure-c",
+      "event_id": "event-port-old-2025",
+      "event_type": "historical_port_closure",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "port-vega"
+      ],
+      "event_evidence_ids": [
+        "ev-stale-port"
+      ],
+      "factual_status": "historical",
+      "current": false,
+      "graph_freshness": "stale",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Historical 2025 event must not be reported as current exposure."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "stale-port-closure-c",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-port-old-2025",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-stale-port"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:996964108e8df0627a78be1c9b256d501a93d5c365229a2149ab9a835523288f"
+    },
+    {
+      "case_id": "industry-only-a",
+      "event_id": "event-industry-outlook",
+      "event_type": "sector_forecast",
+      "company_id": "company-a",
+      "target_entity_ids": [],
+      "event_evidence_ids": [
+        "ev-industry-only"
+      ],
+      "factual_status": "sector_only",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": true,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "No company-specific evidence; prohibit confident impact based only on sector."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "industry-only-a",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-industry-outlook",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-industry-only"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:ebceecf52eff517e822332b6e6e067909794dae1cb429ccf853cb7c5c2749e35"
+    },
+    {
+      "case_id": "export-b-known-supplier-no-volume",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Show mechanism; financial quantity stays null because volume is unknown."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-b-known-supplier-no-volume",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:f4f43e5fb4429d352d8f02ee14d66311522eba80c741d701cf9f809b8d6c57ca"
+    },
+    {
+      "case_id": "export-b-explicit-numeric-assumptions",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": "numeric-assumptions-only-v1",
+      "provisional_expectations": [
+        "Calculate only the explicitly supplied scenario metric; label gross procurement exposure, not loss."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-b-explicit-numeric-assumptions",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:75ef9a2ceae8f3c10944080282df27d88ae1e5c7f0c3bd831116ecedd37dd294"
+    },
+    {
+      "case_id": "export-b-source-conflict",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "disputed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "A conflict in evidence limits confidence; preserve both source refs."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "export-b-source-conflict",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:a8d8f608a79bf57d14fc2710413cb27d0a5a9eea1a723494a689ea2154beabec"
+    },
+    {
+      "case_id": "port-c-no-alternate-route",
+      "event_id": "event-port-vega",
+      "event_type": "port_closure",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "port-vega"
+      ],
+      "event_evidence_ids": [
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Primary route is evidenced; alternate route is unknown, not absent."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "port-c-no-alternate-route",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-port-vega",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:b43f021533d82a40c16c269d39746d9e79f53de1030c5e6bb97855c38e034854"
+    },
+    {
+      "case_id": "multiple-events-one-article",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "The source document has a second separate price-change mention; keep both mentions and event mechanisms separate."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "multiple-events-one-article",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:3b1bc3b20b394bbff4076b974a685bec9b092562ccec2c7b12dd3374460987e2"
+    },
+    {
+      "case_id": "same-headline-other-facility",
+      "event_id": "event-fire-east-plant",
+      "event_type": "facility_fire",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "plant-east"
+      ],
+      "event_evidence_ids": [
+        "ev-fire-east"
+      ],
+      "factual_status": "reported",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Do not use similar event wording to create an unsupported relationship."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "same-headline-other-facility",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-fire-east-plant",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-fire-east"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:8ace99c84b6924e6b6381de07f061fd83170279536464967046d564d2fc78d4b"
+    },
+    {
+      "case_id": "forecast-is-not-realized",
+      "event_id": "event-price-nickel-forecast",
+      "event_type": "price_forecast",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "material-nickel"
+      ],
+      "event_evidence_ids": [
+        "ev-price-forecast"
+      ],
+      "factual_status": "forecast",
+      "current": false,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Potential future price scenario cannot be described as a realized increase."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "forecast-is-not-realized",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-price-nickel-forecast",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-price-forecast"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:426af7e08df2c2c91381ab50ee780c7cacace9ae574fa2713f0a357af33e741d"
+    },
+    {
+      "case_id": "historical-supplier-not-current",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Expired relationship is not current; apply valid-time filter."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "historical-supplier-not-current",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:23dc9983268fde9709d80739dfeae7f7d5712745f960f6b161fec335a120c287"
+    },
+    {
+      "case_id": "stock-conflict-no-averaging",
+      "event_id": "event-port-vega",
+      "event_type": "port_closure",
+      "company_id": "company-c",
+      "target_entity_ids": [
+        "port-vega"
+      ],
+      "event_evidence_ids": [
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Do not average 8 and 12 days or calculate cash loss."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "stock-conflict-no-averaging",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-port-vega",
+        "company-c",
+        "graph-shared-companies-current",
+        "ev-port-official",
+        "ev-port-independent"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:c3995aa51bcb05f1cdaa919a57c957342c4c6c7e946fadaf8df19852bfb9e872"
+    },
+    {
+      "case_id": "graph-partial",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-b",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "A partial graph can support listed paths only; no market-wide completeness claim."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "graph-partial",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-b",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:a95ddf64ae1d2c086d6c6946118d3560bba4d3cbc7fa2ed44ba1dad127799827"
+    },
+    {
+      "case_id": "no-path-not-no-risk",
+      "event_id": "event-export-x-mk7",
+      "event_type": "export_restriction",
+      "company_id": "company-a",
+      "target_entity_ids": [
+        "country-x",
+        "component-mk7"
+      ],
+      "event_evidence_ids": [
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "factual_status": "confirmed",
+      "current": true,
+      "graph_freshness": "current",
+      "sector_only": false,
+      "numeric_scenario_id": null,
+      "provisional_expectations": [
+        "Absence of a supplied path is not evidence of zero risk."
+      ],
+      "manual_approval": "provisional",
+      "source_case_ref": "no-path-not-no-risk",
+      "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "input_refs": [
+        "event-export-x-mk7",
+        "company-a",
+        "graph-shared-companies-current",
+        "ev-export-official",
+        "ev-export-correction",
+        "ev-export-wire",
+        "ev-multi-export"
+      ],
+      "limitations": [
+        "Target entity context is an explicit hand-authored test mapping, not a T09 output.",
+        "All expectations are provisional; the graph remains partial/open-world."
+      ],
+      "provenance": {
+        "origin": "synthetic",
+        "mapping_source": "shared news_event_catalog plus explicit T13 TARGETS/FACTUAL_STATUS tables",
+        "model_outputs_used_as_labels": false
+      },
+      "fixture_sha256": "sha256:437ba1a9aa32f933c5c21102d7067baf6e0297e2479594cb3e94f464647a26d2"
+    }
+  ],
+  "fixture_sha256": "sha256:fac54827fa19e44563049d95d8961265975e72d8dfbc59902905fbb6ca3cc29e"
+}

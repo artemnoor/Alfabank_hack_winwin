@@ -1,0 +1,15 @@
+{
+  "dataset_id": "t09-t13-independent-v1",
+  "version": "1.0.1",
+  "status": "provisional_not_gold_not_approved",
+  "manual_approval": "provisional",
+  "manifest_path": "spike/_shared/datasets/t09-t13-independent-v1/manifest.json",
+  "canonical_data_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+  "data_json_file_sha256": "sha256:5f524da4092a1549d66a4f2e5327129577142c8714618a9895ecb5c45852144f",
+  "operation_fixtures": {
+    "Graph.query": "spike/_shared/fixtures/t09-t13-independent-v1/graph-query.json",
+    "Business.read": "spike/_shared/fixtures/t09-t13-independent-v1/business-read.json"
+  },
+  "purpose": "Pin independent materialized inputs for the T12 algorithm experiments; labels remain provisional.",
+  "no_live_services": true
+}

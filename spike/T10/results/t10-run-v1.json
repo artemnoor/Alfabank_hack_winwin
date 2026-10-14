@@ -1,0 +1,25 @@
+{
+  "result_id": "t10-offline-run-v1",
+  "dataset_id": "t09-t13-independent-v1",
+  "dataset_version": "1.0.1",
+  "dataset_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+  "command": "python -B -m pytest -p no:cacheprovider spike/T10/tests -q",
+  "pythonpath": "packages/contracts/src;spike/T10/src;spike/T10/tests",
+  "environment": {
+    "python": "3.12.15",
+    "pydantic": "2.14.1",
+    "network": false,
+    "database": false,
+    "live_model": false
+  },
+  "test_count": 79,
+  "passed": 79,
+  "failed": 0,
+  "skipped": 0,
+  "coverage": null,
+  "engineering_quality": "PRELIMINARY",
+  "algorithm_quality": "PRELIMINARY",
+  "live_model_quality": "NOT MEASURED",
+  "integration_readiness": "NOT READY",
+  "manual_approval": "provisional"
+}

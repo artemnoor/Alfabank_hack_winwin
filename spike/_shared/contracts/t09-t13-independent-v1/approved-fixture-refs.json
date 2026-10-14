@@ -1,0 +1,66 @@
+{
+  "dataset_id": "t09-t13-independent-v1",
+  "dataset_refs": [
+    {
+      "approved_data_index_sha256": "sha256:cbc28de1fdda50ae39a4d2607f5679b4335adfa62bf25de8be94c28fbcfafc1f",
+      "approved_manifest_index_sha256": "sha256:44b92f6c5ac91ee9140afe17e1a114c830abcd581536fd8d625fd511442766d1",
+      "data_path": "fixtures/approved/datasets/radio-export-v1/data.json",
+      "data_sha256": "sha256:c96057e554723349873dd3f96302e607e54185d45c4cbd18ce52fa47b1a9c615",
+      "dataset_id": "radio-export-v1",
+      "manifest_path": "fixtures/approved/datasets/radio-export-v1/manifest.json",
+      "manifest_sha256": "sha256:a20c7a55d009af6a239353a0cfde2ca9f536fe5df98b46f283be638ebd9af7a3"
+    },
+    {
+      "approved_data_index_sha256": "sha256:015c8ddb0f96538c911bbe56d03d11205f78985d474230abbda754dd3b76635f",
+      "approved_manifest_index_sha256": "sha256:eb0fb66721420bd55bc718508c80a24c56d2e1bc2964189c76170e6650132b21",
+      "data_path": "fixtures/approved/datasets/steel-buffer-v1/data.json",
+      "data_sha256": "sha256:83ffc253f819d04c9d18c8b6b497146c22dc5e0691290c633138939918dd3f7a",
+      "dataset_id": "steel-buffer-v1",
+      "manifest_path": "fixtures/approved/datasets/steel-buffer-v1/manifest.json",
+      "manifest_sha256": "sha256:308ac0d6473801a856edb096c7ab196b592e442a2e0ed04a6c2304dd23e5d6ef"
+    }
+  ],
+  "fixture_refs": [
+    {
+      "approved_index_sha256": "sha256:8b5ddf351b9ee3ce0e9720a97dd71e76584250f82296d5e03570dc292074b57c",
+      "fixture_id": "two-events",
+      "operation_id": "Understanding.extract",
+      "path": "fixtures/approved/Understanding.extract/two-events/manifest.json",
+      "sha256": "sha256:d8b0deaab8cbee29ccf35ce9d92e412205533da92a400c503087436a35a7e050"
+    },
+    {
+      "approved_index_sha256": "sha256:6144d8671fadae1fc6e4446a00569ad3e36ec48cf4f459cc9394a9b987fd6f9f",
+      "fixture_id": "partition-page",
+      "operation_id": "Events.read",
+      "path": "fixtures/approved/Events.read/partition-page/manifest.json",
+      "sha256": "sha256:26ccb68bfb1eeb7f8ffd893f37d8681706acc0f00373faac5bb2887daede12c1"
+    },
+    {
+      "approved_index_sha256": "sha256:90a36b2a79027ee9194294b57dcc533da8d33d3054efec0f1a45cdec1fe044c8",
+      "fixture_id": "current-minimal",
+      "operation_id": "Business.read",
+      "path": "fixtures/approved/Business.read/current-minimal/manifest.json",
+      "sha256": "sha256:5ab3e991440e634ba08750c64b9f5eaea1b355f333a8eaba0877c4759697aa72"
+    },
+    {
+      "approved_index_sha256": "sha256:ff1fb6f6371ccf494635f03bf11211b69f7dfe5f263c3615193f0eb78a8dcaa8",
+      "fixture_id": "span-with-source",
+      "operation_id": "Evidence.read",
+      "path": "fixtures/approved/Evidence.read/span-with-source/manifest.json",
+      "sha256": "sha256:f19543864025dfcbb29d7498049c65fa668edb4dc652bdef288cccdbdd3c4b61"
+    },
+    {
+      "approved_index_sha256": "sha256:c45d1da15642a1d27711a9ead56560e0302479b4ed74e246d5270468c265d5b5",
+      "fixture_id": "current-chain",
+      "operation_id": "Graph.query",
+      "path": "fixtures/approved/Graph.query/current-chain/manifest.json",
+      "sha256": "sha256:621acfedf271036973e5a715a65718126e2f4072d24b4bcc6b36b5f69ea20724"
+    }
+  ],
+  "index_path": "fixtures/approved/index.json",
+  "index_sha256": "sha256:7329098c72ee9883e0bb322667896e6c3fba229f6a8d92d14acae2193c5ceca0",
+  "manual_approval": "provisional",
+  "note": "These are read-only pointers to previously approved fixtures; this provisional corpus is not approved by reference.",
+  "schema": "alfalab.spike.approved-fixture-refs/v1",
+  "version": "1.0.1"
+}

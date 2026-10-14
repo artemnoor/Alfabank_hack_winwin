@@ -1,0 +1,413 @@
+{
+  "schema": "alfalab.spike.t09-metrics/v1",
+  "dataset": {
+    "id": "t09-t13-independent-v1",
+    "version": "1.0.1",
+    "hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+    "manual_approval": "provisional_not_gold_not_approved",
+    "case_count": 32
+  },
+  "algorithm": {
+    "mode": "deterministic_offline_rules",
+    "model_quality": "NOT MEASURED",
+    "quality_status": "PRELIMINARY"
+  },
+  "metrics": {
+    "merge_precision": 1.0,
+    "merge_precision_counts": {
+      "true_positive": 1,
+      "false_positive": 0
+    },
+    "merge_recall": 1.0,
+    "merge_recall_counts": {
+      "true_positive": 1,
+      "false_negative": 0
+    },
+    "false_merge_rate": 0.0,
+    "false_merge_counts": {
+      "false_merge_cases": 0,
+      "nonmerge_cases": 31
+    },
+    "false_split_rate": 0.0,
+    "false_split_counts": {
+      "false_split_cases": 0,
+      "nonsplit_cases": 31
+    },
+    "defer_rate": 0.15493,
+    "defer_counts": {
+      "defer_decisions": 11,
+      "all_decisions": 71
+    },
+    "focus_decision_kind_accuracy": 1.0,
+    "focus_decision_counts": {
+      "correct": 32,
+      "cases": 32
+    }
+  },
+  "limitations": [
+    "The expected case properties are provisional hand-authored annotations, not an approved gold set.",
+    "The score is in-sample engineering feedback for this deterministic prototype, not an estimate of production accuracy.",
+    "The normative EventMention DTO does not contain article title/body, so text similarity and semantic models were not evaluated."
+  ],
+  "case_results": [
+    {
+      "case_id": "same-export-ru-en",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-wire-en",
+      "expected_focus_action": "attach",
+      "predicted_focus_action": "attach",
+      "all_actions": [
+        "attach",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "same-export-ten-reprints",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-reprint-01",
+      "expected_focus_action": "attach",
+      "predicted_focus_action": "attach",
+      "all_actions": [
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "same-port-closure-two-sources",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-port-independent",
+      "expected_focus_action": "attach",
+      "predicted_focus_action": "attach",
+      "all_actions": [
+        "attach",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "same-export-with-correction",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-correction",
+      "expected_focus_action": "correct",
+      "predicted_focus_action": "correct",
+      "all_actions": [
+        "correct",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "fire-same-title-north-east",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-fire-north",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "split-two-events-one-article",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-multi-1",
+      "expected_focus_action": "split",
+      "predicted_focus_action": "split",
+      "all_actions": [
+        "split"
+      ]
+    },
+    {
+      "case_id": "merge-duplicate-export-records",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-official",
+      "expected_focus_action": "merge",
+      "predicted_focus_action": "merge",
+      "all_actions": [
+        "merge"
+      ]
+    },
+    {
+      "case_id": "company-near-name",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-industry-only",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "parent-vs-subsidiary",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-parent-release",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "supplier-sanction-vs-export-ban",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-sanction",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "same-product-different-country",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-official",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "actual-price-vs-forecast",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-price-fact",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "defer"
+      ]
+    },
+    {
+      "case_id": "rumored-default-not-confirmed",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-default-rumor",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "rumored-plant-closure-vs-fire",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-fire-rumor",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "attach",
+        "defer"
+      ]
+    },
+    {
+      "case_id": "old-vs-current-port-closure",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-port-official",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "cyber-vs-maintenance-stop",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-cyber",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "tax-change-vs-sanction",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-tax",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "investment-vs-production-stop",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-investment",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "unknown-date-export",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-official",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "export-product-typo-candidate",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-unrelated-country",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "attach",
+        "defer"
+      ]
+    },
+    {
+      "case_id": "new-investment-same-company",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-investment",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "repost-not-independent-corroboration",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-reprint-01",
+      "expected_focus_action": "attach",
+      "predicted_focus_action": "attach",
+      "all_actions": [
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "different-fire-facility-alias",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-fire-north",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "multi-article-price-and-export",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-official",
+      "expected_focus_action": "attach",
+      "predicted_focus_action": "attach",
+      "all_actions": [
+        "attach",
+        "create",
+        "attach",
+        "create"
+      ]
+    },
+    {
+      "case_id": "potential-vs-actual-shutdown",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-line-stop",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "create",
+        "defer"
+      ]
+    },
+    {
+      "case_id": "historical-supplier-change",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-c-official",
+      "expected_focus_action": "correct",
+      "predicted_focus_action": "correct",
+      "all_actions": [
+        "attach",
+        "correct"
+      ]
+    },
+    {
+      "case_id": "source-version-correction",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-correction",
+      "expected_focus_action": "correct",
+      "predicted_focus_action": "correct",
+      "all_actions": [
+        "correct",
+        "attach"
+      ]
+    },
+    {
+      "case_id": "partial-actor-only",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-industry-only",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "country-name-overlap",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-export-official",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    },
+    {
+      "case_id": "same-supplier-different-events",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-default-rumor",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer",
+        "create"
+      ]
+    },
+    {
+      "case_id": "no-source-support",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-archived-unavailable",
+      "expected_focus_action": "defer",
+      "predicted_focus_action": "defer",
+      "all_actions": [
+        "defer"
+      ]
+    },
+    {
+      "case_id": "near-identical-title-different-sites",
+      "manual_approval": "provisional",
+      "focus_mention_id": "mention-fire-north",
+      "expected_focus_action": "create",
+      "predicted_focus_action": "create",
+      "all_actions": [
+        "create",
+        "create"
+      ]
+    }
+  ]
+}

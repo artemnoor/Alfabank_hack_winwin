@@ -1,0 +1,84 @@
+{
+  "fixture_id": "t10-business-scenarios-v1",
+  "schema": "alfalab.spike.t10-scenario-index/v1",
+  "version": "1.0.0",
+  "origin": "read-only adapter over shared synthetic fixture corpus",
+  "description": "Pins the T10 test harness to all shared v1.0.1 business-question cases. Inputs are materialized by loading strict Business snapshots and event type codes from the frozen dataset; no model or database output is used as a label.",
+  "dataset": {
+    "id": "t09-t13-independent-v1",
+    "version": "1.0.1",
+    "path": "spike/_shared/datasets/t09-t13-independent-v1/data.json",
+    "canonical_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+    "manual_approval": "provisional"
+  },
+  "operation_refs": [
+    {
+      "operation_id": "Business.propose_profile",
+      "contract_version": "1.0.0",
+      "schema_hash": "sha256:30751e07ede061a55a6fc249f37d4110d70e00803655321e375c7b58fb80929a"
+    },
+    {
+      "operation_id": "Business.propose_questions",
+      "contract_version": "1.0.0",
+      "schema_hash": "sha256:c0263ff8c9dd8d7ab2a2dbfdea357b01c210d9e0cefdf0321808706558e0b20d"
+    },
+    {
+      "operation_id": "Business.apply",
+      "contract_version": "1.0.0",
+      "schema_hash": "sha256:a137d6857e14e14ce5bd81106058b7712aab9d0e8ff96f9195df755bce2b0c6e"
+    },
+    {
+      "operation_id": "Business.read",
+      "contract_version": "1.0.0",
+      "schema_hash": "sha256:bcd1da7eced56629c7d6e1b79106eeeb53261c595d494bf5a36fc7f2b0b10cf7"
+    }
+  ],
+  "contract_lock": {
+    "path": "spike/_shared/contracts/t09-t13-independent-v1/operations-lock.json",
+    "sha256": "sha256:60098767a6f884504d9393bb1fc74f307890dce0eb915a448bb26c3ae2e06a27"
+  },
+  "inputs": [
+    "data.json#/company_profiles",
+    "data.json#/news_event_catalog",
+    "data.json#/t10_business_question_cases"
+  ],
+  "case_count": 22,
+  "scenario_ids": [
+    "sparse-export-country",
+    "sparse-export-vendor",
+    "skipped-is-not-no",
+    "sparse-import-share",
+    "b-export-purchase-volume",
+    "b-export-alternative-supplier",
+    "b-port-alternate-route",
+    "b-sanction-scope",
+    "b-budget-one-question",
+    "b-budget-three-questions",
+    "c-price-input-quantity",
+    "c-contradictory-inventory",
+    "c-port-route-check",
+    "c-process-capacity",
+    "c-historical-supplier",
+    "declined-answer-preserved",
+    "forecast-vs-actual",
+    "tax-product-scope",
+    "industry-only-no-profile-fact",
+    "unknown-answer-not-negative",
+    "question-preference-suppression",
+    "investment-amount-unknown"
+  ],
+  "scenario_adaptations": {
+    "sparse-export-country": "Remove the stored skipped answer to exercise the unanswered sparse-profile branch; skipped behavior is covered independently by skipped-is-not-no.",
+    "sparse-export-vendor": "Remove the stored skipped answer to exercise a fresh question proposal.",
+    "b-budget-one-question": "Pass request budget 1; all other scenario budgets are 10 and are still capped by snapshot preferences.",
+    "question-preference-suppression": "Set alternative_route in the explicitly supplied snapshot preference for this local test case."
+  },
+  "expected_properties": "Read from the frozen shared case list and asserted by named per-case properties in tests/test_t10_business.py. They are provisional property expectations, not predicted model outputs.",
+  "limitations": [
+    "This index materializes test inputs by applying the documented scenario adaptations to frozen snapshots; it is not an owner-produced profile.",
+    "No model output is used as a label; all case expectations remain provisional pending independent review."
+  ],
+  "hash_method": "SHA-256 of canonical UTF-8 JSON (sorted keys, compact separators, ensure_ascii=false) after omitting the data_hash field.",
+  "data_hash": "sha256:f2c0066ae128fb9f3af08c4b0e961012d4b4bd9210007d6d65c4e35bfd5fe4ed",
+  "manual_approval": "provisional"
+}

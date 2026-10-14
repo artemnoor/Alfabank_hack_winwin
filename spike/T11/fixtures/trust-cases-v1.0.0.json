@@ -1,0 +1,330 @@
+{
+  "schema": "alfalab.spike.t11-evidence-trust-fixture/v1",
+  "fixture_id": "t11-evidence-trust-cases-v1.0.0",
+  "version": "1.0.0",
+  "dataset_ref": {
+    "dataset_id": "t09-t13-independent-v1",
+    "version": "1.0.1",
+    "path": "spike/_shared/datasets/t09-t13-independent-v1/data.json",
+    "canonical_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725"
+  },
+  "origin": "synthetic",
+  "manual_approval": "provisional",
+  "description": "Hand-authored source-assertion annotations and property expectations over the frozen shared v1.0.1 corpus. This is not gold data and does not use model outputs.",
+  "provenance": {
+    "creator": "T11 offline experiment",
+    "model_outputs_used_as_labels": false,
+    "external_facts_used": false,
+    "source_assertion_annotations": "Hand-authored synthetic relationship labels for testing only; the prototype does not extract assertions from text.",
+    "owner_policy_ref": "spike/_shared/contracts/t09-t13-independent-v1/synthetic-owner-policy.json"
+  },
+  "limitations": [
+    "Synthetic inputs do not measure real source reliability or factual accuracy.",
+    "Source-root and assertion-relation labels are provisional hand-authored inputs.",
+    "The only policy eligibility example is scoped to a named synthetic owner policy; it never sets a confirmed status."
+  ],
+  "expected_properties": [
+    "Anchor integrity, source assertion, and factual sufficiency are separate outputs.",
+    "A verified anchor never promotes a claim to confirmed.",
+    "Copies sharing one publisher root are one origin for the named local policy.",
+    "Conflicts, missing source text, stale assertions, and unknowns remain explicit."
+  ],
+  "source_assertions": [
+    {
+      "annotation_id": "ann-export-original",
+      "evidence_ref": "ev-export-official",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-correction",
+      "evidence_ref": "ev-export-correction",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-source-unavailable",
+      "evidence_ref": "ev-archived-unavailable",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-rumor",
+      "evidence_ref": "ev-rumor-default",
+      "claim_id": "supplier-default-current",
+      "relation": "mentions_only",
+      "value": null,
+      "temporal_scope": "unknown"
+    },
+    {
+      "annotation_id": "ann-stock-8d",
+      "evidence_ref": "ev-c-stock-8d",
+      "claim_id": "company-c-stock-days",
+      "relation": "supports",
+      "value": "8 days",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-stock-12d",
+      "evidence_ref": "ev-c-stock-12d",
+      "claim_id": "company-c-stock-days",
+      "relation": "supports",
+      "value": "12 days",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-stale-port",
+      "evidence_ref": "ev-stale-port",
+      "claim_id": "port-currently-closed",
+      "relation": "supports",
+      "value": "closed",
+      "temporal_scope": "historical"
+    },
+    {
+      "annotation_id": "ann-b-official-supply",
+      "evidence_ref": "ev-b-official",
+      "claim_id": "b-buys-microkaskad",
+      "relation": "supports",
+      "value": "company-b buys MK-7 from MicroKaskad",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-b-independent-supply",
+      "evidence_ref": "ev-b-independent",
+      "claim_id": "b-buys-microkaskad",
+      "relation": "supports",
+      "value": "company-b buys MK-7 from MicroKaskad",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-01",
+      "evidence_ref": "ev-export-reprint-01",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-02",
+      "evidence_ref": "ev-export-reprint-02",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-03",
+      "evidence_ref": "ev-export-reprint-03",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-04",
+      "evidence_ref": "ev-export-reprint-04",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-05",
+      "evidence_ref": "ev-export-reprint-05",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-06",
+      "evidence_ref": "ev-export-reprint-06",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-07",
+      "evidence_ref": "ev-export-reprint-07",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-08",
+      "evidence_ref": "ev-export-reprint-08",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-09",
+      "evidence_ref": "ev-export-reprint-09",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    },
+    {
+      "annotation_id": "ann-export-reprint-10",
+      "evidence_ref": "ev-export-reprint-10",
+      "claim_id": "event-export-claim",
+      "relation": "supports",
+      "value": "export-restriction-announced",
+      "temporal_scope": "current"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "exact-anchor",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "supported_unconfirmed"
+    },
+    {
+      "case_id": "wrong-quote",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "mutation": "wrong_quote",
+      "expected_anchor": "invalid",
+      "expected_claim_status": "unverified"
+    },
+    {
+      "case_id": "wrong-source-hash",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "mutation": "wrong_source_hash",
+      "expected_anchor": "invalid",
+      "expected_claim_status": "unverified"
+    },
+    {
+      "case_id": "source-version-mismatch",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-export-correction"
+      ],
+      "mutation": "source_version_mismatch",
+      "expected_anchor": "invalid",
+      "expected_claim_status": "unverified"
+    },
+    {
+      "case_id": "source-unavailable",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-archived-unavailable"
+      ],
+      "mutation": null,
+      "expected_anchor": "unavailable",
+      "expected_claim_status": "unverified"
+    },
+    {
+      "case_id": "verified-rumor-wording",
+      "claim_id": "supplier-default-current",
+      "evidence_refs": [
+        "ev-rumor-default"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "unknown"
+    },
+    {
+      "case_id": "ten-syndicated-copies",
+      "claim_id": "event-export-claim",
+      "evidence_refs": [
+        "ev-export-reprint-01",
+        "ev-export-reprint-02",
+        "ev-export-reprint-03",
+        "ev-export-reprint-04",
+        "ev-export-reprint-05",
+        "ev-export-reprint-06",
+        "ev-export-reprint-07",
+        "ev-export-reprint-08",
+        "ev-export-reprint-09",
+        "ev-export-reprint-10"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "supported_unconfirmed",
+      "expected_distinct_roots": 1,
+      "policy_allowed": false,
+      "policy_mode": "explicit",
+      "statement_id": "event-export-claim"
+    },
+    {
+      "case_id": "independent-roots",
+      "claim_id": "b-buys-microkaskad",
+      "evidence_refs": [
+        "ev-b-official",
+        "ev-b-independent"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "supported_unconfirmed",
+      "expected_distinct_roots": 2,
+      "policy_allowed": true,
+      "policy_mode": "explicit",
+      "statement_id": "b-buys-microkaskad"
+    },
+    {
+      "case_id": "contradictory-stock",
+      "claim_id": "company-c-stock-days",
+      "evidence_refs": [
+        "ev-c-stock-8d",
+        "ev-c-stock-12d"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "disputed"
+    },
+    {
+      "case_id": "stale-source",
+      "claim_id": "port-currently-closed",
+      "evidence_refs": [
+        "ev-stale-port"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "historical"
+    },
+    {
+      "case_id": "model-hypothesis",
+      "claim_id": "supplier-default-current",
+      "evidence_refs": [],
+      "mutation": null,
+      "expected_anchor": "none",
+      "expected_claim_status": "unknown"
+    },
+    {
+      "case_id": "confirmed-needs-owner-policy",
+      "claim_id": "b-buys-microkaskad",
+      "evidence_refs": [
+        "ev-b-official",
+        "ev-b-independent"
+      ],
+      "mutation": null,
+      "expected_anchor": "verified",
+      "expected_claim_status": "supported_unconfirmed",
+      "expected_distinct_roots": 2,
+      "policy_allowed": false,
+      "statement_id": "b-buys-microkaskad"
+    }
+  ],
+  "content_hash": "sha256:f0ed002a48a9da59baa9b56d9b47e147cbd5de344cfca3621debb4ac4b4de2d4"
+}

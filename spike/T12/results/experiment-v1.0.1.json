@@ -1,0 +1,302 @@
+{
+  "current_projection": {
+    "edge_count": 15,
+    "edge_ids": [
+      "edge-1dbc5e8f134d7832985c33ca9833ce17e59a3fe287956b663b9ada4bdba0a5d1",
+      "edge-1e57277aea2ff71acc288cf5def7b75fca071050ce671dbea3102e5e3cf2a0b3",
+      "edge-213628cb91030536008416ebb31669ea759edf7175d23ad996f5c19a625b88fe",
+      "edge-24439f00257d92936250e42752d14233bf22d1133a1f6873439db0cfb3cb1418",
+      "edge-24610b766c0e2c2c2af3a62360677654cf7f9a48ee489e0dbbf9919d53a56f2b",
+      "edge-4ec3c7d094ed02dc9e922531c94e357d325d8f9fdae0d89cd059cf3d16d3889f",
+      "edge-5cab9490111e5fa266bc368e4bfe4ea7735bc546f22ea06dc5b9205bf9bf1c03",
+      "edge-6c8669428304d9a3bfc19a1b9401425fb32afe416472652f88ba67e7c677c440",
+      "edge-815f31a507ece812eadb8002a8646004db6e253ec4e741addbf58d48de71cc99",
+      "edge-8de94f6cff10a5f2e578a8c56b8875a1bdf25c90c5d6a5f3e34c665a2db592f5",
+      "edge-bb82f1f7978e73e35eeb98c24ebc37456bea44fef959fa945b5ead58353a0633",
+      "edge-be2646a633b08cea7ea40a9f56b3dd81d2215a373f457dc933a8fa22908005ce",
+      "edge-cd8ad6885bedb82c9313afd6d7205534a4682eeaf26ae6d41b1751ee83cb94a8",
+      "edge-f4c2c911dd51c162197175f8f65ca0ffba47c36ce3861e4fa3575f4cf0062913",
+      "edge-f50c284c41cb0abc89cfe8dea719abe35ce544d5c286ba97300a2aedc59c1a36"
+    ],
+    "graph_id": "graph-shared-companies-current",
+    "missing_data": [
+      {
+        "detail": "Поставщики не предоставлены",
+        "path": "/statements/a-supplier-unknown",
+        "reason": "not_provided"
+      },
+      {
+        "detail": "Объём не раскрыт",
+        "path": "/statements/c-volume-unknown",
+        "reason": "not_provided"
+      }
+    ],
+    "node_count": 15,
+    "revision": 0
+  },
+  "dataset_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+  "dataset_id": "t09-t13-independent-v1",
+  "dataset_status": "provisional_not_gold_not_approved",
+  "dataset_version": "1.0.1",
+  "historical_case": {
+    "edge_ids": [
+      "edge-213628cb91030536008416ebb31669ea759edf7175d23ad996f5c19a625b88fe",
+      "edge-3c8f14b8e6ff74d4166cd1a9436acfe81a1270e47070f19fcde19d6ab5ceebf5",
+      "edge-4ec3c7d094ed02dc9e922531c94e357d325d8f9fdae0d89cd059cf3d16d3889f"
+    ],
+    "graph_id": "graph-company-c-historical",
+    "temporal_contexts": [
+      {
+        "edge_id": "edge-213628cb91030536008416ebb31669ea759edf7175d23ad996f5c19a625b88fe",
+        "valid_from": "2025-06-01T00:00:00Z",
+        "valid_to": null
+      },
+      {
+        "edge_id": "edge-3c8f14b8e6ff74d4166cd1a9436acfe81a1270e47070f19fcde19d6ab5ceebf5",
+        "valid_from": "2024-01-01T00:00:00Z",
+        "valid_to": "2025-12-31T23:59:59Z"
+      },
+      {
+        "edge_id": "edge-4ec3c7d094ed02dc9e922531c94e357d325d8f9fdae0d89cd059cf3d16d3889f",
+        "valid_from": "2025-06-01T00:00:00Z",
+        "valid_to": null
+      }
+    ],
+    "valid_as_of": "2025-06-01T00:00:00Z"
+  },
+  "independent_inputs": [
+    {
+      "edge_count": 0,
+      "edges": [],
+      "graph_id": "graph-company-a-t12-input",
+      "input_id": "hypothetical-only",
+      "missing_data": [
+        {
+          "detail": "Negative assertion remains in the spike sidecar because GraphEdge has no explicit polarity field.",
+          "path": "/statements/a-explicit-not-source-country-x",
+          "reason": "unsupported"
+        },
+        {
+          "detail": "Hypothetical assertion is preserved in the spike sidecar and is not projected as a factual edge.",
+          "path": "/statements/a-hypothetical-source-country-x",
+          "reason": "unsupported"
+        },
+        {
+          "detail": "Поставщики не предоставлены",
+          "path": "/statements/a-supplier-unknown",
+          "reason": "not_provided"
+        }
+      ],
+      "node_count": 2,
+      "preserved_statements": [
+        {
+          "has_exact_statement_ref": false,
+          "reason": "valid_from_unknown",
+          "statement_id": "a-supplier-unknown"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "non_graph_statement",
+          "statement_id": "a-activity-v2"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "explicit_negative_not_graph_edge",
+          "statement_id": "a-explicit-not-source-country-x"
+        },
+        {
+          "has_exact_statement_ref": true,
+          "reason": "hypothetical_not_projected_as_fact",
+          "statement_id": "a-hypothetical-source-country-x"
+        }
+      ],
+      "temporal_edge_contexts": []
+    },
+    {
+      "edge_count": 0,
+      "edges": [],
+      "graph_id": "graph-company-a-t12-input",
+      "input_id": "explicit-negative-country-x",
+      "missing_data": [
+        {
+          "detail": "Negative assertion remains in the spike sidecar because GraphEdge has no explicit polarity field.",
+          "path": "/statements/a-explicit-not-source-country-x",
+          "reason": "unsupported"
+        },
+        {
+          "detail": "Hypothetical assertion is preserved in the spike sidecar and is not projected as a factual edge.",
+          "path": "/statements/a-hypothetical-source-country-x",
+          "reason": "unsupported"
+        },
+        {
+          "detail": "Поставщики не предоставлены",
+          "path": "/statements/a-supplier-unknown",
+          "reason": "not_provided"
+        }
+      ],
+      "node_count": 2,
+      "preserved_statements": [
+        {
+          "has_exact_statement_ref": false,
+          "reason": "valid_from_unknown",
+          "statement_id": "a-supplier-unknown"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "non_graph_statement",
+          "statement_id": "a-activity-v2"
+        },
+        {
+          "has_exact_statement_ref": true,
+          "reason": "explicit_negative_not_graph_edge",
+          "statement_id": "a-explicit-not-source-country-x"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "hypothetical_not_projected_as_fact",
+          "statement_id": "a-hypothetical-source-country-x"
+        }
+      ],
+      "temporal_edge_contexts": []
+    },
+    {
+      "edge_count": 3,
+      "edges": [
+        {
+          "edge_id": "edge-24610b766c0e2c2c2af3a62360677654cf7f9a48ee489e0dbbf9919d53a56f2b",
+          "epistemic_status": "confirmed",
+          "input_statement_refs": [],
+          "method": null,
+          "relation": "purchases_from",
+          "source_node_id": "node-company-b",
+          "statement_refs": [
+            "b-buys-microkaskad"
+          ],
+          "target_node_id": "node-supplier-b-x"
+        },
+        {
+          "edge_id": "edge-f2132238334d3c0029b52ff689aea83d13b6b9bb286ee18be39a6176c49443db",
+          "epistemic_status": "inferred",
+          "input_statement_refs": [
+            "b-buys-microkaskad",
+            "b-supplier-country"
+          ],
+          "method": "spike.graph.rule.company-supplier-location",
+          "relation": "depends_on_country",
+          "source_node_id": "node-company-b",
+          "statement_refs": [],
+          "target_node_id": "node-country-x"
+        },
+        {
+          "edge_id": "edge-f50c284c41cb0abc89cfe8dea719abe35ce544d5c286ba97300a2aedc59c1a36",
+          "epistemic_status": "confirmed",
+          "input_statement_refs": [],
+          "method": null,
+          "relation": "located_in",
+          "source_node_id": "node-supplier-b-x",
+          "statement_refs": [
+            "b-supplier-country"
+          ],
+          "target_node_id": "node-country-x"
+        }
+      ],
+      "graph_id": "graph-company-b-t12-input",
+      "input_id": "inferred-company-country-x",
+      "missing_data": [
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-route-vega",
+          "reason": "unavailable"
+        },
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-secondary-component",
+          "reason": "unavailable"
+        },
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-secondary-supplier",
+          "reason": "unavailable"
+        },
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-site",
+          "reason": "unavailable"
+        },
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-supplier-supplies-mk7",
+          "reason": "unavailable"
+        },
+        {
+          "detail": "No graph edge was emitted because the exact direct StatementRef was not supplied.",
+          "path": "/statements/b-uses-mk7",
+          "reason": "unavailable"
+        }
+      ],
+      "node_count": 8,
+      "preserved_statements": [
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-route-vega"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-secondary-component"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-secondary-supplier"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-site"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-supplier-supplies-mk7"
+        },
+        {
+          "has_exact_statement_ref": false,
+          "reason": "direct_statement_reference_missing",
+          "statement_id": "b-uses-mk7"
+        }
+      ],
+      "temporal_edge_contexts": [
+        {
+          "edge_id": "edge-24610b766c0e2c2c2af3a62360677654cf7f9a48ee489e0dbbf9919d53a56f2b",
+          "recorded_at": "2026-10-06T09:00:00Z",
+          "statement_id": "b-buys-microkaskad",
+          "valid_from": "2026-01-01T00:00:00Z",
+          "valid_to": null
+        },
+        {
+          "edge_id": "edge-f2132238334d3c0029b52ff689aea83d13b6b9bb286ee18be39a6176c49443db",
+          "recorded_at": "2026-10-14T08:30:00Z",
+          "statement_id": "b-inferred-country-x-dependency",
+          "valid_from": "2026-01-01T00:00:00Z",
+          "valid_to": null
+        },
+        {
+          "edge_id": "edge-f50c284c41cb0abc89cfe8dea719abe35ce544d5c286ba97300a2aedc59c1a36",
+          "recorded_at": "2026-10-06T09:00:00Z",
+          "statement_id": "b-supplier-country",
+          "valid_from": "2026-01-01T00:00:00Z",
+          "valid_to": null
+        }
+      ]
+    }
+  ],
+  "interpretation": [
+    "The shared corpus is synthetic, provisional and not an approved gold dataset.",
+    "No external data, service, embedding, or live model was used.",
+    "Missing edges represent unknown state; this summary does not infer negative dependency."
+  ],
+  "live_model_quality": "NOT MEASURED",
+  "quality": "PRELIMINARY"
+}

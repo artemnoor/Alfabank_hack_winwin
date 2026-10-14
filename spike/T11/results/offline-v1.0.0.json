@@ -1,0 +1,1030 @@
+{
+  "cases": [
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "exact-anchor",
+      "claim_status": "supported_unconfirmed",
+      "distinct_supporting_publisher_roots": 1,
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 73,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 41
+          },
+          "annotation_id": "ann-export-original",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-official",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T08:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T08:00:00Z",
+            "publisher_id": "regulator-x",
+            "publisher_root_id": "regulator-x",
+            "source_type": "official_notice",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:de49f2b304e98f8c58bbba9cd31474062316473a30e0ecea5cf492870d700698",
+            "object_id": "doc-export-official",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "asserts"
+    },
+    {
+      "anchor_integrity": [
+        "invalid"
+      ],
+      "case_id": "wrong-quote",
+      "claim_status": "unverified",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 73,
+            "integrity": "invalid",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [
+              "quote_hash_mismatch"
+            ],
+            "start": 42
+          },
+          "annotation_id": "ann-export-original",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-official",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T08:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T08:00:00Z",
+            "publisher_id": "regulator-x",
+            "publisher_root_id": "regulator-x",
+            "source_type": "official_notice",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:de49f2b304e98f8c58bbba9cd31474062316473a30e0ecea5cf492870d700698",
+            "object_id": "doc-export-official",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "unverified"
+    },
+    {
+      "anchor_integrity": [
+        "invalid"
+      ],
+      "case_id": "wrong-source-hash",
+      "claim_status": "unverified",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-export-official"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 73,
+            "integrity": "invalid",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [
+              "evidence_source_hash_mismatch"
+            ],
+            "start": 41
+          },
+          "annotation_id": "ann-export-original",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-official",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T08:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T08:00:00Z",
+            "publisher_id": "regulator-x",
+            "publisher_root_id": "regulator-x",
+            "source_type": "official_notice",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:de49f2b304e98f8c58bbba9cd31474062316473a30e0ecea5cf492870d700698",
+            "object_id": "doc-export-official",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "unverified"
+    },
+    {
+      "anchor_integrity": [
+        "invalid"
+      ],
+      "case_id": "source-version-mismatch",
+      "claim_status": "unverified",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-export-correction"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 95,
+            "integrity": "invalid",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:af0537817a41e4abf45c15d503efc2c4c6cf9181421cbcf139768bad7adf7b4d",
+            "reason_codes": [
+              "source_version_mismatch"
+            ],
+            "start": 28
+          },
+          "annotation_id": "ann-export-correction",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": false,
+          "evidence_ref": "ev-export-correction",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-14T07:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-14T07:00:00Z",
+            "publisher_id": "regulator-x",
+            "publisher_root_id": "regulator-x",
+            "source_type": "official_correction",
+            "syndication_group_id": "export-x-correction-20261014"
+          },
+          "source_ref": {
+            "hash": "sha256:a47dfa4843a76c8181df59bc64a210a21112187f8b87346685483fc93573808a",
+            "object_id": "doc-export-correction",
+            "owner": "Documents",
+            "revision": 2
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "unverified"
+    },
+    {
+      "anchor_integrity": [
+        "unavailable"
+      ],
+      "case_id": "source-unavailable",
+      "claim_status": "unverified",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-archived-unavailable"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "unverified",
+            "end": null,
+            "integrity": "unavailable",
+            "locator_kind": "whole_artifact",
+            "quote_hash": null,
+            "reason_codes": [
+              "source_content_unavailable"
+            ],
+            "start": null
+          },
+          "annotation_id": "ann-source-unavailable",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": false,
+          "evidence_ref": "ev-archived-unavailable",
+          "relation": "supports",
+          "source": {
+            "availability": "missing",
+            "collected_at": "2026-10-14T00:00:00Z",
+            "origin": "synthetic",
+            "published_at": null,
+            "publisher_id": "archive-withdrawn",
+            "publisher_root_id": "archive-withdrawn",
+            "source_type": "unavailable_source",
+            "syndication_group_id": "archive-withdrawn-item"
+          },
+          "source_ref": {
+            "hash": "sha256:060bcf4206220428b67b04571beae57755d8fe3121c6f75b5526e7099f9ac239",
+            "object_id": "doc-archived-unavailable",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "unverified"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "verified-rumor-wording",
+      "claim_status": "unknown",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-rumor-default"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:baabc664675b0c1ecf5f3cd2b1787c868ee3b12c34200f916e6349b7c387f90f",
+            "reason_codes": [],
+            "start": 18
+          },
+          "annotation_id": "ann-rumor",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-rumor-default",
+          "relation": "mentions_only",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T14:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T14:00:00Z",
+            "publisher_id": "social-channel",
+            "publisher_root_id": "social-channel",
+            "source_type": "rumor",
+            "syndication_group_id": "supplier-default-rumor"
+          },
+          "source_ref": {
+            "hash": "sha256:b62abbcf510831c6c9e94c6056a58c107d4d25462c2bbfed72b9ccd2380d3ea6",
+            "object_id": "doc-default-rumor",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "unknown",
+          "value": null
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "mentions_only"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "ten-syndicated-copies",
+      "claim_status": "supported_unconfirmed",
+      "distinct_supporting_publisher_roots": 1,
+      "evidence_refs": [
+        "ev-export-reprint-01",
+        "ev-export-reprint-02",
+        "ev-export-reprint-03",
+        "ev-export-reprint-04",
+        "ev-export-reprint-05",
+        "ev-export-reprint-06",
+        "ev-export-reprint-07",
+        "ev-export-reprint-08",
+        "ev-export-reprint-09",
+        "ev-export-reprint-10"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-01",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-01",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T11:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T11:00:00Z",
+            "publisher_id": "repost-outlet-01",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:606f65ff4770ea8f55a037f07336644d74c3d7666b534cfd397c681c12c79ca9",
+            "object_id": "doc-export-reprint-01",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-02",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-02",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T12:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T12:00:00Z",
+            "publisher_id": "repost-outlet-02",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:b1357592066553f5bbe7cc0fa3c08b8dcc56db07b4e6d6dd69f477d2d2fa5e67",
+            "object_id": "doc-export-reprint-02",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-03",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-03",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T13:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T13:00:00Z",
+            "publisher_id": "repost-outlet-03",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:d890db1537a189f51310a9bd7c41d1e44f643c77ac505b48fe6324bf3f24fc9e",
+            "object_id": "doc-export-reprint-03",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-04",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-04",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T14:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T14:00:00Z",
+            "publisher_id": "repost-outlet-04",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:b146a629d708e143c8bbb9e2d7121784c700078da6c5aa07048d3ff5c49a906a",
+            "object_id": "doc-export-reprint-04",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-05",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-05",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T15:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T15:00:00Z",
+            "publisher_id": "repost-outlet-05",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:28b93abf5c22afd7ec0092fde2e3719b849f0144f37a618fcdf97a8f588cd608",
+            "object_id": "doc-export-reprint-05",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-06",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-06",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T16:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T16:00:00Z",
+            "publisher_id": "repost-outlet-06",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:c396f3683e0b5c831929a743d7fca2488510b226d9d78df75c8bbab991ad8c8f",
+            "object_id": "doc-export-reprint-06",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-07",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-07",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T17:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T17:00:00Z",
+            "publisher_id": "repost-outlet-07",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:2117e3e36559be9c46c9348077f39b8afe0dc4d7f9967d40794de5b00ada4db2",
+            "object_id": "doc-export-reprint-07",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-08",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-08",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T18:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T18:00:00Z",
+            "publisher_id": "repost-outlet-08",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:34a3a6726ccd1f94d28296715b83c8f7be2e6d9e48882695f4ad64d4f99879e7",
+            "object_id": "doc-export-reprint-08",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 75,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 43
+          },
+          "annotation_id": "ann-export-reprint-09",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-09",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T19:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T19:00:00Z",
+            "publisher_id": "repost-outlet-09",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:3e07fb789a8c25b5574caac8ac98afea0f55cdc2e6b1bc8a2703ca3084ee4acd",
+            "object_id": "doc-export-reprint-09",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 76,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:88cb1255106e2bad1c205589dcb7c33732ccc6bfe61dabf66c8d12e09e8d18a3",
+            "reason_codes": [],
+            "start": 44
+          },
+          "annotation_id": "ann-export-reprint-10",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-export-reprint-10",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T20:05:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T20:00:00Z",
+            "publisher_id": "repost-outlet-10",
+            "publisher_root_id": "regulator-x",
+            "source_type": "syndicated_repost",
+            "syndication_group_id": "export-x-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:0de0c252c32b20df18b5ec15483cc9e0a93303b4492763fdba50959c090c9fe2",
+            "object_id": "doc-export-reprint-10",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "export-restriction-announced"
+        }
+      ],
+      "owner_policy_id": "test-owner-policy-t09-t13-v1",
+      "owner_policy_reason_codes": [
+        "insufficient_independent_publisher_roots"
+      ],
+      "owner_review_eligible": false,
+      "source_assertion_state": "asserts"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "independent-roots",
+      "claim_status": "supported_unconfirmed",
+      "distinct_supporting_publisher_roots": 2,
+      "evidence_refs": [
+        "ev-b-independent",
+        "ev-b-official"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 169,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:fc74b001ffdcc15603757e9fb2339b4d827417029117ecd41f6cf0f7c8d06f67",
+            "reason_codes": [],
+            "start": 0
+          },
+          "annotation_id": "ann-b-independent-supply",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-b-independent",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-06T08:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-06T08:00:00Z",
+            "publisher_id": "electronics-journal",
+            "publisher_root_id": "electronics-journal",
+            "source_type": "independent_news",
+            "syndication_group_id": "b-supply-independent-20261006"
+          },
+          "source_ref": {
+            "hash": "sha256:fc74b001ffdcc15603757e9fb2339b4d827417029117ecd41f6cf0f7c8d06f67",
+            "object_id": "doc-b-independent",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "company-b buys MK-7 from MicroKaskad"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 178,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:46902a7523e92e037856c5ded1db8e87f00c0bed50f12a6f3de6261ea9b3722e",
+            "reason_codes": [],
+            "start": 0
+          },
+          "annotation_id": "ann-b-official-supply",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-b-official",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-05T10:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-05T10:00:00Z",
+            "publisher_id": "company-b",
+            "publisher_root_id": "company-b",
+            "source_type": "company_statement",
+            "syndication_group_id": "b-supply-statement-20261005"
+          },
+          "source_ref": {
+            "hash": "sha256:46902a7523e92e037856c5ded1db8e87f00c0bed50f12a6f3de6261ea9b3722e",
+            "object_id": "doc-b-official",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "company-b buys MK-7 from MicroKaskad"
+        }
+      ],
+      "owner_policy_id": "test-owner-policy-t09-t13-v1",
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": true,
+      "source_assertion_state": "asserts"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "contradictory-stock",
+      "claim_status": "disputed",
+      "distinct_supporting_publisher_roots": 2,
+      "evidence_refs": [
+        "ev-c-stock-12d",
+        "ev-c-stock-8d"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 89,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:206f899a010f4796e5e4d99ffdebfd5f7d3f850d709afa03b8cdd832794c9019",
+            "reason_codes": [],
+            "start": 21
+          },
+          "annotation_id": "ann-stock-12d",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-c-stock-12d",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T18:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T18:00:00Z",
+            "publisher_id": "auditor-note-b",
+            "publisher_root_id": "auditor-note-b",
+            "source_type": "independent_record",
+            "syndication_group_id": "c-stock-12d-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:7a998541e9dd13a44f700aceac61658b7c0085c6ce9a9c3fc2a92f231883f077",
+            "object_id": "doc-c-stock-b",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "12 days"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 89,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:cea4f69fa872e2e0e587b3425e916873db24c87a688a73ed2447fc11d6314770",
+            "reason_codes": [],
+            "start": 34
+          },
+          "annotation_id": "ann-stock-8d",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-c-stock-8d",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-13T17:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-13T17:00:00Z",
+            "publisher_id": "warehouse-log-a",
+            "publisher_root_id": "warehouse-log-a",
+            "source_type": "company_record",
+            "syndication_group_id": "c-stock-8d-20261013"
+          },
+          "source_ref": {
+            "hash": "sha256:88deb370c6e88949ae0525a6ee710f5091a468b518df9e19805a45fc54789a86",
+            "object_id": "doc-c-stock-a",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "8 days"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "asserts"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "stale-source",
+      "claim_status": "historical",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [
+        "ev-stale-port"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 66,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:e928fcaea615b7f8c4258afd2bb75344dc3b884cdab2022d7176f81c4b864ff6",
+            "reason_codes": [],
+            "start": 25
+          },
+          "annotation_id": "ann-stale-port",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-stale-port",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2025-02-01T07:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2025-02-01T07:00:00Z",
+            "publisher_id": "port-vega-authority",
+            "publisher_root_id": "port-vega-authority",
+            "source_type": "official_notice",
+            "syndication_group_id": "port-vega-old-20250201"
+          },
+          "source_ref": {
+            "hash": "sha256:024fe5f9751054fa1aa422a35ee2dc4da3015e21e108f11583f9e11a73992e21",
+            "object_id": "doc-stale-port",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "historical",
+          "value": "closed"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "historical"
+    },
+    {
+      "anchor_integrity": [
+        "none"
+      ],
+      "case_id": "model-hypothesis",
+      "claim_status": "unknown",
+      "distinct_supporting_publisher_roots": 0,
+      "evidence_refs": [],
+      "final_status": "not_confirmed",
+      "observations": [],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "none"
+    },
+    {
+      "anchor_integrity": [
+        "verified"
+      ],
+      "case_id": "confirmed-needs-owner-policy",
+      "claim_status": "supported_unconfirmed",
+      "distinct_supporting_publisher_roots": 2,
+      "evidence_refs": [
+        "ev-b-independent",
+        "ev-b-official"
+      ],
+      "final_status": "not_confirmed",
+      "observations": [
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 169,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:fc74b001ffdcc15603757e9fb2339b4d827417029117ecd41f6cf0f7c8d06f67",
+            "reason_codes": [],
+            "start": 0
+          },
+          "annotation_id": "ann-b-independent-supply",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-b-independent",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-06T08:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-06T08:00:00Z",
+            "publisher_id": "electronics-journal",
+            "publisher_root_id": "electronics-journal",
+            "source_type": "independent_news",
+            "syndication_group_id": "b-supply-independent-20261006"
+          },
+          "source_ref": {
+            "hash": "sha256:fc74b001ffdcc15603757e9fb2339b4d827417029117ecd41f6cf0f7c8d06f67",
+            "object_id": "doc-b-independent",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "company-b buys MK-7 from MicroKaskad"
+        },
+        {
+          "anchor": {
+            "declared_verification": "verified_anchor",
+            "end": 178,
+            "integrity": "verified",
+            "locator_kind": "text_span",
+            "quote_hash": "sha256:46902a7523e92e037856c5ded1db8e87f00c0bed50f12a6f3de6261ea9b3722e",
+            "reason_codes": [],
+            "start": 0
+          },
+          "annotation_id": "ann-b-official-supply",
+          "annotation_provenance": "t11-evidence-trust-cases-v1.0.0:hand-authored-synthetic",
+          "applicable_as_of": true,
+          "evidence_ref": "ev-b-official",
+          "relation": "supports",
+          "source": {
+            "availability": "available",
+            "collected_at": "2026-10-05T10:00:00Z",
+            "origin": "synthetic",
+            "published_at": "2026-10-05T10:00:00Z",
+            "publisher_id": "company-b",
+            "publisher_root_id": "company-b",
+            "source_type": "company_statement",
+            "syndication_group_id": "b-supply-statement-20261005"
+          },
+          "source_ref": {
+            "hash": "sha256:46902a7523e92e037856c5ded1db8e87f00c0bed50f12a6f3de6261ea9b3722e",
+            "object_id": "doc-b-official",
+            "owner": "Documents",
+            "revision": 1
+          },
+          "temporal_scope": "current",
+          "value": "company-b buys MK-7 from MicroKaskad"
+        }
+      ],
+      "owner_policy_id": null,
+      "owner_policy_reason_codes": [],
+      "owner_review_eligible": null,
+      "source_assertion_state": "asserts"
+    }
+  ],
+  "dataset_hash": "sha256:c30fb7ba9febd8b10bf35b4620a21890c57532c07fa55ad9566977ea6f21d25f",
+  "dataset_id": "t09-t13-independent-v1",
+  "dataset_version": "1.0.0",
+  "experiment_id": "t11-evidence-trust-offline-v1.0.0",
+  "fixture_content_hash": "sha256:6ef1862875866a92e368afddd910850056d16db49e138d975c80813db89400a8",
+  "fixture_id": "t11-evidence-trust-cases-v1.0.0",
+  "manual_approval": "provisional",
+  "model_quality": "NOT MEASURED",
+  "origin": "synthetic"
+}

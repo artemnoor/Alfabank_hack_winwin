@@ -1,0 +1,1966 @@
+{
+  "schema": "alfalab.spike.t13.approach-comparison/v1",
+  "dataset_ref": {
+    "dataset_id": "t09-t13-independent-v1",
+    "version": "1.0.1",
+    "canonical_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725"
+  },
+  "status": "provisional_offline_harness",
+  "live_model_quality": "NOT MEASURED",
+  "cost": "NOT MEASURED",
+  "latency": "NOT MEASURED (local deterministic execution only)",
+  "interpretation": "Counts test the validators and deterministic rules against synthetic provisional cases. Approach C uses model-shaped controlled fixtures, not LLM inference; this is not comparative model quality.",
+  "safety_metrics": {
+    "scenario_count": 30,
+    "c_supported_claims_without_graph_path": 0,
+    "c_claims_with_unavailable_evidence": 0,
+    "c_unsupported_quantities_accepted": 0,
+    "d_mechanisms_without_graph_path": 0,
+    "d_sector_only_positive_mechanisms": 0,
+    "non_null_contract_financial_quantities": 0,
+    "recommendations_outside_safe_local_catalog": 0
+  },
+  "cases": [
+    {
+      "case_id": "export-b-direct",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Potential mechanism may be stated only along the explicit country/supplier/component path."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 3,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "export-a-unknown-supplier",
+      "company_id": "company-a",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No direct path; preserve unknown sourcing and ask a targeted question."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "port-b-known-route",
+      "company_id": "company-b",
+      "event_id": "event-port-vega",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Known route supports possible logistics exposure, not a quantified delay."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 1,
+        "validated_claim_count": 1,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 1,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-port-independent",
+            "ev-port-official"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "port-c-known-route-stock-conflict",
+      "company_id": "company-c",
+      "event_id": "event-port-vega",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Use route path; keep inventory contradiction and avoid a single buffer number."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 2,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-c-independent",
+            "ev-c-official",
+            "ev-port-independent",
+            "ev-port-official"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "nickel-price-c",
+      "company_id": "company-c",
+      "event_id": "event-price-nickel-actual",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Material relation exists; purchase volume and financial impact remain unknown."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "input_cost_pressure"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 2,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-price-fact"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "input_cost_pressure"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-price-fact"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-c-independent",
+            "ev-c-official",
+            "ev-price-fact"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "nickel-price-a-no-material",
+      "company_id": "company-a",
+      "event_id": "event-price-nickel-actual",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No material/supplier path; sector similarity alone is insufficient."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-price-fact"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-price-fact"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-price-fact"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "sanction-b-supplier",
+      "company_id": "company-b",
+      "event_id": "event-sanction-microkaskad",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Supplier path is direct, but transaction scope and operational effect remain conditional."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "supplier_sanctions"
+        ],
+        "graph_paths_used": 1,
+        "validated_claim_count": 1,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-sanction"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "supplier_sanctions"
+        ],
+        "graph_paths_used": 1,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-sanction"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-sanction"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "sanction-a-unknown",
+      "company_id": "company-a",
+      "event_id": "event-sanction-microkaskad",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Unknown supplier does not prove exposure or non-exposure."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-sanction"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-sanction"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-sanction"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "fire-north-a",
+      "company_id": "company-a",
+      "event_id": "event-fire-north-plant",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No supported business path; do not infer from manufacturing/electronics sector."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-north"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-north"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-fire-north"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "fire-east-b",
+      "company_id": "company-b",
+      "event_id": "event-fire-east-plant",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Near-name facility is not company-b without entity evidence."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-east"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-east"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "supplier-default-rumor-b",
+      "company_id": "company-b",
+      "event_id": "event-default-rumor",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Rumor and different supplier cannot support a confident impact."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-rumor-default"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-rumor-default"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "path has a non-confirmed edge; mechanism stays conditional",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "supplier-default-rumor-a",
+      "company_id": "company-a",
+      "event_id": "event-default-rumor",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No supplier match and rumor status both lower factual support."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-rumor-default"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-rumor-default"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "tax-lira-b",
+      "company_id": "company-b",
+      "event_id": "event-tax-lira",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No evidenced sourcing link to Lira; return unknown/none-found for supplied graph."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-tax"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-tax"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "cyber-b",
+      "company_id": "company-b",
+      "event_id": "event-cyber-orbita",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Direct company mention does not establish production stop or data loss."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-cyber"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-cyber"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "line-stop-b-maintenance",
+      "company_id": "company-b",
+      "event_id": "event-line-stop-orbita",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Planned maintenance stop is not a supply disruption; amount and duration unknown."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-line-stop"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-line-stop"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "investment-c",
+      "company_id": "company-c",
+      "event_id": "event-investment-techno",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Announcement is not proof of current production benefit or capacity."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-investment"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-investment"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "export-q-product-mismatch",
+      "company_id": "company-b",
+      "event_id": "event-export-meridian-mk9",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Country/product mismatch prevents a positive conclusion from name/category overlap."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-unrelated-country"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-unrelated-country"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "stale-port-closure-c",
+      "company_id": "company-c",
+      "event_id": "event-port-old-2025",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Historical 2025 event must not be reported as current exposure."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-stale-port"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-stale-port"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "graph is stale, future-dated, or does not contain the exact profile slice",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "industry-only-a",
+      "company_id": "company-a",
+      "event_id": "event-industry-outlook",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "No company-specific evidence; prohibit confident impact based only on sector."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-industry-only"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-industry-only"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "export-b-known-supplier-no-volume",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Show mechanism; financial quantity stays null because volume is unknown."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 3,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "export-b-explicit-numeric-assumptions",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Calculate only the explicitly supplied scenario metric; label gross procurement exposure, not loss."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 3,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": {
+        "quantity": "10000",
+        "unit": "RUB/month",
+        "interpretation": "gross procurement exposure only; not a loss estimate; operation DTO quantity remains null"
+      }
+    },
+    {
+      "case_id": "export-b-source-conflict",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "A conflict in evidence limits confidence; preserve both source refs."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "port-c-no-alternate-route",
+      "company_id": "company-c",
+      "event_id": "event-port-vega",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Primary route is evidenced; alternate route is unknown, not absent."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 2,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-c-independent",
+            "ev-c-official",
+            "ev-port-independent",
+            "ev-port-official"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "multiple-events-one-article",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "The source document has a second separate price-change mention; keep both mentions and event mechanisms separate."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 3,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "same-headline-other-facility",
+      "company_id": "company-a",
+      "event_id": "event-fire-east-plant",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Do not use similar event wording to create an unsupported relationship."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-east"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-fire-east"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-fire-east"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "forecast-is-not-realized",
+      "company_id": "company-c",
+      "event_id": "event-price-nickel-forecast",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Potential future price scenario cannot be described as a realized increase."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-price-forecast"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-price-forecast"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "event state is not current and confirmed",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "historical-supplier-not-current",
+      "company_id": "company-c",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Expired relationship is not current; apply valid-time filter."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "stock-conflict-no-averaging",
+      "company_id": "company-c",
+      "event_id": "event-port-vega",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Do not average 8 and 12 days or calculate cash loss."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 2,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "route_disruption"
+        ],
+        "graph_paths_used": 2,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-c-independent",
+          "ev-c-official",
+          "ev-port-independent",
+          "ev-port-official"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "profile has conflicting/disputed statements",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-c-independent",
+            "ev-c-official",
+            "ev-port-independent",
+            "ev-port-official"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "graph-partial",
+      "company_id": "company-b",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "A partial graph can support listed paths only; no market-wide completeness claim."
+      ],
+      "approach_c": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 3,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "controlled response accepted",
+          "each claim cites supplied graph edges and evidence refs",
+          "model quality not measured"
+        ]
+      },
+      "approach_d": {
+        "exposure": "potential",
+        "likelihood": "possible",
+        "direction": "negative",
+        "materiality": "unknown",
+        "confidence": "low",
+        "mechanisms": [
+          "restricted_input_supply"
+        ],
+        "graph_paths_used": 3,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-b-independent",
+          "ev-b-official",
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "every mechanism path is an actual supplied graph path",
+          "no financial loss calculated"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "review_with_analyst",
+          "requires_approval": true,
+          "evidence_refs": [
+            "ev-b-independent",
+            "ev-b-official",
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    },
+    {
+      "case_id": "no-path-not-no-risk",
+      "company_id": "company-a",
+      "event_id": "event-export-x-mk7",
+      "same_inputs": true,
+      "provisional_expectations": [
+        "Absence of a supplied path is not evidence of zero risk."
+      ],
+      "approach_c": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "no validated model-shaped claim",
+          "unknown is preserved"
+        ]
+      },
+      "approach_d": {
+        "exposure": "unknown",
+        "likelihood": "unknown",
+        "direction": "unknown",
+        "materiality": "unknown",
+        "confidence": "unknown",
+        "mechanisms": [],
+        "graph_paths_used": 0,
+        "validated_claim_count": 0,
+        "evidence_refs": [
+          "ev-export-correction",
+          "ev-export-official",
+          "ev-export-wire",
+          "ev-multi-export"
+        ],
+        "financial_quantity": [
+          null
+        ],
+        "trace": [
+          "ruleset=0.1.0",
+          "source reliability is unassessed; no reliability score is inferred",
+          "insufficient evidence for a current impact mechanism"
+        ]
+      },
+      "recommendations": [
+        {
+          "action": "ask_supplier_geography",
+          "requires_approval": false,
+          "evidence_refs": [
+            "ev-export-correction",
+            "ev-export-official",
+            "ev-export-wire",
+            "ev-multi-export"
+          ]
+        }
+      ],
+      "auxiliary_numeric_scenario": null
+    }
+  ]
+}

@@ -166,12 +166,12 @@ def evaluate_result(
     if evidence_review:
         review_tasks.append(
             "Недостаточно доказательств: score "
-            f"{evidence_score:.2f} ≥ {evidence_threshold:.2f}; кандидаты удержаны для проверки."
+            f"{evidence_score:.2f} ≥ {evidence_threshold:.2f}; кандидаты удержаны для проверки в симуляции."
         )
     if unlisted_review:
         review_tasks.append(
             "Событие вне списка: score "
-            f"{unlisted_score:.2f} ≥ {unlisted_threshold:.2f}; создана отдельная задача проверки."
+            f"{unlisted_score:.2f} ≥ {unlisted_threshold:.2f}; отдельная задача проверки показана в симуляции."
         )
     return {
         "topic_state": "saved",
@@ -204,13 +204,17 @@ def evaluate_case(
     """Evaluate one visualization case, preserving absent results as absent."""
     result = case.get("result")
     if result is None:
+        missing_result = bool(case.get("text", "").strip())
         return {
-            "status": "missing" if case.get("text", "").strip() else "no_content",
+            "status": "missing" if missing_result else "no_content",
+            "topic_state": "not_evaluated",
             "candidate_codes": [],
             "candidate_blocked_codes": [],
             "event_abstain_codes": [],
-            "needs_any_review": bool(case.get("text", "").strip()),
-            "missing_result": bool(case.get("text", "").strip()),
+            "needs_any_review": False,
+            "operational_attention": missing_result,
+            "review_tasks": [],
+            "missing_result": missing_result,
         }
     return {
         "status": "review"

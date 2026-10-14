@@ -220,7 +220,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.locator('[data-policy-mode="policy_v2"]').click()
             page.locator("#statsTab").click()
             self.assertIn(
-                "Новости с кандидатами",
+                "Новости с кандидатами в симуляции",
                 page.locator("#topMetrics .metric-label").all_inner_texts(),
             )
 
@@ -228,32 +228,37 @@ class BrowserAcceptanceTests(unittest.TestCase):
             candidate_chart = charts.nth(1)
             error_chart = charts.nth(2)
             self.assertIn(
-                "События-кандидаты для передачи · Policy v2.1",
+                "Event-кандидаты в симуляции · Policy v2.1",
                 candidate_chart.inner_text(),
             )
-            self.assertIn("Кандидат не подтверждает факт", candidate_chart.inner_text())
+            self.assertIn("кандидат не подтверждает факт", candidate_chart.inner_text())
             self.assertIn(
-                "Лишние и пропущенные события · Policy v2.1", error_chart.inner_text()
+                "Лишние и отсутствующие в симуляции кандидаты · Policy v2.1",
+                error_chart.inner_text(),
             )
             metric_labels = page.locator(
                 "#statsMetrics .metric-label"
             ).all_inner_texts()
             self.assertIn("Точность событий-кандидатов", metric_labels)
-            self.assertIn("Ожидаемые события переданы дальше", metric_labels)
-            self.assertIn("Лишние события-кандидаты", metric_labels)
-            self.assertIn("Поводы для проверки", metric_labels)
+            self.assertIn("Ожидаемые события среди кандидатов", metric_labels)
+            self.assertIn("Лишние кандидаты", metric_labels)
+            self.assertIn("Задачи проверки в симуляции", metric_labels)
             comparison_headers = page.locator(
                 "#policyComparison thead th"
             ).all_inner_texts()
-            self.assertIn("Совпало / лишнее / не передано", comparison_headers)
+            self.assertIn("TP / FP / нет среди кандидатов", comparison_headers)
             self.assertNotIn("Stories с review", comparison_headers)
             self.assertIn(
-                "Точность: какая доля переданных событий совпала",
+                "Точность: какая доля кандидатов совпала",
                 page.locator("#policyComparison").inner_text(),
             )
             self.assertIn(
-                "удержанные правилами события сюда не входят",
+                "удержанные события сюда не входят",
                 page.locator("#policyComparison").inner_text(),
+            )
+            self.assertIn(
+                "ничего не отправляется в T09–T13",
+                page.locator("#statsFootnote").inner_text(),
             )
             self.assertEqual(
                 list(
@@ -339,8 +344,11 @@ class BrowserAcceptanceTests(unittest.TestCase):
         self.assertEqual(page_errors, [])
 
     def test_browser_scenarios_and_responsive_screenshots(self) -> None:
-        screenshots = HERE / "screenshots"
-        screenshots.mkdir(exist_ok=True)
+        screenshot_tempdir = tempfile.TemporaryDirectory(
+            prefix="t08-visualization-browser-"
+        )
+        self.addCleanup(screenshot_tempdir.cleanup)
+        screenshots = Path(screenshot_tempdir.name)
         external_requests: list[str] = []
         page_errors: list[str] = []
         with self.sync_playwright() as playwright:
@@ -403,6 +411,10 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 page.locator('[data-policy-mode="policy_v2"]').inner_text(),
             )
             self.assertTrue(page.locator("#presetButtons").is_hidden())
+            self.assertIn(
+                "В T09–T13 ничего не отправляется",
+                page.locator("#policyCaption").inner_text(),
+            )
             page.locator(".threshold-details summary").click()
             page.locator("#filterSearch").fill("e01-supply-rail")
             page.locator("#caseList .case-card").click()
@@ -410,7 +422,8 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 has_text="Сбой поставок"
             )
             supply_event.locator("summary").click()
-            self.assertIn("Кандидат для следующего этапа", supply_event.inner_text())
+            self.assertIn("локальной симуляции", supply_event.inner_text())
+            self.assertIn("не отправлен в T09", supply_event.inner_text())
             production_event = page.locator("#detailBody .event-item").filter(
                 has_text="Операционный сбой производства"
             )
@@ -422,13 +435,13 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 "событие вне списка", page.locator("#detailBody").inner_text().lower()
             )
             self.assertIn(
-                "1 event-кандидат(а) доступны для передачи",
+                "1 event-кандидат(а) сформировано",
                 page.locator("#detailBody").inner_text(),
             )
             self.assertIn("Оценка сохранена как abstain", production_event.inner_text())
             self.assertIn("не создаёт проверку", production_event.inner_text())
             self.assertIn(
-                "не блокируют передачу event-кандидатов",
+                "не блокируют формирование event-кандидатов",
                 page.locator("#detailBody").inner_text(),
             )
             self.assertTrue(page.locator("#threshold-negative").is_visible())
@@ -448,6 +461,20 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 .locator(".candidate-routing.candidate")
                 .count(),
                 1,
+            )
+            page.locator("#threshold-uncertainty").evaluate(
+                "el => { el.value = '0.17'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            self.assertEqual(page.locator("#detailBody .review-task").count(), 2)
+            self.assertEqual(
+                page.locator(
+                    "#detailBody .event-item .candidate-routing.blocked"
+                ).count(),
+                1,
+            )
+            self.assertIn(
+                "отдельная задача проверки показана в симуляции",
+                page.locator("#detailBody").inner_text(),
             )
             page.locator("#resetThresholds").click()
             page.screenshot(path=str(screenshots / "policy-v2-e01.png"), full_page=True)
@@ -476,7 +503,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertEqual(
                 candidate_event.locator(".candidate-routing.candidate").count(), 1
             )
-            self.assertIn("Кандидат для следующего этапа", candidate_event.inner_text())
+            self.assertIn("локальной симуляции", candidate_event.inner_text())
             page.locator("#threshold-uncertainty").evaluate(
                 "el => { el.value = '0.26'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
             )
@@ -533,7 +560,14 @@ class BrowserAcceptanceTests(unittest.TestCase):
             mobile_overflow = page.evaluate(
                 "document.documentElement.scrollWidth - document.documentElement.clientWidth"
             )
-            self.assertLessEqual(mobile_overflow, 1)
+            mobile_offenders = page.evaluate(
+                """() => [...document.querySelectorAll('*')].map(el => ({tag:el.tagName, cls:typeof el.className==='string'?el.className:'', parent:el.parentElement?.className||'', grandparent:el.parentElement?.parentElement?.className||'', left:Math.round(el.getBoundingClientRect().left), right:Math.round(el.getBoundingClientRect().right), width:Math.round(el.getBoundingClientRect().width), parentWidth:Math.round(el.parentElement?.getBoundingClientRect().width||0), whiteSpace:getComputedStyle(el).whiteSpace, maxWidth:getComputedStyle(el).maxWidth})).filter(x=>x.right>innerWidth+1||x.left < -1).slice(0,12)"""
+            )
+            self.assertLessEqual(
+                mobile_overflow,
+                1,
+                f"390px horizontal overflow={mobile_overflow}; elements={mobile_offenders}",
+            )
             mobile_layout = page.evaluate(
                 """() => ({
                   comparisonTop: document.querySelector('.gold-panel').getBoundingClientRect().top + window.scrollY,
@@ -623,6 +657,24 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertIn(
                 "не учитывается как ошибка", page.locator("#detailBody").inner_text()
             )
+            self.assertIn(
+                "Нужна отдельная техническая проверка",
+                page.locator("#detailBody .missing-box").inner_text(),
+            )
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            self.assertIn(
+                "Нет ответа Jev",
+                page.locator("#caseList .case-card.selected").inner_text(),
+            )
+            self.assertIn(
+                "Нужна отдельная техническая проверка",
+                page.locator("#detailBody .missing-box").inner_text(),
+            )
+            self.assertNotIn(
+                "Задача проверки в симуляции", page.locator("#detailBody").inner_text()
+            )
+            self.assertNotIn("event-кандидат", page.locator("#detailBody").inner_text())
+            page.locator('[data-policy-mode="legacy"]').click()
 
             # e35 is flagged for label review while still correctly marked as no Jev response.
             page.locator("#filterSearch").fill("e35-multi-labor-investment")
@@ -637,6 +689,15 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.locator("#filterState").select_option("missing")
             self.assertEqual(page.locator("#caseList .case-card").count(), 4)
             self.assertNotIn("e48-empty", page.locator("#caseList").inner_text())
+            page.locator("#filterState").select_option("all")
+            page.locator("#filterState").select_option("auto")
+            self.assertEqual(page.locator("#caseList .case-card").count(), 3)
+            self.assertNotIn(
+                "e23-recall-battery", page.locator("#caseList").inner_text()
+            )
+            self.assertNotIn(
+                "e35-multi-labor-investment", page.locator("#caseList").inner_text()
+            )
             page.locator("#filterState").select_option("all")
 
             # Preset E confirms local counterfactual coverage; reset restores the historical baseline.
@@ -751,6 +812,21 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 f"unexpected network requests: {external_requests}",
             )
             self.assertEqual(page_errors, [], f"browser errors: {page_errors}")
+            expected_screenshots = {
+                "lab-desktop.png",
+                "policy-v2-e01.png",
+                "policy-v2-comparison.png",
+                "policy-v2-mobile.png",
+                "statistics-desktop.png",
+                "lab-mobile.png",
+            }
+            actual_screenshots = list(screenshots.glob("*.png"))
+            self.assertEqual(
+                {path.name for path in actual_screenshots}, expected_screenshots
+            )
+            self.assertTrue(
+                all(path.stat().st_size > 10_000 for path in actual_screenshots)
+            )
             browser.close()
 
 

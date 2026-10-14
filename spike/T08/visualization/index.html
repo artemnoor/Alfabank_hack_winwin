@@ -129,6 +129,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 
 .detail-panel { overflow: visible; }
 .detail-title-row { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+.detail-title-row .badge { max-width: 100%; white-space: normal; }
 .detail-title { margin: 4px 0 7px; font-size: clamp(19px, 2vw, 25px); line-height: 1.2; letter-spacing: -.03em; }
 .detail-id { color: var(--quiet); font-family: ui-monospace, Consolas, monospace; font-size: 10px; }
 .detail-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 15px; }
@@ -193,6 +194,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 .decision-explain { margin-top: 8px; color: var(--muted); font-size: 10px; }
 .missing-box { padding: 20px 15px; border: 1px dashed #78404a; border-radius: 11px; color: #ffadb6; background: #25161a; text-align: center; }
 .missing-box strong { display: block; margin-bottom: 4px; }
+.missing-box .badge { max-width: 100%; white-space: normal; justify-content: center; }
 
 .gold-block { padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); margin-bottom: 12px; }
 .gold-block:last-child { padding: 0; border: 0; margin: 0; }
@@ -292,6 +294,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   .hero { align-items: start; flex-direction: column; }
   .hero-stamp { align-items: start; flex-direction: row; flex-wrap: wrap; }
   .detail-title-row { align-items: start; flex-direction: column; }
+  .decision-title { flex-wrap: wrap; }
+  .decision-title .badge { white-space: normal; }
   .choice-meta { align-items: start; flex-direction: column; }
   .choice-meta .badge { white-space: normal; }
   .field { min-height: 44px; padding: 10px; font-size: 16px; }
@@ -586,12 +590,12 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       ? "Policy v2.1 · независимые сигналы"
       : settings.preset === "custom" ? "Legacy · пользовательские пороги" : PRESETS.find((row) => row.id === settings.preset)?.label ?? "A · Current Strict";
     $("policyCaption").textContent = activePolicyMode === "policy_v2"
-      ? "Choice и все оценки сохраняются. Кандидаты — event score ≥ порога; evidence удерживает кандидатов, unlisted создаёт отдельную проверку."
+      ? "Локальная симуляция: Choice и все оценки сохраняются; event score ≥ порога формирует кандидата. Evidence удерживает кандидатов, unlisted создаёт отдельную задачу. В T09–T13 ничего не отправляется."
       : settings.preset === "custom"
         ? "Локальный пересчёт сохранённых оценок; историческая Legacy-логика. Это не новый запуск Jev."
         : "Legacy: экспериментальные сигналы сводятся к общему статусу новости; настройки применяются только в этом браузере.";
-    $("filterState").querySelector('[value="review"]').textContent = activePolicyMode === "policy_v2" ? "Есть задача проверки" : "Нужна проверка";
-    $("filterState").querySelector('[value="auto"]').textContent = activePolicyMode === "policy_v2" ? "Нет задачи проверки" : "Приняты порогами";
+    $("filterState").querySelector('[value="review"]').textContent = activePolicyMode === "policy_v2" ? "Есть задача в симуляции" : "Нужна проверка";
+    $("filterState").querySelector('[value="auto"]').textContent = activePolicyMode === "policy_v2" ? "Нет задачи в симуляции" : "Приняты порогами";
   }
 
   function currentGold(row) {
@@ -611,7 +615,14 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 
   function decision(row, gates = settings.gates) {
     const result = row.result;
-    if (!result) return { status: row.text?.trim() ? "missing" : "no_content", reasons: [], active: {}, raw: {}, predictions: new Set() };
+    if (!result) {
+      const missingResult = Boolean(row.text?.trim());
+      return {
+        status: missingResult ? "missing" : "no_content",
+        reasons: [], active: {}, raw: {}, predictions: new Set(),
+        operationalAttention: missingResult,
+      };
+    }
     const raw = {
       choice: result.topic_confidence < choiceThreshold(),
       event_scores: DATA.taxonomy.events.some((event) => result.event_scores[event.code] > settings.negative && result.event_scores[event.code] < settings.positive),
@@ -639,7 +650,17 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 
   function decisionV2(row) {
     const result = row.result;
-    if (!result) return { status: row.text?.trim() ? "missing" : "no_content", reasons: [], active: {}, predictions: new Set(), eventStates: {}, eventAbstainCodes: [], blockedCodes: [], reviewTasks: [] };
+    if (!result) {
+      const missingResult = Boolean(row.text?.trim());
+      return {
+        status: missingResult ? "missing" : "no_content",
+        topicState: "not_evaluated",
+        reasons: [], active: {}, predictions: new Set(), eventStates: {},
+        eventAbstainCodes: [], blockedCodes: [], reviewTasks: [],
+        needsReview: false, operationalAttention: missingResult,
+        missingResult,
+      };
+    }
     const eventStates = Object.fromEntries(DATA.taxonomy.events.map((event) => [event.code, noulState(result.event_scores[event.code], v2Settings.negative, v2Settings.positive)]));
     const eventAbstainCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "abstain").map((event) => event.code);
     const positiveCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "positive").map((event) => event.code);
@@ -651,7 +672,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const blockedCodes = candidateBlocked ? positiveCodes : [];
     const reviewTasks = [];
     if (evidenceReview) reviewTasks.push(`Недостаточно доказательств: ${scoreText(result.uncertainty_score)} ≥ ${scoreText(v2Settings.evidence)}; кандидаты удержаны для проверки.`);
-    if (unlistedReview) reviewTasks.push(`Событие вне списка: ${scoreText(result.unlisted_event_score)} ≥ ${scoreText(v2Settings.unlisted)}; отдельная задача проверки.`);
+    if (unlistedReview) reviewTasks.push(`Событие вне списка: ${scoreText(result.unlisted_event_score)} ≥ ${scoreText(v2Settings.unlisted)}; отдельная задача проверки показана в симуляции.`);
     const needsReview = reviewTasks.length > 0;
     const status = predictions.size ? (needsReview ? "candidates_and_review" : "candidates") : (candidateBlocked ? "candidates_held" : needsReview ? "unlisted_review" : "no_candidates");
     const reasons = reviewTasks;
@@ -766,7 +787,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     if (activePolicyMode === "policy_v2") {
       if (evaluated.blockedCodes.length) return `Кандидаты удержаны: evidence`;
       if (evaluated.predictions.size && evaluated.needsReview) return `${evaluated.predictions.size} кандидат(а) + отдельная проверка`;
-      if (evaluated.predictions.size) return `${evaluated.predictions.size} кандидат(а) к передаче`;
+      if (evaluated.predictions.size) return `${evaluated.predictions.size} event-кандидат(а) · симуляция`;
       return evaluated.needsReview ? "Проверить событие вне списка" : "Сохранён · без кандидатов";
     }
     if (evaluated.status === "uncertain") return "Нужна проверка";
@@ -782,8 +803,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
         ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
         ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
         ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
-        ["Баланс по событиям", pct(metrics.f1), `${metrics.tp} совпало · ${metrics.fp} лишних · ${metrics.fn} не передано дальше`],
-        ["Новости с кандидатами", `${metrics.candidateStories}/45`, `${candidateCount} меток · все только кандидаты`],
+        ["Баланс по событиям-кандидатам", pct(metrics.f1), `${metrics.tp} совпало · ${metrics.fp} лишних · ${metrics.fn} отсутствует в симуляции`],
+        ["Новости с кандидатами в симуляции", `${metrics.candidateStories}/45`, `${candidateCount} меток · все только кандидаты`],
       ];
     })() : (() => {
       const metrics = metricSet(DATA.cases, settings.gates);
@@ -818,7 +839,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       const error = row.result ? rowError(row, evaluated).any : false;
       const status = evaluated.status;
       if (filters.state === "review" && (activePolicyMode === "policy_v2" ? !evaluated.needsReview : status !== "uncertain")) return false;
-      if (filters.state === "auto" && (activePolicyMode === "policy_v2" ? (!row.result || evaluated.needsReview) : status === "uncertain")) return false;
+      if (filters.state === "auto" && (activePolicyMode === "policy_v2" ? (!row.result || evaluated.needsReview) : (!row.result || status === "uncertain"))) return false;
       if (filters.state === "error" && !error) return false;
       if (filters.state === "clean" && (!row.result || error)) return false;
       if (filters.state === "missing" && (!row.text?.trim() || row.result)) return false;
@@ -924,10 +945,15 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       const stored = node("div", "compare-line");
       append(stored, node("span", "compare-key", activePolicyMode === "policy_v2" ? "Сохранённый Legacy status" : "Сохранённый статус"), node("span", `compare-val ${row.result.classification_status === "uncertain" ? "" : ""}`, row.result.classification_status));
       model.append(stored);
-      model.append(node("div", "subsection-label", activePolicyMode === "policy_v2" ? "Event-кандидаты, переданные по Policy v2.1" : "События Jev при моих порогах"));
+      model.append(node("div", "subsection-label", activePolicyMode === "policy_v2" ? "Event-кандидаты в симуляции Policy v2.1" : "События Jev при моих порогах"));
       const pred = node("div", "label-list");
       for (const code of evaluated.predictions) pred.append(labelChip(eventLabel(code), gold.events.has(code) ? "correct" : "fp"));
-      if (!evaluated.predictions.size) pred.append(labelChip(activePolicyMode === "policy_v2" ? "Кандидаты не переданы" : "Положительных событий нет"));
+      if (!evaluated.predictions.size) {
+        const emptyLabel = activePolicyMode === "policy_v2"
+          ? evaluated.blockedCodes.length ? "Все кандидаты удержаны" : "Положительных event-кандидатов нет"
+          : "Положительных событий нет";
+        pred.append(labelChip(emptyLabel));
+      }
       model.append(pred);
       if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.length) {
         const blocked = node("div", "gold-block");
@@ -953,8 +979,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       if (error.topicMismatch) diffs.append(node("div", "", `Ошибка темы: Jev выбрал «${topicLabel(row.result.topic)}».`));
       for (const code of error.fp) diffs.append(node("div", "", activePolicyMode === "policy_v2" ? `Ложный кандидат (не факт) · ${eventLabel(code)}` : `Ложное срабатывание · ${eventLabel(code)}`));
       for (const code of error.fn) {
-        if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.includes(code)) diffs.append(node("div", "", `Не передан: положительная оценка удержана по доказательствам · ${eventLabel(code)}`));
-        else if (activePolicyMode === "policy_v2") diffs.append(node("div", "", `Не передан: score ниже порога кандидата · ${eventLabel(code)}`));
+        if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.includes(code)) diffs.append(node("div", "", `Не попал в результат симуляции: положительная оценка удержана из-за недостатка доказательств · ${eventLabel(code)}`));
+        else if (activePolicyMode === "policy_v2") diffs.append(node("div", "", `Не попал в результат симуляции: score ниже порога кандидата · ${eventLabel(code)}`));
         else diffs.append(node("div", "", `Пропущено · ${eventLabel(code)}`));
       }
       if (!error.any) diffs.append(node("div", "", "По текущим меткам и порогу событий расхождений нет."));
@@ -1096,6 +1122,9 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     if (!result) {
       const absent = node("div", "missing-box");
       append(absent, node("strong", "", row.text?.trim() ? "Ответ Jev отсутствует. Классификация не выполняется." : "Пустой тестовый текст · no_content"), node("span", "", row.text?.trim() ? "Эта запись остаётся видимой, но у неё нет оценок модели и она не учитывается как ошибка или пропуск события." : "Это локальная проверка обработки пустого ввода; запрос в Jev не выполнялся."));
+      if (evaluated.operationalAttention) {
+        absent.append(node("span", "badge amber", "Нужна отдельная техническая проверка: ответа нет"));
+      }
       root.append(absent);
       if (row.text?.trim()) {
         root.append(node("div", "section-heading", ""));
@@ -1111,9 +1140,9 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       : evaluated.blockedCodes.length
         ? "кандидаты удержаны по недостатку доказательств"
         : evaluated.predictions.size && evaluated.needsReview
-          ? "кандидаты доступны · есть отдельная задача"
+          ? "кандидаты в симуляции · есть отдельная задача"
           : evaluated.predictions.size
-            ? "кандидаты доступны · не подтверждённые факты"
+            ? "кандидаты в симуляции · не подтверждённые факты"
             : evaluated.needsReview
               ? "отдельная задача · кандидатов нет"
               : "сохранено · кандидатов нет";
@@ -1171,7 +1200,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     card.append(meta);
     const accepted = result.topic_confidence >= settings.choice;
     card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
-      ? "В этом потоке тема Choice и её confidence сохраняются для следующих этапов. Они не блокируют передачу event-кандидатов."
+      ? "В этой локальной симуляции тема Choice и её confidence сохраняются. Они не блокируют формирование event-кандидатов."
       : (accepted ? "Confidence не ниже порога: проверка Choice пройдена." : "Confidence ниже порога: приложение отправит тему на ручную проверку.")));
     const entries = DATA.taxonomy.topics.map((item) => ({ item, score: result.topic_probabilities[item.code] })).sort((a, b) => b.score - a.score);
     const bars = node("div", "bars");
@@ -1209,12 +1238,12 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       const extra = node("div", "event-extra");
       if (activePolicyMode === "policy_v2") {
         const routing = evaluated.predictions.has(event.code)
-          ? "Кандидат для следующего этапа · не подтверждённый факт."
+          ? "Кандидат сформирован в локальной симуляции · это не факт и он не отправлен в T09."
           : evaluated.blockedCodes.includes(event.code)
-            ? "Положительная оценка есть, но кандидат удержан из-за сигнала недостаточности доказательств."
+            ? "Положительная оценка есть, но кандидат удержан этой симуляцией из-за недостаточности доказательств."
           : state === "abstain"
               ? "Оценка сохранена как abstain. По этой схеме она сама по себе не создаёт проверку и не блокирует другие категории."
-              : "Не передаётся как кандидат по текущему порогу.";
+              : "По текущему порогу кандидат не формируется.";
         extra.append(node("div", `candidate-routing${evaluated.predictions.has(event.code) ? " candidate" : evaluated.blockedCodes.includes(event.code) ? " blocked" : state === "abstain" ? " saved-state" : ""}`, routing));
       }
       append(extra, node("div", "event-def", event.definition));
@@ -1250,8 +1279,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       card.append(node("div", "signal-copy", signal.copy));
       card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
         ? (signal.key === "evidence"
-          ? `Score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} порога ${scoreText(signal.cutoff)}. ${evaluated.candidateBlocked ? "Есть event-кандидаты — они удержаны для проверки." : evaluated.positiveCodes?.length ? "Кандидаты передаются; это значение их не удержало." : "Положительных event-кандидатов нет, поэтому удерживать нечего и задача не создаётся."}`
-          : `${state}: score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} ${scoreText(signal.cutoff)}. ${signal.triggered ? "Создаётся отдельная задача проверки; известные event-кандидаты остаются доступными." : "Отдельная задача не создаётся."}`)
+          ? `Score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} порога ${scoreText(signal.cutoff)}. ${evaluated.candidateBlocked ? "В локальной симуляции есть event-кандидаты — они удержаны для проверки." : evaluated.positiveCodes?.length ? "Этот сигнал не удержал кандидаты в локальной симуляции." : "Положительных event-кандидатов нет, поэтому удерживать нечего и отдельная задача в симуляции не создаётся."}`
+          : `${state}: score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} ${scoreText(signal.cutoff)}. ${signal.triggered ? "В симуляции показана отдельная задача проверки; известные event-кандидаты не блокируются." : "Отдельная задача в симуляции не создаётся."}`)
         : `${state}; Legacy review gate ${settings.gates[signal.key === "unlisted" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
       grid.append(card);
     }
@@ -1290,17 +1319,18 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const title = evaluated.blockedCodes.length
       ? `${evaluated.blockedCodes.length} кандидат(а) удержаны для проверки`
       : evaluated.predictions.size
-        ? `${evaluated.predictions.size} event-кандидат(а) доступны для передачи`
+        ? `${evaluated.predictions.size} event-кандидат(а) сформировано`
         : "Положительных event-кандидатов нет";
     const head = node("div", "decision-title");
-    append(head, node("span", "", title), node("span", `badge${evaluated.needsReview ? " amber" : " green"}`, evaluated.needsReview ? `${evaluated.reviewTasks.length} задача проверки` : evaluated.predictions.size ? "кандидаты не подтверждены" : "сохранено без кандидатов"));
+    append(head, node("span", "", title), node("span", `badge${evaluated.needsReview ? " amber" : " green"}`, evaluated.needsReview ? `${evaluated.reviewTasks.length} задача проверки в симуляции` : evaluated.predictions.size ? "симуляция · кандидаты не подтверждены" : "сохранено без кандидатов"));
     card.append(head);
     card.append(node("div", "decision-explain", "Схема обработки: технически корректный ответ сохраняет тему Choice и все оценки Noul. Каждая event-оценка ≥ порога становится кандидатом, а не подтверждённым фактом."));
+    card.append(node("div", "policy-v2-caveat", "Только локальная симуляция T08: кандидаты и задачи проверки фактически не отправляются в T09–T13; runtime-интеграции нет."));
     const topics = [
       ["1 · Choice и оценки", `тема «${topicLabel(row.result.topic)}» и все event scores сохранены; Choice confidence ${scoreText(row.result.topic_confidence)} не блокирует события`],
-      ["2 · Положительные события", `${evaluated.positiveCodes.length} оценок ≥ ${scoreText(v2Settings.positive)}; ${evaluated.blockedCodes.length ? "кандидаты удержаны" : `${evaluated.predictions.size} передано как кандидаты`}`],
-      ["3 · Недостаточно доказательств", `score ${scoreText(row.result.uncertainty_score)}; порог ${scoreText(v2Settings.evidence)}; ${evaluated.evidenceReview ? "кандидаты удержаны для проверки" : evaluated.positiveCodes.length ? "кандидаты не удерживаются" : "кандидатов нет, удерживать нечего"}`],
-      ["4 · Событие вне списка", `score ${scoreText(row.result.unlisted_event_score)}; порог ${scoreText(v2Settings.unlisted)}; ${evaluated.unlistedReview ? "отдельная задача проверки" : "без отдельной задачи"}; не блокирует известные события`],
+      ["2 · Положительные события", `${evaluated.positiveCodes.length} оценок ≥ ${scoreText(v2Settings.positive)}; ${evaluated.blockedCodes.length ? "кандидаты удержаны в симуляции" : `${evaluated.predictions.size} кандидатов в результате симуляции`}`],
+      ["3 · Недостаточно доказательств", `score ${scoreText(row.result.uncertainty_score)}; порог ${scoreText(v2Settings.evidence)}; ${evaluated.evidenceReview ? "кандидаты удержаны для проверки в симуляции" : evaluated.positiveCodes.length ? "кандидаты не удерживаются в симуляции" : "кандидатов нет, удерживать нечего"}`],
+      ["4 · Событие вне списка", `score ${scoreText(row.result.unlisted_event_score)}; порог ${scoreText(v2Settings.unlisted)}; ${evaluated.unlistedReview ? "отдельная задача проверки в симуляции" : "без отдельной задачи в симуляции"}; не блокирует известные события`],
     ];
     const list = node("ul", "reason-list");
     for (const [label, value] of topics) list.append(node("li", "", `${label}: ${value}.`));
@@ -1326,14 +1356,14 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const items = activePolicyMode === "policy_v2" ? [
       ["Тема совпала", pct(v2Metrics.topicAccuracy), `${v2Metrics.topicCorrect}/${v2Metrics.total} ответов Jev`],
       ["Точность событий-кандидатов", pct(v2Metrics.precision), `${v2Metrics.tp} совпало · ${v2Metrics.fp} лишних`],
-      ["Ожидаемые события переданы дальше", pct(v2Metrics.recall), `${v2Metrics.tp} совпало · ${v2Metrics.fn} не передано, включая удержанные`],
-      ["Баланс по событиям", pct(v2Metrics.f1), "сводит лишние и не переданные дальше ожидаемые события в одну оценку"],
-      ["Совпали все события", pct(v2Metrics.exactRate), `${v2Metrics.exact}/${v2Metrics.total} ответов`],
-      ["Есть события-кандидаты", pct(v2Metrics.candidateCoverage), `${v2Metrics.candidateStories}/${v2Metrics.total} новостей`],
-      ["Есть задача проверки", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} новостей`],
-      ["Лишние события-кандидаты", String(v2Metrics.fp), "по предварительной разметке, не утверждённой человеком"],
-      ["Ожидаемые события не переданы", String(v2Metrics.fn), "по предварительной разметке"],
-      ["Поводы для проверки", String(v2Metrics.scopedReviewItems), "счётчики могут пересекаться; оценки между порогами сами по себе не создают задачу"],
+      ["Ожидаемые события среди кандидатов", pct(v2Metrics.recall), `${v2Metrics.tp} совпало · ${v2Metrics.fn} не попало в симуляцию, включая удержанные`],
+      ["Баланс по событиям-кандидатам", pct(v2Metrics.f1), "сводит лишние и отсутствующие в симуляции ожидаемые события"],
+      ["Совпали все события-кандидаты", pct(v2Metrics.exactRate), `${v2Metrics.exact}/${v2Metrics.total} ответов`],
+      ["Есть event-кандидаты в симуляции", pct(v2Metrics.candidateCoverage), `${v2Metrics.candidateStories}/${v2Metrics.total} новостей`],
+      ["Есть задача проверки в симуляции", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} новостей`],
+      ["Лишние кандидаты", String(v2Metrics.fp), "по предварительной разметке, не утверждённой человеком"],
+      ["Ожидаемые события отсутствуют среди кандидатов", String(v2Metrics.fn), "по предварительной разметке"],
+      ["Задачи проверки в симуляции", String(v2Metrics.scopedReviewItems), "счётчики могут пересекаться; оценка между порогами сама по себе не создаёт задачу"],
     ] : [
       ["Тема совпала", pct(legacyMetrics.topicAccuracy), `${legacyMetrics.topicCorrect}/${legacyMetrics.total} ответов Jev`],
       ["Точность событий", pct(legacyMetrics.precision), `${legacyMetrics.tp} совпало · ${legacyMetrics.fp} лишних`],
@@ -1353,21 +1383,21 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const usingV2 = activePolicyMode === "policy_v2";
     charts.append(chartCard("Основные темы Jev", "Распределение только по 45 сохранённым ответам.", topicDistribution()));
     charts.append(chartCard(
-      usingV2 ? "События-кандидаты для передачи · Policy v2.1" : "Положительные события · старые правила",
+      usingV2 ? "Event-кандидаты в симуляции · Policy v2.1" : "Положительные события · старые правила",
       usingV2
-        ? `Сколько ответов содержат переданный кандидат при пороге ${scoreText(v2Settings.positive)}. Кандидат не подтверждает факт.`
+        ? `Сколько ответов содержат кандидатов в локальном расчёте при пороге ${scoreText(v2Settings.positive)}. Реальной передачи нет; кандидат не подтверждает факт.`
         : `Сколько ответов содержат положительное событие при пороге ${scoreText(settings.positive)}. Оценки не являются калиброванными вероятностями.`,
       eventDistribution(),
     ));
     charts.append(chartCard(
-      usingV2 ? "Лишние и пропущенные события · Policy v2.1" : "Расхождения событий · старые правила",
+      usingV2 ? "Лишние и отсутствующие в симуляции кандидаты · Policy v2.1" : "Расхождения событий · старые правила",
       usingV2
-        ? "Лишние и пропущенные кандидаты Policy v2.1 относительно выбранных предварительных или предложенных меток."
+        ? "Лишние и не сформированные симуляцией кандидаты Policy v2.1 относительно выбранных предварительных или предложенных меток."
         : "Лишние и пропущенные события по старым порогам относительно выбранных предварительных или предложенных меток.",
       eventErrors(),
     ));
     charts.append(chartCard(
-      activePolicyMode === "policy_v2" ? "Причины задач проверки · Policy v2.1" : "Причины ручной проверки · Legacy",
+      activePolicyMode === "policy_v2" ? "Причины задач проверки в симуляции · Policy v2.1" : "Причины ручной проверки · Legacy",
       activePolicyMode === "policy_v2"
         ? "Удержание кандидатов по недостатку доказательств и отдельные задачи по событиям вне списка. Один случай может попасть в обе группы."
         : "Показаны причины по исходной Legacy-логике. Счётчики могут пересекаться.",
@@ -1375,7 +1405,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     ));
     charts.append(scatterCard());
     charts.append(policyTableCard());
-    $("statsFootnote").textContent = `Метрики рассчитаны по 45 сохранённым ответам Jev на синтетические новости и по выбранным предварительным или предложенным меткам. Ответы для 4 из 49 непустых новостей отсутствуют: они исключены из расчёта точности и пропусков. Ещё 1 пустая новость не классифицируется. Совпадение темы считается одинаково в обоих режимах; графики событий и причин проверки следуют выбранному режиму. В карточках Legacy события оцениваются по порогу Noul до блокировки новости: они могут быть положительными, хотя всю новость отправили на проверку. Таблица сравнения показывает фактически переданные результаты. График автоматического принятия и таблица режимов показывают старые правила Legacy. Все метки пока предварительные, а результаты не доказывают качество на реальном потоке новостей.`;
+    $("statsFootnote").textContent = `Метрики рассчитаны по 45 сохранённым ответам Jev на синтетические новости и по выбранным предварительным или предложенным меткам. Ответы для 4 из 49 непустых новостей отсутствуют: они исключены из расчёта точности и пропусков. Ещё 1 пустая новость не классифицируется. Совпадение темы считается одинаково в обоих режимах; графики событий и причин проверки следуют выбранному режиму. Policy v2.1 здесь только локально симулирует список кандидатов и задачи проверки: ничего не отправляется в T09–T13. В карточках Legacy события оцениваются по порогу Noul до блокировки новости. Таблица сравнения показывает расчётные выходы правил, а не фактическую передачу в runtime. График автоматического принятия и таблица режимов показывают старые правила Legacy. Все метки пока предварительные, а результаты не доказывают качество на реальном потоке новостей.`;
   }
 
   function legacyOutputMetrics() {
@@ -1414,7 +1444,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   function policyComparisonCard(v2Metrics) {
     const card = node("section", "chart-card policy-v2-comparison");
     append(card, node("div", "chart-title", "Старые правила и Policy v2.1 · одни и те же 45 ответов"));
-    card.append(node("div", "chart-desc", "Старые правила передают новость целиком только если она прошла проверку. Policy v2.1 передаёт каждое подходящее событие отдельно. Сравнение показывает результаты передачи относительно предварительных меток; 4 ответа Jev отсутствуют."));
+    card.append(node("div", "chart-desc", "Legacy рассчитывает, какие целые новости прошли бы проверку. Policy v2.1 локально формирует список подходящих событий-кандидатов. Это сравнение расчётных результатов относительно предварительных меток; ничего не передаётся в runtime, а 4 ответа Jev отсутствуют."));
     const legacy = legacyOutputMetrics();
     const v2 = v2Metrics;
     const riskyCodes = new Set(["sanctions", "trade_restriction", "legal_enforcement", "insolvency_default", "product_recall_quality_safety", "production_operational_disruption"]);
@@ -1427,15 +1457,15 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const table = node("table", "policy-table policy-v2-table");
     const head = node("thead");
     const header = node("tr");
-    for (const label of ["Правила", "Передано дальше", "Точность", "Передано от ожидаемых", "Общий баланс", "Совпали все события", "Совпало / лишнее / не передано", "Новости с задачей проверки", "Лишние в важной группе*"]) header.append(node("th", "", label));
+    for (const label of ["Расчёт правил", "Выход расчёта", "Точность кандидатов", "Доля ожидаемых среди кандидатов", "Общий баланс кандидатов", "Совпали все события", "TP / FP / нет среди кандидатов", "Новости с задачей в симуляции", "Лишние в важной группе*"]) header.append(node("th", "", label));
     head.append(header); table.append(head);
     const body = node("tbody");
     const rows = [
       { name: "Старые правила · строгий режим", output: `${legacy.acceptedStories}/45 целых новостей · ${legacy.emittedEvents} меток`, p: legacy.precision, r: legacy.recall, f1: legacy.f1, exact: `${Math.round(legacy.exact * legacy.total)}/${legacy.total} · ${pct(legacy.exact)}`, counts: `${legacy.tp} / ${legacy.fp} / ${legacy.fn}`, review: `${legacy.reviewStories}/45`, danger: legacyDanger },
-      { name: "Policy v2.1", output: `${v2.candidateStories}/45 новостей · ${v2MetricsCandidateCount(v2)} event-меток`, p: v2.precision, r: v2.recall, f1: v2.f1, exact: `${Math.round(v2.exactRate * v2.total)}/${v2.total} · ${pct(v2.exactRate)}`, counts: `${v2.tp} / ${v2.fp} / ${v2.fn}`, review: `${v2.reviewStories}/45`, danger: v2Danger },
+      { name: "Policy v2.1 · симуляция", output: `${v2.candidateStories}/45 новостей · ${v2MetricsCandidateCount(v2)} event-кандидатов`, p: v2.precision, r: v2.recall, f1: v2.f1, exact: `${Math.round(v2.exactRate * v2.total)}/${v2.total} · ${pct(v2.exactRate)}`, counts: `${v2.tp} / ${v2.fp} / ${v2.fn}`, review: `${v2.reviewStories}/45`, danger: v2Danger },
     ];
     for (const row of rows) {
-      const tr = node("tr", `policy-row${row.name === "Policy v2.1" ? " policy-v2-row" : ""}`);
+      const tr = node("tr", `policy-row${row.name.startsWith("Policy v2.1") ? " policy-v2-row" : ""}`);
       const dangerousLabel = `${row.danger.length}${row.danger.length ? ` · ${row.danger.map((item) => `${item.case_id}: ${item.code}`).join(", ")}` : ""}`;
       for (const value of [row.name, row.output, pct(row.p), pct(row.r), pct(row.f1), row.exact, row.counts, row.review, dangerousLabel]) tr.append(node("td", "", value));
       body.append(tr);
@@ -1444,9 +1474,9 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const wrap = node("div", "chart-body policy-table-wrap");
     wrap.append(table);
     card.append(wrap);
-    card.append(node("div", "policy-v2-note", `В Policy v2.1: ${v2Metrics.evidenceReviews} новостей с кандидатами, удержанными из-за недостатка доказательств · ${v2Metrics.unlistedReviews} отдельных задач по событиям вне списка · ${v2Metrics.eventAbstains} оценок между порогами сохранено без отдельной проверки. Всего ${v2Metrics.reviewStories}/45 новостей имеют задачу проверки. *Важная группа категорий условная и не утверждена; это только исследовательский индикатор.`));
-    card.append(node("div", "policy-v2-note", "Точность: какая доля переданных событий совпала с предварительными метками. Передано от ожидаемых: какая доля ожидаемых событий попала в выход; удержанные правилами события сюда не входят. Общий баланс объединяет эти две оценки. Это сравнение правил обработки, а не качества самой модели."));
-    card.append(node("div", "policy-v2-caveat", "Важно: исторический F1=0,840 в отчёте рассчитан по всем исходным оценкам 45 ответов. Здесь считаются только события, которые правила действительно передали дальше. Старая политика блокирует новость целиком, а Policy v2.1 может передать одни события и удержать другие. Разметка предварительная и не утверждена человеком."));
+    card.append(node("div", "policy-v2-note", `В Policy v2.1: ${v2Metrics.evidenceReviews} новостей с кандидатами, удержанными из-за недостатка доказательств · ${v2Metrics.unlistedReviews} отдельных задач по событиям вне списка · ${v2Metrics.eventAbstains} оценок между порогами сохранено без отдельной проверки. Всего ${v2Metrics.reviewStories}/45 новостей имеют задачу проверки в симуляции. *Важная группа категорий условная и не утверждена; это только исследовательский индикатор.`));
+    card.append(node("div", "policy-v2-note", "Точность: какая доля кандидатов совпала с предварительными метками. Доля ожидаемых среди кандидатов: какая часть ожидаемых событий сформирована в списке кандидатов; удержанные события сюда не входят. Общий баланс объединяет эти две оценки. Это сравнение правил в офлайн-симуляции, не качества самой модели."));
+    card.append(node("div", "policy-v2-caveat", "Важно: это локальная симуляция правил T08. Никакие кандидаты и задачи проверки не передаются в T09–T13; runtime-интеграции нет. Здесь оценивается только расчётный список кандидатов. Исторический F1=0,840 в отчёте рассчитан по всем исходным оценкам 45 ответов. Разметка предварительная и не утверждена человеком."));
     return card;
   }
 
@@ -1524,7 +1554,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       append(line, bar, node("span", "chart-num", `${row.fp}/${row.fn}`));
       body.append(line);
     }
-    body.append(node("div", "editor-note", "В конце каждой строки: лишние кандидаты / ожидаемые события, не переданные дальше. Нажмите, чтобы отфильтровать новости по событию."));
+    body.append(node("div", "editor-note", "В конце каждой строки: лишние кандидаты / ожидаемые события, которых нет в расчётном списке. Нажмите, чтобы отфильтровать новости по событию."));
     return body;
   }
 

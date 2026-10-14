@@ -120,6 +120,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 
 .detail-panel { overflow: visible; }
 .detail-title-row { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+.detail-title-row .badge { max-width: 100%; white-space: normal; }
 .detail-title { margin: 4px 0 7px; font-size: clamp(19px, 2vw, 25px); line-height: 1.2; letter-spacing: -.03em; }
 .detail-id { color: var(--quiet); font-family: ui-monospace, Consolas, monospace; font-size: 10px; }
 .detail-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 15px; }
@@ -184,6 +185,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 .decision-explain { margin-top: 8px; color: var(--muted); font-size: 10px; }
 .missing-box { padding: 20px 15px; border: 1px dashed #78404a; border-radius: 11px; color: #ffadb6; background: #25161a; text-align: center; }
 .missing-box strong { display: block; margin-bottom: 4px; }
+.missing-box .badge { max-width: 100%; white-space: normal; justify-content: center; }
 
 .gold-block { padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); margin-bottom: 12px; }
 .gold-block:last-child { padding: 0; border: 0; margin: 0; }
@@ -283,6 +285,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   .hero { align-items: start; flex-direction: column; }
   .hero-stamp { align-items: start; flex-direction: row; flex-wrap: wrap; }
   .detail-title-row { align-items: start; flex-direction: column; }
+  .decision-title { flex-wrap: wrap; }
+  .decision-title .badge { white-space: normal; }
   .choice-meta { align-items: start; flex-direction: column; }
   .choice-meta .badge { white-space: normal; }
   .field { min-height: 44px; padding: 10px; font-size: 16px; }

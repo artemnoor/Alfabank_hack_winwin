@@ -10,7 +10,12 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(SPIKE))
 
 from build import build_payload  # noqa: E402
-from policy_v2 import PolicyV2InputError, evaluate_result, tri_state  # noqa: E402
+from policy_v2 import (  # noqa: E402
+    PolicyV2InputError,
+    evaluate_case,
+    evaluate_result,
+    tri_state,
+)
 
 
 class PolicyV2UnitTests(unittest.TestCase):
@@ -87,6 +92,33 @@ class PolicyV2UnitTests(unittest.TestCase):
         self.assertFalse(result["evidence_review"])
         self.assertFalse(result["needs_any_review"])
 
+    def test_unlisted_signal_creates_only_its_task_without_event_candidates(
+        self,
+    ) -> None:
+        result_input = dict(self.by_id["e49-environment-monitoring"]["result"])
+        result_input["unlisted_event_score"] = 0.8
+        result = evaluate_result(result_input, self.taxonomy)
+
+        self.assertEqual(result["positive_event_codes"], [])
+        self.assertEqual(result["candidate_codes"], [])
+        self.assertTrue(result["unlisted_review"])
+        self.assertFalse(result["evidence_review"])
+        self.assertTrue(result["needs_any_review"])
+        self.assertEqual(len(result["review_tasks"]), 1)
+        self.assertIn("вне списка", result["review_tasks"][0])
+
+    def test_both_review_signals_stay_separate_and_hold_only_candidates(self) -> None:
+        result_input = dict(self.by_id["e01-supply-rail"]["result"])
+        result_input["uncertainty_score"] = 0.8
+        result_input["unlisted_event_score"] = 0.8
+        result = evaluate_result(result_input, self.taxonomy)
+
+        self.assertIn("supply_chain_disruption", result["candidate_blocked_codes"])
+        self.assertEqual(result["candidate_codes"], [])
+        self.assertTrue(result["evidence_review"])
+        self.assertTrue(result["unlisted_review"])
+        self.assertEqual(len(result["review_tasks"]), 2)
+
     def test_unlisted_threshold_is_inclusive_and_independent(self) -> None:
         case = self.by_id["e01-supply-rail"]
         result_input = dict(case["result"])
@@ -142,6 +174,20 @@ class PolicyV2UnitTests(unittest.TestCase):
     def test_missing_jev_result_is_not_fabricated_as_event_false_negative(self) -> None:
         result = self.payload["meta"]["policyV2"]["policy_v2"]["cases"]
         self.assertNotIn("e23-recall-battery", result)
+
+        missing = evaluate_case(self.by_id["e23-recall-battery"], self.taxonomy)
+        self.assertEqual(missing["status"], "missing")
+        self.assertTrue(missing["missing_result"])
+        self.assertEqual(missing["topic_state"], "not_evaluated")
+        self.assertFalse(missing["needs_any_review"])
+        self.assertTrue(missing["operational_attention"])
+        self.assertEqual(missing["review_tasks"], [])
+        self.assertEqual(missing["candidate_codes"], [])
+
+        empty = evaluate_case(self.by_id["e48-empty"], self.taxonomy)
+        self.assertEqual(empty["status"], "no_content")
+        self.assertFalse(empty["missing_result"])
+        self.assertFalse(empty["operational_attention"])
 
     def test_invalid_scores_and_inverted_thresholds_fail_closed(self) -> None:
         case = self.by_id["e01-supply-rail"]

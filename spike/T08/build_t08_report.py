@@ -354,6 +354,7 @@ def build_report(
             "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
             "python_browser_policy_parity_cases": 45,
             "browser_console_errors": "clean Playwright context reports no console errors, page errors, or external requests",
+            "keyboard_skip_link": "skip link stays offscreen until keyboard focus and moves focus to main content",
             "mobile_reading_order": ["case list", "Jev analysis", "preliminary labels"],
         },
         "independent_review": {
@@ -478,6 +479,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "- Для insufficient-evidence интерфейс отдельно показывает достижение порога и факт удержания кандидатов; высокий сигнал без кандидатов больше не называется review.",
         "- Playwright сравнивает браузерную Policy v2.1 с Python-реализацией по всем 45 сохранённым ответам.",
         "- Browser acceptance проверяет, что в чистом Chromium нет ошибок консоли, ошибок страницы и внешних сетевых запросов.",
+        "- Клавиатурная ссылка перехода к содержанию скрыта до фокуса; переход устанавливает фокус на основную область.",
         "- На узком экране сначала идут список, разбор Jev, затем предварительная разметка.",
         "",
         "## Риски и решение",

@@ -553,6 +553,17 @@ class BrowserAcceptanceTests(unittest.TestCase):
             self.assertIn("31/45", page.locator("#topMetrics").inner_text())
             self.assertIn("84.0%", page.locator("#topMetrics").inner_text())
             self.assertIn("3/45", page.locator("#topMetrics").inner_text())
+            skip_link = page.locator(".skip-link")
+            self.assertLess(skip_link.bounding_box()["y"], 0)
+            page.keyboard.press("Tab")
+            self.assertEqual(
+                page.evaluate("document.activeElement.className"), "skip-link"
+            )
+            self.assertGreaterEqual(skip_link.bounding_box()["y"], 0)
+            page.keyboard.press("Enter")
+            self.assertEqual(page.evaluate("document.activeElement.id"), "mainContent")
+            page.locator("#mainContent").evaluate("element => element.blur()")
+            page.evaluate("window.scrollTo(0, 0)")
             page.screenshot(path=str(screenshots / "lab-desktop.png"), full_page=True)
 
             # Legacy score cards use raw Noul threshold labels, while the

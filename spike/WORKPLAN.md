@@ -38,9 +38,32 @@ Module worktrees/branches:
 | `C:\CodexData\worktrees\alfabank-spike-t12-graph` | `codex/spike-t12-graph` |
 | `C:\CodexData\worktrees\alfabank-spike-t12-scoped-freshness` | `codex/spike-t12-scoped-freshness` |
 | `C:\CodexData\worktrees\alfabank-spike-t12-lineage-safety` | `codex/spike-t12-lineage-safety` |
-| `C:\CodexData\worktrees\alfabank-review-t12-aggregate-scope-final` | `codex/review-t12-aggregate-scope-final` |
 | `C:\CodexData\worktrees\alfabank-spike-t13-impact` | `codex/spike-t13-impact` |
 | `C:\CodexData\worktrees\alfabank-spike-t09-t13-parallel` | `codex/spike-t09-t13-parallel` |
+
+Dataset and independent-review worktrees used and retained:
+
+| Worktree | Branch / state | Assignment |
+|---|---|---|
+| `C:\CodexData\worktrees\alfabank-spike-shared-dataset` | `codex/spike-t09-t13-shared-dataset` | Initial shared dataset preparation |
+| `C:\CodexData\worktrees\alfabank-spike-shared-dataset-v101` | `codex/spike-t09-t13-shared-dataset-v101` | Corrected and frozen dataset v1.0.1 |
+| `C:\CodexData\worktrees\alfabank-spike-shared-dataset-v101-clean` | detached at `a5e2d2c` | Clean reproducibility check of frozen dataset |
+| `C:\CodexData\worktrees\alfabank-spike-shared-dataset-v101-lf` | detached at `a5e2d2c` | Line-ending-independent dataset hash check |
+| `C:\CodexData\worktrees\alfabank-review-shared-dataset` | `codex/review-shared-dataset` | Independent initial dataset review |
+| `C:\CodexData\worktrees\alfabank-review-shared-dataset-v101` | `codex/review-shared-dataset-v101` | Independent v1.0.1 dataset/T10/T12/T13 review |
+| `C:\CodexData\worktrees\alfabank-review-t09-events` | `codex/review-t09-events` | Independent T09 review |
+| `C:\CodexData\worktrees\alfabank-review-t09-rerun` | `codex/review-t09-remediation-rerun` | T09 remediation re-review |
+| `C:\CodexData\worktrees\alfabank-review-t10-business` | `codex/review-t10-business` | Independent T10 review |
+| `C:\CodexData\worktrees\alfabank-review-t10-final` | `codex/review-t10-final` | T10 final re-review |
+| `C:\CodexData\worktrees\alfabank-review-t10-rerun` | `codex/review-t10-rerun` | T10 remediation re-review |
+| `C:\CodexData\worktrees\alfabank-review-t11-evidence` | `codex/review-t11-evidence` | Independent T11 review |
+| `C:\CodexData\worktrees\alfabank-review-t11-rerun` | `codex/review-t11-remediation-rerun` | T11 remediation re-review |
+| `C:\CodexData\worktrees\alfabank-review-t12-graph` | `codex/review-t12-graph` | Independent initial T12 review |
+| `C:\CodexData\worktrees\alfabank-review-t12-scoped-freshness` | `codex/review-t12-scoped-freshness` | Adversarial T12 freshness review |
+| `C:\CodexData\worktrees\alfabank-review-t12-confirmed-lineage-final` | `codex/review-t12-confirmed-lineage-final` | Independent lineage remediation audit |
+| `C:\CodexData\worktrees\alfabank-review-t12-final` | `codex/review-t12-remediation-rerun` | Independent T12 remediation re-review |
+| `C:\CodexData\worktrees\alfabank-review-t13-impact` | `codex/review-t13-impact` | Independent initial T13 review |
+| `C:\CodexData\worktrees\alfabank-review-t13-final` | `codex/review-t13-final` | T13 final re-review |
 
 Independent review reports live under each module's `results/`. Worktrees and
 user branches have been retained; none was deleted or force-reset.
@@ -56,7 +79,7 @@ user branches have been retained; none was deleted or force-reset.
 | Remediate initial independent High findings | Complete for tested findings | Independent final T12 re-review closed the HIGH and MEDIUM; one LOW diagnostic gap is documented |
 | Cross-module integration | Verified locally | Eight materialized checks passed after the final T12 patch; modules continue to receive explicit materialized inputs |
 | Final verification and integration report | Complete | Coordinator rerun passed 415 tests, fixture validator 13/13, contract code generation, and diff check; final T12 re-review report is recorded |
-| Draft PR | Pending | User authorized it; publish only after final local review and tests |
+| Draft PR | Created (Draft) | [PR #9](https://github.com/artemnoor/Alfabank_hack_winwin/pull/9); base `ce640214`, published head `e7c471fe`; no merge performed |
 
 ## Recorded checks
 

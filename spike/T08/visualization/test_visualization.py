@@ -219,17 +219,41 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
             page.locator('[data-policy-mode="policy_v2"]').click()
             page.locator("#statsTab").click()
+            self.assertIn(
+                "Новости с кандидатами",
+                page.locator("#topMetrics .metric-label").all_inner_texts(),
+            )
 
             charts = page.locator("#chartsGrid .chart-card")
             candidate_chart = charts.nth(1)
             error_chart = charts.nth(2)
             self.assertIn(
-                "Event-кандидаты для передачи · Policy v2.1",
+                "События-кандидаты для передачи · Policy v2.1",
                 candidate_chart.inner_text(),
             )
             self.assertIn("Кандидат не подтверждает факт", candidate_chart.inner_text())
             self.assertIn(
-                "Расхождения event-кандидатов · Policy v2.1", error_chart.inner_text()
+                "Лишние и пропущенные события · Policy v2.1", error_chart.inner_text()
+            )
+            metric_labels = page.locator(
+                "#statsMetrics .metric-label"
+            ).all_inner_texts()
+            self.assertIn("Точность событий-кандидатов", metric_labels)
+            self.assertIn("Ожидаемые события переданы дальше", metric_labels)
+            self.assertIn("Лишние события-кандидаты", metric_labels)
+            self.assertIn("Поводы для проверки", metric_labels)
+            comparison_headers = page.locator(
+                "#policyComparison thead th"
+            ).all_inner_texts()
+            self.assertIn("Совпало / лишнее / не передано", comparison_headers)
+            self.assertNotIn("Stories с review", comparison_headers)
+            self.assertIn(
+                "Точность: какая доля переданных событий совпала",
+                page.locator("#policyComparison").inner_text(),
+            )
+            self.assertIn(
+                "удержанные правилами события сюда не входят",
+                page.locator("#policyComparison").inner_text(),
             )
             self.assertEqual(
                 list(
@@ -455,7 +479,7 @@ class BrowserAcceptanceTests(unittest.TestCase):
             comparison = page.locator("#policyComparison")
             self.assertIn("Policy v2.1", comparison.inner_text())
             legacy_row = comparison.locator(".policy-v2-table tbody tr").first
-            self.assertIn("Legacy · Current Strict", legacy_row.inner_text())
+            self.assertIn("Старые правила · строгий режим", legacy_row.inner_text())
             self.assertIn("2 / 1 / 39", legacy_row.inner_text())
             self.assertIn("32/45 новостей", comparison.inner_text())
             self.assertIn("34 / 6 / 7", comparison.inner_text())
@@ -583,6 +607,16 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.locator("#statsTab").click()
             self.assertFalse(page.locator("#statsScreen").is_hidden())
             self.assertEqual(page.locator("#statsMetrics .metric").count(), 10)
+            legacy_metric_labels = page.locator(
+                "#statsMetrics .metric-label"
+            ).all_inner_texts()
+            self.assertIn("Принято без проверки", legacy_metric_labels)
+            self.assertIn("Ожидаемые метки выше порога", legacy_metric_labels)
+            self.assertIn("Ожидаемые метки ниже порога", legacy_metric_labels)
+            self.assertIn(
+                "до блокировки новости", page.locator("#statsFootnote").inner_text()
+            )
+            self.assertNotIn("Topic Accuracy", legacy_metric_labels)
             self.assertEqual(
                 page.locator("#chartsGrid .policy-table tbody tr").count(), 5
             )

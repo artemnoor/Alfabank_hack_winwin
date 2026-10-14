@@ -761,8 +761,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
         ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
         ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
         ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
-        ["Event F1 кандидатов", pct(metrics.f1), `${metrics.tp} TP · ${metrics.fp} FP · ${metrics.fn} FN`],
-        ["Истории с кандидатами", `${metrics.candidateStories}/45`, `${candidateCount} меток · все только кандидаты`],
+        ["Баланс по событиям", pct(metrics.f1), `${metrics.tp} совпало · ${metrics.fp} лишних · ${metrics.fn} не передано дальше`],
+        ["Новости с кандидатами", `${metrics.candidateStories}/45`, `${candidateCount} меток · все только кандидаты`],
       ];
     })() : (() => {
       const metrics = metricSet(DATA.cases, settings.gates);
@@ -770,8 +770,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
         ["Новости в корпусе", "49", "непустых · плюс 1 пустой тест"],
         ["Ответы Jev", `${DATA.meta.resultCount}/49`, "4 ответа отсутствуют"],
         ["Тема совпала", `${metrics.topicCorrect}/45`, `${pct(metrics.topicAccuracy)} на всех ответах`],
-        ["Event micro-F1", pct(metrics.f1), `${metrics.tp} TP · ${metrics.fp} FP · ${metrics.fn} FN`],
-        ["Автопринято", `${metrics.accepted}/45`, `${pct(metrics.coverage)} среди ответов`],
+        ["Баланс по оценкам Noul", pct(metrics.f1), `${metrics.tp} совпало · ${metrics.fp} лишних · ${metrics.fn} не набрало порог`],
+        ["Принято без проверки", `${metrics.accepted}/45`, `${pct(metrics.coverage)} среди ответов`],
       ];
     })();
     const root = $("topMetrics");
@@ -1303,27 +1303,27 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const root = $("statsMetrics");
     root.replaceChildren();
     const items = activePolicyMode === "policy_v2" ? [
-      ["Topic Accuracy", pct(v2Metrics.topicAccuracy), `${v2Metrics.topicCorrect}/${v2Metrics.total} ответов`],
-      ["Event Precision", pct(v2Metrics.precision), `${v2Metrics.tp} TP · ${v2Metrics.fp} FP`],
-      ["Event Recall", pct(v2Metrics.recall), `${v2Metrics.tp} TP · ${v2Metrics.fn} не передано`],
-      ["Event F1 кандидатов", pct(v2Metrics.f1), "среди автоматически переданных event-кандидатов"],
-      ["Exact Event-Set", pct(v2Metrics.exactRate), `${v2Metrics.exact}/${v2Metrics.total} выходных наборов`],
-      ["Candidate Coverage", pct(v2Metrics.candidateCoverage), `${v2Metrics.candidateStories}/${v2Metrics.total} с кандидатами`],
-      ["Есть задача review", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} историй`],
-      ["False Positives", String(v2Metrics.fp), "ложные кандидаты по draft gold"],
-      ["Не передано", String(v2Metrics.fn), "включая policy hold и negative"],
-      ["Задачи проверки", String(v2Metrics.scopedReviewItems), `${v2Metrics.eventAbstains} оценок abstain сохранено без review`],
+      ["Тема совпала", pct(v2Metrics.topicAccuracy), `${v2Metrics.topicCorrect}/${v2Metrics.total} ответов Jev`],
+      ["Точность событий-кандидатов", pct(v2Metrics.precision), `${v2Metrics.tp} совпало · ${v2Metrics.fp} лишних`],
+      ["Ожидаемые события переданы дальше", pct(v2Metrics.recall), `${v2Metrics.tp} совпало · ${v2Metrics.fn} не передано, включая удержанные`],
+      ["Баланс по событиям", pct(v2Metrics.f1), "сводит лишние и не переданные дальше ожидаемые события в одну оценку"],
+      ["Совпали все события", pct(v2Metrics.exactRate), `${v2Metrics.exact}/${v2Metrics.total} ответов`],
+      ["Есть события-кандидаты", pct(v2Metrics.candidateCoverage), `${v2Metrics.candidateStories}/${v2Metrics.total} новостей`],
+      ["Есть задача проверки", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} новостей`],
+      ["Лишние события-кандидаты", String(v2Metrics.fp), "по предварительной разметке, не утверждённой человеком"],
+      ["Ожидаемые события не переданы", String(v2Metrics.fn), "по предварительной разметке"],
+      ["Поводы для проверки", String(v2Metrics.scopedReviewItems), "счётчики могут пересекаться; оценки между порогами сами по себе не создают задачу"],
     ] : [
-      ["Topic Accuracy", pct(legacyMetrics.topicAccuracy), `${legacyMetrics.topicCorrect}/${legacyMetrics.total} ответов`],
-      ["Event Precision", pct(legacyMetrics.precision), `${legacyMetrics.tp} TP · ${legacyMetrics.fp} FP`],
-      ["Event Recall", pct(legacyMetrics.recall), `${legacyMetrics.tp} TP · ${legacyMetrics.fn} FN`],
-      ["Event micro-F1", pct(legacyMetrics.f1), "по текущему порогу positive"],
-      ["Exact Event-Set", pct(legacyMetrics.exact), `${legacyMetrics.exactCount}/${legacyMetrics.total} новостей`],
-      ["Auto Coverage", pct(legacyMetrics.coverage), `${legacyMetrics.accepted}/${legacyMetrics.total} без review`],
-      ["Review Rate", pct(legacyMetrics.reviewRate), `${legacyMetrics.review}/${legacyMetrics.total} ответов`],
-      ["False Positives", String(legacyMetrics.fp), "среди 15 категорий событий"],
-      ["False Negatives", String(legacyMetrics.fn), "относительно черновой разметки"],
-      ["Ошибки среди auto", pct(legacyMetrics.autoErrorRate), `${legacyMetrics.acceptedError}/${legacyMetrics.accepted} принятых`],
+      ["Тема совпала", pct(legacyMetrics.topicAccuracy), `${legacyMetrics.topicCorrect}/${legacyMetrics.total} ответов Jev`],
+      ["Точность событий", pct(legacyMetrics.precision), `${legacyMetrics.tp} совпало · ${legacyMetrics.fp} лишних`],
+      ["Ожидаемые метки выше порога", pct(legacyMetrics.recall), `${legacyMetrics.tp} совпало · ${legacyMetrics.fn} не набрало порог`],
+      ["Баланс по оценкам Noul", pct(legacyMetrics.f1), "сводит лишние положительные и не набравшие порог метки"],
+      ["Совпали все события", pct(legacyMetrics.exact), `${legacyMetrics.exactCount}/${legacyMetrics.total} новостей`],
+      ["Принято без проверки", pct(legacyMetrics.coverage), `${legacyMetrics.accepted}/${legacyMetrics.total} ответов`],
+      ["Отправлено на проверку", pct(legacyMetrics.reviewRate), `${legacyMetrics.review}/${legacyMetrics.total} ответов`],
+      ["Лишние положительные оценки", String(legacyMetrics.fp), "по предварительной разметке"],
+      ["Ожидаемые метки ниже порога", String(legacyMetrics.fn), "оценка Noul не достигла положительного порога"],
+      ["Ошибки среди принятых", pct(legacyMetrics.autoErrorRate), `${legacyMetrics.acceptedError}/${legacyMetrics.accepted} ответов`],
     ];
     for (const [label, value, sub] of items) root.append(summaryMetric(label, value, sub));
     $("policyComparison").replaceChildren(policyComparisonCard(v2Metrics));
@@ -1332,17 +1332,17 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const usingV2 = activePolicyMode === "policy_v2";
     charts.append(chartCard("Основные темы Jev", "Распределение только по 45 сохранённым ответам.", topicDistribution()));
     charts.append(chartCard(
-      usingV2 ? "Event-кандидаты для передачи · Policy v2.1" : "Положительные события · Legacy",
+      usingV2 ? "События-кандидаты для передачи · Policy v2.1" : "Положительные события · старые правила",
       usingV2
-        ? `Сколько ответов содержат переданный event-кандидат при пороге ${scoreText(v2Settings.positive)}. Кандидат не подтверждает факт.`
+        ? `Сколько ответов содержат переданный кандидат при пороге ${scoreText(v2Settings.positive)}. Кандидат не подтверждает факт.`
         : `Сколько ответов содержат положительное событие при пороге ${scoreText(settings.positive)}. Оценки не являются калиброванными вероятностями.`,
       eventDistribution(),
     ));
     charts.append(chartCard(
-      usingV2 ? "Расхождения event-кандидатов · Policy v2.1" : "Расхождения событий · Legacy",
+      usingV2 ? "Лишние и пропущенные события · Policy v2.1" : "Расхождения событий · старые правила",
       usingV2
-        ? "FP / FN среди кандидатов Policy v2.1 относительно выбранных предварительных или предложенных меток."
-        : "FP / FN по Legacy-порогам относительно выбранных предварительных или предложенных меток.",
+        ? "Лишние и пропущенные кандидаты Policy v2.1 относительно выбранных предварительных или предложенных меток."
+        : "Лишние и пропущенные события по старым порогам относительно выбранных предварительных или предложенных меток.",
       eventErrors(),
     ));
     charts.append(chartCard(
@@ -1354,7 +1354,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     ));
     charts.append(scatterCard());
     charts.append(policyTableCard());
-    $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и выбранным предварительным или предложенным меткам. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Темы одинаковы для обоих режимов. Распределение событий, расхождения и причины review переключаются вместе с Legacy / Policy v2.1. Coverage vs Error Rate и пресеты A–E ниже остаются Legacy-диагностикой; таблица сравнения фиксирует Legacy Current Strict и Policy v2.1. Результаты не доказывают качество на реальном новостном потоке.`;
+    $("statsFootnote").textContent = `Метрики рассчитаны по 45 сохранённым ответам Jev на синтетические новости и по выбранным предварительным или предложенным меткам. Ответы для 4 из 49 непустых новостей отсутствуют: они исключены из расчёта точности и пропусков. Ещё 1 пустая новость не классифицируется. Совпадение темы считается одинаково в обоих режимах; графики событий и причин проверки следуют выбранному режиму. В карточках Legacy события оцениваются по порогу Noul до блокировки новости: они могут быть положительными, хотя всю новость отправили на проверку. Таблица сравнения показывает фактически переданные результаты. График автоматического принятия и таблица режимов показывают старые правила Legacy. Все метки пока предварительные, а результаты не доказывают качество на реальном потоке новостей.`;
   }
 
   function legacyOutputMetrics() {
@@ -1392,8 +1392,8 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
 
   function policyComparisonCard(v2Metrics) {
     const card = node("section", "chart-card policy-v2-comparison");
-    append(card, node("div", "chart-title", "Legacy vs Policy v2.1 · один и тот же набор из 45 ответов"));
-    card.append(node("div", "chart-desc", "Считается только то, что реально прошло бы дальше. Legacy передаёт целиком только прошедшие новости; v2 — отдельные event-кандидаты. 4 запроса без ответа исключены."));
+    append(card, node("div", "chart-title", "Старые правила и Policy v2.1 · одни и те же 45 ответов"));
+    card.append(node("div", "chart-desc", "Старые правила передают новость целиком только если она прошла проверку. Policy v2.1 передаёт каждое подходящее событие отдельно. Сравнение показывает результаты передачи относительно предварительных меток; 4 ответа Jev отсутствуют."));
     const legacy = legacyOutputMetrics();
     const v2 = v2Metrics;
     const riskyCodes = new Set(["sanctions", "trade_restriction", "legal_enforcement", "insolvency_default", "product_recall_quality_safety", "production_operational_disruption"]);
@@ -1406,11 +1406,11 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const table = node("table", "policy-table policy-v2-table");
     const head = node("thead");
     const header = node("tr");
-    for (const label of ["Режим", "Передано дальше", "P", "R", "F1", "Точные наборы", "TP / FP / FN", "Stories с review", "Условно значимые FP*"]) header.append(node("th", "", label));
+    for (const label of ["Правила", "Передано дальше", "Точность", "Передано от ожидаемых", "Общий баланс", "Совпали все события", "Совпало / лишнее / не передано", "Новости с задачей проверки", "Лишние в важной группе*"]) header.append(node("th", "", label));
     head.append(header); table.append(head);
     const body = node("tbody");
     const rows = [
-      { name: "Legacy · Current Strict", output: `${legacy.acceptedStories}/45 целых новостей · ${legacy.emittedEvents} меток`, p: legacy.precision, r: legacy.recall, f1: legacy.f1, exact: `${Math.round(legacy.exact * legacy.total)}/${legacy.total} · ${pct(legacy.exact)}`, counts: `${legacy.tp} / ${legacy.fp} / ${legacy.fn}`, review: `${legacy.reviewStories}/45`, danger: legacyDanger },
+      { name: "Старые правила · строгий режим", output: `${legacy.acceptedStories}/45 целых новостей · ${legacy.emittedEvents} меток`, p: legacy.precision, r: legacy.recall, f1: legacy.f1, exact: `${Math.round(legacy.exact * legacy.total)}/${legacy.total} · ${pct(legacy.exact)}`, counts: `${legacy.tp} / ${legacy.fp} / ${legacy.fn}`, review: `${legacy.reviewStories}/45`, danger: legacyDanger },
       { name: "Policy v2.1", output: `${v2.candidateStories}/45 новостей · ${v2MetricsCandidateCount(v2)} event-меток`, p: v2.precision, r: v2.recall, f1: v2.f1, exact: `${Math.round(v2.exactRate * v2.total)}/${v2.total} · ${pct(v2.exactRate)}`, counts: `${v2.tp} / ${v2.fp} / ${v2.fn}`, review: `${v2.reviewStories}/45`, danger: v2Danger },
     ];
     for (const row of rows) {
@@ -1423,8 +1423,9 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const wrap = node("div", "chart-body policy-table-wrap");
     wrap.append(table);
     card.append(wrap);
-    card.append(node("div", "policy-v2-note", `Policy v2.1: ${v2Metrics.evidenceReviews} историй с удержанными event-кандидатами · ${v2Metrics.unlistedReviews} отдельных задач по событиям вне списка · ${v2Metrics.eventAbstains} event-оценок abstain сохранено без review. Всего ${v2Metrics.reviewStories}/45 историй с задачей проверки. *Группа «условно значимых» категорий не утверждена и служит только исследовательским индикатором.`));
-    card.append(node("div", "policy-v2-caveat", "Важно: Legacy F1=0.840 в старом отчёте считается по всем сырым оценкам 45 ответов. Эта таблица считает фактическую передачу дальше: Legacy блокирует review-новости, а v2 считает удержанные категории как не переданные автоматически. Это не сравнение качества самой модели."));
+    card.append(node("div", "policy-v2-note", `В Policy v2.1: ${v2Metrics.evidenceReviews} новостей с кандидатами, удержанными из-за недостатка доказательств · ${v2Metrics.unlistedReviews} отдельных задач по событиям вне списка · ${v2Metrics.eventAbstains} оценок между порогами сохранено без отдельной проверки. Всего ${v2Metrics.reviewStories}/45 новостей имеют задачу проверки. *Важная группа категорий условная и не утверждена; это только исследовательский индикатор.`));
+    card.append(node("div", "policy-v2-note", "Точность: какая доля переданных событий совпала с предварительными метками. Передано от ожидаемых: какая доля ожидаемых событий попала в выход; удержанные правилами события сюда не входят. Общий баланс объединяет эти две оценки. Это сравнение правил обработки, а не качества самой модели."));
+    card.append(node("div", "policy-v2-caveat", "Важно: исторический F1=0,840 в отчёте рассчитан по всем исходным оценкам 45 ответов. Здесь считаются только события, которые правила действительно передали дальше. Старая политика блокирует новость целиком, а Policy v2.1 может передать одни события и удержать другие. Разметка предварительная и не утверждена человеком."));
     return card;
   }
 
@@ -1502,7 +1503,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       append(line, bar, node("span", "chart-num", `${row.fp}/${row.fn}`));
       body.append(line);
     }
-    body.append(node("div", "editor-note", "В конце каждой строки: FP / FN. Нажмите, чтобы отфильтровать новости по событию."));
+    body.append(node("div", "editor-note", "В конце каждой строки: лишние кандидаты / ожидаемые события, не переданные дальше. Нажмите, чтобы отфильтровать новости по событию."));
     return body;
   }
 
@@ -1538,7 +1539,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
   function scatterCard() {
     const gatesRows = PRESETS.map((preset) => ({ preset, metrics: metricsForGates(preset.gates) }));
     const card = node("section", "chart-card");
-    append(card, node("div", "chart-title", "Coverage vs Error Rate"), node("div", "chart-desc", "Доля принятых ответов и ошибки среди них. Точки сравнивают диагностические политики."));
+    append(card, node("div", "chart-title", "Автоматическое принятие и ошибки"), node("div", "chart-desc", "Этот график показывает только старые диагностические режимы: по горизонтали доля новостей, принятых без проверки; по вертикали доля ошибок среди них."));
     const wrap = node("div", "scatter-wrap");
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 480 250");
@@ -1563,13 +1564,13 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
       circle.setAttribute("cx", cx); circle.setAttribute("cy", cy); circle.setAttribute("r", "6"); circle.setAttribute("fill", index === 0 ? "#ff3347" : ["#f1bd64", "#8aafff", "#55d69e", "#c19aff"][index - 1]);
       circle.setAttribute("tabindex", "0"); circle.setAttribute("role", "button"); circle.setAttribute("aria-label", `${preset.label}: покрытие ${pct(metrics.coverage)}, ошибки ${pct(metrics.autoErrorRate)}`);
       circle.addEventListener("click", () => selectPreset(preset.id));
-      const title = document.createElementNS("http://www.w3.org/2000/svg", "title"); title.textContent = `${preset.label} · coverage ${pct(metrics.coverage)} · error ${pct(metrics.autoErrorRate)}`; circle.append(title);
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title"); title.textContent = `${preset.label} · принято без проверки ${pct(metrics.coverage)} · ошибки среди принятых ${pct(metrics.autoErrorRate)}`; circle.append(title);
       svg.append(circle);
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text"); label.setAttribute("x", cx + 8); label.setAttribute("y", cy - 6); label.textContent = String.fromCharCode(65 + index); svg.append(label);
     });
     wrap.append(svg);
     const legend = node("div", "scatter-legend");
-    append(legend, node("span", "", "X — доля без review"), node("span", "", "Y — ошибка среди принятых"), node("span", "", "Нажмите на точку, чтобы выбрать режим."));
+    append(legend, node("span", "", "По горизонтали — принято без проверки"), node("span", "", "По вертикали — ошибки среди принятых"), node("span", "", "Нажмите на точку, чтобы выбрать режим."));
     append(wrap, legend);
     card.append(wrap);
     return card;
@@ -1582,7 +1583,7 @@ input[type="range"] { width: 100%; accent-color: var(--red); }
     const table = node("table", "policy-table");
     const thead = node("thead");
     const tr = node("tr");
-    for (const label of ["Режим", "Авто", "Coverage", "Тема точна", "Event F1", "Exact set", "Ошибки авто"]) tr.append(node("th", "", label));
+    for (const label of ["Режим", "Принято без проверки", "Доля принятых", "Тема верна", "Баланс событий", "Все события совпали", "С ошибкой / принято"]) tr.append(node("th", "", label));
     thead.append(tr); table.append(thead);
     const tbody = node("tbody");
     for (const preset of PRESETS) {

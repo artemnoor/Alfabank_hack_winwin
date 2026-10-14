@@ -7,7 +7,7 @@
 - The human annotation packet now contains all 49 non-empty baseline stories without source IDs, draft labels, or model outputs. It is blind to saved model answers, but not to the repository owner; no human annotators have completed it.
 - The separate 60-story visible validation set is unlabelled, unscored, and cannot become a blind benchmark because its inputs were visible to developers.
 - **Ready for T09 experimental handoff only. Not production-ready.** No runtime/OpenAPI integration or new Jev requests were made.
-- Latest checks: 118 offline unit tests and 19 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
+- Latest checks: 118 offline unit tests and 20 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
 
 ## Quality improvement pass — 2026-10-14
 
@@ -16,7 +16,7 @@
 - Added counterfactual coverage/risk tables; they are not threshold recommendations and are not production-ready.
 - Added detailed error review, human adjudication packet, deep-v1 structural audit, benchmark freeze plan and a separate v0.4 taxonomy proposal. Source v0.3, original corpus and saved responses remain unchanged.
 - Added offline regression tests for aggregation, missing cases, review triggers, tri-state boundaries, no-network analysis, spent-budget refusal, corpus hashes and proposal separation.
-- Current statuses after the final offline pass: engineering quality **PASS** (118 unit tests, 19 browser/policy tests, Ruff, offline runner and artifact checks); current-revision API compatibility **BLOCKED** pending an authorized live verification; model quality **NOT MEASURED FOR DECISION**; T09 experimental candidate handoff **READY**, production integration **NOT READY**.
+- Current statuses after the latest offline pass: engineering quality **PASS** (118 unit tests, 20 browser/policy tests, Ruff, offline runner and artifact checks); current-revision API compatibility **BLOCKED** pending an authorized live verification; model quality **NOT MEASURED FOR DECISION**; T09 experimental candidate handoff **READY**, production integration **NOT READY**.
 
 ## Goal and limits
 

@@ -34,7 +34,16 @@ class PolicyV2UnitTests(unittest.TestCase):
     def test_choice_and_event_abstain_are_saved_but_do_not_create_review(self) -> None:
         case = self.by_id["e01-supply-rail"]
         result_input = dict(case["result"])
-        result_input["topic_confidence"] = 0.32
+        topic_codes = list(result_input["topic_probabilities"])
+        selected_topic = result_input["topic"]
+        low_choice_probability = 0.32
+        result_input["topic_probabilities"] = {
+            code: (low_choice_probability if code == selected_topic else 0.068)
+            for code in topic_codes
+        }
+        result_input["topic_confidence"] = (
+            low_choice_probability - 1 / len(topic_codes)
+        ) / (1 - 1 / len(topic_codes))
         result = evaluate_result(result_input, self.taxonomy)
         self.assertEqual(result["event_states"]["supply_chain_disruption"], "positive")
         self.assertIn(
@@ -43,7 +52,7 @@ class PolicyV2UnitTests(unittest.TestCase):
         self.assertEqual(result["topic_state"], "saved")
         self.assertEqual(result["topic_code"], case["result"]["topic"])
         self.assertEqual(
-            result["topic_probabilities"], case["result"]["topic_probabilities"]
+            result["topic_probabilities"], result_input["topic_probabilities"]
         )
         self.assertEqual(result["event_scores"], case["result"]["event_scores"])
         self.assertIn("supply_chain_disruption", result["candidate_codes"])
@@ -152,6 +161,32 @@ class PolicyV2UnitTests(unittest.TestCase):
         )
         with self.assertRaises(PolicyV2InputError):
             evaluate_result(malformed, self.taxonomy)
+
+    def test_choice_probabilities_and_confidence_must_be_consistent(self) -> None:
+        original = self.by_id["e01-supply-rail"]["result"]
+
+        wrong_confidence = dict(original)
+        wrong_confidence["topic_confidence"] = 0.5
+        with self.assertRaises(PolicyV2InputError):
+            evaluate_result(wrong_confidence, self.taxonomy)
+
+        wrong_winner = dict(original)
+        wrong_winner["topic_probabilities"] = dict(original["topic_probabilities"])
+        selected = wrong_winner["topic"]
+        other = next(
+            code for code in wrong_winner["topic_probabilities"] if code != selected
+        )
+        wrong_winner["topic_probabilities"][selected] = 0.0
+        wrong_winner["topic_probabilities"][other] = 1.0
+        wrong_winner["topic_confidence"] = 1.0
+        with self.assertRaises(PolicyV2InputError):
+            evaluate_result(wrong_winner, self.taxonomy)
+
+        wrong_sum = dict(original)
+        wrong_sum["topic_probabilities"] = dict(original["topic_probabilities"])
+        wrong_sum["topic_probabilities"][selected] -= 0.1
+        with self.assertRaises(PolicyV2InputError):
+            evaluate_result(wrong_sum, self.taxonomy)
 
     def test_unknown_topic_and_missing_or_extra_event_scores_fail_closed(self) -> None:
         result = self.by_id["e01-supply-rail"]["result"]

@@ -54,7 +54,7 @@ AI-review — вспомогательное мнение, не человече
 ## Проверки этого состояния
 
 - Unit suite: 118 passed, 0 failed, 0 skipped.
-- Policy/visualization/Playwright suite: 19 passed, 0 failed, 0 skipped.
+- Policy/visualization/Playwright suite: 20 passed, 0 failed, 0 skipped.
 - Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: PASS.
 - Новых Jev/Polza AI запросов: 0.
 

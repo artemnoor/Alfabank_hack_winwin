@@ -11,6 +11,8 @@ import math
 from collections.abc import Iterable
 from typing import Any
 
+from jev_spike import choice_confidence_matches
+
 POLICY_VERSION = "2.1.0-spike"
 PROVISIONAL_HIGH_CONSEQUENCE_CODES = frozenset(
     {
@@ -95,6 +97,15 @@ def evaluate_result(
         code: _score(result["topic_probabilities"][code], f"topic score {code}")
         for code in sorted(topic_codes)
     }
+    if not math.isclose(
+        sum(topic_probabilities.values()), 1.0, rel_tol=0, abs_tol=1e-5
+    ):
+        raise PolicyV2InputError("Choice probabilities do not sum to one")
+    if topic_probabilities[result["topic"]] + 1e-8 < max(topic_probabilities.values()):
+        raise PolicyV2InputError("Choice topic is not a maximum-probability option")
+    confidence = _score(result.get("topic_confidence"), "Choice confidence")
+    if not choice_confidence_matches(topic_probabilities, confidence):
+        raise PolicyV2InputError("Choice confidence does not match its probabilities")
     event_code_list = [row.get("code") for row in events if isinstance(row, dict)]
     event_codes = set(event_code_list)
     if set(result["event_scores"]) != event_codes:
@@ -125,7 +136,6 @@ def evaluate_result(
         else _score(unlisted_cutoff, "unlisted threshold")
     )
 
-    confidence = _score(result.get("topic_confidence"), "Choice confidence")
     event_states = {
         code: tri_state(
             result["event_scores"][code],

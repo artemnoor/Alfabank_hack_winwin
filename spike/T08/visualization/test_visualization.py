@@ -171,7 +171,9 @@ class BrowserAcceptanceTests(unittest.TestCase):
                     else None
                 ),
             )
-            page.on("pageerror", lambda error: page_errors.append(str(error)))
+            page.on(
+                "pageerror", lambda error: page_errors.append(f"{error}\n{error.stack}")
+            )
             page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
 
             self.assertEqual(page.title(), "Лаборатория Jev · T08")
@@ -187,11 +189,12 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page.locator('[data-preset="ignore_unlisted_gate"]').click()
 
             # Policy v2 is a browser-only alternate policy over the exact same
-            # 45 saved results. A clear event survives unrelated abstain and
-            # unlisted signals, while evidence abstain holds its own candidate.
+            # 45 saved results. Event abstain is retained without review; the
+            # evidence and unlisted gates have independent 0.8 cutoffs.
             page.locator('[data-policy-mode="policy_v2"]').click()
             self.assertIn("Policy v2", page.locator("#policyName").inner_text())
             self.assertTrue(page.locator("#presetButtons").is_hidden())
+            page.locator(".threshold-details summary").click()
             page.locator("#filterSearch").fill("e01-supply-rail")
             page.locator("#caseList .case-card").click()
             supply_event = page.locator("#detailBody .event-item").filter(
@@ -210,32 +213,87 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 "событие вне списка", page.locator("#detailBody").inner_text().lower()
             )
             self.assertIn(
-                "кандидаты + точечная проверка",
+                "1 event-кандидат(а) доступны для передачи",
                 page.locator("#detailBody").inner_text(),
             )
+            self.assertIn("Оценка сохранена как abstain", production_event.inner_text())
+            self.assertIn("не создаёт проверку", production_event.inner_text())
+            self.assertIn(
+                "не блокируют передачу event-кандидатов",
+                page.locator("#detailBody").inner_text(),
+            )
+            self.assertTrue(page.locator("#threshold-negative").is_visible())
+            self.assertTrue(page.locator("#threshold-choice").is_hidden())
+
+            # Unlisted score reaching 0.53 creates a separate task while the
+            # known supply-chain candidate remains available.
+            page.locator("#threshold-unlisted").evaluate(
+                "el => { el.value = '0.53'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            self.assertIn(
+                "отдельная задача проверки", page.locator("#detailBody").inner_text()
+            )
+            self.assertEqual(
+                page.locator("#detailBody .event-item")
+                .filter(has_text="Сбой поставок")
+                .locator(".candidate-routing.candidate")
+                .count(),
+                1,
+            )
+            page.locator("#resetThresholds").click()
             page.screenshot(path=str(screenshots / "policy-v2-e01.png"), full_page=True)
+
+            # An actual saved answer with Choice confidence below the Legacy
+            # cutoff still passes its independent positive event candidate.
+            page.locator("#filterSearch").fill("e06-production-fire")
+            page.locator("#caseList .case-card").click()
+            self.assertIn("confidence 0.47", page.locator("#detailBody").inner_text())
+            low_choice_candidate = page.locator("#detailBody .event-item").filter(
+                has_text="Операционный сбой производства"
+            )
+            low_choice_candidate.locator("summary").click()
+            self.assertEqual(
+                low_choice_candidate.locator(".candidate-routing.candidate").count(),
+                1,
+            )
 
             page.locator("#filterSearch").fill("e04-shortage-ports")
             page.locator("#caseList .case-card").click()
             positive_score = page.locator(
                 "#detailBody .event-item .state-chip.positive"
             ).first
-            blocked_event = positive_score.locator("xpath=../..")
-            blocked_event.locator("summary").click()
+            candidate_event = positive_score.locator("xpath=../..")
+            candidate_event.locator("summary").click()
             self.assertEqual(
-                blocked_event.locator(".candidate-routing.blocked").count(), 1
+                candidate_event.locator(".candidate-routing.candidate").count(), 1
             )
+            self.assertIn("Кандидат для следующего этапа", candidate_event.inner_text())
+            page.locator("#threshold-uncertainty").evaluate(
+                "el => { el.value = '0.26'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            self.assertEqual(
+                page.locator(
+                    "#detailBody .event-item .candidate-routing.blocked"
+                ).count(),
+                1,
+            )
+            self.assertIn(
+                "удержаны для проверки", page.locator("#detailBody").inner_text()
+            )
+            page.locator("#resetThresholds").click()
 
             page.locator("#statsTab").click()
             comparison = page.locator("#policyComparison")
             legacy_row = comparison.locator(".policy-v2-table tbody tr").first
             self.assertIn("Legacy · Current Strict", legacy_row.inner_text())
             self.assertIn("2 / 1 / 39", legacy_row.inner_text())
-            self.assertIn("23/45 новостей", comparison.inner_text())
-            self.assertIn("22 / 4 / 19", comparison.inner_text())
+            self.assertIn("32/45 новостей", comparison.inner_text())
+            self.assertIn("34 / 6 / 7", comparison.inner_text())
             self.assertIn("e03-shortage-cells", comparison.inner_text())
             self.assertIn("e25-legal-fine", comparison.inner_text())
+            self.assertIn("e27-disaster-flood", comparison.inner_text())
             self.assertIn("42/45", comparison.inner_text())
+            self.assertIn("0/45", comparison.inner_text())
             page.screenshot(
                 path=str(screenshots / "policy-v2-comparison.png"), full_page=True
             )
@@ -247,17 +305,15 @@ class BrowserAcceptanceTests(unittest.TestCase):
                 page.locator("#topMetrics").inner_text(), previous_candidate_metrics
             )
             self.assertEqual(
-                page.locator("#threshold-uncertainty").get_attribute("max"), "0.94"
+                page.locator("#threshold-uncertainty").get_attribute("max"), "1"
             )
             page.locator("#threshold-uncertainty").evaluate(
                 "el => { el.value = '1'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
             )
-            self.assertEqual(
-                page.locator("#threshold-uncertainty").input_value(), "0.94"
-            )
+            self.assertEqual(page.locator("#threshold-uncertainty").input_value(), "1")
             page.locator("#resetThresholds").click()
             page.locator("[data-policy-mode='legacy']").click()
-            self.assertIn("42/45", comparison.inner_text())
+            self.assertIn("42/45", page.locator("#policyComparison").inner_text())
             page.locator("#labTab").click()
             page.set_viewport_size({"width": 390, "height": 844})
             page.locator('[data-policy-mode="policy_v2"]').click()

@@ -17,6 +17,7 @@
     gates: { choice: true, event_band: true, uncertainty: true, unlisted: true },
     preset: "current_strict",
   };
+  const v2Settings = { negative: 0.2, positive: 0.8, evidence: 0.8, unlisted: 0.8 };
   let activePolicyMode = "legacy";
   let selectedId = DATA.cases[0]?.id ?? null;
   let activeTab = "lab";
@@ -117,16 +118,24 @@
       const input = $(`threshold-${field}`);
       input.addEventListener("input", () => {
         let value = Math.round(Number(input.value) * 100) / 100;
-        if (field === "negative") value = Math.min(value, settings.positive - 0.01);
-        if (field === "positive") value = Math.max(value, settings.negative + 0.01);
-        if (field === "uncertainty" || field === "unlisted") value = Math.min(value, settings.positive - 0.01);
-        settings[field] = value;
-        if (field === "positive") {
-          settings.uncertainty = Math.min(settings.uncertainty, value - 0.01);
-          settings.unlisted = Math.min(settings.unlisted, value - 0.01);
+        if (activePolicyMode === "policy_v2") {
+          if (field === "choice") return;
+          if (field === "negative") value = Math.min(value, v2Settings.positive - 0.01);
+          if (field === "positive") value = Math.max(value, v2Settings.negative + 0.01);
+          const v2Field = { negative: "negative", positive: "positive", uncertainty: "evidence", unlisted: "unlisted" }[field];
+          v2Settings[v2Field] = value;
+        } else {
+          if (field === "negative") value = Math.min(value, settings.positive - 0.01);
+          if (field === "positive") value = Math.max(value, settings.negative + 0.01);
+          if (field === "uncertainty" || field === "unlisted") value = Math.min(value, settings.positive - 0.01);
+          settings[field] = value;
+          if (field === "positive") {
+            settings.uncertainty = Math.min(settings.uncertainty, value - 0.01);
+            settings.unlisted = Math.min(settings.unlisted, value - 0.01);
+          }
+          settings.gates = { choice: true, event_band: true, uncertainty: true, unlisted: true };
+          settings.preset = "custom";
         }
-        settings.gates = { choice: true, event_band: true, uncertainty: true, unlisted: true };
-        settings.preset = "custom";
         syncSliders();
         renderAll();
       });
@@ -137,6 +146,10 @@
       settings.positive = 0.8;
       settings.uncertainty = 0.2;
       settings.unlisted = 0.2;
+      v2Settings.negative = 0.2;
+      v2Settings.positive = 0.8;
+      v2Settings.evidence = 0.8;
+      v2Settings.unlisted = 0.8;
       settings.gates = { choice: true, event_band: true, uncertainty: true, unlisted: true };
       settings.preset = "current_strict";
       syncSliders();
@@ -146,19 +159,31 @@
   }
 
   function syncSliders() {
+    const shown = activePolicyMode === "policy_v2"
+      ? { choice: settings.choice, negative: v2Settings.negative, positive: v2Settings.positive, uncertainty: v2Settings.evidence, unlisted: v2Settings.unlisted }
+      : settings;
     const pairs = [
-      ["choice", settings.choice], ["negative", settings.negative], ["positive", settings.positive],
-      ["uncertainty", settings.uncertainty], ["unlisted", settings.unlisted],
+      ["choice", shown.choice], ["negative", shown.negative], ["positive", shown.positive],
+      ["uncertainty", shown.uncertainty], ["unlisted", shown.unlisted],
     ];
     for (const [field, value] of pairs) {
       const input = $(`threshold-${field}`);
       input.value = value.toFixed(2);
       $(`value-${field}`).textContent = value.toFixed(2);
     }
-    $("threshold-negative").max = Math.max(0, settings.positive - 0.01).toFixed(2);
-    $("threshold-positive").min = Math.min(1, settings.negative + 0.01).toFixed(2);
-    $("threshold-uncertainty").max = Math.max(0, settings.positive - 0.01).toFixed(2);
-    $("threshold-unlisted").max = Math.max(0, settings.positive - 0.01).toFixed(2);
+    $("threshold-negative").max = Math.max(0, shown.positive - 0.01).toFixed(2);
+    $("threshold-positive").min = Math.min(1, shown.negative + 0.01).toFixed(2);
+    $("threshold-uncertainty").max = "1";
+    $("threshold-unlisted").max = "1";
+    $("threshold-choice").closest(".threshold-control").hidden = activePolicyMode === "policy_v2";
+    $("threshold-negative").closest(".threshold-control").hidden = false;
+    const labels = activePolicyMode === "policy_v2"
+      ? { negative: "Noul: отрицательный до ", positive: "Кандидат события при ≥ ", uncertainty: "Удержать кандидаты при evidence ≥ ", unlisted: "Отдельный review при unlisted ≥ " }
+      : { positive: "Noul: положительный от ", uncertainty: "Review: мало доказательств > ", unlisted: "Review: событие вне списка > " };
+    for (const [field, label] of Object.entries(labels)) $(`threshold-${field}`).labels[0].childNodes[0].nodeValue = label;
+    $("thresholdHelp").textContent = activePolicyMode === "policy_v2"
+      ? "В Policy v2: Noul ≤ отрицательного порога = negative, ≥ порога кандидата = positive, между ними = abstain. Положительные события становятся кандидатами; evidence ≥ порога удерживает только их; unlisted ≥ порога создаёт отдельную проверку. Choice и abstain сохраняются, но сами не создают review."
+      : "Noul: score ≤ отрицательного порога → negative; score ≥ положительного → positive; между ними → abstain. Порог Choice принимает значение на границе. Сигналы review срабатывают только при score строго выше порога.";
     for (const button of document.querySelectorAll(".preset")) button.classList.toggle("active", button.dataset.preset === settings.preset);
     $("presetButtons").hidden = activePolicyMode === "policy_v2";
     $("legacyPresetNote").hidden = activePolicyMode !== "policy_v2";
@@ -166,10 +191,12 @@
       ? "Policy v2 · независимые сигналы"
       : settings.preset === "custom" ? "Legacy · пользовательские пороги" : PRESETS.find((row) => row.id === settings.preset)?.label ?? "A · Current Strict";
     $("policyCaption").textContent = activePolicyMode === "policy_v2"
-      ? "Положительные события идут только как кандидаты; Choice, abstain, evidence и unlisted проверяются отдельно."
+      ? "Choice и все оценки сохраняются. Кандидаты — event score ≥ порога; evidence удерживает кандидатов, unlisted создаёт отдельную проверку."
       : settings.preset === "custom"
         ? "Локальный пересчёт сохранённых оценок; историческая Legacy-логика. Это не новый запуск Jev."
         : "Legacy: экспериментальные сигналы сводятся к общему статусу новости; настройки применяются только в этом браузере.";
+    $("filterState").querySelector('[value="review"]').textContent = activePolicyMode === "policy_v2" ? "Есть задача проверки" : "Нужна проверка";
+    $("filterState").querySelector('[value="auto"]').textContent = activePolicyMode === "policy_v2" ? "Нет задачи проверки" : "Приняты порогами";
   }
 
   function currentGold(row) {
@@ -217,31 +244,30 @@
 
   function decisionV2(row) {
     const result = row.result;
-    if (!result) return { status: row.text?.trim() ? "missing" : "no_content", reasons: [], active: {}, predictions: new Set(), eventStates: {}, eventReviewCodes: [], blockedCodes: [], reviewTasks: [] };
-    const eventStates = Object.fromEntries(DATA.taxonomy.events.map((event) => [event.code, noulState(result.event_scores[event.code])]));
-    const evidenceState = noulState(result.uncertainty_score, settings.uncertainty, settings.positive);
-    const unlistedState = noulState(result.unlisted_event_score, settings.unlisted, settings.positive);
-    const choiceReview = result.topic_confidence < settings.choice;
-    const eventReviewCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "abstain").map((event) => event.code);
+    if (!result) return { status: row.text?.trim() ? "missing" : "no_content", reasons: [], active: {}, predictions: new Set(), eventStates: {}, eventAbstainCodes: [], blockedCodes: [], reviewTasks: [] };
+    const eventStates = Object.fromEntries(DATA.taxonomy.events.map((event) => [event.code, noulState(result.event_scores[event.code], v2Settings.negative, v2Settings.positive)]));
+    const eventAbstainCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "abstain").map((event) => event.code);
     const positiveCodes = DATA.taxonomy.events.filter((event) => eventStates[event.code] === "positive").map((event) => event.code);
-    const evidenceReview = evidenceState !== "negative";
-    const unlistedReview = unlistedState !== "negative";
+    const evidenceThresholdReached = result.uncertainty_score >= v2Settings.evidence;
+    const evidenceReview = positiveCodes.length > 0 && evidenceThresholdReached;
+    const unlistedReview = result.unlisted_event_score >= v2Settings.unlisted;
     const candidateBlocked = evidenceReview;
     const predictions = new Set(candidateBlocked ? [] : positiveCodes);
     const blockedCodes = candidateBlocked ? positiveCodes : [];
     const reviewTasks = [];
-    if (choiceReview) reviewTasks.push("Choice: основная тема требует проверки.");
-    for (const code of eventReviewCodes) reviewTasks.push(`Событие «${eventLabel(code)}»: оценка между порогами, проверить эту метку.`);
-    if (evidenceReview) reviewTasks.push(`Недостаточность доказательств: состояние ${evidenceState}; кандидаты удержаны до проверки доказательств.`);
-    if (unlistedReview) reviewTasks.push(`Событие вне списка: состояние ${unlistedState}; проверить необходимость новой метки.`);
+    if (evidenceReview) reviewTasks.push(`Недостаточно доказательств: ${scoreText(result.uncertainty_score)} ≥ ${scoreText(v2Settings.evidence)}; кандидаты удержаны для проверки.`);
+    if (unlistedReview) reviewTasks.push(`Событие вне списка: ${scoreText(result.unlisted_event_score)} ≥ ${scoreText(v2Settings.unlisted)}; отдельная задача проверки.`);
     const needsReview = reviewTasks.length > 0;
-    const status = predictions.size ? (needsReview ? "candidates_review" : "candidates") : (needsReview ? "review" : "no_candidate");
+    const status = predictions.size ? (needsReview ? "candidates_and_review" : "candidates") : (candidateBlocked ? "candidates_held" : needsReview ? "unlisted_review" : "no_candidates");
     const reasons = reviewTasks;
     return {
-      status, reasons, predictions, eventStates, eventReviewCodes, positiveCodes,
-      blockedCodes, evidenceState, unlistedState, choiceReview, evidenceReview,
-      unlistedReview, candidateBlocked, needsReview,
-      active: { choice: choiceReview, event_scores: eventReviewCodes.length > 0, uncertainty: evidenceReview, unlisted: unlistedReview },
+      status, reasons, predictions, eventStates, eventAbstainCodes, positiveCodes,
+      blockedCodes, evidenceThresholdReached, evidenceReview,
+      unlistedReview, candidateBlocked, needsReview, reviewTasks,
+      topicCode: result.topic, topicConfidence: result.topic_confidence,
+      topicProbabilities: { ...result.topic_probabilities },
+      eventScores: { ...result.event_scores },
+      active: { evidence: evidenceReview, unlisted: unlistedReview },
     };
   }
 
@@ -307,7 +333,7 @@
   function metricSetV2(rows) {
     const observed = rows.filter((row) => row.result);
     let tp = 0; let fp = 0; let fn = 0; let exact = 0; let candidateStories = 0;
-    let reviewStories = 0; let eventAbstains = 0; let choiceReviews = 0; let evidenceReviews = 0; let unlistedReviews = 0;
+    let reviewStories = 0; let eventAbstains = 0; let evidenceReviews = 0; let unlistedReviews = 0;
     let evidenceBlockedStories = 0; let topicCorrect = 0;
     for (const row of observed) {
       const evaluated = decisionV2(row);
@@ -320,8 +346,7 @@
       exact += Number(falsePositive.length === 0 && falseNegative.length === 0);
       candidateStories += Number(predicted.size > 0);
       reviewStories += Number(evaluated.needsReview);
-      eventAbstains += evaluated.eventReviewCodes.length;
-      choiceReviews += Number(evaluated.choiceReview);
+      eventAbstains += evaluated.eventAbstainCodes.length;
       evidenceReviews += Number(evaluated.evidenceReview);
       unlistedReviews += Number(evaluated.unlistedReview);
       evidenceBlockedStories += Number(evaluated.blockedCodes.length > 0);
@@ -335,8 +360,8 @@
       exactRate: observed.length ? exact / observed.length : null,
       candidateStories, candidateCoverage: observed.length ? candidateStories / observed.length : null,
       reviewStories, noReviewStories: observed.length - reviewStories,
-      eventAbstains, choiceReviews, evidenceReviews, unlistedReviews,
-      scopedReviewItems: eventAbstains + choiceReviews + evidenceReviews + unlistedReviews,
+      eventAbstains, evidenceReviews, unlistedReviews,
+      scopedReviewItems: evidenceReviews + unlistedReviews,
       evidenceBlockedStories, topicCorrect, topicAccuracy: observed.length ? topicCorrect / observed.length : null,
     };
   }
@@ -344,9 +369,10 @@
   function caseStatusLabel(row, evaluated = activeDecision(row)) {
     if (!row.result) return row.text?.trim() ? "Нет ответа Jev" : "Пустой текст";
     if (activePolicyMode === "policy_v2") {
-      if (evaluated.predictions.size && evaluated.needsReview) return `${evaluated.predictions.size} кандидат(а) · нужна проверка`;
-      if (evaluated.predictions.size) return `${evaluated.predictions.size} кандидат(а) · без review`;
-      return evaluated.needsReview ? "Точечная проверка" : "Нет кандидатов";
+      if (evaluated.blockedCodes.length) return `Кандидаты удержаны: evidence`;
+      if (evaluated.predictions.size && evaluated.needsReview) return `${evaluated.predictions.size} кандидат(а) + отдельная проверка`;
+      if (evaluated.predictions.size) return `${evaluated.predictions.size} кандидат(а) к передаче`;
+      return evaluated.needsReview ? "Проверить событие вне списка" : "Сохранён · без кандидатов";
     }
     if (evaluated.status === "uncertain") return "Нужна проверка";
     if (evaluated.status === "other") return "Другая тема";
@@ -397,13 +423,13 @@
       const error = row.result ? rowError(row, evaluated).any : false;
       const status = evaluated.status;
       if (filters.state === "review" && (activePolicyMode === "policy_v2" ? !evaluated.needsReview : status !== "uncertain")) return false;
-      if (filters.state === "auto" && (activePolicyMode === "policy_v2" ? evaluated.needsReview : status === "uncertain")) return false;
+      if (filters.state === "auto" && (activePolicyMode === "policy_v2" ? (!row.result || evaluated.needsReview) : status === "uncertain")) return false;
       if (filters.state === "error" && !error) return false;
       if (filters.state === "clean" && (!row.result || error)) return false;
       if (filters.state === "missing" && (!row.text?.trim() || row.result)) return false;
       if (filters.state === "disputed" && !reviewCaseIds.has(row.id)) return false;
-      if (filters.state === "unlisted" && (!row.result || row.result.unlisted_event_score <= settings.unlisted)) return false;
-      if (filters.state === "evidence" && (!row.result || row.result.uncertainty_score <= settings.uncertainty)) return false;
+      if (filters.state === "unlisted" && (!row.result || (activePolicyMode === "policy_v2" ? !evaluated.unlistedReview : row.result.unlisted_event_score <= settings.unlisted))) return false;
+      if (filters.state === "evidence" && (!row.result || (activePolicyMode === "policy_v2" ? !evaluated.evidenceReview : row.result.uncertainty_score <= settings.uncertainty))) return false;
       if (filters.state === "empty" && row.text?.trim()) return false;
       return true;
     });
@@ -467,7 +493,7 @@
     original.append(eventHead);
     const originalEvents = node("div", "label-list");
     for (const code of row.expected_events) {
-      const v2Held = activePolicyMode === "policy_v2" && (evaluated.blockedCodes.includes(code) || evaluated.eventReviewCodes.includes(code));
+      const v2Held = activePolicyMode === "policy_v2" && evaluated.blockedCodes.includes(code);
       originalEvents.append(labelChip(eventLabel(code), v2Held ? "review" : error?.fn.includes(code) ? "fn" : error?.fp.includes(code) ? "fp" : "correct"));
     }
     if (!row.expected_events.length) originalEvents.append(labelChip("Событий нет"));
@@ -533,8 +559,8 @@
       for (const code of error.fp) diffs.append(node("div", "", activePolicyMode === "policy_v2" ? `Ложный кандидат (не факт) · ${eventLabel(code)}` : `Ложное срабатывание · ${eventLabel(code)}`));
       for (const code of error.fn) {
         if (activePolicyMode === "policy_v2" && evaluated.blockedCodes.includes(code)) diffs.append(node("div", "", `Не передан: положительная оценка удержана по доказательствам · ${eventLabel(code)}`));
-        else if (activePolicyMode === "policy_v2" && evaluated.eventReviewCodes.includes(code)) diffs.append(node("div", "", `Не передан: эта категория требует проверки · ${eventLabel(code)}`));
-        else diffs.append(node("div", "", activePolicyMode === "policy_v2" ? `Не передан кандидатом (состояние negative) · ${eventLabel(code)}` : `Пропущено · ${eventLabel(code)}`));
+        else if (activePolicyMode === "policy_v2") diffs.append(node("div", "", `Не передан: score ниже порога кандидата · ${eventLabel(code)}`));
+        else diffs.append(node("div", "", `Пропущено · ${eventLabel(code)}`));
       }
       if (!error.any) diffs.append(node("div", "", "По текущим меткам и порогу событий расхождений нет."));
       model.append(diffs);
@@ -685,9 +711,20 @@
 
     const summary = node("div", "summary-grid");
     const topic = topicByCode.get(result.topic);
+    const routeSummary = activePolicyMode !== "policy_v2"
+      ? evaluated.status === "uncertain" ? "нужна общая проверка" : "пороговая проверка пройдена"
+      : evaluated.blockedCodes.length
+        ? "кандидаты удержаны по недостатку доказательств"
+        : evaluated.predictions.size && evaluated.needsReview
+          ? "кандидаты доступны · есть отдельная задача"
+          : evaluated.predictions.size
+            ? "кандидаты доступны · не подтверждённые факты"
+            : evaluated.needsReview
+              ? "отдельная задача · кандидатов нет"
+              : "сохранено · кандидатов нет";
     summary.append(summaryCell("Тема Jev", topic?.label ?? result.topic, `Choice ${scoreText(result.topic_confidence)}`));
-    summary.append(summaryCell(activePolicyMode === "policy_v2" ? "Event-кандидаты" : "Положительные события", String(evaluated.predictions.size), activePolicyMode === "policy_v2" ? "не подтверждённые факты" : `по порогу ${scoreText(settings.positive)}`));
-    summary.append(summaryCell("Решение сейчас", activePolicyMode === "policy_v2" ? (evaluated.needsReview ? "кандидаты + точечная проверка" : "без review-сигналов") : evaluated.status, activePolicyMode === "policy_v2" ? `${evaluated.reasons.length} отдельных причин` : evaluated.status === "uncertain" ? `${evaluated.reasons.length} активных причин` : "пороговая проверка пройдена"));
+    summary.append(summaryCell(activePolicyMode === "policy_v2" ? "Event-кандидаты" : "Положительные события", String(evaluated.predictions.size), activePolicyMode === "policy_v2" ? (evaluated.blockedCodes.length ? `${evaluated.blockedCodes.length} удержано по evidence · не подтверждённые факты` : "кандидаты, не подтверждённые факты") : `по порогу ${scoreText(settings.positive)}`));
+    summary.append(summaryCell("Решение сейчас", activePolicyMode === "policy_v2" ? routeSummary : evaluated.status, activePolicyMode === "policy_v2" ? `${evaluated.reasons.length} отдельных задач проверки` : evaluated.status === "uncertain" ? `${evaluated.reasons.length} активных причин` : "пороговая проверка пройдена"));
     root.append(summary);
     root.append(storyCard(row));
     root.append(sectionHeading("Choice · основная тема", "Choice выбирает одну главную тему. Значения показывают ответ и сохранённые оценки; это не калиброванные вероятности."));
@@ -734,12 +771,12 @@
     const topic = topicByCode.get(result.topic);
     const meta = node("div", "choice-meta");
     const chosen = node("div", "choice-name", `Выбрано: ${topic?.label ?? result.topic}`);
-    const badge = node("span", `badge${result.topic_confidence < settings.choice ? " amber" : " green"}`, `confidence ${scoreText(result.topic_confidence)} · порог ${scoreText(settings.choice)}`);
+    const badge = node("span", "badge blue", `confidence ${scoreText(result.topic_confidence)} · сохранено`);
     append(meta, chosen, badge);
     card.append(meta);
     const accepted = result.topic_confidence >= settings.choice;
     card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
-      ? (accepted ? "Choice прошёл отдельную проверку темы. Это не подтверждает события." : "Тема требует отдельной проверки; положительные события-кандидаты могут пройти дальше независимо.")
+      ? "В этом потоке тема Choice и её confidence сохраняются для следующих этапов. Они не блокируют передачу event-кандидатов."
       : (accepted ? "Confidence не ниже порога: проверка Choice пройдена." : "Confidence ниже порога: приложение отправит тему на ручную проверку.")));
     const entries = DATA.taxonomy.topics.map((item) => ({ item, score: result.topic_probabilities[item.code] })).sort((a, b) => b.score - a.score);
     const bars = node("div", "bars");
@@ -763,7 +800,9 @@
     const root = node("div", "event-list");
     for (const event of DATA.taxonomy.events) {
       const score = result.event_scores[event.code];
-      const state = noulState(score);
+      const state = activePolicyMode === "policy_v2"
+        ? evaluated.eventStates[event.code]
+        : noulState(score);
       const detail = node("details", "event-item");
       const summary = node("summary", "event-summary");
       append(summary, node("span", "event-name", event.label));
@@ -778,10 +817,10 @@
           ? "Кандидат для следующего этапа · не подтверждённый факт."
           : evaluated.blockedCodes.includes(event.code)
             ? "Положительная оценка есть, но кандидат удержан из-за сигнала недостаточности доказательств."
-            : state === "abstain"
-              ? "Эту категорию нужно проверить; она не блокирует другие категории с положительной оценкой."
+          : state === "abstain"
+              ? "Оценка сохранена как abstain. По этой схеме она сама по себе не создаёт проверку и не блокирует другие категории."
               : "Не передаётся как кандидат по текущему порогу.";
-        extra.append(node("div", `candidate-routing${evaluated.predictions.has(event.code) ? " candidate" : evaluated.blockedCodes.includes(event.code) ? " blocked" : state === "abstain" ? " needs-review" : ""}`, routing));
+        extra.append(node("div", `candidate-routing${evaluated.predictions.has(event.code) ? " candidate" : evaluated.blockedCodes.includes(event.code) ? " blocked" : state === "abstain" ? " saved-state" : ""}`, routing));
       }
       append(extra, node("div", "event-def", event.definition));
       const criteria = node("div", "include-exclude");
@@ -791,7 +830,9 @@
       append(exclude, node("b", "", "Не считать, если"), node("span", "", event.exclude));
       append(criteria, include, exclude);
       extra.append(criteria);
-      extra.append(node("div", "editor-note", `Локальное правило: score ${scoreText(score)} ${state === "positive" ? `≥ ${scoreText(settings.positive)}` : state === "negative" ? `≤ ${scoreText(settings.negative)}` : `между ${scoreText(settings.negative)} и ${scoreText(settings.positive)}`}.`));
+      const negative = activePolicyMode === "policy_v2" ? v2Settings.negative : settings.negative;
+      const positive = activePolicyMode === "policy_v2" ? v2Settings.positive : settings.positive;
+      extra.append(node("div", "editor-note", `Состояние по сохранённой оценке: ${scoreText(score)} ${state === "positive" ? `≥ ${scoreText(positive)}` : state === "negative" ? `≤ ${scoreText(negative)}` : `между ${scoreText(negative)} и ${scoreText(positive)}`}.`));
       append(detail, summary, extra);
       root.append(detail);
     }
@@ -801,21 +842,22 @@
   function renderSignals(result, evaluated = activePolicyMode === "policy_v2" ? decisionV2({ result }) : null) {
     const grid = node("div", "signal-grid");
     const signals = [
-      { title: "Событие вне списка", score: result.unlisted_event_score, cutoff: settings.unlisted, state: activePolicyMode === "policy_v2" ? evaluated.unlistedState : noulState(result.unlisted_event_score), copy: "Оценивает, есть ли описанное событие, которому не нашлось подходящей метки в нашем справочнике." },
-      { title: "Недостаточно доказательств", score: result.uncertainty_score, cutoff: settings.uncertainty, state: activePolicyMode === "policy_v2" ? evaluated.evidenceState : noulState(result.uncertainty_score), copy: "Отдельный сигнал о расплывчатом, неполном, слуховом или противоречивом сообщении." },
+      { title: "Событие вне списка", key: "unlisted", score: result.unlisted_event_score, cutoff: activePolicyMode === "policy_v2" ? v2Settings.unlisted : settings.unlisted, triggered: activePolicyMode === "policy_v2" ? evaluated.unlistedReview : result.unlisted_event_score > settings.unlisted, copy: "Отдельно оценивает, есть ли событие, которому не нашлось подходящей метки в нашем справочнике." },
+      { title: "Недостаточно доказательств", key: "evidence", score: result.uncertainty_score, cutoff: activePolicyMode === "policy_v2" ? v2Settings.evidence : settings.uncertainty, triggered: activePolicyMode === "policy_v2" ? evaluated.evidenceThresholdReached : result.uncertainty_score > settings.uncertainty, copy: "Отдельно показывает, насколько сообщение расплывчато, неполно, похоже на слух или содержит противоречия." },
     ];
     for (const signal of signals) {
       const card = node("div", "signal-card");
       const top = node("div", "signal-value-row");
       append(top, node("span", "", signal.title), node("strong", "signal-value", scoreText(signal.score)));
       card.append(top);
-      card.append(makeBar(`Порог review ${scoreText(signal.cutoff)}`, signal.score, signal.state === "positive" ? "event-positive" : signal.state === "abstain" ? "event-abstain" : "topic"));
+      const state = signal.triggered ? "сработал" : "ниже порога";
+      card.append(makeBar(`Порог ${scoreText(signal.cutoff)}`, signal.score, signal.triggered ? "event-abstain" : "topic"));
       card.append(node("div", "signal-copy", signal.copy));
       card.append(node("div", "editor-note", activePolicyMode === "policy_v2"
-        ? (signal.title === "Недостаточно доказательств"
-          ? `${signal.state}; кандидаты передаются только при negative. Сейчас ${evaluated.candidateBlocked ? "кандидаты удержаны" : "сигнал не блокирует кандидатов"}.`
-          : `${signal.state}; создаёт отдельную проверку и не блокирует известные event-кандидаты.`)
-        : `${signal.state}; review gate ${settings.gates[signal.title === "Событие вне списка" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
+        ? (signal.key === "evidence"
+          ? `Score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} порога ${scoreText(signal.cutoff)}. ${evaluated.candidateBlocked ? "Есть event-кандидаты — они удержаны для проверки." : evaluated.positiveCodes?.length ? "Кандидаты передаются; это значение их не удержало." : "Положительных event-кандидатов нет, поэтому удерживать нечего и задача не создаётся."}`
+          : `${state}: score ${scoreText(signal.score)} ${signal.triggered ? "≥" : "<"} ${scoreText(signal.cutoff)}. ${signal.triggered ? "Создаётся отдельная задача проверки; известные event-кандидаты остаются доступными." : "Отдельная задача не создаётся."}`)
+        : `${state}; Legacy review gate ${settings.gates[signal.key === "unlisted" ? "unlisted" : "uncertainty"] ? "включён" : "выключен"}.`));
       grid.append(card);
     }
     return grid;
@@ -850,18 +892,20 @@
 
   function renderDecisionV2(row, evaluated) {
     const card = node("div", `decision-card${evaluated.needsReview ? " uncertain" : " classified"}`);
-    const title = evaluated.predictions.size
-      ? `${evaluated.predictions.size} event-кандидат(а) доступны для передачи`
-      : evaluated.needsReview ? "Кандидатов для передачи сейчас нет" : "Положительных event-кандидатов нет";
+    const title = evaluated.blockedCodes.length
+      ? `${evaluated.blockedCodes.length} кандидат(а) удержаны для проверки`
+      : evaluated.predictions.size
+        ? `${evaluated.predictions.size} event-кандидат(а) доступны для передачи`
+        : "Положительных event-кандидатов нет";
     const head = node("div", "decision-title");
-    append(head, node("span", "", title), node("span", `badge${evaluated.needsReview ? " amber" : " green"}`, evaluated.needsReview ? "точечная проверка" : "нет review-сигналов"));
+    append(head, node("span", "", title), node("span", `badge${evaluated.needsReview ? " amber" : " green"}`, evaluated.needsReview ? `${evaluated.reviewTasks.length} задача проверки` : evaluated.predictions.size ? "кандидаты не подтверждены" : "сохранено без кандидатов"));
     card.append(head);
-    card.append(node("div", "decision-explain", "Положительная метка — только кандидат для следующего этапа, а не подтверждённое событие."));
+    card.append(node("div", "decision-explain", "Схема обработки: технически корректный ответ сохраняет тему Choice и все оценки Noul. Каждая event-оценка ≥ порога становится кандидатом, а не подтверждённым фактом."));
     const topics = [
-      ["Тема (Choice)", evaluated.choiceReview ? "проверить тему" : "порог пройден"],
-      ["Категории событий", `${evaluated.eventReviewCodes.length} категорий требуют отдельной проверки`],
-      ["Недостаточность доказательств", `${evaluated.evidenceState}${evaluated.candidateBlocked ? " · блокирует кандидаты" : " · не блокирует кандидаты"}`],
-      ["Событие вне списка", `${evaluated.unlistedState} · отдельная проверка`],
+      ["1 · Choice и оценки", `тема «${topicLabel(row.result.topic)}» и все event scores сохранены; Choice confidence ${scoreText(row.result.topic_confidence)} не блокирует события`],
+      ["2 · Положительные события", `${evaluated.positiveCodes.length} оценок ≥ ${scoreText(v2Settings.positive)}; ${evaluated.blockedCodes.length ? "кандидаты удержаны" : `${evaluated.predictions.size} передано как кандидаты`}`],
+      ["3 · Недостаточно доказательств", `score ${scoreText(row.result.uncertainty_score)}; порог ${scoreText(v2Settings.evidence)}; ${evaluated.evidenceReview ? "кандидаты удержаны для проверки" : evaluated.positiveCodes.length ? "кандидаты не удерживаются" : "кандидатов нет, удерживать нечего"}`],
+      ["4 · Событие вне списка", `score ${scoreText(row.result.unlisted_event_score)}; порог ${scoreText(v2Settings.unlisted)}; ${evaluated.unlistedReview ? "отдельная задача проверки" : "без отдельной задачи"}; не блокирует известные события`],
     ];
     const list = node("ul", "reason-list");
     for (const [label, value] of topics) list.append(node("li", "", `${label}: ${value}.`));
@@ -874,7 +918,7 @@
     if (evaluated.blockedCodes.length) {
       card.append(node("div", "decision-explain", `Удержаны положительные оценки: ${evaluated.blockedCodes.map(eventLabel).join(", ")}.`));
     }
-    card.append(node("div", "editor-note", "Policy v2 не переводит отрицание/неопределённость в факт: события передаются только как помеченные кандидаты, а решение требует последующей проверки."));
+    card.append(node("div", "editor-note", "Negative и abstain оценки тоже сохраняются. Abstain само по себе не создаёт review. Кандидаты не являются подтверждёнными фактами; последующие этапы должны проверять их и собирать доказательства."));
     return card;
   }
 
@@ -894,7 +938,7 @@
       ["Есть задача review", pct(v2Metrics.reviewStories / v2Metrics.total), `${v2Metrics.reviewStories}/${v2Metrics.total} историй`],
       ["False Positives", String(v2Metrics.fp), "ложные кандидаты по draft gold"],
       ["Не передано", String(v2Metrics.fn), "включая policy hold и negative"],
-      ["Точечные задачи", String(v2Metrics.scopedReviewItems), `${v2Metrics.eventAbstains} event-категорий в abstain`],
+      ["Задачи проверки", String(v2Metrics.scopedReviewItems), `${v2Metrics.eventAbstains} оценок abstain сохранено без review`],
     ] : [
       ["Topic Accuracy", pct(legacyMetrics.topicAccuracy), `${legacyMetrics.topicCorrect}/${legacyMetrics.total} ответов`],
       ["Event Precision", pct(legacyMetrics.precision), `${legacyMetrics.tp} TP · ${legacyMetrics.fp} FP`],
@@ -914,7 +958,13 @@
     charts.append(chartCard("Основные темы Jev", "Распределение только по 45 сохранённым ответам.", topicDistribution()));
     charts.append(chartCard("Положительные события", `Текущий positive-порог ${scoreText(settings.positive)}; оценки не являются калиброванными вероятностями.`, eventDistribution()));
     charts.append(chartCard("События с наибольшими расхождениями", "FP и FN на текущем пороге и текущих метках.", eventErrors()));
-    charts.append(chartCard("Причины ручной проверки", "Счётчики перекрываются: одна новость может иметь несколько причин.", triggerDistribution()));
+    charts.append(chartCard(
+      activePolicyMode === "policy_v2" ? "Причины задач проверки · Policy v2" : "Причины ручной проверки · Legacy",
+      activePolicyMode === "policy_v2"
+        ? "Удержание кандидатов по недостатку доказательств и отдельные задачи по событиям вне списка. Один случай может попасть в обе группы."
+        : "Показаны причины по исходной Legacy-логике. Счётчики могут пересекаться.",
+      triggerDistribution(),
+    ));
     charts.append(scatterCard());
     charts.append(policyTableCard());
     $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и предварительных метках. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Модельные оценки не калиброваны. Диаграммы и пресеты A–E ниже остаются Legacy-диагностикой; таблица выше сравнивает реальную передачу Legacy и Policy v2. Результаты не доказывают качество на реальном новостном потоке.`;
@@ -986,7 +1036,7 @@
     const wrap = node("div", "chart-body policy-table-wrap");
     wrap.append(table);
     card.append(wrap);
-    card.append(node("div", "policy-v2-note", `Policy v2: ${v2Metrics.choiceReviews} Choice review · ${v2Metrics.evidenceReviews} evidence review · ${v2Metrics.unlistedReviews} unlisted review · ${v2Metrics.eventAbstains} отдельных event-abstain задач. Итого ${v2Metrics.reviewStories}/45 новостей имеют хотя бы один сигнал; причины пересекаются. *Группа «условно значимых» категорий не утверждена и служит только исследовательским индикатором.`));
+    card.append(node("div", "policy-v2-note", `Policy v2: ${v2Metrics.evidenceReviews} историй с удержанными event-кандидатами · ${v2Metrics.unlistedReviews} отдельных задач по событиям вне списка · ${v2Metrics.eventAbstains} event-оценок abstain сохранено без review. Всего ${v2Metrics.reviewStories}/45 историй с задачей проверки. *Группа «условно значимых» категорий не утверждена и служит только исследовательским индикатором.`));
     card.append(node("div", "policy-v2-caveat", "Важно: Legacy F1=0.840 в старом отчёте считается по всем сырым оценкам 45 ответов. Эта таблица считает фактическую передачу дальше: Legacy блокирует review-новости, а v2 считает удержанные категории как не переданные автоматически. Это не сравнение качества самой модели."));
     return card;
   }
@@ -1070,6 +1120,24 @@
   }
 
   function triggerDistribution() {
+    if (activePolicyMode === "policy_v2") {
+      const rows = [
+        { key: "evidenceReview", label: "Кандидаты удержаны: мало доказательств" },
+        { key: "unlistedReview", label: "Отдельная задача: событие вне списка" },
+      ];
+      const values = rows.map(({ key, label }) => ({
+        key,
+        label,
+        value: liveCaseRows().filter((row) => decisionV2(row)[key]).length,
+      }));
+      return chartRows(values, () => {
+        filters.state = "review";
+        $("filterState").value = "review";
+        activeTab = "lab";
+        switchToLab();
+        renderAll();
+      });
+    }
     const names = [
       ["choice", "Низкая уверенность Choice"], ["event_scores", "Event score в серой зоне"],
       ["uncertainty", "Недостаточно доказательств"], ["unlisted", "Событие вне списка"],

@@ -230,7 +230,7 @@ def render_html(payload: dict[str, Any]) -> str:
           <div class="threshold-control"><label for="threshold-uncertainty">Review: мало доказательств <output id="value-uncertainty">0.20</output></label><input id="threshold-uncertainty" type="range" min="0" max="1" step="0.01" value="0.20"></div>
           <div class="threshold-control"><label for="threshold-unlisted">Review: событие вне списка <output id="value-unlisted">0.20</output></label><input id="threshold-unlisted" type="range" min="0" max="1" step="0.01" value="0.20"></div>
         </div>
-        <div class="threshold-help">Noul: score ≤ отрицательного порога → negative; score ≥ положительного → positive; между ними → abstain. Порог Choice принимает значение на границе. Сигналы review срабатывают только при score строго выше порога.</div>
+        <div id="thresholdHelp" class="threshold-help">Noul: score ≤ отрицательного порога → negative; score ≥ положительного → positive; между ними → abstain. Порог Choice принимает значение на границе. Сигналы review срабатывают только при score строго выше порога.</div>
       </details>
     </section>
     <section id="labScreen" class="lab-screen">

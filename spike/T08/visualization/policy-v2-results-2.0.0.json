@@ -1,0 +1,1861 @@
+{
+  "schema_version": "t08-policy-v2-offline-report-v1",
+  "policy_version": "2.0.0-spike",
+  "generated_from_saved_outputs_only": true,
+  "new_jev_api_requests": 0,
+  "source_hashes": {
+    "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+    "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+    "aggregate": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+  },
+  "preliminary_gold_is_not_human_approved": true,
+  "policy_comparison": {
+    "policy_version": "2.0.0-spike",
+    "denominator": 45,
+    "expected_event_total": 41,
+    "legacy": {
+      "full_story_auto_count": 3,
+      "full_story_review_count": 42,
+      "stories_with_emitted_events": 2,
+      "emitted_event_count": 3,
+      "event_output_metrics": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 39,
+        "precision": 0.6666666666666666,
+        "recall": 0.04878048780487805,
+        "f1": 0.09090909090909091,
+        "exact_count": 13,
+        "exact_rate": 0.28888888888888886,
+        "case_count": 45,
+        "false_positives": [
+          {
+            "case_id": "e09-trade-export",
+            "code": "regulation_tax_change"
+          }
+        ],
+        "event_code_count": 15,
+        "expected_event_total": 41,
+        "provisional_high_consequence_fp": [],
+        "provisional_high_consequence_fp_count": 0
+      }
+    },
+    "policy_v2": {
+      "stories_with_candidates": 23,
+      "candidate_coverage": 0.5111111111111111,
+      "candidate_event_count": 26,
+      "stories_with_any_review": 42,
+      "stories_without_review": 3,
+      "stories_with_candidate_blocked_by_evidence": 9,
+      "choice_review_stories": 5,
+      "insufficient_evidence_review_stories": 17,
+      "unlisted_event_review_stories": 33,
+      "event_abstain_cells": 43,
+      "event_abstain_stories": 25,
+      "scoped_review_items": 98,
+      "event_output_metrics": {
+        "tp": 22,
+        "fp": 4,
+        "fn": 19,
+        "precision": 0.8461538461538461,
+        "recall": 0.5365853658536586,
+        "f1": 0.6567164179104478,
+        "exact_count": 30,
+        "exact_rate": 0.6666666666666666,
+        "case_count": 45,
+        "false_positives": [
+          {
+            "case_id": "e03-shortage-cells",
+            "code": "production_operational_disruption"
+          },
+          {
+            "case_id": "e09-trade-export",
+            "code": "regulation_tax_change"
+          },
+          {
+            "case_id": "e25-legal-fine",
+            "code": "sanctions"
+          },
+          {
+            "case_id": "e32-multi-fire-supply",
+            "code": "environment_disaster_impact"
+          }
+        ],
+        "event_code_count": 15,
+        "false_negatives_as_not_forwarded": 19,
+        "expected_event_total": 41,
+        "provisional_high_consequence_fp": [
+          {
+            "case_id": "e03-shortage-cells",
+            "code": "production_operational_disruption"
+          },
+          {
+            "case_id": "e25-legal-fine",
+            "code": "sanctions"
+          }
+        ],
+        "provisional_high_consequence_fp_count": 2
+      },
+      "cases": {
+        "e01-supply-rail": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "positive",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "abstain",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "production_operational_disruption"
+          ],
+          "positive_event_codes": [
+            "supply_chain_disruption"
+          ],
+          "candidate_codes": [
+            "supply_chain_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e02-supply-carrier": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.99,
+          "event_states": {
+            "supply_chain_disruption": "positive",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "abstain",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "production_operational_disruption",
+            "shortage_capacity_constraint"
+          ],
+          "positive_event_codes": [
+            "supply_chain_disruption"
+          ],
+          "candidate_codes": [
+            "supply_chain_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e03-shortage-cells": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.88,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "shortage_capacity_constraint",
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e04-shortage-ports": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.66,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "positive",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "shortage_capacity_constraint"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "shortage_capacity_constraint"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e05-production-furnace": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.91,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "shortage_capacity_constraint",
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e06-production-fire": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "review",
+          "topic_confidence": 0.47,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "abstain",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "abstain",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "environment_disaster_impact",
+            "labor_workforce_event",
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": true,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e07-price-polymer": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.53,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "positive",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "price_cost_change"
+          ],
+          "candidate_codes": [
+            "price_cost_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e08-price-transport": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.99,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "positive",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "abstain",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "regulation_tax_change"
+          ],
+          "positive_event_codes": [
+            "price_cost_change"
+          ],
+          "candidate_codes": [
+            "price_cost_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e09-trade-export": {
+          "status": "no_review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.68,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "positive",
+            "sanctions": "negative",
+            "regulation_tax_change": "positive",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "regulation_tax_change",
+            "trade_restriction"
+          ],
+          "candidate_codes": [
+            "regulation_tax_change",
+            "trade_restriction"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": false
+        },
+        "e10-trade-import": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.54,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "abstain",
+            "trade_restriction": "positive",
+            "sanctions": "negative",
+            "regulation_tax_change": "positive",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "price_cost_change"
+          ],
+          "positive_event_codes": [
+            "regulation_tax_change",
+            "trade_restriction"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "regulation_tax_change",
+            "trade_restriction"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e11-sanctions-list": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.54,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "abstain",
+            "sanctions": "positive",
+            "regulation_tax_change": "abstain",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "regulation_tax_change",
+            "trade_restriction"
+          ],
+          "positive_event_codes": [
+            "sanctions"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "sanctions"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e12-sanctions-assets": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.98,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "positive",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "sanctions"
+          ],
+          "candidate_codes": [
+            "sanctions"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e13-regulation-waste": {
+          "status": "no_review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.92,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "positive",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "regulation_tax_change"
+          ],
+          "candidate_codes": [
+            "regulation_tax_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": false
+        },
+        "e14-regulation-tax": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "review",
+          "topic_confidence": 0.44,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "abstain",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "positive",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "price_cost_change"
+          ],
+          "positive_event_codes": [
+            "regulation_tax_change"
+          ],
+          "candidate_codes": [
+            "regulation_tax_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "negative",
+          "choice_review": true,
+          "evidence_review": false,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e15-cyber-ransom": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.71,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "positive",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "cyber_security_incident"
+          ],
+          "candidate_codes": [
+            "cyber_security_incident"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e16-cyber-leak": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.99,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "abstain",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "positive",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "abstain",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "product_recall_quality_safety",
+            "production_operational_disruption"
+          ],
+          "positive_event_codes": [
+            "cyber_security_incident"
+          ],
+          "candidate_codes": [
+            "cyber_security_incident"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e17-labor-strike": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "positive",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "abstain",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "positive",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "production_operational_disruption",
+            "shortage_capacity_constraint"
+          ],
+          "positive_event_codes": [
+            "labor_workforce_event",
+            "supply_chain_disruption"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "labor_workforce_event",
+            "supply_chain_disruption"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e18-labor-layoffs": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.91,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "abstain",
+            "price_cost_change": "abstain",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "positive",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "abstain",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "abstain"
+          },
+          "event_review_codes": [
+            "corporate_transaction_restructuring",
+            "investment_capacity_change",
+            "price_cost_change",
+            "production_operational_disruption"
+          ],
+          "positive_event_codes": [
+            "labor_workforce_event"
+          ],
+          "candidate_codes": [
+            "labor_workforce_event"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e19-insolvency-court": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.75,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "positive",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "insolvency_default"
+          ],
+          "candidate_codes": [
+            "insolvency_default"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e20-insolvency-coupon": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "review",
+          "topic_confidence": 0.46,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "positive",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "insolvency_default"
+          ],
+          "candidate_codes": [
+            "insolvency_default"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": true,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e21-corporate-acquisition": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "positive",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "corporate_transaction_restructuring"
+          ],
+          "candidate_codes": [
+            "corporate_transaction_restructuring"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e22-corporate-spinoff": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "positive",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "corporate_transaction_restructuring"
+          ],
+          "candidate_codes": [
+            "corporate_transaction_restructuring"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e24-recall-food": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.85,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "abstain",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "positive",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "sanctions"
+          ],
+          "positive_event_codes": [
+            "product_recall_quality_safety"
+          ],
+          "candidate_codes": [
+            "product_recall_quality_safety"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e25-legal-fine": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.94,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "positive",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "abstain",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "legal_enforcement"
+          ],
+          "positive_event_codes": [
+            "sanctions"
+          ],
+          "candidate_codes": [
+            "sanctions"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e26-legal-investigation": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.96,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e27-disaster-flood": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.55,
+          "event_states": {
+            "supply_chain_disruption": "positive",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "abstain",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "positive",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "labor_workforce_event",
+            "shortage_capacity_constraint"
+          ],
+          "positive_event_codes": [
+            "environment_disaster_impact",
+            "production_operational_disruption",
+            "supply_chain_disruption"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "environment_disaster_impact",
+            "production_operational_disruption",
+            "supply_chain_disruption"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e28-disaster-drought": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.51,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "abstain",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "abstain",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "abstain",
+            "investment_capacity_change": "abstain"
+          },
+          "event_review_codes": [
+            "environment_disaster_impact",
+            "investment_capacity_change",
+            "labor_workforce_event",
+            "regulation_tax_change",
+            "shortage_capacity_constraint",
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "production_operational_disruption"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "production_operational_disruption"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e29-investment-plant": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.77,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "abstain",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "positive"
+          },
+          "event_review_codes": [
+            "price_cost_change"
+          ],
+          "positive_event_codes": [
+            "investment_capacity_change"
+          ],
+          "candidate_codes": [
+            "investment_capacity_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e30-investment-expansion": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.79,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "positive"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [
+            "investment_capacity_change"
+          ],
+          "candidate_codes": [
+            "investment_capacity_change"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e31-multi-sanction-trade": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.98,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "positive",
+            "sanctions": "positive",
+            "regulation_tax_change": "abstain",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "regulation_tax_change"
+          ],
+          "positive_event_codes": [
+            "sanctions",
+            "trade_restriction"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "sanctions",
+            "trade_restriction"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e32-multi-fire-supply": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.93,
+          "event_states": {
+            "supply_chain_disruption": "positive",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "positive",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "positive",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "shortage_capacity_constraint"
+          ],
+          "positive_event_codes": [
+            "environment_disaster_impact",
+            "production_operational_disruption",
+            "supply_chain_disruption"
+          ],
+          "candidate_codes": [
+            "environment_disaster_impact",
+            "production_operational_disruption",
+            "supply_chain_disruption"
+          ],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e33-multi-price-shortage": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "abstain",
+            "shortage_capacity_constraint": "abstain",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "positive",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "shortage_capacity_constraint",
+            "supply_chain_disruption"
+          ],
+          "positive_event_codes": [
+            "price_cost_change"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "price_cost_change"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e34-multi-insolvency-legal": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.6,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "positive",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "abstain",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "legal_enforcement"
+          ],
+          "positive_event_codes": [
+            "insolvency_default"
+          ],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [
+            "insolvency_default"
+          ],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e36-noevent-rates": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "abstain",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "price_cost_change"
+          ],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e37-noevent-results": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e38-noevent-satellite": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.97,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e39-noevent-health": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e40-uncertain-strike-forecast": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "positive",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e42-uncertain-price-forecast": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "review",
+          "topic_confidence": 0.45,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "negative",
+          "choice_review": true,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e44-negated-bankruptcy": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e45-injection-rumor": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "review",
+          "topic_confidence": 0.32,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "positive",
+          "unlisted_event_state": "negative",
+          "choice_review": true,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e46-other-topic": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 1.0,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "abstain",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        },
+        "e47-unlisted-contract-award": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.61,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "abstain",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "corporate_transaction_restructuring"
+          ],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "abstain",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": true,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": true
+        },
+        "e49-environment-monitoring": {
+          "status": "no_review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.98,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "negative",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "negative",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": false,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": false,
+          "needs_any_review": false
+        },
+        "e50-uncertain-topic": {
+          "status": "review",
+          "missing_result": false,
+          "topic_state": "accepted",
+          "topic_confidence": 0.93,
+          "event_states": {
+            "supply_chain_disruption": "negative",
+            "shortage_capacity_constraint": "negative",
+            "production_operational_disruption": "negative",
+            "price_cost_change": "negative",
+            "trade_restriction": "negative",
+            "sanctions": "negative",
+            "regulation_tax_change": "abstain",
+            "cyber_security_incident": "negative",
+            "labor_workforce_event": "negative",
+            "insolvency_default": "negative",
+            "corporate_transaction_restructuring": "negative",
+            "product_recall_quality_safety": "negative",
+            "legal_enforcement": "negative",
+            "environment_disaster_impact": "negative",
+            "investment_capacity_change": "negative"
+          },
+          "event_review_codes": [
+            "regulation_tax_change"
+          ],
+          "positive_event_codes": [],
+          "candidate_codes": [],
+          "candidate_blocked_codes": [],
+          "insufficient_evidence_state": "positive",
+          "unlisted_event_state": "negative",
+          "choice_review": false,
+          "evidence_review": true,
+          "unlisted_review": false,
+          "candidate_blocked_by_evidence": true,
+          "needs_any_review": true
+        }
+      }
+    },
+    "interpretation": {
+      "candidate_is_fact": false,
+      "evidence_route": "candidate only when insufficient-evidence state is negative",
+      "choice_blocks_event_candidates": false,
+      "unlisted_blocks_known_event_candidates": false,
+      "event_abstain_blocks_other_event_candidates": false,
+      "provisional_risk_codes": [
+        "insolvency_default",
+        "legal_enforcement",
+        "product_recall_quality_safety",
+        "production_operational_disruption",
+        "sanctions",
+        "trade_restriction"
+      ],
+      "provisional_risk_policy_approved": false
+    }
+  }
+}

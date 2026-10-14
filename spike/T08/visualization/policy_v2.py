@@ -11,7 +11,7 @@ import math
 from collections.abc import Iterable
 from typing import Any
 
-POLICY_VERSION = "2.0.0-spike"
+POLICY_VERSION = "2.1.0-spike"
 PROVISIONAL_HIGH_CONSEQUENCE_CODES = frozenset(
     {
         "sanctions",
@@ -57,7 +57,6 @@ def evaluate_result(
     result: dict[str, Any],
     taxonomy: dict[str, Any],
     *,
-    choice_cutoff: float | None = None,
     negative_cutoff: float | None = None,
     positive_cutoff: float | None = None,
     evidence_cutoff: float | None = None,
@@ -65,11 +64,13 @@ def evaluate_result(
 ) -> dict[str, Any]:
     """Evaluate independent signals and the candidates eligible for routing.
 
-    Routing rule (pre-registered for this offline comparison): only a positive
-    event score is a candidate, and any non-negative insufficient-evidence
-    state holds all candidates for human evidence review. Choice, an event's
-    own abstain state, and the unlisted-event signal create scoped review items
-    but do not suppress unrelated event candidates.
+    Routing rule: save the Choice topic and all scores; event scores at or
+    above the positive cutoff become candidates. If at least one candidate
+    exists, an insufficient-evidence score at or above its cutoff holds those
+    candidates for review. An unlisted-event score at or above its cutoff
+    creates a separate review task and never blocks known-event candidates.
+    Choice confidence and event abstain states are retained for inspection but
+    do not create review tasks in this flow.
     """
     if not isinstance(result, dict) or not isinstance(taxonomy, dict):
         raise PolicyV2InputError("result and taxonomy must be objects")
@@ -86,15 +87,19 @@ def evaluate_result(
     topic_codes = {row.get("code") for row in topics if isinstance(row, dict)}
     if result.get("topic") not in topic_codes:
         raise PolicyV2InputError("topic is outside the pinned taxonomy")
+    if not isinstance(result.get("topic_probabilities"), dict):
+        raise PolicyV2InputError("topic_probabilities must be an object")
+    if set(result["topic_probabilities"]) != topic_codes:
+        raise PolicyV2InputError("topic_probabilities do not match the pinned taxonomy")
+    topic_probabilities = {
+        code: _score(result["topic_probabilities"][code], f"topic score {code}")
+        for code in sorted(topic_codes)
+    }
     event_code_list = [row.get("code") for row in events if isinstance(row, dict)]
     event_codes = set(event_code_list)
     if set(result["event_scores"]) != event_codes:
         raise PolicyV2InputError("event_scores do not match the pinned taxonomy")
 
-    choice_threshold = _score(
-        thresholds["choice_review_below"] if choice_cutoff is None else choice_cutoff,
-        "Choice threshold",
-    )
     negative = _score(
         thresholds["noul_negative_at_or_below"]
         if negative_cutoff is None
@@ -110,12 +115,12 @@ def evaluate_result(
     if negative >= positive:
         raise PolicyV2InputError("negative threshold must be below positive threshold")
     evidence_threshold = (
-        negative
+        positive
         if evidence_cutoff is None
         else _score(evidence_cutoff, "evidence threshold")
     )
     unlisted_threshold = (
-        negative
+        positive
         if unlisted_cutoff is None
         else _score(unlisted_cutoff, "unlisted threshold")
     )
@@ -134,49 +139,52 @@ def evaluate_result(
         result.get("uncertainty_score"), "insufficient-evidence score"
     )
     unlisted_score = _score(result.get("unlisted_event_score"), "unlisted-event score")
-    evidence_state = tri_state(
-        evidence_score,
-        negative=evidence_threshold,
-        positive=positive,
-        name="insufficient-evidence score",
-    )
-    unlisted_state = tri_state(
-        unlisted_score,
-        negative=unlisted_threshold,
-        positive=positive,
-        name="unlisted-event score",
-    )
-
-    choice_review = confidence < choice_threshold
-    evidence_review = evidence_state != "negative"
-    unlisted_review = unlisted_state != "negative"
-    event_review_codes = sorted(
+    evidence_threshold_reached = evidence_score >= evidence_threshold
+    unlisted_review = unlisted_score >= unlisted_threshold
+    event_abstain_codes = sorted(
         code for code, state in event_states.items() if state == "abstain"
     )
     positive_codes = sorted(
         code for code, state in event_states.items() if state == "positive"
     )
-    candidate_blocked_by_evidence = evidence_state != "negative"
+    candidate_blocked_by_evidence = bool(positive_codes) and evidence_threshold_reached
+    evidence_review = candidate_blocked_by_evidence
     candidate_codes = [] if candidate_blocked_by_evidence else positive_codes
     blocked_codes = positive_codes if candidate_blocked_by_evidence else []
-    review_story = bool(
-        choice_review or evidence_review or unlisted_review or event_review_codes
-    )
+    review_story = evidence_review or unlisted_review
+    review_tasks = []
+    if evidence_review:
+        review_tasks.append(
+            "Недостаточно доказательств: score "
+            f"{evidence_score:.2f} ≥ {evidence_threshold:.2f}; кандидаты удержаны для проверки."
+        )
+    if unlisted_review:
+        review_tasks.append(
+            "Событие вне списка: score "
+            f"{unlisted_score:.2f} ≥ {unlisted_threshold:.2f}; создана отдельная задача проверки."
+        )
     return {
-        "topic_state": "review" if choice_review else "accepted",
+        "topic_state": "saved",
+        "topic_code": result["topic"],
         "topic_confidence": confidence,
+        "topic_probabilities": topic_probabilities,
+        "event_scores": dict(result["event_scores"]),
         "event_states": event_states,
-        "event_review_codes": event_review_codes,
+        "event_abstain_codes": event_abstain_codes,
         "positive_event_codes": positive_codes,
         "candidate_codes": candidate_codes,
         "candidate_blocked_codes": blocked_codes,
-        "insufficient_evidence_state": evidence_state,
-        "unlisted_event_state": unlisted_state,
-        "choice_review": choice_review,
+        "insufficient_evidence_score": evidence_score,
+        "insufficient_evidence_threshold": evidence_threshold,
+        "insufficient_evidence_threshold_reached": evidence_threshold_reached,
+        "unlisted_event_score": unlisted_score,
+        "unlisted_event_threshold": unlisted_threshold,
+        "unlisted_event_threshold_reached": unlisted_review,
         "evidence_review": evidence_review,
         "unlisted_review": unlisted_review,
         "candidate_blocked_by_evidence": candidate_blocked_by_evidence,
         "needs_any_review": review_story,
+        "review_tasks": review_tasks,
     }
 
 
@@ -190,7 +198,7 @@ def evaluate_case(
             "status": "missing" if case.get("text", "").strip() else "no_content",
             "candidate_codes": [],
             "candidate_blocked_codes": [],
-            "event_review_codes": [],
+            "event_abstain_codes": [],
             "needs_any_review": bool(case.get("text", "").strip()),
             "missing_result": bool(case.get("text", "").strip()),
         }
@@ -272,11 +280,8 @@ def compare_policies(
         case_id for case_id, codes in legacy_predictions.items() if codes
     }
     v2_emitted_ids = {case_id for case_id, codes in v2_outputs.items() if codes}
-    event_review_count = sum(
-        len(decision["event_review_codes"]) for decision in decisions.values()
-    )
-    choice_review_count = sum(
-        decision["choice_review"] for decision in decisions.values()
+    event_abstain_count = sum(
+        len(decision["event_abstain_codes"]) for decision in decisions.values()
     )
     evidence_review_count = sum(
         decision["evidence_review"] for decision in decisions.values()
@@ -331,25 +336,22 @@ def compare_policies(
             "stories_with_any_review": len(review_ids),
             "stories_without_review": len(observed) - len(review_ids),
             "stories_with_candidate_blocked_by_evidence": candidate_blocked,
-            "choice_review_stories": choice_review_count,
             "insufficient_evidence_review_stories": evidence_review_count,
             "unlisted_event_review_stories": unlisted_review_count,
-            "event_abstain_cells": event_review_count,
+            "event_abstain_cells_saved_without_review": event_abstain_count,
             "event_abstain_stories": sum(
-                bool(decision["event_review_codes"]) for decision in decisions.values()
+                bool(decision["event_abstain_codes"]) for decision in decisions.values()
             ),
-            "scoped_review_items": (
-                choice_review_count
-                + evidence_review_count
-                + unlisted_review_count
-                + event_review_count
-            ),
+            "scoped_review_items": evidence_review_count + unlisted_review_count,
             "event_output_metrics": v2_events,
             "cases": decisions,
         },
         "interpretation": {
             "candidate_is_fact": False,
-            "evidence_route": "candidate only when insufficient-evidence state is negative",
+            "evidence_route": "hold candidates only when candidates exist and insufficient-evidence score is at or above the threshold",
+            "unlisted_route": "create a separate review task at or above the threshold without blocking known-event candidates",
+            "choice_route": "save topic and confidence; no Choice review gate in this flow",
+            "event_abstain_route": "retain score state for inspection; abstain alone does not create a review task",
             "choice_blocks_event_candidates": False,
             "unlisted_blocks_known_event_candidates": False,
             "event_abstain_blocks_other_event_candidates": False,

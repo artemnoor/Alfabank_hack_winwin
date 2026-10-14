@@ -1,0 +1,32 @@
+{
+  "authorized_statement_ids": [
+    "b-buys-microkaskad",
+    "b-route-vega",
+    "b-site",
+    "b-supplier-country",
+    "b-supplier-supplies-mk7",
+    "b-uses-mk7",
+    "c-current-supplier",
+    "c-route-port",
+    "c-route-vega",
+    "c-supplier-route",
+    "c-supplier-supplies-nickel",
+    "c-uses-nickel",
+    "c-warehouse",
+    "event-export-claim"
+  ],
+  "dataset_id": "t09-t13-independent-v1",
+  "explicit_non_policy": "No universal source reliability score or production confirmed threshold is asserted.",
+  "manual_approval": "provisional",
+  "policy_id": "test-owner-policy-t09-t13-v1",
+  "rules": [
+    "The local owner explicitly opts in for each named synthetic statement.",
+    "Each assertion has at least two Evidence refs with exact verified anchors against immutable synthetic source versions.",
+    "Supporting documents have distinct publisher_root_id values; syndicated copies count as one root.",
+    "No unresolved same-time contradiction exists for the assertion.",
+    "A verified anchor establishes only that a quote is present; the policy separately evaluates the claim and its independent support."
+  ],
+  "schema": "alfalab.spike.synthetic-owner-policy/v1",
+  "scope": "Named assertions in this provisional synthetic dataset only.",
+  "version": "1.0.1"
+}

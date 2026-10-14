@@ -1,0 +1,4920 @@
+{
+  "component_names": [
+    "ActionDefinition",
+    "AnalyticalConfidence",
+    "ApplyBusinessInput",
+    "ApplyBusinessOutput",
+    "ApplyEventsInput",
+    "ApplyEventsOutput",
+    "ArtifactRef",
+    "ArtifactView",
+    "BooleanValue",
+    "BuildGraphInput",
+    "BuildGraphOutput",
+    "BusinessQuery",
+    "BusinessResult",
+    "BusinessSelection",
+    "BusinessSnapshot",
+    "Business_applyRequest",
+    "Business_applyResponse",
+    "Business_propose_profileRequest",
+    "Business_propose_profileResponse",
+    "Business_propose_questionsRequest",
+    "Business_propose_questionsResponse",
+    "Business_readRequest",
+    "Business_readResponse",
+    "CodeRef",
+    "CommandReceipt",
+    "Contradiction",
+    "DataPolicyDecision",
+    "DecimalString",
+    "EntityRef",
+    "EntityValue",
+    "EventChangeProposal",
+    "EventDecision",
+    "EventMention",
+    "EventQuery",
+    "EventRecord",
+    "EventResult",
+    "EventSelection",
+    "EventSnapshot",
+    "Events_applyRequest",
+    "Events_applyResponse",
+    "Events_propose_resolutionRequest",
+    "Events_propose_resolutionResponse",
+    "Events_readRequest",
+    "Events_readResponse",
+    "EvidenceLocator",
+    "EvidenceQuery",
+    "EvidenceRecord",
+    "EvidenceResult",
+    "EvidenceSelection",
+    "EvidenceSpan",
+    "Evidence_readRequest",
+    "Evidence_readResponse",
+    "Evidence_registerRequest",
+    "Evidence_registerResponse",
+    "ExecutionMeta",
+    "ExecutionOptions",
+    "ExtractionInput",
+    "ExtractionOutput",
+    "FinancialScenario",
+    "GraphEdge",
+    "GraphNode",
+    "GraphQuery",
+    "GraphSnapshot",
+    "GraphSubgraph",
+    "Graph_buildRequest",
+    "Graph_buildResponse",
+    "Graph_publishRequest",
+    "Graph_publishResponse",
+    "Graph_queryRequest",
+    "Graph_queryResponse",
+    "Hash",
+    "Identifier",
+    "ImpactAssessment",
+    "ImpactInput",
+    "ImpactOutput",
+    "Impact_assessRequest",
+    "Impact_assessResponse",
+    "ImplementationParameters",
+    "ImplementationSelection",
+    "KnowledgeSlice",
+    "KnowledgeSnapshot",
+    "LineageSummary",
+    "LiveExecution",
+    "Match",
+    "MatchingInput",
+    "MatchingOutput",
+    "Matching_matchRequest",
+    "Matching_matchResponse",
+    "Measurement",
+    "MissingDatum",
+    "MockParameters",
+    "NumberValue",
+    "ObjectRef",
+    "PreparedMaterial",
+    "ProfileChangeProposal",
+    "ProfileInput",
+    "ProfileOutput",
+    "ProjectionManifest",
+    "Provenance",
+    "PublishGraphInput",
+    "PublishGraphOutput",
+    "QueryGraphInput",
+    "QueryGraphOutput",
+    "QuestionAnswer",
+    "QuestionPreferences",
+    "QuestionProposal",
+    "QuestionsInput",
+    "QuestionsOutput",
+    "RawMaterial",
+    "ReadBusinessInput",
+    "ReadBusinessOutput",
+    "ReadEventsInput",
+    "ReadEventsOutput",
+    "ReadEvidenceInput",
+    "ReadEvidenceOutput",
+    "RealPrepareParameters",
+    "ReceiptQuery",
+    "ReceiptResult",
+    "Recommendation",
+    "RecommendationInput",
+    "RecommendationOutput",
+    "Recommendations_proposeRequest",
+    "Recommendations_proposeResponse",
+    "RegisterEvidenceInput",
+    "RegisterEvidenceOutput",
+    "ReplayExecution",
+    "ResolutionInput",
+    "ResolutionOutput",
+    "SafeText",
+    "SpanMap",
+    "Statement",
+    "StatementRef",
+    "SubgraphResult",
+    "SubgraphSelection",
+    "TargetRevision",
+    "TextSpan",
+    "TextValue",
+    "TimeSlice",
+    "TimeValue",
+    "Timestamp",
+    "TypedValue",
+    "Understanding_extractRequest",
+    "Understanding_extractResponse",
+    "UnknownValue",
+    "Validity",
+    "Version",
+    "VersionedRef",
+    "WholeArtifact"
+  ],
+  "dataset_id": "t09-t13-independent-v1",
+  "manual_approval": "provisional",
+  "openapi_path": "docs/specs/framework-v1/contracts/openapi.json",
+  "openapi_sha256": "sha256:c97090b844cf01ed290da923e6e4c58b9e5cfaeaccebf7b9838178d993e8c8ad",
+  "schema": "alfalab.spike.openapi-closure/v1",
+  "schemas": {
+    "ActionDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "audiences": {
+          "items": {
+            "enum": [
+              "entrepreneur",
+              "bank_manager",
+              "analyst"
+            ],
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        },
+        "code": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "requires_approval": {
+          "type": "boolean"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "title",
+        "audiences",
+        "requires_approval"
+      ],
+      "type": "object"
+    },
+    "AnalyticalConfidence": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "$ref": "#/components/schemas/SafeText"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/VersionedRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "level",
+        "method",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "ApplyBusinessInput": {
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "items": {
+            "$ref": "#/components/schemas/QuestionAnswer"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "preferences": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/QuestionPreferences"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proposal": {
+          "$ref": "#/components/schemas/ProfileChangeProposal"
+        }
+      },
+      "required": [
+        "proposal",
+        "answers",
+        "preferences",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "ApplyBusinessOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt": {
+          "$ref": "#/components/schemas/CommandReceipt"
+        },
+        "snapshot": {
+          "$ref": "#/components/schemas/BusinessSnapshot"
+        }
+      },
+      "required": [
+        "snapshot",
+        "receipt"
+      ],
+      "type": "object"
+    },
+    "ApplyEventsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "expected_revisions": {
+          "items": {
+            "$ref": "#/components/schemas/TargetRevision"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "proposal": {
+          "$ref": "#/components/schemas/EventChangeProposal"
+        }
+      },
+      "required": [
+        "proposal",
+        "expected_revisions",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "ApplyEventsOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt": {
+          "$ref": "#/components/schemas/CommandReceipt"
+        },
+        "snapshot": {
+          "$ref": "#/components/schemas/EventSnapshot"
+        }
+      },
+      "required": [
+        "snapshot",
+        "receipt"
+      ],
+      "type": "object"
+    },
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "text/plain"
+          ],
+          "type": "string"
+        },
+        "schema_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "schema_version": {
+          "$ref": "#/components/schemas/Version"
+        },
+        "size_bytes": {
+          "maximum": 2097152,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "hash",
+        "schema_id",
+        "schema_version",
+        "size_bytes",
+        "classification",
+        "media_type"
+      ],
+      "type": "object"
+    },
+    "ArtifactView": {
+      "additionalProperties": false,
+      "description": "Encoded JSON must validate against ref.schema_id/version before persistence and after load. This is an artifact transport, not an untyped domain payload.",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "metadata_only",
+            "missing",
+            "policy_denied"
+          ],
+          "type": "string"
+        },
+        "content_json": {
+          "anyOf": [
+            {
+              "maxLength": 2097152,
+              "minLength": 0,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ref": {
+          "$ref": "#/components/schemas/ArtifactRef"
+        }
+      },
+      "required": [
+        "ref",
+        "content_json",
+        "availability"
+      ],
+      "type": "object"
+    },
+    "BooleanValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "boolean",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "BuildGraphInput": {
+      "additionalProperties": false,
+      "properties": {
+        "graph_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "knowledge": {
+          "$ref": "#/components/schemas/KnowledgeSnapshot"
+        },
+        "ontology": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "rules": {
+          "$ref": "#/components/schemas/VersionedRef"
+        }
+      },
+      "required": [
+        "graph_id",
+        "knowledge",
+        "ontology",
+        "rules"
+      ],
+      "type": "object"
+    },
+    "BuildGraphOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "$ref": "#/components/schemas/GraphSnapshot"
+        }
+      },
+      "required": [
+        "candidate"
+      ],
+      "type": "object"
+    },
+    "BusinessQuery": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/BusinessSelection"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptQuery"
+        }
+      ]
+    },
+    "BusinessResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "business",
+          "type": "string"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/BusinessSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "snapshot"
+      ],
+      "type": "object"
+    },
+    "BusinessSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/TimeSlice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "company_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "kind": {
+          "const": "business",
+          "type": "string"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "company_id",
+        "revision",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "BusinessSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "items": {
+            "$ref": "#/components/schemas/QuestionAnswer"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "company": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/components/schemas/Contradiction"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "preferences": {
+          "$ref": "#/components/schemas/QuestionPreferences"
+        },
+        "ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "slice": {
+          "$ref": "#/components/schemas/KnowledgeSlice"
+        },
+        "statements": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "ref",
+        "company",
+        "statements",
+        "contradictions",
+        "missing_data",
+        "answers",
+        "preferences",
+        "slice",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "Business_applyRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ApplyBusinessInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "Business_applyResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ApplyBusinessOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_propose_profileRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ProfileInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_propose_profileResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ProfileOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_propose_questionsRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/QuestionsInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_propose_questionsResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/QuestionsOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_readRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadBusinessInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Business_readResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadBusinessOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "CodeRef": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "namespace": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "version": {
+          "$ref": "#/components/schemas/Version"
+        }
+      },
+      "required": [
+        "namespace",
+        "version",
+        "code"
+      ],
+      "type": "object"
+    },
+    "CommandReceipt": {
+      "additionalProperties": false,
+      "properties": {
+        "applied": {
+          "type": "boolean"
+        },
+        "audit_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "changed_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "command_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "committed_at": {
+          "$ref": "#/components/schemas/Timestamp"
+        },
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "operation_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "original_run_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "operation_id",
+        "idempotency_key",
+        "command_hash",
+        "applied",
+        "changed_refs",
+        "audit_id",
+        "committed_at",
+        "original_run_id"
+      ],
+      "type": "object"
+    },
+    "Contradiction": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/components/schemas/SafeText"
+        },
+        "statement_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 100,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement_ids",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "DataPolicyDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "egress_allowed": {
+          "type": "boolean"
+        },
+        "export_allowed": {
+          "type": "boolean"
+        },
+        "policy": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "processing_allowed": {
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "recording": {
+          "enum": [
+            "full",
+            "metadata_only"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy",
+        "classification",
+        "processing_allowed",
+        "egress_allowed",
+        "recording",
+        "export_allowed",
+        "reason_codes"
+      ],
+      "type": "object"
+    },
+    "DecimalString": {
+      "maxLength": 80,
+      "minLength": 1,
+      "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "type": "string"
+    },
+    "EntityRef": {
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "entity_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "kind": {
+          "$ref": "#/components/schemas/VersionedRef"
+        }
+      },
+      "required": [
+        "entity_id",
+        "kind",
+        "display_name"
+      ],
+      "type": "object"
+    },
+    "EntityValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "entity",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/components/schemas/EntityRef"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "EventChangeProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "items": {
+            "$ref": "#/components/schemas/EventDecision"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "proposal_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "source_snapshot": {
+          "$ref": "#/components/schemas/KnowledgeSlice"
+        },
+        "unresolved_mentions": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "source_snapshot",
+        "decisions",
+        "unresolved_mentions",
+        "missing_data",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "EventDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "create",
+            "attach",
+            "correct",
+            "merge",
+            "split",
+            "defer"
+          ],
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "mention_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "proposed_events": {
+          "items": {
+            "$ref": "#/components/schemas/EventRecord"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "reason": {
+          "$ref": "#/components/schemas/SafeText"
+        },
+        "target_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "action",
+        "mention_ids",
+        "target_refs",
+        "proposed_events",
+        "reason",
+        "evidence_refs"
+      ],
+      "type": "object"
+    },
+    "EventMention": {
+      "additionalProperties": false,
+      "properties": {
+        "actors": {
+          "items": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "effective_at": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_type": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "mention_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "objects": {
+          "items": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "statements": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "mention_id",
+        "event_type",
+        "actors",
+        "objects",
+        "statements",
+        "effective_at",
+        "missing_data",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "EventQuery": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/EventSelection"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptQuery"
+        }
+      ]
+    },
+    "EventRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "event_type": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "merged",
+            "split"
+          ],
+          "type": "string"
+        },
+        "lineage_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "mention_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "statements": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "ref",
+        "event_type",
+        "lifecycle",
+        "statements",
+        "mention_ids",
+        "lineage_refs",
+        "missing_data"
+      ],
+      "type": "object"
+    },
+    "EventResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "events",
+          "type": "string"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "snapshot": {
+          "$ref": "#/components/schemas/EventSnapshot"
+        }
+      },
+      "required": [
+        "kind",
+        "snapshot",
+        "next_cursor"
+      ],
+      "type": "object"
+    },
+    "EventSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "kind": {
+          "const": "events",
+          "type": "string"
+        },
+        "limit": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "partition_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "kind",
+        "event_ids",
+        "partition_id",
+        "as_of",
+        "limit",
+        "cursor"
+      ],
+      "type": "object"
+    },
+    "EventSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/components/schemas/EventRecord"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "slice": {
+          "$ref": "#/components/schemas/KnowledgeSlice"
+        }
+      },
+      "required": [
+        "events",
+        "slice",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "Events_applyRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ApplyEventsInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "Events_applyResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ApplyEventsOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Events_propose_resolutionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ResolutionInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Events_propose_resolutionResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ResolutionOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Events_readRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadEventsInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Events_readResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadEventsOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "EvidenceLocator": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/TextSpan"
+        },
+        {
+          "$ref": "#/components/schemas/WholeArtifact"
+        }
+      ]
+    },
+    "EvidenceQuery": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/EvidenceSelection"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptQuery"
+        }
+      ]
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "$ref": "#/components/schemas/EvidenceLocator"
+        },
+        "ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "reliability_method": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/VersionedRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "source_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "source_reliability": {
+          "enum": [
+            "unassessed",
+            "low",
+            "medium",
+            "high",
+            "disputed"
+          ],
+          "type": "string"
+        },
+        "verification": {
+          "enum": [
+            "verified_anchor",
+            "unverified"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "source_ref",
+        "locator",
+        "source_hash",
+        "verification",
+        "source_reliability",
+        "reliability_method"
+      ],
+      "type": "object"
+    },
+    "EvidenceResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "evidence",
+          "type": "string"
+        },
+        "missing_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "source_artifacts": {
+          "items": {
+            "$ref": "#/components/schemas/ArtifactView"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "records",
+        "source_artifacts",
+        "missing_refs"
+      ],
+      "type": "object"
+    },
+    "EvidenceSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "include_source_text": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "evidence",
+          "type": "string"
+        },
+        "refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "refs",
+        "include_source_text"
+      ],
+      "type": "object"
+    },
+    "EvidenceSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "local_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "locator": {
+          "$ref": "#/components/schemas/TextSpan"
+        },
+        "material_hash": {
+          "$ref": "#/components/schemas/Hash"
+        }
+      },
+      "required": [
+        "local_id",
+        "material_hash",
+        "locator",
+        "claim_ids"
+      ],
+      "type": "object"
+    },
+    "Evidence_readRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadEvidenceInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Evidence_readResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ReadEvidenceOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Evidence_registerRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/RegisterEvidenceInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "Evidence_registerResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/RegisterEvidenceOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "ExecutionMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "configuration_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_policy": {
+          "$ref": "#/components/schemas/DataPolicyDecision"
+        },
+        "duration_ms": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "environment": {
+          "enum": [
+            "development",
+            "testing",
+            "production"
+          ],
+          "type": "string"
+        },
+        "execution_mode": {
+          "enum": [
+            "live",
+            "replay"
+          ],
+          "type": "string"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "lineage": {
+          "$ref": "#/components/schemas/LineageSummary"
+        },
+        "measurements": {
+          "items": {
+            "$ref": "#/components/schemas/Measurement"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "operation_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "replay_status": {
+          "enum": [
+            "available",
+            "incomplete",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "run_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "trace_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "metadata_only"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "operation_id",
+        "contract_version",
+        "implementation",
+        "execution_mode",
+        "environment",
+        "configuration_hash",
+        "duration_ms",
+        "lineage",
+        "trace_status",
+        "replay_status",
+        "measurements",
+        "data_policy"
+      ],
+      "type": "object"
+    },
+    "ExecutionOptions": {
+      "discriminator": {
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/LiveExecution"
+        },
+        {
+          "$ref": "#/components/schemas/ReplayExecution"
+        }
+      ]
+    },
+    "ExtractionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "event_schema": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "hints": {
+          "items": {
+            "$ref": "#/components/schemas/CodeRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "known_entities": {
+          "items": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "material": {
+          "$ref": "#/components/schemas/PreparedMaterial"
+        }
+      },
+      "required": [
+        "material",
+        "event_schema",
+        "hints",
+        "known_entities"
+      ],
+      "type": "object"
+    },
+    "ExtractionOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_spans": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceSpan"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "mentions": {
+          "items": {
+            "$ref": "#/components/schemas/EventMention"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "unresolved_entities": {
+          "items": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "mentions",
+        "evidence_spans",
+        "unresolved_entities",
+        "missing_data"
+      ],
+      "type": "object"
+    },
+    "FinancialScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "assumptions": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "calculation_method": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "input_refs": {
+          "items": {
+            "$ref": "#/components/schemas/StatementRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/NumberValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scenario_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "quantity",
+        "assumptions",
+        "calculation_method",
+        "input_refs"
+      ],
+      "type": "object"
+    },
+    "GraphEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "edge_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "epistemic_status": {
+          "enum": [
+            "confirmed",
+            "user_declared",
+            "observed",
+            "inferred",
+            "hypothetical",
+            "disputed",
+            "disproved",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "relation": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "source_node_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "statement_refs": {
+          "items": {
+            "$ref": "#/components/schemas/StatementRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "target_node_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "edge_id",
+        "source_node_id",
+        "target_node_id",
+        "relation",
+        "epistemic_status",
+        "statement_refs",
+        "evidence_refs",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "GraphNode": {
+      "additionalProperties": false,
+      "properties": {
+        "entity": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "node_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "statement_refs": {
+          "items": {
+            "$ref": "#/components/schemas/StatementRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "node_id",
+        "entity",
+        "statement_refs",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "GraphQuery": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/SubgraphSelection"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptQuery"
+        }
+      ]
+    },
+    "GraphSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete_for_declared_slice",
+            "partial",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/components/schemas/GraphEdge"
+          },
+          "maxItems": 20000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "graph_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "manifest": {
+          "$ref": "#/components/schemas/ProjectionManifest"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/components/schemas/GraphNode"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "graph_id",
+        "revision",
+        "nodes",
+        "edges",
+        "manifest",
+        "completeness",
+        "missing_data"
+      ],
+      "type": "object"
+    },
+    "GraphSubgraph": {
+      "additionalProperties": false,
+      "properties": {
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "historical",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "missing_slices": {
+          "items": {
+            "$ref": "#/components/schemas/KnowledgeSlice"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "query_scope": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "snapshot": {
+          "$ref": "#/components/schemas/GraphSnapshot"
+        },
+        "traversal_truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "snapshot",
+        "freshness",
+        "missing_slices",
+        "traversal_truncated",
+        "query_scope"
+      ],
+      "type": "object"
+    },
+    "Graph_buildRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/BuildGraphInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Graph_buildResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/BuildGraphOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Graph_publishRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/PublishGraphInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "Graph_publishResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/PublishGraphOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Graph_queryRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/QueryGraphInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Graph_queryResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/QueryGraphOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Hash": {
+      "maxLength": 71,
+      "minLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "Identifier": {
+      "maxLength": 120,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,119}$",
+      "type": "string"
+    },
+    "ImpactAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "assumptions": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "company": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "confidence": {
+          "$ref": "#/components/schemas/AnalyticalConfidence"
+        },
+        "direction": {
+          "enum": [
+            "negative",
+            "positive",
+            "mixed",
+            "neutral",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "event_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "exposure": {
+          "enum": [
+            "confirmed",
+            "potential",
+            "none_found",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "graph_manifest": {
+          "$ref": "#/components/schemas/ProjectionManifest"
+        },
+        "likelihood": {
+          "enum": [
+            "likely",
+            "possible",
+            "unlikely",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "materiality": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "mechanisms": {
+          "items": {
+            "$ref": "#/components/schemas/CodeRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/components/schemas/FinancialScenario"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "assessment_id",
+        "event_ref",
+        "company",
+        "graph_manifest",
+        "exposure",
+        "likelihood",
+        "direction",
+        "materiality",
+        "mechanisms",
+        "assumptions",
+        "scenarios",
+        "missing_data",
+        "evidence_refs",
+        "confidence",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "ImpactInput": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "event": {
+          "$ref": "#/components/schemas/EventRecord"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "graph": {
+          "$ref": "#/components/schemas/GraphSubgraph"
+        },
+        "match": {
+          "$ref": "#/components/schemas/Match"
+        },
+        "profile": {
+          "$ref": "#/components/schemas/BusinessSnapshot"
+        },
+        "rules": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/VersionedRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "event",
+        "profile",
+        "match",
+        "graph",
+        "evidence",
+        "rules",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "ImpactOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "$ref": "#/components/schemas/ImpactAssessment"
+        }
+      },
+      "required": [
+        "assessment"
+      ],
+      "type": "object"
+    },
+    "Impact_assessRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ImpactInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Impact_assessResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ImpactOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "ImplementationParameters": {
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/MockParameters"
+        },
+        {
+          "$ref": "#/components/schemas/RealPrepareParameters"
+        }
+      ]
+    },
+    "ImplementationSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "parameters": {
+          "$ref": "#/components/schemas/ImplementationParameters"
+        },
+        "version": {
+          "$ref": "#/components/schemas/Version"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "KnowledgeSlice": {
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "enum": [
+            "Events",
+            "Business",
+            "Documents",
+            "Reference"
+          ],
+          "type": "string"
+        },
+        "partition_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "selection_key": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "owner",
+        "partition_id",
+        "revision",
+        "selection_key"
+      ],
+      "type": "object"
+    },
+    "KnowledgeSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "slices": {
+          "items": {
+            "$ref": "#/components/schemas/KnowledgeSlice"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "statements": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "statements",
+        "entities",
+        "slices",
+        "evidence",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "LineageSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "mock_derivation": {
+          "type": "boolean"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "synthetic_source": {
+          "type": "boolean"
+        },
+        "unknown_origin": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "synthetic_source",
+        "mock_derivation",
+        "unknown_origin",
+        "source_refs"
+      ],
+      "type": "object"
+    },
+    "LiveExecution": {
+      "additionalProperties": false,
+      "properties": {
+        "analytical_time": {
+          "$ref": "#/components/schemas/Timestamp"
+        },
+        "mode": {
+          "const": "live",
+          "type": "string"
+        },
+        "random_seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "recording": {
+          "enum": [
+            "full",
+            "metadata_only"
+          ],
+          "type": "string"
+        },
+        "timeout_ms": {
+          "maximum": 30000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mode",
+        "recording",
+        "analytical_time",
+        "random_seed",
+        "timeout_ms"
+      ],
+      "type": "object"
+    },
+    "Match": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_components": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "company": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "edge_paths": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "maxItems": 5,
+            "minItems": 0,
+            "type": "array"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "event_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "exposure": {
+          "enum": [
+            "confirmed",
+            "potential",
+            "none_found",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "match_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        }
+      },
+      "required": [
+        "match_id",
+        "event_ref",
+        "company",
+        "exposure",
+        "affected_components",
+        "edge_paths",
+        "evidence_refs",
+        "missing_data",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "MatchingInput": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "$ref": "#/components/schemas/EventRecord"
+        },
+        "graph": {
+          "$ref": "#/components/schemas/GraphSubgraph"
+        },
+        "limit": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "mode": {
+          "enum": [
+            "strict",
+            "balanced",
+            "broad"
+          ],
+          "type": "string"
+        },
+        "profiles": {
+          "items": {
+            "$ref": "#/components/schemas/BusinessSnapshot"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "event",
+        "graph",
+        "profiles",
+        "mode",
+        "limit"
+      ],
+      "type": "object"
+    },
+    "MatchingOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_scope": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "matches": {
+          "items": {
+            "$ref": "#/components/schemas/Match"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "search_complete_for_scope": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "matches",
+        "candidate_scope",
+        "search_complete_for_scope",
+        "missing_data"
+      ],
+      "type": "object"
+    },
+    "Matching_matchRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/MatchingInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Matching_matchResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/MatchingOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "measured",
+            "estimated",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "unit": {
+          "maxLength": 40,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/DecimalString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "unit",
+        "basis"
+      ],
+      "type": "object"
+    },
+    "MissingDatum": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "$ref": "#/components/schemas/SafeText"
+        },
+        "path": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "not_provided",
+            "not_observed",
+            "contradictory",
+            "unsupported",
+            "unavailable"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "reason",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "MockParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "enum": [
+            "default",
+            "empty",
+            "partial",
+            "contradictory",
+            "timeout",
+            "retryable_error",
+            "fatal_error"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario"
+      ],
+      "type": "object"
+    },
+    "NumberValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "number",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/CodeRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "value": {
+          "$ref": "#/components/schemas/DecimalString"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "type": "object"
+    },
+    "ObjectRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "object_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "owner": {
+          "enum": [
+            "Documents",
+            "Events",
+            "Business",
+            "Graph",
+            "Evidence",
+            "Runs",
+            "Cases"
+          ],
+          "type": "string"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner",
+        "object_id",
+        "revision",
+        "hash"
+      ],
+      "type": "object"
+    },
+    "PreparedMaterial": {
+      "additionalProperties": false,
+      "properties": {
+        "material": {
+          "$ref": "#/components/schemas/RawMaterial"
+        },
+        "prepared_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "quality": {
+          "enum": [
+            "valid",
+            "review",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "raw_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "span_map": {
+          "items": {
+            "$ref": "#/components/schemas/SpanMap"
+          },
+          "maxItems": 200000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/components/schemas/SafeText"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "material",
+        "raw_hash",
+        "prepared_hash",
+        "quality",
+        "span_map",
+        "warnings"
+      ],
+      "type": "object"
+    },
+    "ProfileChangeProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "add_statements": {
+          "items": {
+            "$ref": "#/components/schemas/Statement"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "company": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/components/schemas/Contradiction"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "expected_revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "proposal_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "supersede_refs": {
+          "items": {
+            "$ref": "#/components/schemas/StatementRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "company",
+        "expected_revision",
+        "add_statements",
+        "supersede_refs",
+        "contradictions",
+        "missing_data",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "ProfileInput": {
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "items": {
+            "$ref": "#/components/schemas/QuestionAnswer"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "company": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "description": {
+          "maxLength": 200000,
+          "minLength": 0,
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "#/components/schemas/RawMaterial"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "existing": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/BusinessSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "company",
+        "description",
+        "documents",
+        "answers",
+        "existing",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "ProfileOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal": {
+          "$ref": "#/components/schemas/ProfileChangeProposal"
+        }
+      },
+      "required": [
+        "proposal"
+      ],
+      "type": "object"
+    },
+    "ProjectionManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "builder": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "config_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "input_slices": {
+          "items": {
+            "$ref": "#/components/schemas/KnowledgeSlice"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "ontology": {
+          "$ref": "#/components/schemas/VersionedRef"
+        },
+        "rules": {
+          "$ref": "#/components/schemas/VersionedRef"
+        }
+      },
+      "required": [
+        "ontology",
+        "rules",
+        "input_slices",
+        "as_of",
+        "builder",
+        "config_hash"
+      ],
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "derivation_method": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/VersionedRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "input_statement_refs": {
+          "items": {
+            "$ref": "#/components/schemas/StatementRef"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "origin": {
+          "enum": [
+            "public_source",
+            "user_declared",
+            "synthetic",
+            "derived",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "origin_verified": {
+          "type": "boolean"
+        },
+        "producer_run_id": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "origin",
+        "source_refs",
+        "input_statement_refs",
+        "producer_run_id",
+        "derivation_method",
+        "evidence_refs",
+        "origin_verified"
+      ],
+      "type": "object"
+    },
+    "PublishGraphInput": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "$ref": "#/components/schemas/GraphSnapshot"
+        },
+        "expected_revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "candidate",
+        "expected_revision"
+      ],
+      "type": "object"
+    },
+    "PublishGraphOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "projection_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "receipt": {
+          "$ref": "#/components/schemas/CommandReceipt"
+        }
+      },
+      "required": [
+        "projection_ref",
+        "receipt"
+      ],
+      "type": "object"
+    },
+    "QueryGraphInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/components/schemas/GraphQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "QueryGraphOutput": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/SubgraphResult"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptResult"
+        }
+      ]
+    },
+    "QuestionAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "question_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "status": {
+          "enum": [
+            "answered",
+            "skipped",
+            "declined",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/TypedValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "question_id",
+        "status",
+        "value",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "QuestionPreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_event_prompts": {
+          "type": "boolean"
+        },
+        "max_questions": {
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "suppressed_targets": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "max_questions",
+        "allow_event_prompts",
+        "suppressed_targets"
+      ],
+      "type": "object"
+    },
+    "QuestionProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "can_skip": {
+          "type": "boolean"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/components/schemas/TextValue"
+          },
+          "maxItems": 20,
+          "minItems": 0,
+          "type": "array"
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string"
+        },
+        "question_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "target": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "why": {
+          "$ref": "#/components/schemas/SafeText"
+        }
+      },
+      "required": [
+        "question_id",
+        "target",
+        "text",
+        "why",
+        "options",
+        "can_skip",
+        "priority"
+      ],
+      "type": "object"
+    },
+    "QuestionsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "budget": {
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "event": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/EventRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "profile": {
+          "$ref": "#/components/schemas/BusinessSnapshot"
+        },
+        "question_history": {
+          "items": {
+            "$ref": "#/components/schemas/QuestionAnswer"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile",
+        "event",
+        "question_history",
+        "budget"
+      ],
+      "type": "object"
+    },
+    "QuestionsOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "questions": {
+          "items": {
+            "$ref": "#/components/schemas/QuestionProposal"
+          },
+          "maxItems": 10,
+          "minItems": 0,
+          "type": "array"
+        },
+        "stop_reason": {
+          "enum": [
+            "budget",
+            "complete",
+            "declined",
+            "no_useful_question",
+            "proposed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "questions",
+        "stop_reason"
+      ],
+      "type": "object"
+    },
+    "RawMaterial": {
+      "additionalProperties": false,
+      "properties": {
+        "collected_at": {
+          "$ref": "#/components/schemas/Timestamp"
+        },
+        "content_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "language": {
+          "enum": [
+            "ru",
+            "en",
+            "other",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "material_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "maxLength": 200000,
+          "minLength": 0,
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 500,
+          "minLength": 0,
+          "type": "string"
+        }
+      },
+      "required": [
+        "material_id",
+        "source_id",
+        "source_url",
+        "title",
+        "text",
+        "published_at",
+        "collected_at",
+        "content_hash",
+        "language",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "ReadBusinessInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/components/schemas/BusinessQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ReadBusinessOutput": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/BusinessResult"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptResult"
+        }
+      ]
+    },
+    "ReadEventsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/components/schemas/EventQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ReadEventsOutput": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/EventResult"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptResult"
+        }
+      ]
+    },
+    "ReadEvidenceInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/components/schemas/EvidenceQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ReadEvidenceOutput": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/EvidenceResult"
+        },
+        {
+          "$ref": "#/components/schemas/ReceiptResult"
+        }
+      ]
+    },
+    "RealPrepareParameters": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "ReceiptQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "idempotency_key": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "kind": {
+          "const": "receipt",
+          "type": "string"
+        },
+        "operation_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "kind",
+        "operation_id",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "ReceiptResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "receipt",
+          "type": "string"
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/CommandReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "receipt"
+      ],
+      "type": "object"
+    },
+    "Recommendation": {
+      "additionalProperties": false,
+      "properties": {
+        "action_type": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "assessment_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "conditions": {
+          "items": {
+            "$ref": "#/components/schemas/SafeText"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "recommendation_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "requires_approval": {
+          "type": "boolean"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "why": {
+          "$ref": "#/components/schemas/SafeText"
+        }
+      },
+      "required": [
+        "recommendation_id",
+        "assessment_id",
+        "action_type",
+        "title",
+        "why",
+        "priority",
+        "conditions",
+        "requires_approval",
+        "evidence_refs",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "RecommendationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_actions": {
+          "items": {
+            "$ref": "#/components/schemas/ActionDefinition"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "assessment": {
+          "$ref": "#/components/schemas/ImpactAssessment"
+        },
+        "audience": {
+          "enum": [
+            "entrepreneur",
+            "bank_manager",
+            "analyst"
+          ],
+          "type": "string"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/components/schemas/SafeText"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "assessment",
+        "audience",
+        "allowed_actions",
+        "constraints"
+      ],
+      "type": "object"
+    },
+    "RecommendationOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "missing_data": {
+          "items": {
+            "$ref": "#/components/schemas/MissingDatum"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "recommendations": {
+          "items": {
+            "$ref": "#/components/schemas/Recommendation"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "recommendations",
+        "missing_data"
+      ],
+      "type": "object"
+    },
+    "Recommendations_proposeRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/RecommendationInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Recommendations_proposeResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/RecommendationOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "RegisterEvidenceInput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "expected_revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "locator": {
+          "$ref": "#/components/schemas/EvidenceLocator"
+        },
+        "source_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "expected_revision",
+        "source_ref",
+        "locator"
+      ],
+      "type": "object"
+    },
+    "RegisterEvidenceOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "$ref": "#/components/schemas/EvidenceRecord"
+        },
+        "receipt": {
+          "$ref": "#/components/schemas/CommandReceipt"
+        }
+      },
+      "required": [
+        "evidence",
+        "receipt"
+      ],
+      "type": "object"
+    },
+    "ReplayExecution": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "replay",
+          "type": "string"
+        },
+        "recording": {
+          "const": "full",
+          "type": "string"
+        },
+        "source_run_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "strict": {
+          "const": true,
+          "type": "boolean"
+        },
+        "timeout_ms": {
+          "maximum": 30000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mode",
+        "recording",
+        "source_run_id",
+        "strict",
+        "timeout_ms"
+      ],
+      "type": "object"
+    },
+    "ResolutionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/components/schemas/EvidenceRecord"
+          },
+          "maxItems": 10000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "existing": {
+          "$ref": "#/components/schemas/EventSnapshot"
+        },
+        "mentions": {
+          "items": {
+            "$ref": "#/components/schemas/EventMention"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "policy": {
+          "$ref": "#/components/schemas/VersionedRef"
+        }
+      },
+      "required": [
+        "mentions",
+        "existing",
+        "evidence",
+        "policy"
+      ],
+      "type": "object"
+    },
+    "ResolutionOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal": {
+          "$ref": "#/components/schemas/EventChangeProposal"
+        }
+      },
+      "required": [
+        "proposal"
+      ],
+      "type": "object"
+    },
+    "SafeText": {
+      "maxLength": 2000,
+      "minLength": 0,
+      "type": "string"
+    },
+    "SpanMap": {
+      "additionalProperties": false,
+      "properties": {
+        "prepared_end": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "prepared_start": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "raw_end": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "raw_start": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "prepared_start",
+        "prepared_end",
+        "raw_start",
+        "raw_end"
+      ],
+      "type": "object"
+    },
+    "Statement": {
+      "additionalProperties": false,
+      "properties": {
+        "epistemic_status": {
+          "enum": [
+            "confirmed",
+            "user_declared",
+            "observed",
+            "inferred",
+            "hypothetical",
+            "disputed",
+            "disproved",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "predicate": {
+          "$ref": "#/components/schemas/CodeRef"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "statement_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "subject": {
+          "$ref": "#/components/schemas/EntityRef"
+        },
+        "validity": {
+          "$ref": "#/components/schemas/Validity"
+        },
+        "value": {
+          "$ref": "#/components/schemas/TypedValue"
+        }
+      },
+      "required": [
+        "statement_id",
+        "revision",
+        "subject",
+        "predicate",
+        "value",
+        "epistemic_status",
+        "validity",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "StatementRef": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate_ref": {
+          "$ref": "#/components/schemas/ObjectRef"
+        },
+        "hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "statement_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "aggregate_ref",
+        "statement_id",
+        "revision",
+        "hash"
+      ],
+      "type": "object"
+    },
+    "SubgraphResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "subgraph",
+          "type": "string"
+        },
+        "subgraph": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/GraphSubgraph"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "subgraph"
+      ],
+      "type": "object"
+    },
+    "SubgraphSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "$ref": "#/components/schemas/TimeSlice"
+        },
+        "freshness_policy": {
+          "enum": [
+            "current_required",
+            "allow_stale",
+            "historical"
+          ],
+          "type": "string"
+        },
+        "graph_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "kind": {
+          "const": "subgraph",
+          "type": "string"
+        },
+        "max_depth": {
+          "maximum": 5,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_nodes": {
+          "maximum": 10000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/components/schemas/CodeRef"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "type": "array"
+        },
+        "required_slices": {
+          "items": {
+            "$ref": "#/components/schemas/KnowledgeSlice"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "seed_ids": {
+          "items": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "graph_id",
+        "revision",
+        "seed_ids",
+        "relations",
+        "max_depth",
+        "max_nodes",
+        "required_slices",
+        "freshness_policy",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "TargetRevision": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_revision": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "object_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "object_id",
+        "expected_revision"
+      ],
+      "type": "object"
+    },
+    "TextSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "text_span",
+          "type": "string"
+        },
+        "quote_hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "start": {
+          "maximum": 200000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "start",
+        "end",
+        "quote_hash"
+      ],
+      "type": "object"
+    },
+    "TextValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "text",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 5000,
+          "minLength": 0,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "TimeSlice": {
+      "additionalProperties": false,
+      "properties": {
+        "known_as_of": {
+          "$ref": "#/components/schemas/Timestamp"
+        },
+        "valid_as_of": {
+          "$ref": "#/components/schemas/Timestamp"
+        }
+      },
+      "required": [
+        "valid_as_of",
+        "known_as_of"
+      ],
+      "type": "object"
+    },
+    "TimeValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "time",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/components/schemas/Timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Timestamp": {
+      "format": "date-time",
+      "maxLength": 40,
+      "minLength": 1,
+      "pattern": "(Z|\\+00:00)$",
+      "type": "string"
+    },
+    "TypedValue": {
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/TextValue"
+        },
+        {
+          "$ref": "#/components/schemas/NumberValue"
+        },
+        {
+          "$ref": "#/components/schemas/BooleanValue"
+        },
+        {
+          "$ref": "#/components/schemas/EntityValue"
+        },
+        {
+          "$ref": "#/components/schemas/TimeValue"
+        },
+        {
+          "$ref": "#/components/schemas/UnknownValue"
+        }
+      ]
+    },
+    "Understanding_extractRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "data_declaration": {
+          "enum": [
+            "synthetic",
+            "public",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "$ref": "#/components/schemas/ExecutionOptions"
+        },
+        "implementation": {
+          "$ref": "#/components/schemas/ImplementationSelection"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ExtractionInput"
+        },
+        "request_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "sandbox_id",
+        "implementation",
+        "execution",
+        "data_declaration",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "Understanding_extractResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ExecutionMeta"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/ExtractionOutput"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "partial",
+            "abstained"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "UnknownValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "unknown",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/components/schemas/SafeText"
+        }
+      },
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "Validity": {
+      "additionalProperties": false,
+      "properties": {
+        "recorded_at": {
+          "$ref": "#/components/schemas/Timestamp"
+        },
+        "valid_from": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "valid_from",
+        "valid_to",
+        "recorded_at"
+      ],
+      "type": "object"
+    },
+    "Version": {
+      "maxLength": 40,
+      "minLength": 1,
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "VersionedRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "$ref": "#/components/schemas/Hash"
+        },
+        "id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "version": {
+          "$ref": "#/components/schemas/Version"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "type": "object"
+    },
+    "WholeArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "whole_artifact",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    }
+  },
+  "version": "1.0.1"
+}

@@ -1,0 +1,162 @@
+{
+  "approved_fixture_refs": "contracts/t09-t13-independent-v1/approved-fixture-refs.json",
+  "as_of": {
+    "known_as_of": "2026-10-14T00:00:00Z",
+    "valid_as_of": "2026-10-14T00:00:00Z"
+  },
+  "contracts": {
+    "lock_path": "contracts/t09-t13-independent-v1/operations-lock.json",
+    "operation_ids": [
+      "Understanding.extract",
+      "Events.propose_resolution",
+      "Events.apply",
+      "Events.read",
+      "Business.propose_profile",
+      "Business.propose_questions",
+      "Business.apply",
+      "Business.read",
+      "Evidence.register",
+      "Evidence.read",
+      "Graph.build",
+      "Graph.publish",
+      "Graph.query",
+      "Matching.match",
+      "Impact.assess",
+      "Recommendations.propose"
+    ],
+    "schema_snapshot_path": "contracts/t09-t13-independent-v1/openapi-schema-snapshot.json"
+  },
+  "created_at": "2026-10-14T00:00:00Z",
+  "data_hash": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+  "dataset_id": "t09-t13-independent-v1",
+  "description": "Independent provisional synthetic corpus for algorithm experiments T09-T13.",
+  "expected_properties": [
+    "Unknowns are explicit and absence of a graph edge is not a negative assertion.",
+    "The named T09/T10/T11/T12/T13 cases are property expectations, not model-derived labels.",
+    "False event merges, invented business facts, anchor/truth confusion, invented graph edges, and unsupported impact are critical failure cases."
+  ],
+  "files": {
+    "approved-fixture-refs.json": "sha256:f0978b3def832636137eda386916f1dba452879d11bc95bd199fe9e73cc423ad",
+    "data.json": {
+      "canonical_sha256": "sha256:f8a8a275a61e894ccb9dc1d9e3eaae46745467d6630db2a085466ad7e8372725",
+      "file_sha256": "sha256:5f524da4092a1549d66a4f2e5327129577142c8714618a9895ecb5c45852144f"
+    },
+    "openapi-schema-snapshot.json": "sha256:18c69ce98123dba8155f58572c0ab58cbcc595f4d61c0ba5c6319b1aa8afe901",
+    "operations-lock.json": "sha256:60098767a6f884504d9393bb1fc74f307890dce0eb915a448bb26c3ae2e06a27",
+    "synthetic-owner-policy.json": "sha256:8e2d69096a1f8987c704af6d71d42ae54ba2f0a7728cf6a75ce0fafe8d8131cd"
+  },
+  "fixtures": [
+    {
+      "data_hash": "sha256:876700dbf0e6942a35e78f45663a59129fe9acf24aee520cd181f71d1c5ee822",
+      "fixture_id": "fixture-understanding-extract-v1",
+      "operation_id": "Understanding.extract",
+      "path": "fixtures/t09-t13-independent-v1/understanding-extract.json",
+      "sha256": "sha256:4d8f7f7594d49bb341f52ad095066f276ea22d4acc83b292fd5d8589fa6f9cf3"
+    },
+    {
+      "data_hash": "sha256:bcf5fe6f4064624c2f57f9f2d180c6e8a0b2abaa77e0dd7d3fef8f44d03e04d0",
+      "fixture_id": "fixture-events-read-v1",
+      "operation_id": "Events.read",
+      "path": "fixtures/t09-t13-independent-v1/events-read.json",
+      "sha256": "sha256:640bc431b79da0f623af45a412190a1cfcebcca0a5f5764ff471ea7c085943f6"
+    },
+    {
+      "data_hash": "sha256:7e364f9d4c959e2c2bd27352637299cd69096a0943c12431beb9d157c01e4b70",
+      "fixture_id": "fixture-business-read-v1",
+      "operation_id": "Business.read",
+      "path": "fixtures/t09-t13-independent-v1/business-read.json",
+      "sha256": "sha256:a015b25af739a297a1155edf409a9f9c6f003adce03da9d6964f80a52c2040a8"
+    },
+    {
+      "data_hash": "sha256:38bbfeb16f77c37f84f0dcd04ea083af78fca41673be819b0e3113d999d793cd",
+      "fixture_id": "fixture-evidence-read-v1",
+      "operation_id": "Evidence.read",
+      "path": "fixtures/t09-t13-independent-v1/evidence-read.json",
+      "sha256": "sha256:1df4ded75b348342a0fc462ee1e826d912bd33aa1d692929ac57573a04042768"
+    },
+    {
+      "data_hash": "sha256:ba91ccc1a31e80a35e386026bc40c432b7689928ae0e61357327b55e2e769c9f",
+      "fixture_id": "fixture-graph-query-v1",
+      "operation_id": "Graph.query",
+      "path": "fixtures/t09-t13-independent-v1/graph-query.json",
+      "sha256": "sha256:f9799690c71c8befc317c52a2c04ddf30e39605e2b4ecc41b0e934c2aac1a63f"
+    }
+  ],
+  "inputs": [
+    "Hand-authored synthetic company, event, source, evidence, and graph records in data.json.",
+    "Read-only contract and approved-fixture references recorded under contracts/."
+  ],
+  "limitations": [
+    "Synthetic scenarios do not establish real-world algorithm quality.",
+    "The confirmed status examples use only the explicitly described local synthetic test-owner policy.",
+    "Publisher-root/syndication grouping and owner-policy linkage are local experimental metadata because the normative DTOs do not carry those fields.",
+    "The shared graph is partial; its missing edges cannot be interpreted as non-dependencies."
+  ],
+  "manual_approval": "provisional",
+  "origin": "synthetic",
+  "provenance": {
+    "approved_fixture_index": {
+      "path": "fixtures/approved/index.json",
+      "sha256": "sha256:7329098c72ee9883e0bb322667896e6c3fba229f6a8d92d14acae2193c5ceca0"
+    },
+    "base_commit": "ce640214be7c5ff2fdb451b9e290135a11b512a6",
+    "creator": "hand-authored deterministic fixture builder",
+    "external_facts_used": false,
+    "framework_sources": [
+      {
+        "path": "docs/specs/framework-v1/contracts/operations.json",
+        "sha256": "sha256:18c8b8fb8fcb2dac4889bdebbaf41787f771d14ac43332d69879110ce4185d70"
+      },
+      {
+        "path": "docs/specs/framework-v1/contracts/openapi.json",
+        "sha256": "sha256:c97090b844cf01ed290da923e6e4c58b9e5cfaeaccebf7b9838178d993e8c8ad"
+      },
+      {
+        "path": "packages/contracts/src/alfalab_contracts/_generated.py",
+        "sha256": "sha256:6aabbcc6de15ec6701dd7e9a21b24f04bd599bc356f8dda937c064b2f7527df7"
+      },
+      {
+        "path": "packages/contracts/src/alfalab_contracts/models.py",
+        "sha256": "sha256:3709991de4c977fed2c635d639a465e9374dbc4777d4c25e593193b732a14f22"
+      },
+      {
+        "path": "packages/contracts/src/alfalab_contracts/registry.py",
+        "sha256": "sha256:81f0a822717272cc7d0af4c3d974e612f19dcd78ce052fe515e9ee3012155d30"
+      },
+      {
+        "path": "packages/contracts/src/alfalab_contracts/semantics.py",
+        "sha256": "sha256:cde409e54adde81828e143103b1833ad64f36341762dbfb610e9b907bdc0b543"
+      },
+      {
+        "path": "docs/specs/framework-v1/02-contracts.md",
+        "sha256": "sha256:83a7d129edae10d26b597998ce69413e9864168bef1e18f5a71763d3bdbefbbb"
+      },
+      {
+        "path": "docs/specs/framework-v1/08-verification.md",
+        "sha256": "sha256:998758f2011e5e4e8e8f300e3d09533952811934fa2ce671488748d6c27aaffb"
+      }
+    ],
+    "model_outputs_used_as_labels": false,
+    "pdf_source": {
+      "name": "1-AlfaBank_T08-T13_Jev_classification.pdf",
+      "pages_reviewed": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "path": "C:\\CodexData\\codex-remote-attachments\\01a139c4-4c18-7961-871d-9a097becc117\\0AE3329F-305C-4579-87D8-812744BE7943\\1-AlfaBank_T08-T13_Jev_classification.pdf",
+      "sha256": "sha256:f8ca2513d92690e824cb7e63c92d4c10b5c0147e126409e05778dcbf9f6050f5"
+    }
+  },
+  "schema": "alfalab.spike.synthetic-dataset-manifest/v1",
+  "status": "provisional_not_gold_not_approved",
+  "supersedes": {
+    "commit": "db48cd37491e8fab8a9f122ae4b100da72197a81",
+    "reason": "Portable normalized-LF artifact hashes and executable grounded/inferred, hypothetical, and explicit-negative T12 inputs.",
+    "version": "1.0.0"
+  },
+  "version": "1.0.1"
+}

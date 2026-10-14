@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -148,6 +149,170 @@ class BrowserAcceptanceTests(unittest.TestCase):
         cls.chrome = next((path for path in candidates if path.exists()), None)
         if cls.chrome is None:
             raise unittest.SkipTest("Chrome executable is not installed")
+
+    def test_policy_v2_statistics_charts_follow_candidates_thresholds_and_gold_edits(
+        self,
+    ) -> None:
+        from policy_v2 import evaluate_case
+
+        payload = build_payload()
+        observed = [row for row in payload["cases"] if row["result"]]
+        events = payload["taxonomy"]["events"]
+        event_order = [event["code"] for event in events]
+        event_labels = {event["code"]: event["label"] for event in events}
+        recorded = payload["meta"]["policyV2"]["policy_v2"]["cases"]
+
+        def expected_chart_rows(decisions, gold_overrides=None):
+            overrides = gold_overrides or {}
+            predictions = {
+                row["id"]: set(decisions[row["id"]]["candidate_codes"])
+                for row in observed
+            }
+            distribution = Counter(
+                code
+                for candidate_codes in predictions.values()
+                for code in candidate_codes
+            )
+            errors = {code: [0, 0] for code in event_order}
+            for row in observed:
+                gold = set(overrides.get(row["id"], row["expected_events"]))
+                predicted = predictions[row["id"]]
+                for code in predicted - gold:
+                    errors[code][0] += 1
+                for code in gold - predicted:
+                    errors[code][1] += 1
+            distribution_rows = sorted(
+                (
+                    (event_labels[code], distribution[code])
+                    for code in event_order
+                    if distribution[code]
+                ),
+                key=lambda item: -item[1],
+            )
+            error_rows = sorted(
+                (
+                    (event_labels[code], fp, fn)
+                    for code, (fp, fn) in errors.items()
+                    if fp + fn
+                ),
+                key=lambda item: -(item[1] + item[2]),
+            )[:10]
+            return distribution_rows, error_rows
+
+        expected_distribution, expected_errors = expected_chart_rows(recorded)
+        external_requests: list[str] = []
+        page_errors: list[str] = []
+        with self.sync_playwright() as playwright:
+            browser = playwright.chromium.launch(
+                headless=True,
+                executable_path=str(self.chrome),
+                args=["--no-sandbox"],
+            )
+            page = browser.new_page(viewport={"width": 1440, "height": 1000})
+            page.on(
+                "request",
+                lambda request: external_requests.append(request.url)
+                if request.url.startswith(("http:", "https:"))
+                else None,
+            )
+            page.on("pageerror", lambda error: page_errors.append(str(error)))
+            page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")
+            page.locator('[data-policy-mode="policy_v2"]').click()
+            page.locator("#statsTab").click()
+
+            charts = page.locator("#chartsGrid .chart-card")
+            candidate_chart = charts.nth(1)
+            error_chart = charts.nth(2)
+            self.assertIn(
+                "Event-кандидаты для передачи · Policy v2.1",
+                candidate_chart.inner_text(),
+            )
+            self.assertIn("Кандидат не подтверждает факт", candidate_chart.inner_text())
+            self.assertIn(
+                "Расхождения event-кандидатов · Policy v2.1", error_chart.inner_text()
+            )
+            self.assertEqual(
+                list(
+                    zip(
+                        candidate_chart.locator(
+                            ".chart-row .bar-label"
+                        ).all_inner_texts(),
+                        [
+                            int(value)
+                            for value in candidate_chart.locator(
+                                ".chart-row .chart-num"
+                            ).all_inner_texts()
+                        ],
+                    )
+                ),
+                expected_distribution,
+            )
+            self.assertEqual(
+                [
+                    (label, *map(int, value.split("/")))
+                    for label, value in zip(
+                        error_chart.locator(".chart-row .bar-label").all_inner_texts(),
+                        error_chart.locator(".chart-row .chart-num").all_inner_texts(),
+                    )
+                ],
+                expected_errors,
+            )
+
+            # A proposed label edit must immediately alter the active v2 FP/FN chart.
+            page.locator("#labTab").click()
+            page.locator("#filterSearch").fill("e01-supply-rail")
+            page.locator("#caseList .case-card").click()
+            page.locator("#comparisonBody details.edit-gold summary").click()
+            page.locator(
+                '#comparisonBody .event-check input[value="supply_chain_disruption"]'
+            ).uncheck(force=True)
+            page.locator("#statsTab").click()
+            supply_row = (
+                page.locator("#chartsGrid .chart-card")
+                .nth(2)
+                .locator(".chart-row")
+                .filter(has_text=event_labels["supply_chain_disruption"])
+            )
+            self.assertEqual(supply_row.locator(".chart-num").inner_text(), "1/0")
+
+            # The slider changes the chart locally; compare it with an independent Python
+            # evaluation over the same saved Jev scores at the selected cutoff.
+            page.locator("#labTab").click()
+            page.locator("#comparisonBody button.secondary-button").filter(
+                has_text="Отменить"
+            ).click()
+            page.locator("#threshold-positive").evaluate(
+                "el => { el.value = '0.95'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+            )
+            page.locator("#statsTab").click()
+            adjusted = {
+                row["id"]: evaluate_case(row, payload["taxonomy"], positive_cutoff=0.95)
+                for row in observed
+            }
+            adjusted_distribution, _ = expected_chart_rows(adjusted)
+            actual_adjusted = list(
+                zip(
+                    page.locator("#chartsGrid .chart-card")
+                    .nth(1)
+                    .locator(".chart-row .bar-label")
+                    .all_inner_texts(),
+                    [
+                        int(value)
+                        for value in page.locator("#chartsGrid .chart-card")
+                        .nth(1)
+                        .locator(".chart-row .chart-num")
+                        .all_inner_texts()
+                    ],
+                )
+            )
+            self.assertEqual(actual_adjusted, adjusted_distribution)
+            self.assertEqual(
+                sum(value for _, value in actual_adjusted),
+                sum(len(row["candidate_codes"]) for row in adjusted.values()),
+            )
+            browser.close()
+        self.assertEqual(external_requests, [])
+        self.assertEqual(page_errors, [])
 
     def test_browser_scenarios_and_responsive_screenshots(self) -> None:
         screenshots = HERE / "screenshots"

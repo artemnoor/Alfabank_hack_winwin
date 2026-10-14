@@ -62,4 +62,4 @@
 - `T09_HANDOFF.md` описывает экспериментальную передачу неподтверждённых event-кандидатов. Это не DTO и не runtime-интеграция; T09 должен привязать свои утверждения к источнику и evidence spans.
 - Проверка: `py -m unittest discover -s spike/T08 -p 'test*.py' -v`; Policy/Playwright: `py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v`.
 - Пересобрать proposal, visible validation и error audit: `py spike/T08/build_t08_validation_assets.py`.
-- Пересобрать TEST_REPORT после прогонов: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 20`; проверить байтовую воспроизводимость: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 20 --check`.
+- Пересобрать TEST_REPORT после прогонов: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 21`; проверить байтовую воспроизводимость: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 21 --check`.

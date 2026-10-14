@@ -13,7 +13,7 @@ from build_t08_report import (
 
 class T08FinalReportTests(unittest.TestCase):
     def test_checked_in_report_reproduces_current_evidence_and_verdicts(self) -> None:
-        report = build_report(unit_tests_passed=118, browser_tests_passed=20)
+        report = build_report(unit_tests_passed=118, browser_tests_passed=21)
         self.assertEqual(
             json.loads(REPORT_JSON_PATH.read_text(encoding="utf-8")), report
         )

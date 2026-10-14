@@ -955,9 +955,22 @@
     $("policyComparison").replaceChildren(policyComparisonCard(v2Metrics));
     const charts = $("chartsGrid");
     charts.replaceChildren();
+    const usingV2 = activePolicyMode === "policy_v2";
     charts.append(chartCard("Основные темы Jev", "Распределение только по 45 сохранённым ответам.", topicDistribution()));
-    charts.append(chartCard("Положительные события", `Текущий positive-порог ${scoreText(settings.positive)}; оценки не являются калиброванными вероятностями.`, eventDistribution()));
-    charts.append(chartCard("События с наибольшими расхождениями", "FP и FN на текущем пороге и текущих метках.", eventErrors()));
+    charts.append(chartCard(
+      usingV2 ? "Event-кандидаты для передачи · Policy v2.1" : "Положительные события · Legacy",
+      usingV2
+        ? `Сколько ответов содержат переданный event-кандидат при пороге ${scoreText(v2Settings.positive)}. Кандидат не подтверждает факт.`
+        : `Сколько ответов содержат положительное событие при пороге ${scoreText(settings.positive)}. Оценки не являются калиброванными вероятностями.`,
+      eventDistribution(),
+    ));
+    charts.append(chartCard(
+      usingV2 ? "Расхождения event-кандидатов · Policy v2.1" : "Расхождения событий · Legacy",
+      usingV2
+        ? "FP / FN среди кандидатов Policy v2.1 относительно выбранных предварительных или предложенных меток."
+        : "FP / FN по Legacy-порогам относительно выбранных предварительных или предложенных меток.",
+      eventErrors(),
+    ));
     charts.append(chartCard(
       activePolicyMode === "policy_v2" ? "Причины задач проверки · Policy v2.1" : "Причины ручной проверки · Legacy",
       activePolicyMode === "policy_v2"
@@ -967,7 +980,7 @@
     ));
     charts.append(scatterCard());
     charts.append(policyTableCard());
-    $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и предварительных метках. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Модельные оценки не калиброваны. Диаграммы и пресеты A–E ниже остаются Legacy-диагностикой; таблица выше сравнивает реальную передачу Legacy и Policy v2.1. Результаты не доказывают качество на реальном новостном потоке.`;
+    $("statsFootnote").textContent = `Метрики относятся к 45 сохранённым ответам на синтетических новостях и выбранным предварительным или предложенным меткам. 4 из 49 непустых новостей без ответа исключены из точности и event FN; ещё 1 пустой кейс не классифицируется. Темы одинаковы для обоих режимов. Распределение событий, расхождения и причины review переключаются вместе с Legacy / Policy v2.1. Coverage vs Error Rate и пресеты A–E ниже остаются Legacy-диагностикой; таблица сравнения фиксирует Legacy Current Strict и Policy v2.1. Результаты не доказывают качество на реальном новостном потоке.`;
   }
 
   function legacyOutputMetrics() {
@@ -1086,7 +1099,7 @@
 
   function eventDistribution() {
     const counts = new Map(DATA.taxonomy.events.map((event) => [event.code, 0]));
-    for (const row of liveCaseRows()) for (const code of decision(row).predictions) counts.set(code, counts.get(code) + 1);
+    for (const row of liveCaseRows()) for (const code of activeDecision(row).predictions) counts.set(code, counts.get(code) + 1);
     const values = [...counts].filter(([, count]) => count > 0).map(([code, value]) => ({ code, value, label: eventLabel(code) })).sort((a, b) => b.value - a.value);
     return chartRows(values, (row) => { filters.event = row.code; $("filterEvent").value = row.code; activeTab = "lab"; switchToLab(); renderAll(); });
   }
@@ -1094,7 +1107,7 @@
   function eventErrors() {
     const counts = new Map(DATA.taxonomy.events.map((event) => [event.code, { fp: 0, fn: 0 }]));
     for (const row of liveCaseRows()) {
-      const error = rowError(row);
+      const error = rowError(row, activeDecision(row));
       for (const code of error.fp) counts.get(code).fp += 1;
       for (const code of error.fn) counts.get(code).fn += 1;
     }

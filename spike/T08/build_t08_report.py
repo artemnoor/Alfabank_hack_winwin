@@ -275,12 +275,12 @@ def build_report(
             "new_jev_api_requests": 0,
         },
         "independent_review": {
-            "result": "PASS_NO_BLOCKING_OR_MATERIAL_FINDINGS",
-            "reviewer": "AI Factory read-only review",
-            "scope": "saved-output 6/7 discrepancy reconciliation, taxonomy invariants, visible-validation naming and hash, full-baseline packet, and report consistency",
+            "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",
+            "reviewer": "AI Factory read-only reviews",
+            "scope": "saved-output error reconciliation and taxonomy checks; plus Policy v2.1 statistics chart consistency, active-policy candidate/error data, threshold and proposed-label updates",
             "reviewer_ran_tests": False,
             "ai_review_is_human_gold": False,
-            "limitations": "The full-baseline annotation packet was subsequently expanded and validated by regression tests; it is not a human-adjudicated benchmark.",
+            "limitations": "Reviewers did not run tests; the author ran regression tests after corrections. AI review is not a human-adjudicated benchmark.",
         },
         "remaining_risks": [
             "Draft labels are single-author and several boundary cases remain disputed.",

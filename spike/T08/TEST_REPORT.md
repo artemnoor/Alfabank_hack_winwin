@@ -11,7 +11,7 @@
 | Engineering quality | **PASS** | Офлайн-проверки и воспроизводимость перечисленных артефактов. |
 | API compatibility | **BLOCKED** | Сохранённые ответы есть, но текущая версия клиента не проверялась live. |
 | Model quality | **NOT_MEASURED_FOR_DECISION** | Предварительные метрики не доказывают качество для решения. |
-| T09 handoff | **READY — экспериментальные кандидаты** | Не является production-ready интеграцией. |
+| T09 handoff | **READY — только экспериментальная передача кандидатов** | Не является production-ready интеграцией. |
 
 ## Что показывают сохранённые ответы
 
@@ -41,7 +41,7 @@
 
 Сверено 6 FP-расхождений и 7 FN-расхождений. Подробные тексты, scores, цитаты и причины — в ERROR_ANALYSIS_V2.1.md/.json. Расхождения могут быть вызваны Jev, границами таксономии, порогом или draft gold; они не объявляются доказанными ошибками модели.
 
-Создана отдельная taxonomy 0.4.1-spike (unvalidated-experimental-proposal); hash fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230. Коды и вопросы сохранены, live-оценки нет, требуется решение владельца.
+Создана отдельная taxonomy 0.4.2-spike (unvalidated-experimental-proposal); hash 911d607106c093926775ec880918ff7e5aa2ce4a5e1d366b134cfdc550f7bacd. Коды и вопросы сохранены, live-оценки нет, требуется решение владельца.
 
 ## Человеческая разметка и будущая проверка
 
@@ -49,20 +49,23 @@
 
 Набор из 60 новых синтетических текстов имеет роль visible_validation_candidate, hash ec1effa1d2647ac1a10e14c6ec5269823323d446805e4f20f3ddafbcadf8cfd7. Нет labels/ответов Jev; набор исключён из метрик. Его тексты видели разработчики, поэтому он не может стать финальным blind test.
 
+Создан отдельный пул из 40 новых inputs, hash ac3b8582c0f228b35259c3dcbba0e1dc3070e079c00fa4d97e0961bc7bd15f7c; он не основан на текущих Jev ошибках и исключён из scoring. Labels и outputs отсутствуют; поскольку тексты уже видимы в репозитории, это пока не blind benchmark. Требуются две human разметки и независимый custodian.
+
 AI-review — вспомогательное мнение, не человеческий gold. Для gold нужны два независимых человека и третий adjudicator.
 
 ## Проверки этого состояния
 
-- Unit suite: 118 passed, 0 failed, 0 skipped.
+- Unit suite: 132 passed, 0 failed, 0 skipped.
 - Policy/visualization/Playwright suite: 23 passed, 0 failed, 0 skipped.
-- Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: PASS.
+- Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: PASS/PASS/PASS/PASS/PASS/PASS/PASS/PASS.
+- Отчёт не запускает эти команды: статусы переданы явно после запусков; если аргумент не указан, он остаётся NOT_RUN.
 - Новых Jev/Polza AI запросов: 0.
 
 ## Риски и решение
 
 - Голд не adjudicated; границы e03/e09/e10/e18/e25/e26/e27/e28/e32/e33/e34 требуют человеческой проверки.
-- Taxonomy 0.4.1 не протестирована на модели; нельзя утверждать, что она улучшает Jev.
-- 60 visible validation-кандидатов ещё не размечены; поскольку разработчики видели inputs, они не подходят для финального blind test. Нужен новый набор от независимого custodian после freeze.
+- Taxonomy v0.4.2 не протестирована на Jev; изменение вопроса о недостаточности доказательств требует отдельного live-пилота, поэтому улучшение не доказано.
+- Набор из 60 visible-validation текстов уже видели разработчики и он не является blind. Новый пул из 40 inputs также видим в репозитории и пока только кандидат: перед слепой проверкой его нужно передать независимому custodian, получить две независимые человеческие разметки и adjudication.
 - Текущий клиент не проверен live; причина прежних HTTP 451 и четырёх ошибок пилота неизвестна. Повторов не было.
 - Нет runtime DTO/policy/provenance integration. Передача в T09 только экспериментальная и текстовая.
 

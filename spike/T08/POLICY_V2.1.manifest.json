@@ -1,0 +1,53 @@
+{
+  "schema_version": "t08-policy-freeze-manifest-v1",
+  "policy_version": "2.1.0-spike",
+  "freeze_status": "frozen_for_experimental_handoff_only",
+  "runtime_integration": false,
+  "public_contract_changed": false,
+  "new_jev_api_requests": 0,
+  "source_hashes": {
+    "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+    "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+    "aggregate": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+  },
+  "implementation_hashes": {
+    "python_policy": "721b38a2e14891f1006be1293cc7cc615686558c482bd6cf6e19856f455750ed",
+    "browser_policy_and_presentation": "7fdb6c2de13cdede9ff6935080c1cf70620a52743bd47c05c8480b1378f02e3f"
+  },
+  "saved_policy_report_sha256": "0e807af565151bf4bec861c8e238b4ce69c0ac08d19b9359084f4e6b37adb4ea",
+  "thresholds": {
+    "candidate_positive_at_or_above": 0.8,
+    "noul_negative_at_or_below": 0.2,
+    "noul_positive_at_or_above": 0.8,
+    "insufficient_evidence_hold_at_or_above": 0.8,
+    "unlisted_separate_task_at_or_above": 0.8,
+    "boundary_semantics": "inclusive"
+  },
+  "routing_invariants": {
+    "preserve_choice_and_all_event_scores": true,
+    "positive_events_are_unconfirmed_candidates": true,
+    "insufficient_evidence_holds_only_existing_candidates": true,
+    "unlisted_task_does_not_block_known_candidates": true,
+    "choice_confidence_does_not_block_candidates": true,
+    "event_abstain_does_not_block_other_candidates": true,
+    "missing_result_is_not_empty_classification": true
+  },
+  "observed_saved_run": {
+    "nonempty_input_count": 49,
+    "saved_answer_count": 45,
+    "missing_answer_count": 4,
+    "candidate_bearing_stories": 32,
+    "candidate_event_count": 40,
+    "stories_with_review": 0,
+    "tp_fp_fn_against_preliminary_labels": {
+      "tp": 34,
+      "fp": 6,
+      "fn": 7
+    }
+  },
+  "gold_status": "preliminary_single_author_unadjudicated",
+  "known_semantic_limit": "Taxonomy v0.3 insufficient_evidence combines primary-topic and event uncertainty; it may conservatively hold an event candidate for topic-only doubt.",
+  "candidate_transport": "released event codes may be extraction hints only; never facts",
+  "manifest_path": "spike/T08/POLICY_V2.1.manifest.json",
+  "policy_spec_path": "spike/T08/POLICY_V2.1.md"
+}

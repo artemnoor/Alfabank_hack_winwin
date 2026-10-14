@@ -7,13 +7,13 @@ from difflib import SequenceMatcher
 from pathlib import Path
 
 from build_t08_validation_assets import (
-    VALIDATION_MANIFEST,
-    VALIDATION_NEWS,
     ERROR_ANALYSIS,
     ERROR_MANIFEST,
     GOLD_REVIEW_PACKET,
     V041_MANIFEST,
     V041_TAXONOMY,
+    VALIDATION_MANIFEST,
+    VALIDATION_NEWS,
     build,
 )
 

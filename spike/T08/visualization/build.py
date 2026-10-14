@@ -14,9 +14,9 @@ SPIKE_DIR = HERE.parent
 sys.path.insert(0, str(SPIKE_DIR))
 
 from jev_spike import load_verified_inputs  # noqa: E402
+from policy_v2 import compare_policies  # noqa: E402
 from quality_analysis import build_quality_analysis  # noqa: E402
 from quality_policy import historical_review_reasons  # noqa: E402
-from policy_v2 import compare_policies  # noqa: E402
 
 CORPUS_PATH = SPIKE_DIR / "corpus.json"
 TAXONOMY_PATH = SPIKE_DIR / "taxonomy.json"
@@ -205,18 +205,20 @@ def render_html(payload: dict[str, Any]) -> str:
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Перейти к содержанию</a>
   <div class="shell">
     <header class="topbar">
       <div class="brand"><div class="brand-mark" aria-hidden="true">A</div><div><div class="eyebrow">ALFA FUTURE HACK · T08</div><div class="brand-name">Jev Classification Lab</div></div></div>
       <div class="topbar-note"><span class="live-dot" aria-hidden="true"></span><span>Локальная песочница · без сети</span><span id="resultCountBadge" class="pill"></span></div>
     </header>
+    <main id="mainContent" tabindex="-1">
     <section class="hero">
       <div><div class="eyebrow">Экспериментальная аналитика</div><h1>Как Jev читает новости</h1><p>Изучайте сохранённые ответы, сравнивайте их с предварительной разметкой и меняйте пороги. Все пересчёты происходят локально и не запускают модель повторно.</p></div>
       <div class="hero-stamp"><span class="pill red">НЕ PRODUCTION</span><span id="versionBadge" class="pill">tax. 0.3.0-spike</span></div>
     </section>
     <div id="topMetrics" class="metric-strip" aria-label="Краткие метрики"></div>
     <div class="notice"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Предварительная оценка.</strong> Использованы только 45 сохранённых ответов Jev на синтетические новости. Gold-метки — черновые; оценки Jev не являются калиброванными вероятностями. Песочница не отправляет запросы и не делает выводов о реальном новостном потоке.</div></div>
-    <nav class="section-nav" aria-label="Разделы"><button id="labTab" class="tab" type="button" data-tab="lab" aria-selected="true">Разбор новостей</button><button id="statsTab" class="tab" type="button" data-tab="stats" aria-selected="false">Общая статистика</button></nav>
+    <div class="section-nav" role="group" aria-label="Экран"><button id="labTab" class="tab" type="button" data-tab="lab" aria-controls="labScreen" aria-pressed="true">Разбор новостей</button><button id="statsTab" class="tab" type="button" data-tab="stats" aria-controls="statsScreen" aria-pressed="false">Общая статистика</button></div>
     <section class="policy-bar" aria-label="Экспериментальные пороги">
       <div class="policy-top"><div><div id="policyName" class="policy-title">A · Current Strict</div><div id="policyCaption" class="policy-caption"></div></div><button id="resetThresholds" class="reset-button" type="button">Вернуть исходные пороги</button></div>
       <div class="mode-row"><div><div class="mode-label">Способ обработки результата</div><div class="mode-help">Переключает только локальные правила; Jev не запускается повторно.</div></div><div class="mode-switch" role="group" aria-label="Режим политики"><button type="button" class="mode-button active" data-policy-mode="legacy" aria-pressed="true">Legacy · всё вместе</button><button type="button" class="mode-button" data-policy-mode="policy_v2" aria-pressed="false">Policy v2.1 · отдельно по сигналам</button></div></div>
@@ -233,10 +235,11 @@ def render_html(payload: dict[str, Any]) -> str:
         <div id="thresholdHelp" class="threshold-help">Noul: score ≤ отрицательного порога → negative; score ≥ положительного → positive; между ними → abstain. Порог Choice принимает значение на границе. Сигналы review срабатывают только при score строго выше порога.</div>
       </details>
     </section>
-    <section id="labScreen" class="lab-screen">
+    <section id="labScreen" class="lab-screen" aria-labelledby="labScreenTitle">
+      <h2 id="labScreenTitle" class="sr-only">Разбор новостей</h2>
       <div id="labGrid" class="lab-grid">
         <aside id="caseSidebar" class="panel case-sidebar" aria-label="Список новостей">
-          <div class="panel-head"><div><div class="panel-title">Новости корпуса</div><div class="panel-subtitle">Выберите пример для разбора</div></div><span id="visibleCaseCount" class="case-count"></span></div>
+          <div class="panel-head"><div><h3 class="panel-title">Новости корпуса</h3><div class="panel-subtitle">Выберите пример для разбора</div></div><span id="visibleCaseCount" class="case-count" role="status" aria-live="polite" aria-atomic="true"></span></div>
           <div class="sidebar-tools">
             <input id="filterSearch" class="field" type="search" placeholder="Поиск по тексту или ID" aria-label="Поиск по новостям">
             <div class="filter-grid"><select id="filterTopic" class="field" aria-label="Фильтр по теме"></select><select id="filterEvent" class="field" aria-label="Фильтр по событию"></select></div>
@@ -244,16 +247,18 @@ def render_html(payload: dict[str, Any]) -> str:
           </div>
           <div id="caseList" class="case-list"></div>
         </aside>
-        <main id="detailPanel" class="panel detail-panel" aria-label="Подробный анализ новости"><div class="panel-head"><div><div class="panel-title">Разбор выбранной новости</div><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></main>
-        <aside id="goldPanel" class="panel gold-panel" aria-label="Сравнение с предварительной разметкой"><div class="panel-head"><div><div class="panel-title">Сверка с разметкой</div><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
+        <section id="detailPanel" class="panel detail-panel" aria-labelledby="detailPanelTitle"><div class="panel-head"><div><h3 id="detailPanelTitle" class="panel-title">Разбор выбранной новости</h3><div class="panel-subtitle">Ответ модели отдельно от правил приложения</div></div></div><div id="detailBody" class="panel-body"></div></section>
+        <aside id="goldPanel" class="panel gold-panel" aria-labelledby="goldPanelTitle"><div class="panel-head"><div><h3 id="goldPanelTitle" class="panel-title">Сверка с разметкой</h3><div class="panel-subtitle">Метки — предварительные, не утверждены человеком</div></div></div><div id="comparisonBody" class="panel-body"></div></aside>
       </div>
     </section>
-    <section id="statsScreen" class="stats-screen" hidden>
+    <section id="statsScreen" class="stats-screen" aria-labelledby="statsScreenTitle" hidden>
+      <h2 id="statsScreenTitle" class="sr-only">Общая статистика</h2>
       <div id="statsMetrics" class="metric-strip" aria-label="Интерактивные метрики"></div>
       <div id="policyComparison"></div>
       <div class="charts-grid" id="chartsGrid"></div>
       <div id="statsFootnote" class="warning-foot"></div>
     </section>
+    </main>
   </div>
   <script id="visual-data" type="application/json">{encoded}</script>
   <script>

@@ -1,0 +1,22 @@
+{
+  "dataset_id": "t08-future-blind-candidate-inputs",
+  "version": "1.0.0",
+  "status": "awaiting_independent_human_annotation",
+  "cases": 40,
+  "language": "ru_with_one_mixed_language_case",
+  "content_origin": "new synthetic input authored offline; no real news",
+  "derived_from_jev_outputs": false,
+  "selected_from_current_error_cases": false,
+  "gold_labels_present": false,
+  "model_outputs_present": false,
+  "human_annotators": 0,
+  "eligible_for_current_scoring": false,
+  "genuinely_blind_now": false,
+  "blindness_limit": "Inputs are visible in the repository. Prospective label-blind use requires frozen taxonomy/prompt/policy, two independent human labels, third-person adjudication, and an external custodian holding labels until Jev output hashes are fixed.",
+  "baseline_taxonomy_version": "0.3.0-spike",
+  "baseline_taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "news_path": "spike/T08/experiments/future-blind-candidate-v1/news.json",
+  "news_sha256": "ac3b8582c0f228b35259c3dcbba0e1dc3070e079c00fa4d97e0961bc7bd15f7c",
+  "maximum_similarity_to_existing_t08_texts": 0.55132,
+  "new_jev_requests": 0
+}

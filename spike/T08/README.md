@@ -21,6 +21,8 @@
 - На тех же 45 ответах: 32 новости с 40 кандидатами; 0 review-задач по сигналам evidence/unlisted; 6 FP и 7 FN-расхождений с предварительными метками. В provisional risk group — 3 FP.
 - Ноль review на этой выборке не доказывает безопасность. Кандидаты — не подтверждённые факты, а labels не утверждены человеком.
 - Разбор причин — `ERROR_ANALYSIS_V2.1.md`/`.json`; граница передачи — `T09_HANDOFF.md`.
+- Замороженные правила и hashes Policy v2.1 — `POLICY_V2.1.md` и `POLICY_V2.1.manifest.json`. Это локальный экспериментальный маршрут, не runtime.
+- Спорная разметка предварительно проверена отдельно в `GOLD_LABEL_REVIEW_V2.1.md`/`.json`; AI reviewer не является human gold, исходные labels не менялись.
 
 ## Артефакты этого разбора
 
@@ -29,7 +31,8 @@
 - `THRESHOLD_COMPARISON.md` — counterfactual coverage/risk и раздельные Choice, event, insufficient-evidence и unlisted gate sweeps.
 - `QUALITY_ANALYSIS.json` — машинный подробный расчёт по pinned v4.
 - `HUMAN_REVIEW_PACKET.md` — спорная разметка на ручную adjudication; AI review не является human gold.
-- `experiments/taxonomy-v0.4-proposal/` и `TAXONOMY_PROPOSAL.md` — отдельная неутверждённая и непроверенная taxonomy proposal. Исходная v0.3 не менялась.
+- Latest taxonomy proposal — `experiments/taxonomy-v0.4.2-proposal/`; предыдущие 0.4.0/0.4.1 сохранены как родители. Proposal неутверждён, live не тестировался; базовая v0.3 и ответы Jev не менялись.
+- `experiments/future-blind-candidate-v1/` — 40 новых синтетических inputs без labels и ответов Jev. Это candidate pool, пока не blind test: labels должны создать два человека, adjudicate третий, хранить их должен независимый custodian.
 - `DEEP_CORPUS_AUDIT.json` и `BENCHMARK_PLAN.md` — аудит 160 примеров и план настоящего blind set. D видим и не является blind.
 - `NEXT_STEPS.md` — следующий эксперимент; предложение на 20 matched calls требует отдельного бюджета и здесь не запускалось.
 - `AI_REVIEW_LOG.md` — роли субагентов и ограничения ревью.
@@ -42,6 +45,9 @@
     python spike/T08/run_spike.py
     python spike/T08/quality_analysis.py --check
     python spike/T08/deep_corpus_audit.py --check
+    python spike/T08/build_taxonomy_v042_proposal.py
+    python spike/T08/build_future_blind_candidate.py
+    python spike/T08/build_policy_v21_manifest.py
 
 `run_spike.py` без `--live` выполняет только локальную проверку. Тесты также блокируют network entrypoints; тест исчерпанного ledger доказывает, что over-budget run не доходит до `classify`.
 
@@ -57,9 +63,10 @@
 
 - Разбор всех 6 FP-кандидатов и 7 FN-кандидатов Policy v2.1: `ERROR_ANALYSIS_V2.1.md` и `ERROR_ANALYSIS_V2.1.json`. Это расхождения с предварительными метками одного автора, не adjudicated model errors.
 - `HUMAN_REVIEW_PACKET_V2.1.md` — нейтральный пакет по всем 49 непустым baseline-новостям, без исходных ID, draft labels и Jev scores. Он слеп к результатам модели, но не к владельцу репозитория; независимых человеческих разметчиков пока нет.
-- Предложение taxonomy `0.4.1-spike`: `experiments/taxonomy-v0.4.1-proposal/`. Оно уточняет только границы и правила разметки, сохраняет коды и вопросы, не меняет v0.3/v0.4, не тестировалось live и ждёт решения владельца.
+- Предложение taxonomy `0.4.1-spike`: `experiments/taxonomy-v0.4.1-proposal/` — сохранённая промежуточная версия.
+- Latest taxonomy proposal `0.4.2-spike`: `experiments/taxonomy-v0.4.2-proposal/` и `TAXONOMY_PROPOSAL_V0.4.2.md`. Это неутверждённое офлайн-предложение: уточняет event boundaries и отделяет сомнение в событии от сомнения в теме. Кодовая схема и пороги не менялись; требуется новый разрешённый live-пилот, качество не доказано.
 - Набор из 60 новых синтетических текстов: `experiments/visible-validation-v1/`. Это только visible validation: тексты уже видели авторы/разработчики, поэтому набор не может стать финальным blind test, даже если labels держать отдельно. Для blind evaluation нужен новый корпус от независимого custodian после фиксации taxonomy, prompt и policy.
 - `T09_HANDOFF.md` описывает экспериментальную передачу неподтверждённых event-кандидатов. Это не DTO и не runtime-интеграция; T09 должен привязать свои утверждения к источнику и evidence spans.
 - Проверка: `py -m unittest discover -s spike/T08 -p 'test*.py' -v`; Policy/Playwright: `py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v`.
 - Пересобрать proposal, visible validation и error audit: `py spike/T08/build_t08_validation_assets.py`.
-- Пересобрать TEST_REPORT после прогонов: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 21`; проверить байтовую воспроизводимость: `py spike/T08/build_t08_report.py --tests-passed 118 --browser-tests-passed 21 --check`.
+- Пересобрать TEST_REPORT после прогонов: `py spike/T08/build_t08_report.py --tests-passed 132 --browser-tests-passed 23 --ruff-check PASS --ruff-format-check PASS --offline-runner PASS --quality-analysis-reproducibility PASS --deep-corpus-audit-reproducibility PASS --validation-asset-builder PASS --javascript-syntax PASS --git-diff-checks PASS`; проверить байтовую воспроизводимость — добавить `--check`.

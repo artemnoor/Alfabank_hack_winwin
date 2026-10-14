@@ -76,7 +76,7 @@
     for (const tab of document.querySelectorAll("[data-tab]")) {
       tab.addEventListener("click", () => {
         activeTab = tab.dataset.tab;
-        for (const button of document.querySelectorAll("[data-tab]")) button.setAttribute("aria-selected", String(button.dataset.tab === activeTab));
+        for (const button of document.querySelectorAll("[data-tab]")) button.setAttribute("aria-pressed", String(button.dataset.tab === activeTab));
         $("labScreen").hidden = activeTab !== "lab";
         $("statsScreen").hidden = activeTab !== "stats";
         $("statsScreen").classList.toggle("active", activeTab === "stats");
@@ -467,8 +467,17 @@
       const evaluated = activeDecision(row);
       const card = node("button", `case-card${row.id === selectedId ? " selected" : ""}`);
       card.type = "button";
-      card.setAttribute("aria-current", String(row.id === selectedId));
-      card.addEventListener("click", () => { selectedId = row.id; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+      card.dataset.caseId = row.id;
+      if (row.id === selectedId) card.setAttribute("aria-current", "true");
+      card.addEventListener("click", () => {
+        const list = $("caseList");
+        const scrollTop = list.scrollTop;
+        selectedId = row.id;
+        renderAll();
+        const updatedList = $("caseList");
+        updatedList.scrollTop = scrollTop;
+        updatedList.querySelector(`[data-case-id="${CSS.escape(row.id)}"]`)?.focus({ preventScroll: true });
+      });
       const top = node("div", "case-card-top");
       append(top, node("span", "case-id", row.id));
       if (reviewCaseIds.has(row.id)) top.append(node("span", "badge amber small", "разметка на ревью"));
@@ -497,7 +506,7 @@
     const evaluated = activeDecision(row);
     const error = row.result ? rowError(row, evaluated) : null;
     const original = node("div", "gold-block");
-    const originalHeading = node("div", "gold-heading");
+    const originalHeading = node("h4", "gold-heading");
     append(originalHeading, node("span", "", "Предварительная разметка"), node("span", "badge amber small", "не утверждена человеком"));
     original.append(originalHeading);
     const topicLine = node("div", "compare-line");
@@ -517,7 +526,7 @@
     original.append(originalEvents);
     if (gold.changed) {
       const changed = node("div", "gold-block");
-      const heading = node("div", "gold-heading");
+      const heading = node("h4", "gold-heading");
       append(heading, node("span", "", "Ваш вариант"), node("span", "badge blue small", "черновик"));
       changed.append(heading);
       const changedTopic = node("div", "compare-line");
@@ -531,7 +540,7 @@
     }
 
     const model = node("div", "gold-block");
-    model.append(node("div", "gold-heading", "Сохранённый ответ Jev"));
+    model.append(node("h4", "gold-heading", "Сохранённый ответ Jev"));
     if (!row.result) {
       const absent = node("div", "missing-box");
       append(absent, node("strong", "", row.text?.trim() ? "Ответ Jev отсутствует" : "Пустой тестовый текст"), node("span", "", row.text?.trim() ? "Классификация не выполняется. Эта запись исключена из метрик точности." : "Локальный кейс no_content; он не отправлялся в Jev."));
@@ -707,7 +716,7 @@
     const error = result ? rowError(row, evaluated) : null;
     const heading = node("div", "detail-title-row");
     const left = node("div");
-    append(left, node("div", "detail-id", row.id), node("h2", "detail-title", row.title || "Пустой текст"));
+    append(left, node("div", "detail-id", row.id), node("h4", "detail-title", row.title || "Пустой текст"));
     const isReview = activePolicyMode === "policy_v2" ? evaluated.needsReview : evaluated.status === "uncertain";
     const headStatus = node("span", `badge${!result ? " red" : isReview ? " amber" : " green"}`, caseStatusLabel(row, evaluated));
     append(heading, left, headStatus);
@@ -728,7 +737,6 @@
       }
       root.append(absent);
       if (row.text?.trim()) {
-        root.append(node("div", "section-heading", ""));
         root.append(storyCard(row));
       }
       return;
@@ -787,7 +795,7 @@
 
   function sectionHeading(title, copy) {
     const section = node("div", "section-heading");
-    append(section, node("div", "", title), node("p", "", copy));
+    append(section, node("h4", "", title), node("p", "", copy));
     return section;
   }
 
@@ -1044,7 +1052,7 @@
 
   function policyComparisonCard(v2Metrics) {
     const card = node("section", "chart-card policy-v2-comparison");
-    append(card, node("div", "chart-title", "Старые правила и Policy v2.1 · одни и те же 45 ответов"));
+    append(card, node("h3", "chart-title", "Старые правила и Policy v2.1 · одни и те же 45 ответов"));
     card.append(node("div", "chart-desc", "Legacy рассчитывает, какие целые новости прошли бы проверку. Policy v2.1 локально формирует список подходящих событий-кандидатов. Это сравнение расчётных результатов относительно предварительных меток; ничего не передаётся в runtime, а 4 ответа Jev отсутствуют."));
     const legacy = legacyOutputMetrics();
     const v2 = v2Metrics;
@@ -1058,7 +1066,11 @@
     const table = node("table", "policy-table policy-v2-table");
     const head = node("thead");
     const header = node("tr");
-    for (const label of ["Расчёт правил", "Выход расчёта", "Точность кандидатов", "Доля ожидаемых среди кандидатов", "Общий баланс кандидатов", "Совпали все события", "TP / FP / нет среди кандидатов", "Новости с задачей в симуляции", "Лишние в важной группе*"]) header.append(node("th", "", label));
+    for (const label of ["Расчёт правил", "Выход расчёта", "Точность кандидатов", "Доля ожидаемых среди кандидатов", "Общий баланс кандидатов", "Совпали все события", "TP / FP / нет среди кандидатов", "Новости с задачей в симуляции", "Лишние в важной группе*"]) {
+      const th = node("th", "", label);
+      th.scope = "col";
+      header.append(th);
+    }
     head.append(header); table.append(head);
     const body = node("tbody");
     const rows = [
@@ -1093,7 +1105,7 @@
 
   function chartCard(title, description, body) {
     const card = node("section", "chart-card");
-    append(card, node("div", "chart-title", title), node("div", "chart-desc", description), body);
+    append(card, node("h3", "chart-title", title), node("div", "chart-desc", description), body);
     return card;
   }
 
@@ -1191,7 +1203,7 @@
   function scatterCard() {
     const gatesRows = PRESETS.map((preset) => ({ preset, metrics: metricsForGates(preset.gates) }));
     const card = node("section", "chart-card");
-    append(card, node("div", "chart-title", "Автоматическое принятие и ошибки"), node("div", "chart-desc", "Этот график показывает только старые диагностические режимы: по горизонтали доля новостей, принятых без проверки; по вертикали доля ошибок среди них."));
+    append(card, node("h3", "chart-title", "Автоматическое принятие и ошибки"), node("div", "chart-desc", "Этот график показывает только старые диагностические режимы: по горизонтали доля новостей, принятых без проверки; по вертикали доля ошибок среди них."));
     const wrap = node("div", "scatter-wrap");
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 480 250");
@@ -1216,6 +1228,11 @@
       circle.setAttribute("cx", cx); circle.setAttribute("cy", cy); circle.setAttribute("r", "6"); circle.setAttribute("fill", index === 0 ? "#ff3347" : ["#f1bd64", "#8aafff", "#55d69e", "#c19aff"][index - 1]);
       circle.setAttribute("tabindex", "0"); circle.setAttribute("role", "button"); circle.setAttribute("aria-label", `${preset.label}: покрытие ${pct(metrics.coverage)}, ошибки ${pct(metrics.autoErrorRate)}`);
       circle.addEventListener("click", () => selectPreset(preset.id));
+      circle.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        selectPreset(preset.id);
+      });
       const title = document.createElementNS("http://www.w3.org/2000/svg", "title"); title.textContent = `${preset.label} · принято без проверки ${pct(metrics.coverage)} · ошибки среди принятых ${pct(metrics.autoErrorRate)}`; circle.append(title);
       svg.append(circle);
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text"); label.setAttribute("x", cx + 8); label.setAttribute("y", cy - 6); label.textContent = String.fromCharCode(65 + index); svg.append(label);
@@ -1230,7 +1247,7 @@
 
   function policyTableCard() {
     const card = node("section", "chart-card");
-    append(card, node("div", "chart-title", "Сравнение политик"), node("div", "chart-desc", "Одинаковые пороги, меняется набор включённых сигналов. Ни один вариант не объявлен production-ready."));
+    append(card, node("h3", "chart-title", "Сравнение политик"), node("div", "chart-desc", "Одинаковые пороги, меняется набор включённых сигналов. Ни один вариант не объявлен production-ready."));
     const wrap = node("div", "chart-body policy-table-wrap");
     const table = node("table", "policy-table");
     const thead = node("thead");

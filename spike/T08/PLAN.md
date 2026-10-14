@@ -3,11 +3,11 @@
 ## Current status — 2026-10-15
 
 - Policy v2.1 is frozen as an experimental routing rule for the saved pilot. It produced 40 unconfirmed candidates in 32/45 successful responses and no evidence/unlisted review tasks at the configured 0.80 cutoffs. It also produced 6 candidate FP and 7 FN disagreements with preliminary labels; this does not establish safe automation.
-- Offline error audit covers all 6/7 disagreements. Taxonomy 0.4.1 is a separate unapproved, untested proposal; source taxonomy 0.3 and saved Jev outputs remain unchanged.
+- Offline error audit covers all 6/7 disagreements. Latest taxonomy proposal 0.4.2 is separate, unapproved, and untested; proposals 0.4.0/0.4.1 remain preserved parents. Source taxonomy 0.3 and saved Jev outputs remain unchanged.
 - The human annotation packet now contains all 49 non-empty baseline stories without source IDs, draft labels, or model outputs. It is blind to saved model answers, but not to the repository owner; no human annotators have completed it.
 - The separate 60-story visible validation set is unlabelled, unscored, and cannot become a blind benchmark because its inputs were visible to developers.
 - **Ready for T09 experimental handoff only. Not production-ready.** No runtime/OpenAPI integration or new Jev requests were made.
-- Latest checks: 118 offline unit tests and 20 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
+- Latest checks: 132 offline unit tests and 23 Policy/visualization/Playwright tests; Ruff, offline runner and reproducibility checks passed. See `TEST_REPORT.md` and `TEST_REPORT.json`.
 
 ## Quality improvement pass — 2026-10-14
 
@@ -45,6 +45,15 @@
 Current tests and calculations are recorded in `TEST_REPORT.md`, `TEST_REPORT.json`, and `QUALITY_ANALYSIS.json`. Report version 3.0.0 is preserved in `results/archive/TEST_REPORT-3.0.0-pre-policy-v2.1-handoff.*`; the current report records the 2026-10-15 T09-handoff preparation.
 
 Detailed results: TEST_REPORT.md; machine details and metrics: TEST_REPORT.json.
+
+## T08 handoff freeze — 2026-10-15
+
+- Policy `2.1.0-spike` is frozen for offline candidate handoff only; see `POLICY_V2.1.md` and its hash manifest. Released codes are extraction hints, never facts. T09 must create its own source evidence.
+- Reconciled 6 FP and 7 FN disagreements against draft labels. e03/e09/e10 may be label or ontology disputes; e26 is the clearest likely Jev/prompt miss. AI review of e33/e34/e35 and additional disputed topics is advisory, not approved gold.
+- Added taxonomy proposal `0.4.2-spike` as a child of the preserved v0.4.1/v0.4.0 chain. It sharpens event boundaries and separates topic uncertainty from event-evidence uncertainty. It is not live-tested or user-approved; do not apply it to old outputs.
+- Added 40 new unlabelled synthetic inputs for future prospective evaluation. They are visible candidate inputs, not yet a blind benchmark; human annotation and external custody are outstanding.
+- Fixed Windows live-budget ledger initialization to happen under the OS lock; tests cover lock ordering, concurrent duplicate requests, and the final five budget slots.
+- The original v0.3 taxonomy, source corpus and saved Jev responses remain frozen. No new API calls, production changes, OpenAPI changes or later-stage implementation.
 
 ## Live pilot facts
 

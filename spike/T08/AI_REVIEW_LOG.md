@@ -57,3 +57,23 @@ The visualization had a small version-label drift: the calculation/report were P
 `/root/t08_policy_integrity_audit` performed a read-only review of the updated local-only T09 handoff wording, Policy v2.1 routing, and missing-result behavior. The first pass found two UI inconsistencies: the absent-answer technical-attention badge appeared only in Policy v2.1, and Legacy's “accepted by thresholds” filter included rows with no Jev result. Both are fixed: missing outputs show technical attention in both modes while producing no event candidate/review task, and Legacy auto filtering now excludes absent answers. Browser regressions assert the badge in both modes and that the Legacy auto list contains only the 3 saved outputs accepted by current thresholds, not missing e23/e35 (or the other absent rows).
 
 The report regression had a stale expected browser-check count (21 vs. 23 test methods in the current focused suite). Updated the expectation and regenerated checked-in report artifacts from the actual run counts. Follow-up review passed with no findings and confirmed generated `index.html` byte-for-byte matches its builder inputs. Author verification: 23 Policy/visualization/Playwright tests and the full 118-test T08 suite passed. Ruff check/format, JavaScript syntax, offline runner, quality and deep-corpus reproducibility, report reproducibility, and `git diff --check` also passed. No Jev/Polza call was made. User-modified screenshots and `INDUSTRY_RESEARCH.md` remain unmodified and excluded from the task changes.
+
+## Final T08 integration-preparation review — 2026-10-15
+
+Three read-only AI Factory reviews were dispatched for this work:
+
+| Agent | Scope | Result |
+|---|---|---|
+| `/root/error_case_review` | Recompute and explain saved-output FP/FN rows | Confirmed 34 TP / 6 FP / 7 FN at 0.80; found the e34 abstain wording defect and a stale taxonomy proposal reference. |
+| `/root/blind_gold_audit` | Review disputed labels from text before opening Jev results | Suggested human adjudication for e33/e34/e35 and additional topic/status cases. No source label changed; the AI opinions are explicitly provisional. |
+| `/root/policy_v21_review` | Check candidate route and Framework v1 boundary | Confirmed candidate-vs-fact distinction; flagged that v0.3 insufficient-evidence conflates topic and event uncertainty and can conservatively hold event candidates. |
+
+Corrections are recorded in `ERROR_ANALYSIS_V2.1.*`, `GOLD_LABEL_REVIEW_V2.1.*`, the separately versioned taxonomy v0.4.2 proposal, and the frozen Policy v2.1/T09 handoff. Reviewers did not edit files or call APIs. Human gold adjudication, live evaluation of v0.4.2, and production integration remain outstanding.
+
+## Final verification and concurrency follow-up — 2026-10-15
+
+`/root/policy_v21_review` independently found that the report builder's Markdown output hardcoded a READY T09 label even when its machine report had no verification evidence. The renderer now derives the label from `integration_readiness`; a regression asserts a no-run report says NOT READY and the verified report remains READY. A read-only follow-up confirmed both generated reports reproduce and found no remaining issue.
+
+The first final Windows regression run exposed a race in `AttemptLedger._locked`: concurrent callers could all observe an empty lock file and write its initialization byte before obtaining the OS lock. The byte initialization now occurs inside the locked critical section. `/root/compat_security_review` independently reviewed the ordering and asked for regression coverage of initialization order, concurrent duplicates, and the final budget slots. Added deterministic `lock → write → unlock` assertion, an eight-caller same-case/hash test (one reservation), and an eight-caller limit test (exactly five of five remaining slots reserved). The reviewer reran all 8 ledger tests on Windows and found no blocker; separate-process contention remains an untested optional case.
+
+Final author verification on this revision: 132 T08 unit tests passed, 23 Policy/visualization/Playwright tests passed, Ruff check and format passed, JavaScript syntax passed, the offline runner reported `classifier_calls: 0`, and quality/deep-corpus/report reproducibility checks passed. No Jev/Polza request was made. Six user-modified screenshots and the user-owned `visualization/INDUSTRY_RESEARCH.md` were excluded from the changes.

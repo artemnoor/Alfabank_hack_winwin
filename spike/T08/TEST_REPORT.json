@@ -259,12 +259,13 @@
     ]
   },
   "taxonomy_proposal": {
-    "version": "0.4.1-spike",
+    "version": "0.4.2-spike",
     "status": "unvalidated-experimental-proposal",
-    "sha256": "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230",
+    "sha256": "911d607106c093926775ec880918ff7e5aa2ce4a5e1d366b134cfdc550f7bacd",
     "live_requests": 0,
     "approval": "awaiting_user_review",
-    "scope": "boundary wording and annotation guidance only; codes and question schemas unchanged"
+    "scope": false,
+    "requires_new_live_pilot_before_scoring": true
   },
   "human_annotation": {
     "packet_path": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
@@ -290,10 +291,22 @@
     "excluded_from_current_reports": true,
     "is_genuinely_blind": false
   },
+  "future_blind_candidate": {
+    "dataset_id": "t08-future-blind-candidate-inputs",
+    "version": "1.0.0",
+    "case_count": 40,
+    "input_sha256": "ac3b8582c0f228b35259c3dcbba0e1dc3070e079c00fa4d97e0961bc7bd15f7c",
+    "status": "awaiting_independent_human_annotation",
+    "gold_labels_present": false,
+    "model_outputs_present": false,
+    "eligible_for_current_scoring": false,
+    "genuinely_blind_now": false,
+    "maximum_similarity_to_existing_t08_texts": 0.55132
+  },
   "verification": {
     "unit_tests": {
       "command": "py -m unittest discover -s spike/T08 -p 'test*.py' -v",
-      "passed": 118,
+      "passed": 132,
       "failed": 0,
       "skipped": 0,
       "status": "PASS"
@@ -303,31 +316,35 @@
       "passed": 23,
       "failed": 0,
       "skipped": 0,
+      "status": "PASS",
       "includes_playwright": true
     },
     "ruff_check": "PASS",
     "ruff_format_check": "PASS",
     "offline_runner_classifier_calls": 0,
+    "offline_runner_status": "PASS",
     "quality_analysis_reproducibility": "PASS",
     "deep_corpus_audit_reproducibility": "PASS",
     "validation_asset_builder": "PASS",
     "javascript_syntax": "PASS",
     "git_diff_checks": "PASS",
-    "new_jev_api_requests": 0
+    "new_jev_api_requests": 0,
+    "status_source": "explicit command-line run evidence; unprovided checks remain NOT_RUN"
   },
   "independent_review": {
     "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",
     "reviewer": "AI Factory read-only reviews",
-    "scope": "saved-output error reconciliation and taxonomy checks; plus Policy v2.1 statistics chart consistency, active-policy candidate/error data, threshold and proposed-label updates",
+    "scope": "saved-output FP/FN reconciliation, disputed-label review, v0.4.2 proposal boundaries, future blind-candidate integrity, Policy v2.1 routing and T09 contract boundary",
     "reviewer_ran_tests": false,
     "ai_review_is_human_gold": false,
     "limitations": "Reviewers did not run tests; the author ran regression tests after corrections. AI review is not a human-adjudicated benchmark."
   },
   "remaining_risks": [
     "Draft labels are single-author and several boundary cases remain disputed.",
-    "The 60 candidate texts are visible to the owner, unlabelled and not a completed blind benchmark.",
+    "The existing 60 visible-validation texts are not blind; the new 40-case candidate pool is also repository-visible and awaits independent human labels/custody.",
     "Policy v2.1 produces six candidate disagreements (including three provisional high-consequence false positives) on draft labels; zero review in this sample does not establish safe automation.",
-    "Taxonomy 0.4.1 has not been evaluated with Jev.",
+    "Taxonomy 0.4.2 has not been evaluated with Jev; its revised uncertainty question changes signal semantics.",
+    "Taxonomy v0.3 insufficient-evidence combines topic and event uncertainty, so Policy v2.1 can conservatively hold candidates on topic-only doubt.",
     "The current source revision and provider upstream identity have not been live-verified; historical HTTP 451 cause and sanitized failures remain unknown.",
     "There is no production DTO, policy, evidence provenance, history or replay integration."
   ],
@@ -335,9 +352,12 @@
   "artifacts": {
     "error_analysis": "spike/T08/ERROR_ANALYSIS_V2.1.md",
     "error_analysis_json": "spike/T08/ERROR_ANALYSIS_V2.1.json",
-    "taxonomy_proposal": "spike/T08/experiments/taxonomy-v0.4.1-proposal/",
+    "taxonomy_proposal": "spike/T08/experiments/taxonomy-v0.4.2-proposal/",
     "human_annotation_packet": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
     "visible_validation_set": "spike/T08/experiments/visible-validation-v1/",
+    "future_blind_candidate": "spike/T08/experiments/future-blind-candidate-v1/",
+    "gold_review": "spike/T08/GOLD_LABEL_REVIEW_V2.1.md",
+    "policy_freeze": "spike/T08/POLICY_V2.1.manifest.json",
     "t09_handoff_note": "spike/T08/T09_HANDOFF.md",
     "historical_report_archive": "spike/T08/results/archive/TEST_REPORT-3.0.0-pre-policy-v2.1-handoff.*"
   }

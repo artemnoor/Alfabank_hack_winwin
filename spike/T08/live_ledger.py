@@ -51,8 +51,6 @@ class AttemptLedger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(self.lock_path, os.O_CREAT | os.O_RDWR, 0o600)
         try:
-            if os.fstat(descriptor).st_size == 0:
-                os.write(descriptor, b"\0")
             os.lseek(descriptor, 0, os.SEEK_SET)
             if os.name == "nt":
                 import msvcrt
@@ -63,6 +61,11 @@ class AttemptLedger:
 
                 fcntl.flock(descriptor, fcntl.LOCK_EX)
             try:
+                # Initialize the lock byte only after acquiring the OS lock.
+                # Writing before locking lets simultaneous Windows callers
+                # race while the lock file is still empty.
+                if os.fstat(descriptor).st_size == 0:
+                    os.write(descriptor, b"\0")
                 yield
             finally:
                 if os.name == "nt":

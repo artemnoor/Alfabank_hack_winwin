@@ -1,4 +1,6 @@
-# Предложение taxonomy v0.4.0-spike
+# Историческое предложение taxonomy v0.4.0-spike
+
+> Это сохранённая версия цепочки proposals. Последнее предложение — [`TAXONOMY_PROPOSAL_V0.4.2.md`](TAXONOMY_PROPOSAL_V0.4.2.md); v0.4.0 не заменяет его и остаётся неизменным.
 
 **Статус:** draft / awaiting user review / not evaluated. Это предложение не заменяет и не меняет `taxonomy.json` v0.3.0-spike. Новый live прогон не выполнялся, поэтому улучшение Jev не доказано.
 

@@ -1,0 +1,29 @@
+{
+  "proposal_id": "t08-jev-taxonomy-proposal",
+  "version": "0.4.2-spike",
+  "status": "unvalidated-experimental-proposal",
+  "parent": {
+    "version": "0.4.1-spike",
+    "path": "spike/T08/experiments/taxonomy-v0.4.1-proposal/taxonomy.json",
+    "sha256": "fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230",
+    "manifest_sha256": "0a002a129b7d1fcf711ac194ffaad6f63f087e6e3df9557bff1a8d63b36aadd5"
+  },
+  "baseline": {
+    "version": "0.3.0-spike",
+    "path": "spike/T08/taxonomy.json",
+    "sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d"
+  },
+  "proposal_path": "spike/T08/experiments/taxonomy-v0.4.2-proposal/taxonomy.json",
+  "proposal_sha256": "911d607106c093926775ec880918ff7e5aa2ce4a5e1d366b134cfdc550f7bacd",
+  "source_error_audit": "spike/T08/ERROR_ANALYSIS_V2.1.json",
+  "source_human_review_packet": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
+  "saved_outputs_used_for_proposal": true,
+  "new_jev_requests": 0,
+  "approval": "awaiting_user_review",
+  "evaluation_status": "not_live_tested; no quality improvement claim",
+  "code_and_threshold_changes": false,
+  "contract_or_production_changes": false,
+  "topic_uncertainty_signal_changed": true,
+  "requires_new_live_pilot_before_scoring": true,
+  "gold_status": "preliminary_single_author; disputed cases require human adjudication"
+}

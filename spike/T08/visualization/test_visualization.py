@@ -211,9 +211,11 @@ class BrowserAcceptanceTests(unittest.TestCase):
             page = browser.new_page(viewport={"width": 1440, "height": 1000})
             page.on(
                 "request",
-                lambda request: external_requests.append(request.url)
-                if request.url.startswith(("http:", "https:"))
-                else None,
+                lambda request: (
+                    external_requests.append(request.url)
+                    if request.url.startswith(("http:", "https:"))
+                    else None
+                ),
             )
             page.on("pageerror", lambda error: page_errors.append(str(error)))
             page.goto(OUTPUT_PATH.resolve().as_uri(), wait_until="load")

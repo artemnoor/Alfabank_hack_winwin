@@ -312,6 +312,133 @@ class AttemptLedgerTests(unittest.TestCase):
             self.assertEqual(ledger.count(), 25)
             self.assertEqual(sorted(start for start, _ in reserved), list(range(1, 25)))
             self.assertEqual(sorted(end for _, end in reserved), list(range(2, 26)))
+            self.assertEqual(ledger.lock_path.stat().st_size, 1)
+
+    def test_lock_byte_initialization_happens_after_os_lock(self) -> None:
+        if os.name == "nt":
+            import msvcrt
+
+            lock_module = msvcrt
+            lock_name = "locking"
+            acquire_value = msvcrt.LK_LOCK
+            original_lock = msvcrt.locking
+
+            def lock(fd: int, operation: int, byte_count: int) -> None:
+                nonlocal lock_held
+                original_lock(fd, operation, byte_count)
+                lock_held = operation == acquire_value
+
+        else:
+            import fcntl
+
+            lock_module = fcntl
+            lock_name = "flock"
+            acquire_value = fcntl.LOCK_EX
+            original_lock = fcntl.flock
+
+            def lock(fd: int, operation: int) -> None:
+                nonlocal lock_held
+                original_lock(fd, operation)
+                lock_held = operation == acquire_value
+
+        with tempfile.TemporaryDirectory() as temporary:
+            ledger = self._test_ledger(Path(temporary) / "attempts.json")
+            lock_held = False
+            events: list[str] = []
+            original_write = os.write
+
+            def tracked_lock(fd: int, operation: int, *args: int) -> None:
+                lock(fd, operation, *args)
+                events.append("lock" if operation == acquire_value else "unlock")
+
+            def tracked_write(fd: int, content: bytes) -> int:
+                self.assertTrue(lock_held, "lock byte was written before locking")
+                events.append("write")
+                return original_write(fd, content)
+
+            with (
+                patch.object(lock_module, lock_name, side_effect=tracked_lock),
+                patch("os.write", side_effect=tracked_write),
+            ):
+                with ledger._locked():
+                    pass
+
+            self.assertEqual(events, ["lock", "write", "unlock"])
+            self.assertEqual(ledger.lock_path.stat().st_size, 1)
+
+    def test_concurrent_duplicate_reservations_only_consume_budget_once(self) -> None:
+        import hashlib
+        import threading
+        from concurrent.futures import ThreadPoolExecutor
+
+        from live_ledger import AttemptLedger
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            self._test_ledger(path)
+            request = (
+                "same-concurrent-case",
+                hashlib.sha256(b"same concurrent request").hexdigest(),
+            )
+            barrier = threading.Barrier(8)
+
+            def reserve(index: int) -> str:
+                barrier.wait()
+                try:
+                    AttemptLedger(path).reserve(*request)
+                except SpikeError as error:
+                    return str(error)
+                return f"reserved-{index}"
+
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                outcomes = list(pool.map(reserve, range(8)))
+
+            self.assertEqual(
+                sum(value.startswith("reserved-") for value in outcomes), 1
+            )
+            self.assertEqual(outcomes.count("request_already_in_live_ledger"), 7)
+            self.assertEqual(AttemptLedger(path).count(), 2)
+
+    def test_concurrent_reservations_do_not_exceed_remaining_call_budget(self) -> None:
+        import hashlib
+        import threading
+        from concurrent.futures import ThreadPoolExecutor
+
+        from live_ledger import AttemptLedger, MAX_CUMULATIVE_ATTEMPTS
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            ledger = self._test_ledger(path)
+            for index in range(MAX_CUMULATIVE_ATTEMPTS - 5 - 1):
+                ledger.reserve(
+                    f"preexisting-{index}",
+                    hashlib.sha256(f"preexisting-{index}".encode()).hexdigest(),
+                )
+            self.assertEqual(ledger.count(), MAX_CUMULATIVE_ATTEMPTS - 5)
+
+            requests = [
+                (
+                    f"limit-race-{index}",
+                    hashlib.sha256(f"limit-race-{index}".encode()).hexdigest(),
+                )
+                for index in range(8)
+            ]
+            barrier = threading.Barrier(len(requests))
+
+            def reserve(item: tuple[str, str]) -> str:
+                barrier.wait()
+                try:
+                    AttemptLedger(path).reserve(*item)
+                except SpikeError as error:
+                    return str(error)
+                return "reserved"
+
+            with ThreadPoolExecutor(max_workers=len(requests)) as pool:
+                outcomes = list(pool.map(reserve, requests))
+
+            self.assertEqual(outcomes.count("reserved"), 5)
+            self.assertEqual(outcomes.count("cumulative_live_call_limit_reached"), 3)
+            self.assertEqual(ledger.count(), MAX_CUMULATIVE_ATTEMPTS)
 
     def test_ledger_reconciles_a_known_historical_attempt(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

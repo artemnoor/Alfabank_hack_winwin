@@ -16,10 +16,13 @@ POLICY_PATH = SPIKE_DIR / "visualization" / "policy-v2-results.json"
 ERROR_PATH = SPIKE_DIR / "ERROR_ANALYSIS_V2.1.json"
 ERROR_MANIFEST_PATH = SPIKE_DIR / "ERROR_ANALYSIS_V2.1.manifest.json"
 TAXONOMY_MANIFEST_PATH = (
-    SPIKE_DIR / "experiments" / "taxonomy-v0.4.1-proposal" / "manifest.json"
+    SPIKE_DIR / "experiments" / "taxonomy-v0.4.2-proposal" / "manifest.json"
 )
 VALIDATION_MANIFEST_PATH = (
     SPIKE_DIR / "experiments" / "visible-validation-v1" / "manifest.json"
+)
+FUTURE_BLIND_MANIFEST_PATH = (
+    SPIKE_DIR / "experiments" / "future-blind-candidate-v1" / "manifest.json"
 )
 REPORT_JSON_PATH = SPIKE_DIR / "TEST_REPORT.json"
 REPORT_MD_PATH = SPIKE_DIR / "TEST_REPORT.md"
@@ -47,6 +50,9 @@ def build_report(
     browser_tests_passed: int,
     failed: int = 0,
     skipped: int = 0,
+    browser_tests_failed: int = 0,
+    browser_tests_skipped: int = 0,
+    check_statuses: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     quality = _read(QUALITY_PATH)
     deep = _read(DEEP_AUDIT_PATH)
@@ -55,6 +61,7 @@ def build_report(
     error_manifest = _read(ERROR_MANIFEST_PATH)
     taxonomy_manifest = _read(TAXONOMY_MANIFEST_PATH)
     validation_manifest = _read(VALIDATION_MANIFEST_PATH)
+    future_blind_manifest = _read(FUTURE_BLIND_MANIFEST_PATH)
 
     source = quality["generated_from"]
     legacy_metrics = quality["reproduction"]["legacy_metrics"]
@@ -63,6 +70,42 @@ def build_report(
     legacy_policy = policy["legacy"]
     v21 = policy["policy_v2"]
     event_metrics = v21["event_output_metrics"]
+    check_names = (
+        "ruff_check",
+        "ruff_format_check",
+        "offline_runner",
+        "quality_analysis_reproducibility",
+        "deep_corpus_audit_reproducibility",
+        "validation_asset_builder",
+        "javascript_syntax",
+        "git_diff_checks",
+    )
+    observed_checks = check_statuses or {}
+    if set(observed_checks) - set(check_names):
+        raise ValueError("unknown verification check status")
+    if any(
+        status not in {"PASS", "FAIL", "NOT_RUN"} for status in observed_checks.values()
+    ):
+        raise ValueError("verification statuses must be PASS, FAIL, or NOT_RUN")
+    observed_checks = {
+        name: observed_checks.get(name, "NOT_RUN") for name in check_names
+    }
+    unit_status = "FAIL" if failed else "PASS" if unit_tests_passed > 0 else "NOT_RUN"
+    browser_status = (
+        "FAIL"
+        if browser_tests_failed
+        else "PASS"
+        if browser_tests_passed > 0
+        else "NOT_RUN"
+    )
+    all_checks_pass = all(status == "PASS" for status in observed_checks.values())
+    any_check_failed = any(status == "FAIL" for status in observed_checks.values())
+    if failed or browser_tests_failed or any_check_failed:
+        engineering_status = "FAIL"
+    elif unit_status == "PASS" and browser_status == "PASS" and all_checks_pass:
+        engineering_status = "PASS"
+    else:
+        engineering_status = "INCOMPLETE"
 
     if errors["saved_answer_count"] != 45:
         raise ValueError("error audit must reconcile the pinned 45 saved answers")
@@ -84,7 +127,7 @@ def build_report(
         "scope": "spike/T08 only; offline analysis; no production, OpenAPI, or Jev changes",
         "verdicts": {
             "engineering_quality": {
-                "status": "PASS" if failed == 0 else "FAIL",
+                "status": engineering_status,
                 "scope": "offline implementation and listed regression checks",
             },
             "api_compatibility": {
@@ -96,7 +139,11 @@ def build_report(
                 "scope": "descriptive results use synthetic inputs and preliminary single-author labels",
             },
             "integration_readiness": {
-                "status": "READY_FOR_EXPERIMENTAL_T09_HANDOFF_ONLY",
+                "status": (
+                    "READY_FOR_EXPERIMENTAL_T09_HANDOFF_ONLY"
+                    if engineering_status == "PASS"
+                    else "INCOMPLETE_VERIFICATION"
+                ),
                 "production_ready": False,
             },
         },
@@ -215,9 +262,12 @@ def build_report(
             "version": taxonomy_manifest["version"],
             "status": taxonomy_manifest["status"],
             "sha256": taxonomy_manifest["proposal_sha256"],
-            "live_requests": taxonomy_manifest["live_requests"],
+            "live_requests": taxonomy_manifest["new_jev_requests"],
             "approval": taxonomy_manifest["approval"],
-            "scope": taxonomy_manifest["change_scope"],
+            "scope": taxonomy_manifest["code_and_threshold_changes"],
+            "requires_new_live_pilot_before_scoring": taxonomy_manifest[
+                "requires_new_live_pilot_before_scoring"
+            ],
         },
         "human_annotation": {
             "packet_path": error_manifest["model_blind_review_packet_path"],
@@ -249,54 +299,85 @@ def build_report(
             ],
             "is_genuinely_blind": validation_manifest["is_genuinely_blind"],
         },
+        "future_blind_candidate": {
+            "dataset_id": future_blind_manifest["dataset_id"],
+            "version": future_blind_manifest["version"],
+            "case_count": future_blind_manifest["cases"],
+            "input_sha256": future_blind_manifest["news_sha256"],
+            "status": future_blind_manifest["status"],
+            "gold_labels_present": future_blind_manifest["gold_labels_present"],
+            "model_outputs_present": future_blind_manifest["model_outputs_present"],
+            "eligible_for_current_scoring": future_blind_manifest[
+                "eligible_for_current_scoring"
+            ],
+            "genuinely_blind_now": future_blind_manifest["genuinely_blind_now"],
+            "maximum_similarity_to_existing_t08_texts": future_blind_manifest[
+                "maximum_similarity_to_existing_t08_texts"
+            ],
+        },
         "verification": {
             "unit_tests": {
                 "command": "py -m unittest discover -s spike/T08 -p 'test*.py' -v",
                 "passed": unit_tests_passed,
                 "failed": failed,
                 "skipped": skipped,
-                "status": "PASS" if failed == 0 else "FAIL",
+                "status": unit_status,
             },
             "policy_and_browser_tests": {
                 "command": "py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v",
                 "passed": browser_tests_passed,
-                "failed": 0,
-                "skipped": 0,
+                "failed": browser_tests_failed,
+                "skipped": browser_tests_skipped,
+                "status": browser_status,
                 "includes_playwright": True,
             },
-            "ruff_check": "PASS",
-            "ruff_format_check": "PASS",
+            "ruff_check": observed_checks["ruff_check"],
+            "ruff_format_check": observed_checks["ruff_format_check"],
             "offline_runner_classifier_calls": 0,
-            "quality_analysis_reproducibility": "PASS",
-            "deep_corpus_audit_reproducibility": "PASS",
-            "validation_asset_builder": "PASS",
-            "javascript_syntax": "PASS",
-            "git_diff_checks": "PASS",
+            "offline_runner_status": observed_checks["offline_runner"],
+            "quality_analysis_reproducibility": observed_checks[
+                "quality_analysis_reproducibility"
+            ],
+            "deep_corpus_audit_reproducibility": observed_checks[
+                "deep_corpus_audit_reproducibility"
+            ],
+            "validation_asset_builder": observed_checks["validation_asset_builder"],
+            "javascript_syntax": observed_checks["javascript_syntax"],
+            "git_diff_checks": observed_checks["git_diff_checks"],
             "new_jev_api_requests": 0,
+            "status_source": "explicit command-line run evidence; unprovided checks remain NOT_RUN",
         },
         "independent_review": {
             "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",
             "reviewer": "AI Factory read-only reviews",
-            "scope": "saved-output error reconciliation and taxonomy checks; plus Policy v2.1 statistics chart consistency, active-policy candidate/error data, threshold and proposed-label updates",
+            "scope": "saved-output FP/FN reconciliation, disputed-label review, v0.4.2 proposal boundaries, future blind-candidate integrity, Policy v2.1 routing and T09 contract boundary",
             "reviewer_ran_tests": False,
             "ai_review_is_human_gold": False,
             "limitations": "Reviewers did not run tests; the author ran regression tests after corrections. AI review is not a human-adjudicated benchmark.",
         },
         "remaining_risks": [
             "Draft labels are single-author and several boundary cases remain disputed.",
-            "The 60 candidate texts are visible to the owner, unlabelled and not a completed blind benchmark.",
+            "The existing 60 visible-validation texts are not blind; the new 40-case candidate pool is also repository-visible and awaits independent human labels/custody.",
             "Policy v2.1 produces six candidate disagreements (including three provisional high-consequence false positives) on draft labels; zero review in this sample does not establish safe automation.",
-            "Taxonomy 0.4.1 has not been evaluated with Jev.",
+            "Taxonomy 0.4.2 has not been evaluated with Jev; its revised uncertainty question changes signal semantics.",
+            "Taxonomy v0.3 insufficient-evidence combines topic and event uncertainty, so Policy v2.1 can conservatively hold candidates on topic-only doubt.",
             "The current source revision and provider upstream identity have not been live-verified; historical HTTP 451 cause and sanitized failures remain unknown.",
             "There is no production DTO, policy, evidence provenance, history or replay integration.",
         ],
-        "recommendation": "Ready for experimental handoff of unconfirmed event candidates to the next-stage team; not ready for production or automatic classification.",
+        "recommendation": (
+            "Ready for experimental handoff of unconfirmed event candidates to the next-stage team; not ready for production or automatic classification."
+            if engineering_status == "PASS"
+            else "Verification is incomplete or failed; do not use this report as a T09 handoff approval."
+        ),
         "artifacts": {
             "error_analysis": "spike/T08/ERROR_ANALYSIS_V2.1.md",
             "error_analysis_json": "spike/T08/ERROR_ANALYSIS_V2.1.json",
-            "taxonomy_proposal": "spike/T08/experiments/taxonomy-v0.4.1-proposal/",
+            "taxonomy_proposal": "spike/T08/experiments/taxonomy-v0.4.2-proposal/",
             "human_annotation_packet": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
             "visible_validation_set": "spike/T08/experiments/visible-validation-v1/",
+            "future_blind_candidate": "spike/T08/experiments/future-blind-candidate-v1/",
+            "gold_review": "spike/T08/GOLD_LABEL_REVIEW_V2.1.md",
+            "policy_freeze": "spike/T08/POLICY_V2.1.manifest.json",
             "t09_handoff_note": "spike/T08/T09_HANDOFF.md",
             "historical_report_archive": "spike/T08/results/archive/TEST_REPORT-3.0.0-pre-policy-v2.1-handoff.*",
         },
@@ -311,6 +392,12 @@ def render_markdown(report: dict[str, Any]) -> str:
     tests = report["verification"]
     verdicts = report["verdicts"]
     errors = report["error_disagreements"]
+    handoff_status = verdicts["integration_readiness"]["status"]
+    handoff_label = (
+        "READY — только экспериментальная передача кандидатов"
+        if handoff_status == "READY_FOR_EXPERIMENTAL_T09_HANDOFF_ONLY"
+        else f"NOT READY — {handoff_status}"
+    )
     lines = [
         "# T08 — итоговая offline-приёмка и передача кандидатов",
         "",
@@ -325,7 +412,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"| Engineering quality | **{verdicts['engineering_quality']['status']}** | Офлайн-проверки и воспроизводимость перечисленных артефактов. |",
         f"| API compatibility | **{verdicts['api_compatibility']['status']}** | Сохранённые ответы есть, но текущая версия клиента не проверялась live. |",
         f"| Model quality | **{verdicts['model_quality']['status']}** | Предварительные метрики не доказывают качество для решения. |",
-        "| T09 handoff | **READY — экспериментальные кандидаты** | Не является production-ready интеграцией. |",
+        f"| T09 handoff | **{handoff_label}** | Не является production-ready интеграцией. |",
         "",
         "## Что показывают сохранённые ответы",
         "",
@@ -363,20 +450,23 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         f"Набор из {report['visible_validation_set']['case_count']} новых синтетических текстов имеет роль {report['visible_validation_set']['benchmark_role']}, hash {report['visible_validation_set']['input_sha256']}. Нет labels/ответов Jev; набор исключён из метрик. Его тексты видели разработчики, поэтому он не может стать финальным blind test.",
         "",
+        f"Создан отдельный пул из {report['future_blind_candidate']['case_count']} новых inputs, hash {report['future_blind_candidate']['input_sha256']}; он не основан на текущих Jev ошибках и исключён из scoring. Labels и outputs отсутствуют; поскольку тексты уже видимы в репозитории, это пока не blind benchmark. Требуются две human разметки и независимый custodian.",
+        "",
         "AI-review — вспомогательное мнение, не человеческий gold. Для gold нужны два независимых человека и третий adjudicator.",
         "",
         "## Проверки этого состояния",
         "",
         f"- Unit suite: {tests['unit_tests']['passed']} passed, {tests['unit_tests']['failed']} failed, {tests['unit_tests']['skipped']} skipped.",
         f"- Policy/visualization/Playwright suite: {tests['policy_and_browser_tests']['passed']} passed, {tests['policy_and_browser_tests']['failed']} failed, {tests['policy_and_browser_tests']['skipped']} skipped.",
-        "- Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: PASS.",
+        f"- Ruff check/format, offline runner, quality analysis, deep-corpus audit, asset builder, JavaScript syntax and diff checks: {tests['ruff_check']}/{tests['ruff_format_check']}/{tests['offline_runner_status']}/{tests['quality_analysis_reproducibility']}/{tests['deep_corpus_audit_reproducibility']}/{tests['validation_asset_builder']}/{tests['javascript_syntax']}/{tests['git_diff_checks']}.",
+        "- Отчёт не запускает эти команды: статусы переданы явно после запусков; если аргумент не указан, он остаётся NOT_RUN.",
         "- Новых Jev/Polza AI запросов: 0.",
         "",
         "## Риски и решение",
         "",
         "- Голд не adjudicated; границы e03/e09/e10/e18/e25/e26/e27/e28/e32/e33/e34 требуют человеческой проверки.",
-        "- Taxonomy 0.4.1 не протестирована на модели; нельзя утверждать, что она улучшает Jev.",
-        "- 60 visible validation-кандидатов ещё не размечены; поскольку разработчики видели inputs, они не подходят для финального blind test. Нужен новый набор от независимого custodian после freeze.",
+        "- Taxonomy v0.4.2 не протестирована на Jev; изменение вопроса о недостаточности доказательств требует отдельного live-пилота, поэтому улучшение не доказано.",
+        "- Набор из 60 visible-validation текстов уже видели разработчики и он не является blind. Новый пул из 40 inputs также видим в репозитории и пока только кандидат: перед слепой проверкой его нужно передать независимому custodian, получить две независимые человеческие разметки и adjudication.",
         "- Текущий клиент не проверен live; причина прежних HTTP 451 и четырёх ошибок пилота неизвестна. Повторов не было.",
         "- Нет runtime DTO/policy/provenance integration. Передача в T09 только экспериментальная и текстовая.",
         "",
@@ -394,6 +484,24 @@ def main() -> int:
     parser.add_argument("--browser-tests-passed", type=int, required=True)
     parser.add_argument("--tests-failed", type=int, default=0)
     parser.add_argument("--tests-skipped", type=int, default=0)
+    parser.add_argument("--browser-tests-failed", type=int, default=0)
+    parser.add_argument("--browser-tests-skipped", type=int, default=0)
+    for check_name in (
+        "ruff-check",
+        "ruff-format-check",
+        "offline-runner",
+        "quality-analysis-reproducibility",
+        "deep-corpus-audit-reproducibility",
+        "validation-asset-builder",
+        "javascript-syntax",
+        "git-diff-checks",
+    ):
+        parser.add_argument(
+            f"--{check_name}",
+            dest=check_name.replace("-", "_"),
+            choices=("PASS", "FAIL", "NOT_RUN"),
+            default="NOT_RUN",
+        )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if (
@@ -402,6 +510,8 @@ def main() -> int:
             args.browser_tests_passed,
             args.tests_failed,
             args.tests_skipped,
+            args.browser_tests_failed,
+            args.browser_tests_skipped,
         )
         < 0
     ):
@@ -411,6 +521,18 @@ def main() -> int:
         browser_tests_passed=args.browser_tests_passed,
         failed=args.tests_failed,
         skipped=args.tests_skipped,
+        browser_tests_failed=args.browser_tests_failed,
+        browser_tests_skipped=args.browser_tests_skipped,
+        check_statuses={
+            "ruff_check": args.ruff_check,
+            "ruff_format_check": args.ruff_format_check,
+            "offline_runner": args.offline_runner,
+            "quality_analysis_reproducibility": args.quality_analysis_reproducibility,
+            "deep_corpus_audit_reproducibility": args.deep_corpus_audit_reproducibility,
+            "validation_asset_builder": args.validation_asset_builder,
+            "javascript_syntax": args.javascript_syntax,
+            "git_diff_checks": args.git_diff_checks,
+        },
     )
     json_text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     markdown_text = render_markdown(report)

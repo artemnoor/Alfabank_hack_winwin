@@ -53,7 +53,7 @@ def _sha256(raw: bytes) -> str:
 def _read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
-        raise ValueError(f"expected JSON object: {path}")
+        raise TypeError(f"expected JSON object: {path}")
     return value
 
 
@@ -640,7 +640,7 @@ def _error_audit() -> dict[str, Any]:
             "case_id": "e34-multi-insolvency-legal",
             "event_code": "legal_enforcement",
             "evidence": "кредитор подал в суд заявление о банкротстве; судебная процедура начата",
-            "observed_issue": "Score 0.29 отрицательный; insolvency_default передан, отдельное судебное действие — нет.",
+            "observed_issue": "Score 0.29 находится в abstain band (>0.20 и <0.80); insolvency_default передан, отдельное судебное действие — нет.",
             "likely_cause": "Модель могла объединить заявление кредитора с меткой неплатёжеспособности; taxonomy должна различать дефолт и отдельное обращение в суд.",
             "taxonomy_action": "v0.4.1 требует обе метки при отдельном заявлении кредитора; обычная регистрация банкротства сама по себе остаётся одним событием.",
             "human_review": "Подтвердить и пропуск платежа, и отдельно поданное заявление в суд.",
@@ -747,7 +747,7 @@ def _render_model_blind_packet() -> str:
     cases = [case for case in corpus if case.get("text", "").strip()]
     cases.sort(
         key=lambda case: hashlib.sha256(
-            f"{EXPECTED_CORPUS_SHA256}:{case['id']}".encode("utf-8")
+            f"{EXPECTED_CORPUS_SHA256}:{case['id']}".encode()
         ).hexdigest()
     )
     lines = [

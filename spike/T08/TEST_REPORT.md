@@ -137,3 +137,33 @@ Next: human-adjudicate e33/e34/e35 and topic ties, freeze a genuinely blind gold
 **Can we trust Jev to classify Russian business news now? No. The quality has not been proved.**
 
 See [RESULTS_SUMMARY_RU.md](RESULTS_SUMMARY_RU.md), [ERROR_ANALYSIS.md](ERROR_ANALYSIS.md), [UNCERTAINTY_ANALYSIS.md](UNCERTAINTY_ANALYSIS.md), [THRESHOLD_COMPARISON.md](THRESHOLD_COMPARISON.md), and [NEXT_STEPS.md](NEXT_STEPS.md) for detailed evidence and owner decisions.
+
+## Addendum — error audit, blind-candidate inputs, and T09 handoff
+
+This addendum preserves the preceding pilot results and records the latest preparation work. The 6 FP and 7 FN lists are generated/reconciled against the same pinned Policy v2.1 output. Their interpretations remain **draft-label disagreements**, not confirmed Jev errors. Per-case text, score/state, likely cause, evidence quote, minimal taxonomy action, and human decision are in `ERROR_ANALYSIS_V2.1.md` and `ERROR_ANALYSIS_V2.1.json`. A separate model-blind first-pass sheet for e03/e09/e10/e18/e25/e26/e27/e28/e32/e33/e34/e35 is `HUMAN_REVIEW_PACKET_V2.1.md`; it omits draft labels and model scores until a human records their own assessment.
+
+Offline analysis suggests four groups: overlapping class descriptions (customs measures vs general regulation; generic fines vs sanctions; production vs shipment/environment); threshold abstains below 0.80 (e03, e18, e28, e33); low score despite direct text criteria (e26); and unresolved gold completeness (notably e03/e25 and the previously flagged e33/e34/e35). The analysis explicitly does not lower thresholds or rewrite v0.3 labels.
+
+Minimal boundary fixes were added only to new proposal `experiments/taxonomy-v0.4.1-proposal/`. It preserves v0.3 and v0.4, registry codes, and question fields; it is unapproved, has zero live calls, and is unevaluated. It cannot be described as improving Jev.
+
+`experiments/blind-candidate-v1/` contains 60 newly authored synthetic news texts with input-only records. There are no expected labels, Jev outputs, or result scores. It is excluded from current metrics and all threshold/taxonomy fitting. Since the owner can see these inputs and no independent human gold exists, it is a **candidate holdout awaiting annotation**, not a completed blind benchmark. The guide requires two independent annotators, evidence spans, human adjudication, frozen taxonomy, and separately controlled labels.
+
+`T09_HANDOFF.md` records the spike-level candidate fields and limits. Candidates are unconfirmed; the saved Jev response has no evidence spans. This is a handoff note only: no T09 code, public contract, production runtime, or network integration was added.
+
+Fresh verification for this addendum is recorded after implementation below. No new Jev/Polza AI requests were made.
+
+### Verification for this addendum
+
+- `py -m unittest discover -s spike/T08 -p 'test*.py' -v` — **117 passed, 0 failed, 0 skipped**.
+- `py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v` — **19 passed, 0 failed, 0 skipped**, including browser checks.
+- `py -m ruff check spike/T08` — **PASS**; `py -m ruff format --check spike/T08` — **PASS**, 23 files formatted.
+- `py spike/T08/run_spike.py` — **PASS**, offline validation only, 0 classifier calls.
+- `py spike/T08/quality_analysis.py --check` — **PASS**, historical report reproducible.
+- `py spike/T08/deep_corpus_audit.py --check` — **PASS**, historical corpus audit reproducible.
+- `py spike/T08/build_t08_validation_assets.py` — **PASS**; taxonomy 0.4.1 SHA-256 `fd127a0913573a4bfeb42dcd7fe8a4cac6d426b43a4e62ac592d73fc60a45230`; blind candidate inputs 60 cases, SHA-256 `3d1f3c6cca97437216c8b023c008fccc630cda6aa23249724e60a9d9c64c9e6d`.
+- `node --check spike/T08/visualization/app.js` and `git diff --check` — **PASS**.
+- New tests compare all 60 texts against the baseline and deep-v1 splits and against one another for near-duplicates, assert that no labels or model outputs are present, pin the proposal/holdout hashes, reconcile the 6/7 error lists, and keep the blind candidate excluded from current scoring.
+- Independent AI Factory review of this addendum: **PASS, no blocking or material findings**. The reviewer independently reconciled the 6/7 disagreements, checked that the v0.4.1 proposal keeps the existing codes/questions and is clearly unvalidated, and confirmed the 60-case set contains inputs only and is excluded from scoring. The reviewer did not run tests; test results above are from this workspace. Limitation remains: candidate texts are visible to the project owner and have no human labels, so this is not yet a genuinely blind benchmark. AI review is not human gold adjudication.
+- Ruff identified and the pass fixed an uninitialized local in the existing T08 redirect-safety test; the test behavior remains the same. No live transport was used.
+
+The previously proposed paired live taxonomy comparison is still **not authorized and was not run**. Before any future spend, the owner must adjudicate labels and decide whether to test v0.3, v0.4.0 or the new unvalidated v0.4.1 proposal. The 60-case candidate set must not be used to tune that choice or its thresholds.

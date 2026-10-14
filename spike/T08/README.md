@@ -42,3 +42,12 @@
 - Aggregate v4: `results/jev-live-aggregate-20261014-v4.json`; historical bytes and prior report copied to `results/archive/` before updates.
 
 Не сохранять ключи, raw provider responses или prompts. Изменения ограничены `spike/T08`; main runtime и OpenAPI остаются без изменений.
+
+## Подготовка к следующему этапу
+
+- Разбор всех 6 FP-кандидатов и 7 FN-кандидатов Policy v2.1: `ERROR_ANALYSIS_V2.1.md` и `ERROR_ANALYSIS_V2.1.json`. Это расхождения с предварительными метками одного автора, не adjudicated model errors.
+- `HUMAN_REVIEW_PACKET_V2.1.md` — отдельный model-blind первичный лист для e03/e09/e10/e18/e25/e26/e27/e28/e32/e33/e34/e35. В нём нет draft labels и Jev scores; e35 отмечен как кейс без сохранённого ответа.
+- Предложение taxonomy `0.4.1-spike`: `experiments/taxonomy-v0.4.1-proposal/`. Оно уточняет только границы и правила разметки, сохраняет коды и вопросы, не меняет v0.3/v0.4, не тестировалось live и ждёт решения владельца.
+- Candidate holdout из 60 новых синтетических текстов: `experiments/blind-candidate-v1/`. В корпусе нет model outputs и gold labels, он исключён из текущих отчётов и sweeps. Он ждёт независимой разметки и пока не является завершённым blind benchmark.
+- `T09_HANDOFF.md` описывает экспериментальную передачу неподтверждённых event-кандидатов. Это не DTO и не runtime-интеграция; T09 должен привязать свои утверждения к источнику и evidence spans.
+- Проверка материалов: `python -m unittest discover -s spike/T08 -p "test*.py" -v`; сборка proposal/report: `python spike/T08/build_t08_validation_assets.py`.

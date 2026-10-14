@@ -1,0 +1,262 @@
+{
+  "schema_version": "t08-policy-v2.1-error-audit-v1",
+  "created_from_saved_outputs_only": true,
+  "live_api_requests": 0,
+  "policy_version": "2.1.0-spike",
+  "taxonomy_version_used_by_jev": "0.3.0-spike",
+  "saved_answer_count": 45,
+  "baseline_sha256": {
+    "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+    "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+    "aggregate": "a5e95d2367cbe81fa62665e7ef42b201316136c6c08dbac23c35798996e82286"
+  },
+  "counts": {
+    "false_positives": 6,
+    "false_negatives": 7
+  },
+  "interpretation_limit": "FP/FN are disagreements against preliminary single-author synthetic labels. They are not confirmed model errors until humans adjudicate the evidence and labels.",
+  "false_positives": [
+    {
+      "kind": "FP",
+      "case_id": "e03-shortage-cells",
+      "event_code": "production_operational_disruption",
+      "evidence": "ограничила выпуск двух линеек",
+      "observed_issue": "Score 0.87 прошёл как кандидат, хотя draft gold не содержит эту метку.",
+      "likely_cause": "Текст прямо сообщает об ограничении выпуска; возможно, draft gold неполон. Это пока не подтверждённый FP Jev.",
+      "taxonomy_action": "Уточнить, что явное сокращение выпуска подходит; отдельную метку нехватки сырья ставить при прямом указании.",
+      "human_review": "Подтвердить, есть ли в тексте оба независимых события: снижение выпуска и нехватка материала.",
+      "text": "Запас изоляционного волокна на заводе «ТехноПласт» сократился до объёма на семь дней производства. Компания сообщила о фактической нехватке и ограничила выпуск двух линеек.",
+      "draft_expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.87,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FP",
+      "case_id": "e09-trade-export",
+      "event_code": "regulation_tax_change",
+      "evidence": "ограничивающее экспорт промышленных датчиков квотой",
+      "observed_issue": "Score 0.96 стал кандидатом вместе с ожидаемым trade_restriction.",
+      "likely_cause": "Квота на границе похожа по словам на изменение правил; определения v0.3 пересекаются.",
+      "taxonomy_action": "В v0.4.1 отнести квоту к trade_restriction и не дублировать ту же меру в regulation_tax_change.",
+      "human_review": "Подтвердить, что в тексте нет отдельного общего правила.",
+      "text": "Правительство опубликовало постановление, ограничивающее экспорт промышленных датчиков квотой на ближайший квартал. Документ вступил в силу сегодня.",
+      "draft_expected_events": [
+        "trade_restriction"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.96,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FP",
+      "case_id": "e10-trade-import",
+      "event_code": "regulation_tax_change",
+      "evidence": "начала применять пошлину к импорту",
+      "observed_issue": "Score 0.95 передан вместе с trade_restriction.",
+      "likely_cause": "Пошлина одновременно звучит как налог и как ограничение на границе; исходная разметка не разрешает это пересечение последовательно.",
+      "taxonomy_action": "В v0.4.1 относить пошлину на импорт/экспорт к trade_restriction, если отдельно не менялось внутреннее налоговое правило.",
+      "human_review": "Утвердить, как эта taxonomy должна трактовать таможенные пошлины.",
+      "text": "Таможенная служба начала применять пошлину к импорту двух типов станков. В опубликованном решении указаны ставка и перечень товаров.",
+      "draft_expected_events": [
+        "trade_restriction"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.95,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FP",
+      "case_id": "e25-legal-fine",
+      "event_code": "sanctions",
+      "evidence": "назначил компании штраф",
+      "observed_issue": "Sanctions score 0.89 прошёл; legal_enforcement score 0.59 остался abstain.",
+      "likely_cause": "Обычный антимонопольный штраф принят за санкции; это граница классов. Оценка ожидаемого юридического события также ниже порога.",
+      "taxonomy_action": "v0.4.1 исключает обычные штрафы из sanctions и прямо включает формальный штраф в legal_enforcement.",
+      "human_review": "Подтвердить, что gold — только legal_enforcement; не менять метку вслед за Jev.",
+      "text": "Антимонопольный орган признал практику торговой сети «Дом-Маркет» нарушающей правила конкуренции и назначил компании штраф. Решение опубликовано на сайте ведомства.",
+      "draft_expected_events": [
+        "legal_enforcement"
+      ],
+      "jev_topic": "law_regulation",
+      "event_score": 0.89,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FP",
+      "case_id": "e27-disaster-flood",
+      "event_code": "production_operational_disruption",
+      "evidence": "смена не может выйти на площадку ... остановке отгрузки",
+      "observed_issue": "Score 0.85 стал кандидатом, хотя прямо сказано только о доступе к площадке и остановке отгрузки.",
+      "likely_cause": "Модель вывела остановку выпуска из проблем с доступом; текст прямо не сообщает о снижении/остановке производства.",
+      "taxonomy_action": "v0.4.1 требует прямого влияния на выпуск; одну задержку отгрузки относит к supply_chain_disruption.",
+      "human_review": "Решить, подразумевает ли сюжет остановку завода; если нет, оставить вероятным FP.",
+      "text": "После сильного наводнения подъездная дорога к заводу «Берег» закрыта, а смена не может выйти на площадку. Компания сообщила о суточной остановке отгрузки.",
+      "draft_expected_events": [
+        "environment_disaster_impact",
+        "supply_chain_disruption"
+      ],
+      "jev_topic": "environment_disasters",
+      "event_score": 0.85,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FP",
+      "case_id": "e32-multi-fire-supply",
+      "event_code": "environment_disaster_impact",
+      "evidence": "Пожар повредил цех ... производство остановлено",
+      "observed_issue": "Score 0.83 передан, хотя текст описывает пожар на заводе без экологического ущерба или выброса.",
+      "likely_cause": "Модель смешала серьёзный пожар на объекте с экологическим бедствием.",
+      "taxonomy_action": "v0.4.1 исключает локальный промышленный пожар без отдельного экологического вреда; производство и поставки оцениваются отдельно.",
+      "human_review": "Подтвердить, что draft gold намеренно не включает environment_disaster_impact.",
+      "text": "Пожар повредил цех компании «Точка-Металл», производство остановлено. Из-за этого компания уже уведомила покупателей о задержке отправки заказанных комплектующих.",
+      "draft_expected_events": [
+        "production_operational_disruption",
+        "supply_chain_disruption"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.83,
+      "event_state": "positive",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    }
+  ],
+  "false_negatives": [
+    {
+      "kind": "FN",
+      "case_id": "e03-shortage-cells",
+      "event_code": "shortage_capacity_constraint",
+      "evidence": "сообщила о фактической нехватке",
+      "observed_issue": "Score 0.67 ниже порога кандидата 0.80; это abstain, метка дальше не передаётся.",
+      "likely_cause": "Оценка близка к экспериментальному порогу, хотя текст прямо говорит о нехватке; важны и полнота gold, и порог.",
+      "taxonomy_action": "Добавить пример явной нехватки одновременно со снижением выпуска; не менять порог по этому кейсу.",
+      "human_review": "Сверить обе метки события, прежде чем считать это пропуском модели.",
+      "text": "Запас изоляционного волокна на заводе «ТехноПласт» сократился до объёма на семь дней производства. Компания сообщила о фактической нехватке и ограничила выпуск двух линеек.",
+      "draft_expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.67,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e18-labor-layoffs",
+      "event_code": "corporate_transaction_restructuring",
+      "evidence": "сокращении 800 должностей ... с закрытием двух площадок",
+      "observed_issue": "Score 0.67 остался abstain; labor_workforce_event передан, restructuring — нет.",
+      "likely_cause": "Закрытие площадок может быть отдельной реструктуризацией, но увольнения сами по себе — нет. Примеры taxonomy не задают эту границу явно.",
+      "taxonomy_action": "Добавить положительный пример подтверждённого закрытия площадки и отрицательный пример увольнений без реорганизации.",
+      "human_review": "Решить, является ли заявленное будущее закрытие подтверждённым решением и отдельным событием.",
+      "text": "Производитель «Стандарт-М» официально уведомил сотрудников о сокращении 800 должностей к концу квартала. Компания связывает решение с закрытием двух площадок.",
+      "draft_expected_events": [
+        "labor_workforce_event",
+        "corporate_transaction_restructuring"
+      ],
+      "jev_topic": "labor_employment",
+      "event_score": 0.67,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e25-legal-fine",
+      "event_code": "legal_enforcement",
+      "evidence": "признал ... нарушающей правила конкуренции и назначил компании штраф",
+      "observed_issue": "Legal score 0.59 — abstain и не передан; вместо него передан ложный кандидат sanctions.",
+      "likely_cause": "В тексте есть формальный штраф, но оценка ниже экспериментального порога; модель также путает его с санкциями.",
+      "taxonomy_action": "Явно включить назначенный антимонопольный штраф в legal_enforcement и исключить обычные штрафы из sanctions.",
+      "human_review": "Проверить, описан ли в синтетическом тексте окончательно назначенный штраф.",
+      "text": "Антимонопольный орган признал практику торговой сети «Дом-Маркет» нарушающей правила конкуренции и назначил компании штраф. Решение опубликовано на сайте ведомства.",
+      "draft_expected_events": [
+        "legal_enforcement"
+      ],
+      "jev_topic": "law_regulation",
+      "event_score": 0.59,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e26-legal-investigation",
+      "event_code": "legal_enforcement",
+      "evidence": "начале официального расследования ... направило запрос документов",
+      "observed_issue": "Score 0.13 попал в negative при заданных границах состояния.",
+      "likely_cause": "Proposal уже включает официальное расследование; вероятнее чувствительность модели/формулировки вопроса или несовпадение разметки и вопроса, а не отсутствие категории.",
+      "taxonomy_action": "Явно указать, что начатое официальное расследование и запрос документов считаются без итогового решения; не снижать порог по одному кейсу.",
+      "human_review": "Подтвердить, что расследование официально открыто, а не только запланировано.",
+      "text": "Регулятор объявил о начале официального расследования закупок компании «Парус». Ведомство направило запрос документов; выводов о нарушении пока нет.",
+      "draft_expected_events": [
+        "legal_enforcement"
+      ],
+      "jev_topic": "law_regulation",
+      "event_score": 0.13,
+      "event_state": "negative",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e28-disaster-drought",
+      "event_code": "environment_disaster_impact",
+      "evidence": "после продолжительной засухи ... ограничили забор воды",
+      "observed_issue": "Score 0.76 — abstain и ниже порога 0.80; кандидат сокращения производства передан.",
+      "likely_cause": "Граница засухи/ресурсного ограничения описана неясно, а оценка близка к порогу. Draft labels также по-разному трактуют тему и событие.",
+      "taxonomy_action": "Добавить примеры засухи/ограничения воды только при прямо указанном влиянии на бизнес; порог не менять.",
+      "human_review": "Решить, подтверждены ли отдельно влияние засухи и сокращение выпуска.",
+      "text": "Региональные власти ограничили забор воды после продолжительной засухи. Завод «Родник» сообщил, что из-за этого сократил выпуск на одной линии.",
+      "draft_expected_events": [
+        "environment_disaster_impact",
+        "production_operational_disruption"
+      ],
+      "jev_topic": "environment_disasters",
+      "event_score": 0.76,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e33-multi-price-shortage",
+      "event_code": "shortage_capacity_constraint",
+      "evidence": "фактической нехватке каучука на складах",
+      "observed_issue": "Score 0.75 — abstain и ниже порога кандидата; price_cost_change передан.",
+      "likely_cause": "Прямое сообщение о нехватке конкурирует с одновременным событием изменения цены; оценка чуть ниже порога. Тема и gold нехватки уже спорные.",
+      "taxonomy_action": "Добавить multi-label пример текущей нехватки вместе с ростом цены; не подбирать порог по e33.",
+      "human_review": "Решить тему и обе event-метки по отдельным evidence spans до оценки качества Jev.",
+      "text": "Переработчик сообщил о фактической нехватке каучука на складах; поставщик повысил действующую закупочную цену на 9 процентов.",
+      "draft_expected_events": [
+        "shortage_capacity_constraint",
+        "price_cost_change"
+      ],
+      "jev_topic": "industry_trade_supply",
+      "event_score": 0.75,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    },
+    {
+      "kind": "FN",
+      "case_id": "e34-multi-insolvency-legal",
+      "event_code": "legal_enforcement",
+      "evidence": "кредитор подал в суд заявление о банкротстве; судебная процедура начата",
+      "observed_issue": "Score 0.29 отрицательный; insolvency_default передан, отдельное судебное действие — нет.",
+      "likely_cause": "Модель могла объединить заявление кредитора с меткой неплатёжеспособности; taxonomy должна различать дефолт и отдельное обращение в суд.",
+      "taxonomy_action": "v0.4.1 требует обе метки при отдельном заявлении кредитора; обычная регистрация банкротства сама по себе остаётся одним событием.",
+      "human_review": "Подтвердить и пропуск платежа, и отдельно поданное заявление в суд.",
+      "text": "Компания «Восток-Транс» пропустила платеж по долгу. На следующий день кредитор подал в суд заявление о банкротстве; судебная процедура начата.",
+      "draft_expected_events": [
+        "insolvency_default",
+        "legal_enforcement"
+      ],
+      "jev_topic": "law_regulation",
+      "event_score": 0.29,
+      "event_state": "abstain",
+      "gold_status": "preliminary_single_author_unadjudicated"
+    }
+  ]
+}

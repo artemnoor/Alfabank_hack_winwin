@@ -1183,7 +1183,7 @@ class PilotAggregationTests(unittest.TestCase):
                     None, None, 302, "Found", {}, "https://attacker.example/collect"
                 )
 
-        opener: RedirectingOpener
+        opener: RedirectingOpener | None = None
 
         def build_opener(*handlers: Any) -> RedirectingOpener:
             nonlocal opener
@@ -1195,6 +1195,7 @@ class PilotAggregationTests(unittest.TestCase):
             self.assertRaisesRegex(LiveRequestError, "redirect_refused"),
         ):
             https_transport(API_ENDPOINT, b"synthetic only", {}, 30)
+        self.assertIsNotNone(opener)
         self.assertEqual(opener.calls, 1)
 
     def test_http_error_body_is_suppressed(self) -> None:

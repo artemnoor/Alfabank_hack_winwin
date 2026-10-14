@@ -6,7 +6,7 @@
 
 **Базовый `main`, проверенный для spike:** `ce640214be7c5ff2fdb451b9e290135a11b512a6`
 
-**Текущий HEAD:** будет указан после фиксации отчёта и push в существующий PR #8.
+**Текущий HEAD:** см. head текущего PR #8; отчёт не записывает SHA собственного commit, чтобы не создавать самоссылку.
 **Область:** только `spike/T08/`; production runtime, OpenAPI и generated contracts не изменялись.
 
 ## Краткое резюме
@@ -125,6 +125,40 @@ Gold labels написаны без ответов Jev, однако это **si
 ### Ручной охват benchmark A (не метрики Jev)
 
 Число положительных ручных примеров по каждому event code в A: `supply_chain_disruption` 8; `production_operational_disruption` 5; `environment_disaster_impact` 5; `cyber_security_incident` 5; `labor_workforce_event` 5; `shortage_capacity_constraint` 4; `price_cost_change` 4; `trade_restriction` 4; `sanctions` 4; `regulation_tax_change` 4; `insolvency_default` 4; `corporate_transaction_restructuring` 4; `product_recall_quality_safety` 4; `legal_enforcement` 4; `investment_capacity_change` 4. Это только support в draft labels; полноценные независимые negative challenge examples и распределение production prevalence из этого не следуют.
+
+Все строки ниже означают ручную разметку split A. Jev не запускался, поэтому качество каждого кода отдельно **NOT MEASURED**.
+
+| Общая тема | Gold support A | Jev accuracy |
+|---|---:|---|
+| `industry_trade_supply` | 15 | NOT MEASURED |
+| `business_companies` | 11 | NOT MEASURED |
+| `law_regulation` | 11 | NOT MEASURED |
+| `technology_telecom` | 8 | NOT MEASURED |
+| `politics_government` | 8 | NOT MEASURED |
+| `energy_resources` | 5 | NOT MEASURED |
+| `labor_employment` | 5 | NOT MEASURED |
+| `environment_disasters` | 4 | NOT MEASURED |
+| `economy_finance` | 3 | NOT MEASURED |
+| `health` | 3 | NOT MEASURED |
+| `other_uncertain` | 2 | NOT MEASURED |
+
+| Бизнес-событие | Gold positives A | Jev precision / recall / F1 |
+|---|---:|---|
+| `supply_chain_disruption` | 8 | NOT MEASURED |
+| `production_operational_disruption` | 5 | NOT MEASURED |
+| `environment_disaster_impact` | 5 | NOT MEASURED |
+| `cyber_security_incident` | 5 | NOT MEASURED |
+| `labor_workforce_event` | 5 | NOT MEASURED |
+| `shortage_capacity_constraint` | 4 | NOT MEASURED |
+| `price_cost_change` | 4 | NOT MEASURED |
+| `trade_restriction` | 4 | NOT MEASURED |
+| `sanctions` | 4 | NOT MEASURED |
+| `regulation_tax_change` | 4 | NOT MEASURED |
+| `insolvency_default` | 4 | NOT MEASURED |
+| `corporate_transaction_restructuring` | 4 | NOT MEASURED |
+| `product_recall_quality_safety` | 4 | NOT MEASURED |
+| `legal_enforcement` | 4 | NOT MEASURED |
+| `investment_capacity_change` | 4 | NOT MEASURED |
 
 ## Метрики качества, сложность, стабильность, latency и стоимость
 

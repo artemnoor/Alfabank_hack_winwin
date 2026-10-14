@@ -117,6 +117,39 @@
     "prompt_injection_model_results": null,
     "mock_scores_counted_as_quality": false
   },
+  "manual_gold_coverage_split_a": {
+    "topics": {
+      "industry_trade_supply": {"support": 15, "jev_accuracy": null},
+      "business_companies": {"support": 11, "jev_accuracy": null},
+      "law_regulation": {"support": 11, "jev_accuracy": null},
+      "technology_telecom": {"support": 8, "jev_accuracy": null},
+      "politics_government": {"support": 8, "jev_accuracy": null},
+      "energy_resources": {"support": 5, "jev_accuracy": null},
+      "labor_employment": {"support": 5, "jev_accuracy": null},
+      "environment_disasters": {"support": 4, "jev_accuracy": null},
+      "economy_finance": {"support": 3, "jev_accuracy": null},
+      "health": {"support": 3, "jev_accuracy": null},
+      "other_uncertain": {"support": 2, "jev_accuracy": null}
+    },
+    "events": {
+      "supply_chain_disruption": {"gold_positive_support": 8, "jev_precision_recall_f1": null},
+      "production_operational_disruption": {"gold_positive_support": 5, "jev_precision_recall_f1": null},
+      "environment_disaster_impact": {"gold_positive_support": 5, "jev_precision_recall_f1": null},
+      "cyber_security_incident": {"gold_positive_support": 5, "jev_precision_recall_f1": null},
+      "labor_workforce_event": {"gold_positive_support": 5, "jev_precision_recall_f1": null},
+      "shortage_capacity_constraint": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "price_cost_change": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "trade_restriction": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "sanctions": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "regulation_tax_change": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "insolvency_default": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "corporate_transaction_restructuring": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "product_recall_quality_safety": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "legal_enforcement": {"gold_positive_support": 4, "jev_precision_recall_f1": null},
+      "investment_capacity_change": {"gold_positive_support": 4, "jev_precision_recall_f1": null}
+    },
+    "note": "Manual draft-label support is corpus coverage, not classifier performance."
+  },
   "thresholds": {
     "choice_review_below": 0.5,
     "noul_negative_at_or_below": 0.2,

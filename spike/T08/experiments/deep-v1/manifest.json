@@ -1,0 +1,61 @@
+{
+  "corpus_id": "t08-jevs-spike-deep",
+  "version": "1.0.0",
+  "created_date": "2026-10-14",
+  "status": "experimental-synthetic-single-annotator-draft",
+  "taxonomy_reference": {
+    "path": "spike/T08/taxonomy.json",
+    "id": "alfa-business-news",
+    "version": "0.3.0-spike",
+    "sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d"
+  },
+  "baseline_preservation_reference": {
+    "path": "spike/T08/corpus.json",
+    "corpus_id": "synthetic-ru-news-50",
+    "version": "1.0.0",
+    "sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7"
+  },
+  "total_cases": 160,
+  "nonempty_cases": 158,
+  "source_policy": "synthetic text only; no real articles; no Jev outputs used for gold labels",
+  "gold_policy": "single-annotator draft; blind second pass and adjudication required before quality claims",
+  "hash_policy": "sha256 over exact UTF-8 bytes including the final LF",
+  "known_annotation_ambiguities": [
+    {
+      "case_id": "b24-price-forecast-after-bill",
+      "issue": "taxonomy conflict: price event definition requires factual change; current request wording also permits an officially announced future change",
+      "scoring": "exclude until adjudicated"
+    }
+  ],
+  "splits": {
+    "A": {
+      "path": "corpus_a_benchmark.json",
+      "cases": 76,
+      "sha256": "b001c933c7cfb6b3d10c3ea89ce9328ff968cdde0bb17822dcbdb36e053ce1fd",
+      "purpose": "Fixed broad benchmark; freeze before live evaluation.",
+      "holdout": false
+    },
+    "B": {
+      "path": "corpus_b_boundaries.json",
+      "cases": 36,
+      "sha256": "e157fc989441f6160a59217bf430839e699be7a04e59ab27b6195a62c95c4918",
+      "purpose": "Boundary and difficult-case analysis; do not fit production thresholds.",
+      "holdout": false
+    },
+    "C": {
+      "path": "corpus_c_robustness.json",
+      "cases": 24,
+      "sha256": "83a0c49e63afda0719c9634aa739935ba4c09725ecce8ab5ae47663e0c8815fc",
+      "purpose": "Metamorphic stimuli with prespecified expected relations; no Jev run has been made.",
+      "holdout": false
+    },
+    "D": {
+      "path": "holdout_d_control.json",
+      "cases": 24,
+      "sha256": "568285d305641d5a784faae88f43ddbece7ec6efaddca966052bbf42d9f672f7",
+      "purpose": "Separate control split; do not use for prompt, taxonomy, or threshold tuning. Gold labels are visible in this repository and were seen by the corpus author, so it is not a blind holdout.",
+      "holdout": true,
+      "blind": false
+    }
+  }
+}

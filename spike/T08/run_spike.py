@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -11,9 +12,11 @@ from pathlib import Path
 from typing import Any
 
 from jev_spike import (
+    CORPUS_PATH,
     DEFAULT_MODEL,
     SPIKE_DIR,
     SUPPORTED_MODEL_ALIASES,
+    TAXONOMY_PATH,
     JevClient,
     LiveRequestError,
     SpikeError,
@@ -22,6 +25,7 @@ from jev_spike import (
     interpret_response,
     load_verified_inputs,
     make_request,
+    request_hash,
     taxonomy_hash,
 )
 
@@ -33,6 +37,10 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     )
 
 
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _safe_failure(case_id: str, error: Exception) -> dict[str, str]:
     code = str(error)
     allowed = {
@@ -41,6 +49,7 @@ def _safe_failure(case_id: str, error: Exception) -> dict[str, str]:
         "redirect_refused",
         "unapproved_endpoint",
         "invalid_json_response",
+        "invalid_response_body",
         "response_too_large",
     }
     if code.startswith("http_status_") and code[12:].isdigit():
@@ -60,6 +69,8 @@ def offline_report(
         "topic_count": len(taxonomy["topics"]),
         "business_event_count": len(taxonomy["events"]),
         "corpus_id": corpus["corpus_id"],
+        "corpus_sha256": _sha256_file(CORPUS_PATH),
+        "taxonomy_sha256_raw": _sha256_file(TAXONOMY_PATH),
         "corpus_case_count": len(cases),
         "non_empty_news_count": sum(
             bool(case["title"].strip() or case["text"].strip()) for case in cases
@@ -86,7 +97,8 @@ def run_live(
     corpus: dict[str, Any],
     cases: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    api_key = os.environ.get("JEV_API_KEY", "")
+    # TYPESAFE_API_KEY is the variable used by TypeSafe's official examples.
+    api_key = os.environ.get("TYPESAFE_API_KEY", "")
     if not 1 <= args.max_calls <= 50:
         raise SpikeError("--max-calls must be between 1 and 50")
     client = JevClient(
@@ -102,12 +114,15 @@ def run_live(
     results: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
     attempted = 0
+    request_hashes: dict[str, str] = {}
     for case in news_cases:
         attempted += 1
         try:
             request = make_request(case, taxonomy, model=args.model)
+            request_hashes[case["id"]] = request_hash(request)
             response = client.classify(request)
             result = interpret_response(case, response, request, taxonomy).result
+            result["request_sha256"] = request_hashes[case["id"]]
             results.append(result)
             print(
                 f"LIVE case={case['id']} status={result['classification_status']} model={result['model_version']}"
@@ -128,12 +143,17 @@ def run_live(
         "taxonomy_id": taxonomy["id"],
         "taxonomy_version": taxonomy["version"],
         "taxonomy_hash": taxonomy_hash(taxonomy),
+        "taxonomy_sha256_raw": _sha256_file(TAXONOMY_PATH),
+        "corpus_sha256": _sha256_file(CORPUS_PATH),
+        "client_sha256": _sha256_file(Path(__file__).with_name("jev_spike.py")),
+        "runner_sha256": _sha256_file(Path(__file__)),
         "requested_model_alias": args.model,
         "attempted_calls": attempted,
         "successful_calls": len(results),
         "control_calls": 0,
         "controls": {},
         "failures": failures,
+        "request_sha256_by_case": request_hashes,
         "results": results,
         "metrics": evaluate(cases, results, taxonomy) if results else None,
         "note": "Synthetic-only pilot; raw articles, prompts, provider response bodies, credentials, and exception details are not saved.",

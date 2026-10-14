@@ -11,6 +11,7 @@ import json
 import math
 import re
 import ssl
+import statistics
 import time
 import urllib.error
 import urllib.request
@@ -35,6 +36,12 @@ TRUSTED_CORPUS_SHA256 = (
 MAX_ARTICLE_CHARS = 10_000
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_RESPONSE_BYTES = 1_000_000
+# The public confidence examples are rounded to two decimals. A 0.02 absolute
+# tolerance accepts that displayed precision while rejecting inconsistent data.
+CHOICE_CONFIDENCE_ROUNDING_TOLERANCE = 0.02
+MAX_TOTAL_QUESTIONS = (
+    20  # Spike-local cost guard; TypeSafe documents no total-count limit.
+)
 
 JsonObject = dict[str, Any]
 Transport = Callable[[str, bytes, dict[str, str], int], bytes]
@@ -215,9 +222,15 @@ def make_request(
     *,
     model: str = DEFAULT_MODEL,
 ) -> JsonObject:
-    title = case["title"].strip()
-    text = case["text"].strip()
-    if not title and not text:
+    if not isinstance(case, dict):
+        raise SpikeError("invalid synthetic article")
+    title_value = case.get("title")
+    text_value = case.get("text")
+    if not isinstance(title_value, str) or not isinstance(text_value, str):
+        raise SpikeError("synthetic article title and text must be strings")
+    title = title_value
+    text = text_value
+    if not title.strip() and not text.strip():
         raise NoContentError("empty_text")
     if len(title) + len(text) > MAX_ARTICLE_CHARS:
         raise SpikeError("synthetic article exceeds the spike size limit")
@@ -254,8 +267,12 @@ def make_request(
             "criteria": taxonomy["uncertainty_criteria"],
         },
     }
-    if len(questions) > 20:
-        raise SpikeError("Jev System One request exceeds the documented question limit")
+    if len(topic_criteria) > 255:
+        raise SpikeError("Choice exceeds TypeSafe's documented 255-option limit")
+    if len(questions) > MAX_TOTAL_QUESTIONS:
+        raise SpikeError(
+            "Jev System One request exceeds the spike-local question budget"
+        )
     return {
         "state": {"title": title, "text": text},
         "model": model,
@@ -314,7 +331,12 @@ def validate_response(
     choice = topic.get("choice")
     confidence = topic.get("confidence")
     probabilities = topic.get("probabilities")
-    if choice not in topic_codes or not _number(confidence) or not 0 <= confidence <= 1:
+    if (
+        not isinstance(choice, str)
+        or choice not in topic_codes
+        or not _number(confidence)
+        or not 0 <= confidence <= 1
+    ):
         raise SpikeError("Jev returned an unknown or invalid topic Choice")
     if not isinstance(probabilities, dict) or set(probabilities) != topic_codes:
         raise SpikeError("Jev Choice probabilities do not match the allowed taxonomy")
@@ -326,6 +348,19 @@ def validate_response(
         raise SpikeError("Jev Choice probabilities do not sum to one")
     if probabilities[choice] + 1e-8 < max(probabilities.values()):
         raise SpikeError("Jev Choice label is not a maximum-probability option")
+    option_count = len(probabilities)
+    if option_count < 2:
+        raise SpikeError("Jev Choice needs at least two probability options")
+    expected_confidence = (max(probabilities.values()) - 1 / option_count) / (
+        1 - 1 / option_count
+    )
+    if not math.isclose(
+        confidence,
+        expected_confidence,
+        rel_tol=0,
+        abs_tol=CHOICE_CONFIDENCE_ROUNDING_TOLERANCE,
+    ):
+        raise SpikeError("Jev Choice confidence does not match its probabilities")
 
     for question_id in requested:
         if question_id == topic_id:
@@ -340,11 +375,13 @@ def validate_response(
         ):
             raise SpikeError("Jev returned an invalid Noul answer")
 
-    usage = response.get("usage", {})
-    if not isinstance(usage, dict):
+    usage = response.get("usage")
+    if not isinstance(usage, dict) or not {"input_tokens", "output_tokens"}.issubset(
+        usage
+    ):
         raise SpikeError("Jev returned invalid usage metadata")
     for key in ("input_tokens", "output_tokens"):
-        if key in usage and (
+        if (
             not isinstance(usage[key], int)
             or isinstance(usage[key], bool)
             or usage[key] < 0
@@ -373,8 +410,12 @@ def https_transport(
     if url != API_ENDPOINT:
         raise LiveRequestError("unapproved_endpoint")
     request = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+    # Do not inherit HTTP(S)_PROXY from the shell: the experiment must use the
+    # configured direct route and must never route around provider restrictions.
     opener = urllib.request.build_opener(
-        _NoRedirect(), urllib.request.HTTPSHandler(context=ssl.create_default_context())
+        urllib.request.ProxyHandler({}),
+        _NoRedirect(),
+        urllib.request.HTTPSHandler(context=ssl.create_default_context()),
     )
     try:
         with opener.open(request, timeout=timeout) as response:
@@ -391,7 +432,14 @@ def https_transport(
         raise LiveRequestError(f"http_status_{exc.code}") from None
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         # Do not include the raw exception: it can contain URLs, headers, or payload fragments.
-        kind = "timeout" if isinstance(exc, TimeoutError) else "connection_error"
+        wrapped_timeout = isinstance(exc, urllib.error.URLError) and isinstance(
+            exc.reason, TimeoutError
+        )
+        kind = (
+            "timeout"
+            if isinstance(exc, TimeoutError) or wrapped_timeout
+            else "connection_error"
+        )
         raise LiveRequestError(kind) from None
 
 
@@ -404,7 +452,7 @@ class JevClient:
         transport: Transport = https_transport,
     ) -> None:
         if not api_key or not api_key.strip():
-            raise SpikeError("JEV_API_KEY is required for live mode")
+            raise SpikeError("TYPESAFE_API_KEY is required for live mode")
         if not allowed_request_hashes or any(
             not re.fullmatch(r"[0-9a-f]{64}", value) for value in allowed_request_hashes
         ):
@@ -439,9 +487,13 @@ class JevClient:
             # Keep test/custom transport failures sanitized too.
             raise LiveRequestError("transport_error") from None
         elapsed_ms = round((time.monotonic() - started) * 1000)
+        if not isinstance(body, bytes):
+            raise LiveRequestError("invalid_response_body")
+        if len(body) > MAX_RESPONSE_BYTES:
+            raise LiveRequestError("response_too_large")
         try:
             response = json.loads(body)
-        except (UnicodeDecodeError, json.JSONDecodeError):
+        except (UnicodeDecodeError, json.JSONDecodeError, TypeError):
             raise LiveRequestError("invalid_json_response") from None
         if not isinstance(response, dict):
             raise LiveRequestError("invalid_json_response")
@@ -549,6 +601,14 @@ def _f1(tp: int, fp: int, fn: int) -> float:
 def evaluate(
     cases: list[JsonObject], results: list[JsonObject], taxonomy: JsonObject
 ) -> JsonObject:
+    result_ids = [result.get("case_id") for result in results]
+    if any(not isinstance(case_id, str) or not case_id for case_id in result_ids):
+        raise SpikeError("evaluation results need non-empty case ids")
+    if len(result_ids) != len(set(result_ids)):
+        raise SpikeError("evaluation results contain duplicate case ids")
+    case_ids = {case.get("id") for case in cases}
+    if any(case_id not in case_ids for case_id in result_ids):
+        raise SpikeError("evaluation results contain unknown case ids")
     by_id = {result["case_id"]: result for result in results}
     evaluated = [
         case
@@ -563,8 +623,14 @@ def evaluate(
     )
     event_codes = [event["code"] for event in taxonomy["events"]]
     threshold_rows: list[JsonObject] = []
-    for threshold in [round(step / 10, 1) for step in range(1, 10)]:
+    fixed_negative_threshold = float(
+        taxonomy["thresholds"]["noul_negative_at_or_below"]
+    )
+    event_threshold_grid: list[JsonObject] = []
+    for threshold in [round(step / 10, 1) for step in range(3, 10)]:
         tp = fp = fn = 0
+        class_f1_at_threshold: list[float] = []
+        review_cells = 0
         for case in evaluated:
             scores = by_id[case["id"]]["event_scores"]
             predicted = {code for code in event_codes if scores[code] >= threshold}
@@ -572,19 +638,105 @@ def evaluate(
             tp += len(predicted & expected)
             fp += len(predicted - expected)
             fn += len(expected - predicted)
+            review_cells += sum(
+                fixed_negative_threshold < scores[code] < threshold
+                for code in event_codes
+            )
+        for code in event_codes:
+            class_tp = class_fp = class_fn = 0
+            for case in evaluated:
+                predicted = by_id[case["id"]]["event_scores"][code] >= threshold
+                expected = code in case["expected_events"]
+                class_tp += int(predicted and expected)
+                class_fp += int(predicted and not expected)
+                class_fn += int(not predicted and expected)
+            if class_tp + class_fn > 0:
+                class_f1_at_threshold.append(_f1(class_tp, class_fp, class_fn))
         threshold_rows.append(
             {
                 "threshold": threshold,
-                "micro_f1": round(_f1(tp, fp, fn), 4),
+                "micro_f1": round(_f1(tp, fp, fn), 4) if tp + fp + fn else None,
+                "micro_precision": round(tp / (tp + fp), 4) if tp + fp else None,
+                "micro_recall": round(tp / (tp + fn), 4) if tp + fn else None,
+                "macro_f1": round(
+                    sum(class_f1_at_threshold) / len(class_f1_at_threshold), 4
+                )
+                if class_f1_at_threshold
+                else None,
                 "tp": tp,
                 "fp": fp,
                 "fn": fn,
+                "positive_support": tp + fn,
+                "fixed_negative_threshold": fixed_negative_threshold,
+                "review_cells": review_cells,
+                "review_cell_rate": round(
+                    review_cells / (len(evaluated) * len(event_codes)), 4
+                )
+                if evaluated
+                else None,
+            }
+        )
+
+    for negative_cutoff in (0.1, 0.2, 0.3):
+        for positive_cutoff in (0.6, 0.7, 0.8, 0.9):
+            if negative_cutoff >= positive_cutoff:
+                continue
+            review_cells = sum(
+                negative_cutoff
+                < by_id[case["id"]]["event_scores"][code]
+                < positive_cutoff
+                for case in evaluated
+                for code in event_codes
+            )
+            total_cells = len(evaluated) * len(event_codes)
+            event_threshold_grid.append(
+                {
+                    "negative_cutoff": negative_cutoff,
+                    "positive_cutoff": positive_cutoff,
+                    "fixed_as_review_band": True,
+                    "review_cells": review_cells,
+                    "review_cell_rate": round(review_cells / total_cells, 4)
+                    if total_cells
+                    else None,
+                }
+            )
+
+    choice_threshold_rows: list[JsonObject] = []
+    for choice_cutoff in [round(step / 10, 1) for step in range(3, 9)]:
+        auto_cases = [
+            case
+            for case in evaluated
+            if by_id[case["id"]]["topic_confidence"] >= choice_cutoff
+        ]
+        auto_correct = sum(
+            by_id[case["id"]]["topic"] == case["expected_topic"] for case in auto_cases
+        )
+        review_count = len(evaluated) - len(auto_cases)
+        choice_threshold_rows.append(
+            {
+                "choice_review_below": choice_cutoff,
+                "auto_cases": len(auto_cases),
+                "review_cases": review_count,
+                "review_rate": round(review_count / len(evaluated), 4)
+                if evaluated
+                else None,
+                "auto_coverage": round(len(auto_cases) / len(evaluated), 4)
+                if evaluated
+                else None,
+                "auto_topic_accuracy": round(auto_correct / len(auto_cases), 4)
+                if auto_cases
+                else None,
+                "all_case_topic_accuracy": round(topic_correct / len(evaluated), 4)
+                if evaluated
+                else None,
             }
         )
 
     per_event: dict[str, JsonObject] = {}
     class_f1: list[float] = []
     tp_all = fp_all = fn_all = 0
+    event_false_positives: list[JsonObject] = []
+    event_false_negatives: list[JsonObject] = []
     threshold = float(taxonomy["thresholds"]["noul_positive_at_or_above"])
     for code in event_codes:
         tp = fp = fn = 0
@@ -594,18 +746,24 @@ def evaluate(
             tp += int(predicted and expected)
             fp += int(predicted and not expected)
             fn += int(not predicted and expected)
+            if predicted and not expected:
+                event_false_positives.append({"case_id": case["id"], "code": code})
+            if expected and not predicted:
+                event_false_negatives.append({"case_id": case["id"], "code": code})
         f1 = _f1(tp, fp, fn)
-        class_f1.append(f1)
+        if tp + fn > 0:
+            class_f1.append(f1)
         tp_all += tp
         fp_all += fp
         fn_all += fn
         per_event[code] = {
-            "precision": round(tp / (tp + fp), 4) if tp + fp else 0.0,
-            "recall": round(tp / (tp + fn), 4) if tp + fn else 0.0,
-            "f1": round(f1, 4),
+            "precision": round(tp / (tp + fp), 4) if tp + fp else None,
+            "recall": round(tp / (tp + fn), 4) if tp + fn else None,
+            "f1": round(f1, 4) if tp + fn or tp + fp else None,
             "tp": tp,
             "fp": fp,
             "fn": fn,
+            "support": tp + fn,
         }
     expected_status_cases = [
         case for case in evaluated if case["expected_status"] in {"uncertain", "other"}
@@ -627,6 +785,25 @@ def evaluate(
         unlisted_tp += int(predicted and expected)
         unlisted_fp += int(predicted and not expected)
         unlisted_fn += int(not predicted and expected)
+    unlisted_threshold_sweep: list[JsonObject] = []
+    for cutoff in [round(step / 10, 1) for step in range(3, 10)]:
+        tp = fp = fn = 0
+        for case in evaluated:
+            predicted = by_id[case["id"]]["unlisted_event_score"] >= cutoff
+            expected = case["expected_unlisted_event"]
+            tp += int(predicted and expected)
+            fp += int(predicted and not expected)
+            fn += int(not predicted and expected)
+        unlisted_threshold_sweep.append(
+            {
+                "threshold": cutoff,
+                "tp": tp,
+                "fp": fp,
+                "fn": fn,
+                "precision": round(tp / (tp + fp), 4) if tp + fp else None,
+                "recall": round(tp / (tp + fn), 4) if tp + fn else None,
+            }
+        )
     uncertainty_review_threshold = float(
         taxonomy["thresholds"]["noul_negative_at_or_below"]
     )
@@ -639,6 +816,148 @@ def evaluate(
         uncertainty_tp += int(predicted and expected)
         uncertainty_fp += int(predicted and not expected)
         uncertainty_fn += int(not predicted and expected)
+    uncertainty_threshold_sweep: list[JsonObject] = []
+    for cutoff in [round(step / 10, 1) for step in range(1, 10)]:
+        tp = fp = fn = 0
+        for case in evaluated:
+            predicted = by_id[case["id"]]["uncertainty_score"] > cutoff
+            expected = case["expected_uncertainty_signal"]
+            tp += int(predicted and expected)
+            fp += int(predicted and not expected)
+            fn += int(not predicted and expected)
+        uncertainty_threshold_sweep.append(
+            {
+                "threshold_exclusive": cutoff,
+                "tp": tp,
+                "fp": fp,
+                "fn": fn,
+                "review_rate": round((tp + fp) / len(evaluated), 4)
+                if evaluated
+                else None,
+                "precision": round(tp / (tp + fp), 4) if tp + fp else None,
+                "recall": round(tp / (tp + fn), 4) if tp + fn else None,
+            }
+        )
+    topic_codes = [topic["code"] for topic in taxonomy["topics"]]
+    topic_confusion = {
+        code: {predicted: 0 for predicted in topic_codes} for code in topic_codes
+    }
+    exact_event_matches = 0
+    false_topic_cases: list[JsonObject] = []
+    for case in evaluated:
+        predicted_topic = by_id[case["id"]]["topic"]
+        expected_topic = case["expected_topic"]
+        if (
+            expected_topic in topic_confusion
+            and predicted_topic in topic_confusion[expected_topic]
+        ):
+            topic_confusion[expected_topic][predicted_topic] += 1
+        if predicted_topic != expected_topic:
+            false_topic_cases.append(
+                {
+                    "case_id": case["id"],
+                    "expected": expected_topic,
+                    "predicted": predicted_topic,
+                }
+            )
+        predicted_events = {
+            code
+            for code in event_codes
+            if by_id[case["id"]]["event_scores"][code] >= threshold
+        }
+        if predicted_events == set(case["expected_events"]):
+            exact_event_matches += 1
+
+    status_codes = ["classified", "uncertain", "other"]
+    status_confusion = {
+        expected: {predicted: 0 for predicted in status_codes}
+        for expected in status_codes
+    }
+    for case in evaluated:
+        expected_status = case["expected_status"]
+        predicted_status = by_id[case["id"]]["classification_status"]
+        if (
+            expected_status in status_confusion
+            and predicted_status in status_confusion[expected_status]
+        ):
+            status_confusion[expected_status][predicted_status] += 1
+
+    case_slices: dict[str, JsonObject] = {}
+    slice_types = sorted(
+        {
+            case["case_type"]
+            for case in evaluated
+            if isinstance(case.get("case_type"), str)
+        }
+    )
+    for case_type in slice_types:
+        subset = [case for case in evaluated if case.get("case_type") == case_type]
+        slice_tp = slice_fp = slice_fn = slice_topic_correct = slice_exact = 0
+        for case in subset:
+            scores = by_id[case["id"]]["event_scores"]
+            predicted_events = {
+                code for code in event_codes if scores[code] >= threshold
+            }
+            expected_events = set(case["expected_events"])
+            slice_tp += len(predicted_events & expected_events)
+            slice_fp += len(predicted_events - expected_events)
+            slice_fn += len(expected_events - predicted_events)
+            slice_topic_correct += int(
+                by_id[case["id"]]["topic"] == case["expected_topic"]
+            )
+            slice_exact += int(predicted_events == expected_events)
+        case_slices[case_type] = {
+            "count": len(subset),
+            "topic_accuracy": round(slice_topic_correct / len(subset), 4)
+            if subset
+            else None,
+            "event_micro_precision": round(slice_tp / (slice_tp + slice_fp), 4)
+            if slice_tp + slice_fp
+            else None,
+            "event_micro_recall": round(slice_tp / (slice_tp + slice_fn), 4)
+            if slice_tp + slice_fn
+            else None,
+            "event_micro_f1": round(_f1(slice_tp, slice_fp, slice_fn), 4)
+            if slice_tp + slice_fp + slice_fn
+            else None,
+            "event_exact_match_rate": round(slice_exact / len(subset), 4)
+            if subset
+            else None,
+        }
+
+    latencies = sorted(
+        float(by_id[case["id"]]["elapsed_ms"])
+        for case in evaluated
+        if "elapsed_ms" in by_id[case["id"]]
+        and _number(by_id[case["id"]]["elapsed_ms"])
+        and by_id[case["id"]]["elapsed_ms"] >= 0
+    )
+    usage_totals = {
+        key: sum(
+            by_id[case["id"]]["usage"][key]
+            for case in evaluated
+            if isinstance(by_id[case["id"]].get("usage"), dict)
+            and isinstance(by_id[case["id"]]["usage"].get(key), int)
+            and not isinstance(by_id[case["id"]]["usage"].get(key), bool)
+            and by_id[case["id"]]["usage"][key] >= 0
+        )
+        if evaluated
+        and all(
+            isinstance(by_id[case["id"]].get("usage"), dict)
+            and isinstance(by_id[case["id"]]["usage"].get(key), int)
+            and not isinstance(by_id[case["id"]]["usage"].get(key), bool)
+            and by_id[case["id"]]["usage"][key] >= 0
+            for case in evaluated
+        )
+        else None
+        for key in ("input_tokens", "output_tokens")
+    }
+    review_count = sum(
+        by_id[case["id"]]["classification_status"] == "uncertain" for case in evaluated
+    )
+    other_count = sum(
+        by_id[case["id"]]["classification_status"] == "other" for case in evaluated
+    )
     return {
         "case_count": len(cases),
         "non_empty_case_count": len(evaluated),
@@ -646,24 +965,49 @@ def evaluate(
         "evaluation_complete": len(evaluated) == non_empty_case_total,
         "evaluation_coverage": round(len(evaluated) / non_empty_case_total, 4)
         if non_empty_case_total
-        else 0.0,
+        else None,
         "topic_accuracy": round(topic_correct / len(evaluated), 4)
         if evaluated
-        else 0.0,
+        else None,
         "topic_correct": topic_correct,
         "topic_total": len(evaluated),
+        "topic_confusion_matrix": topic_confusion,
+        "topic_misclassifications": false_topic_cases,
+        "classification_status_confusion_matrix": status_confusion,
+        "case_type_slices": case_slices,
+        "event_exact_match_rate": round(exact_event_matches / len(evaluated), 4)
+        if evaluated
+        else None,
+        "event_exact_match_count": exact_event_matches,
+        "event_false_positives": event_false_positives,
+        "event_false_negatives": event_false_negatives,
         "event_micro_precision": round(tp_all / (tp_all + fp_all), 4)
         if tp_all + fp_all
-        else 0.0,
+        else None,
         "event_micro_recall": round(tp_all / (tp_all + fn_all), 4)
         if tp_all + fn_all
-        else 0.0,
-        "event_micro_f1": round(_f1(tp_all, fp_all, fn_all), 4),
-        "event_macro_f1": round(sum(class_f1) / len(class_f1), 4) if class_f1 else 0.0,
+        else None,
+        "event_micro_f1": round(_f1(tp_all, fp_all, fn_all), 4)
+        if tp_all + fp_all + fn_all
+        else None,
+        "event_macro_f1": round(sum(class_f1) / len(class_f1), 4) if class_f1 else None,
+        "event_macro_f1_supported_classes": len(class_f1),
         "event_threshold": threshold,
+        "threshold_sweep_type": "event positive cutoff; negative cutoff fixed, scores between cutoffs route to review",
+        "event_review_band_sweep": event_threshold_grid,
+        "choice_review_threshold_sweep": choice_threshold_rows,
+        "unlisted_threshold_sweep": unlisted_threshold_sweep,
+        "uncertainty_threshold_sweep": uncertainty_threshold_sweep,
         "per_event": per_event,
         "threshold_sweep": threshold_rows,
+        "review_count": review_count,
+        "review_rate": round(review_count / len(evaluated), 4) if evaluated else None,
+        "other_count": other_count,
+        "other_rate": round(other_count / len(evaluated), 4) if evaluated else None,
         "review_or_other_count": len(uncertain_predicted),
+        "review_or_other_rate": round(len(uncertain_predicted) / len(evaluated), 4)
+        if evaluated
+        else None,
         "expected_review_or_other_count": len(expected_status_cases),
         "expected_review_or_other_exact_matches": correct_uncertain,
         "expected_unlisted_event_count": sum(
@@ -671,11 +1015,13 @@ def evaluate(
         ),
         "unlisted_event_precision": round(unlisted_tp / (unlisted_tp + unlisted_fp), 4)
         if unlisted_tp + unlisted_fp
-        else 0.0,
+        else None,
         "unlisted_event_recall": round(unlisted_tp / (unlisted_tp + unlisted_fn), 4)
         if unlisted_tp + unlisted_fn
-        else 0.0,
-        "unlisted_event_exact": unlisted_fp == 0 and unlisted_fn == 0,
+        else None,
+        "unlisted_event_exact": unlisted_fp == 0 and unlisted_fn == 0
+        if evaluated
+        else None,
         "expected_uncertainty_signal_count": sum(
             case["expected_uncertainty_signal"] for case in evaluated
         ),
@@ -683,12 +1029,30 @@ def evaluate(
             uncertainty_tp / (uncertainty_tp + uncertainty_fp), 4
         )
         if uncertainty_tp + uncertainty_fp
-        else 0.0,
+        else None,
         "uncertainty_signal_recall": round(
             uncertainty_tp / (uncertainty_tp + uncertainty_fn), 4
         )
         if uncertainty_tp + uncertainty_fn
-        else 0.0,
+        else None,
         "uncertainty_signal_threshold": uncertainty_review_threshold,
+        "latency": {
+            "n": len(latencies),
+            "mean_ms": round(statistics.fmean(latencies), 2) if latencies else None,
+            "median_ms": statistics.median(latencies) if latencies else None,
+            "p95_nearest_rank_ms": latencies[
+                max(0, math.ceil(0.95 * len(latencies)) - 1)
+            ]
+            if latencies
+            else None,
+            "p95_method": "nearest-rank; descriptive only; small-sample estimates are unstable",
+        },
+        "token_usage": {
+            "input_tokens": usage_totals["input_tokens"],
+            "output_tokens": usage_totals["output_tokens"],
+            "total_tokens": sum(usage_totals.values())
+            if all(value is not None for value in usage_totals.values())
+            else None,
+        },
         "note": "Pilot corpus metrics only; synthetic and small. Threshold sweep is descriptive and must not be treated as production calibration.",
     }

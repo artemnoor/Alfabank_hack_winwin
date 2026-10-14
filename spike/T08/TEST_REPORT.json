@@ -1,0 +1,166 @@
+{
+  "report_version": "1.0.0",
+  "report_date": "2026-10-14",
+  "repository": "artemnoor/Alfabank_hack_winwin",
+  "branch": "codex/spike-t08-jev-news-classification",
+  "pr": "https://github.com/artemnoor/Alfabank_hack_winwin/pull/8",
+  "base_sha": "ce640214be7c5ff2fdb451b9e290135a11b512a6",
+  "head_sha": null,
+  "head_sha_note": "The exact PR head SHA is supplied in the final report; embedding this report's own commit SHA would be self-referential.",
+  "scope": "spike/T08 only; no production runtime, OpenAPI, or generated contract changes",
+  "verdicts": {
+    "engineering_quality": "PASS",
+    "api_compatibility": "BLOCKED",
+    "model_quality": "NOT MEASURED",
+    "integration_readiness": "NOT READY"
+  },
+  "tests": {
+    "unit_and_offline_tests": {
+      "command": "python -m unittest discover -s spike/T08 -p \"test*.py\" -v",
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.393
+    },
+    "ruff_check": {"command": "ruff check spike/T08", "status": "PASS"},
+    "ruff_format": {
+      "command": "ruff format --check spike/T08",
+      "status": "PASS",
+      "formatted_python_files": 10
+    },
+    "offline_runner": {
+      "command": "python spike/T08/run_spike.py",
+      "status": "PASS",
+      "classifier_calls": 0,
+      "baseline_cases": 50,
+      "nonempty_news": 49,
+      "locally_rejected_empty": 1,
+      "model_quality": "NOT MEASURED"
+    },
+    "diff_check": {"command": "git diff --check", "status": "PASS"},
+    "live_api": {"status": "NOT RUN IN THIS AUDIT", "calls": 0},
+    "skipped": [
+      "Live Jev quality pilot: no successful API access and no newly approved live budget",
+      "Provider-side prompt-injection/privacy behavior",
+      "Actual latency, token usage, and request cost",
+      "Independent blind gold-label adjudication"
+    ]
+  },
+  "api": {
+    "documentation_review_date": "2026-10-14",
+    "official_endpoint": "https://api.typesafe.ai/v1/systemone",
+    "official_request_auth": "Bearer token; official examples use TYPESAFE_API_KEY",
+    "request_shape_documented": ["state", "model", "questions"],
+    "primitives": {"choice": "one selected option with scores and confidence", "noul": "independent yes score in [0,1]"},
+    "choice_max_options": 255,
+    "documented_total_question_limit": null,
+    "local_question_guard": 20,
+    "current_question_count": 18,
+    "model_alias": "jev-latest",
+    "documented_alias_target_at_audit": "jev-1.13.0",
+    "required_response_usage": ["input_tokens", "output_tokens"],
+    "successful_round_trip": false,
+    "compatibility_status": "BLOCKED",
+    "quality_status": "NOT MEASURED"
+  },
+  "http_451": {
+    "historical_attempts": [
+      {"request": "authenticated GET /v1/models", "status": 451, "body_saved": false},
+      {"request": "single synthetic POST using taxonomy 0.1.0-spike", "status": 451, "body_saved": false},
+      {"request": "single synthetic POST using taxonomy 0.2.0-spike", "status": 451, "body_saved": false}
+    ],
+    "new_attempts_this_audit": 0,
+    "request_id_available": false,
+    "exact_cause": "UNKNOWN",
+    "provider_or_intermediary_source_confirmed": false,
+    "known_facts": ["The saved attempts returned HTTP 451."],
+    "unconfirmed_hypotheses": ["account, credential, network, intermediary, regional, legal, or provider-side cause"],
+    "route_bypass_attempted": false
+  },
+  "corpus": {
+    "taxonomy_version": "0.3.0-spike",
+    "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+    "baseline_corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+    "deep_corpus_version": "1.0.0",
+    "deep_manifest_sha256": "eb746655045ccb9ec6baabbc34cd3d396d13755c5b6548bfe8228349ea3fb0d0",
+    "total_cases": 160,
+    "nonempty_cases": 158,
+    "splits": {
+      "A": {"cases": 76, "nonempty": 75, "status": "NOT SCORED BY JEV"},
+      "B": {"cases": 36, "nonempty": 36, "status": "NOT SCORED BY JEV", "exclude_case": "b24-price-forecast-after-bill"},
+      "C": {"cases": 24, "nonempty": 24, "metamorphic_pairs": 12, "status": "GOLD RELATIONS VALIDATED; MODEL NOT TESTED"},
+      "D": {"cases": 24, "nonempty": 23, "holdout": true, "blind": false, "status": "NOT SCORED; LABELS VISIBLE"}
+    },
+    "gold_label_status": "single-annotator draft; independent blind second annotation and adjudication not done",
+    "source": "synthetic only",
+    "jev_outputs_used_as_gold": false,
+    "original_taxonomy_and_corpus_changed": false
+  },
+  "model_metrics": {
+    "status": "NOT MEASURED",
+    "topic_accuracy": null,
+    "per_topic_confusion_matrix": null,
+    "per_event_precision_recall_f1": null,
+    "micro_f1": null,
+    "macro_f1": null,
+    "multi_label_exact_match": null,
+    "false_positives": null,
+    "false_negatives": null,
+    "uncertain_and_review_rates": null,
+    "out_of_taxonomy_detection": null,
+    "unconfirmed_claim_detection": null,
+    "latency_mean_median_p95": null,
+    "token_usage": null,
+    "actual_cost": null,
+    "calibration": null,
+    "stability_and_metamorphic_model_results": null,
+    "prompt_injection_model_results": null,
+    "mock_scores_counted_as_quality": false
+  },
+  "thresholds": {
+    "choice_review_below": 0.5,
+    "noul_negative_at_or_below": 0.2,
+    "noul_positive_at_or_above": 0.8,
+    "status": "experimental; no model-derived empirical justification",
+    "sweep_math": "tested only on controlled offline fixtures",
+    "production_optimization": false
+  },
+  "security": {
+    "fixed_official_https_endpoint": true,
+    "bearer_auth": true,
+    "redirects_refused": true,
+    "environment_proxy_discovery_disabled": true,
+    "request_timeout_bounded": true,
+    "response_body_bounded": true,
+    "automatic_retries": false,
+    "request_hash_allowlist": true,
+    "one_send_per_approved_request": true,
+    "raw_error_body_saved": false,
+    "api_key_read_or_printed_by_audit": false,
+    "real_articles_sent": false,
+    "offline_network_guard": "stdlib socket entrypoints patched during tests; process-level only, not OS sandbox",
+    "provider_side_behavior": "NOT MEASURED"
+  },
+  "framework_compatibility": {
+    "normative_operation": "Understanding.classify",
+    "reference": "docs/specs/framework-v1/03-operations.md#05-understandingclassify and openapi.json#/components/schemas/ClassificationInput, ClassificationOutput",
+    "fully_compatible": [],
+    "partially_compatible": ["Jev is the sole spike classifier", "native Choice topic plus independent event Noul questions", "registered finite output codes"],
+    "not_compatible": ["normative material/taxonomy/allowed_codes/multi_label input DTO", "normative topics/event_hints/status/missing_data output DTO", "runtime policy/provenance/history/replay integration"],
+    "not_verified": ["successful live provider round-trip"]
+  },
+  "independent_review": {
+    "architecture_security": "no remaining blocker identified after regression additions; runtime integration absent by design",
+    "provider_api": "request fields and native primitive usage align with official docs; successful server response unavailable",
+    "taxonomy_data": "offline review complete; single-annotator draft and B24 ambiguity remain",
+    "statistics": "offline evaluator arithmetic tested; no model-quality conclusion supported"
+  },
+  "findings": [
+    {"severity": "HIGH", "key": "API_451", "status": "OPEN", "reproduction": "read saved discovery and single-case synthetic POST reports", "expected": "documented API response", "actual": "three historical HTTP 451 responses", "action": "request official support/account-owner explanation; do not retry or bypass"},
+    {"severity": "HIGH", "key": "NO_MODEL_MEASUREMENT", "status": "OPEN", "reproduction": "baseline offline runner reports classifier_calls=0 and saved result folder has no success", "expected": "approved synthetic Jev outputs against adjudicated gold", "actual": "all Jev quality metrics null/not measured", "action": "after access and budget approval run a one-call smoke then bounded pilot"},
+    {"severity": "HIGH", "key": "GOLD_NOT_BLIND_ADJUDICATED", "status": "OPEN", "reproduction": "inspect deep manifest annotator and D split declarations", "expected": "independent adjudicated gold and blind control", "actual": "single annotator, D visible, B24 ambiguity", "action": "second blind annotation and adjudication; publish a new dataset version"},
+    {"severity": "MEDIUM", "key": "TAXONOMY_BOUNDARIES", "status": "OPEN_PROPOSAL", "reproduction": "inspect taxonomy review six boundary pairs and B24", "expected": "operational definitions for event time, legal distinction, and overlaps", "actual": "several ambiguous boundaries and unlisted event families", "action": "review separate v0.4 proposal before changing v0.3"},
+    {"severity": "MEDIUM", "key": "FRAMEWORK_DTO_GAP", "status": "OPEN_BY_DESIGN", "reproduction": "compare spike case/output with normative operation schemas", "expected": "normative input/output with policy and provenance", "actual": "isolated experimental request and result shape", "action": "design an approved adapter before runtime integration; no OpenAPI change"}
+  ],
+  "recommendation": "Keep the prototype isolated. Do not trust Jev for Russian business-news classification until official access is diagnosed, a successful permitted pilot is run, and an independently adjudicated blind evaluation supports quality claims."
+}

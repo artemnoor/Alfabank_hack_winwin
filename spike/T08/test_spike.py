@@ -231,6 +231,120 @@ class TaxonomyAndCorpusTests(unittest.TestCase):
         self.assertIn("legal_enforcement", by_id["e26-legal-investigation"])
 
 
+def write_test_attempt_ledger(path: Path) -> None:
+    from live_ledger import (
+        HISTORICAL_CASE_ID,
+        HISTORICAL_REQUEST_SHA256,
+        LEDGER_SCHEMA_VERSION,
+    )
+
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": LEDGER_SCHEMA_VERSION,
+                "attempts": [
+                    {
+                        "case_id": HISTORICAL_CASE_ID,
+                        "request_sha256": HISTORICAL_REQUEST_SHA256,
+                        "timestamp_utc": "2026-10-14T09:46:55+00:00",
+                        "record_type": "historical_recorded_attempt",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+class AttemptLedgerTests(unittest.TestCase):
+    def _test_ledger(self, path: Path) -> Any:
+        from live_ledger import AttemptLedger
+
+        write_test_attempt_ledger(path)
+        return AttemptLedger(path)
+
+    def test_ledger_persists_cases_and_blocks_historical_duplicate(self) -> None:
+        import hashlib
+
+        from live_ledger import HISTORICAL_REQUEST_SHA256, AttemptLedger
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            ledger = self._test_ledger(path)
+            self.assertEqual(ledger.count(), 1)
+            with self.assertRaisesRegex(SpikeError, "already_in_live_ledger"):
+                ledger.reserve("e01-supply-rail", HISTORICAL_REQUEST_SHA256)
+            request_sha = hashlib.sha256(b"e02 synthetic request").hexdigest()
+            self.assertEqual(ledger.reserve("e02-supply-carrier", request_sha), (1, 2))
+            self.assertEqual(AttemptLedger(path).count(), 2)
+            serialized = path.read_text(encoding="utf-8")
+            self.assertNotIn("synthetic request", serialized)
+            self.assertNotIn("POLZA_AI_API_KEY", serialized)
+
+    def test_ledger_enforces_fifty_cumulative_attempt_cap(self) -> None:
+        import hashlib
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            ledger = self._test_ledger(path)
+            self.assertEqual(ledger.count(), 1)
+            for index in range(49):
+                request_sha = hashlib.sha256(f"request-{index}".encode()).hexdigest()
+                ledger.reserve(f"case-{index}", request_sha)
+            self.assertEqual(ledger.count(), 50)
+            with self.assertRaisesRegex(SpikeError, "cumulative_live_call_limit"):
+                ledger.reserve("case-final", hashlib.sha256(b"final").hexdigest())
+
+    def test_ledger_concurrent_reservations_are_serialized(self) -> None:
+        import hashlib
+        from concurrent.futures import ThreadPoolExecutor
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            ledger = self._test_ledger(path)
+            requests = [
+                (f"concurrent-{index}", hashlib.sha256(str(index).encode()).hexdigest())
+                for index in range(24)
+            ]
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                reserved = list(pool.map(lambda item: ledger.reserve(*item), requests))
+
+            self.assertEqual(ledger.count(), 25)
+            self.assertEqual(sorted(start for start, _ in reserved), list(range(1, 25)))
+            self.assertEqual(sorted(end for _, end in reserved), list(range(2, 26)))
+
+    def test_ledger_reconciles_a_known_historical_attempt(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attempts.json"
+            ledger = self._test_ledger(path)
+            self.assertEqual(
+                ledger.record_historical_attempt(
+                    "legacy-typesafe-e01-failed",
+                    "32267acce614055107a4c627a29167d0b9d19603d412c0a6722df3a0f1558291",
+                    "2026-10-14T09:45:44+00:00",
+                ),
+                (1, 2),
+            )
+            self.assertEqual(ledger.count(), 2)
+            with self.assertRaisesRegex(SpikeError, "already_in_live_ledger"):
+                ledger.record_historical_attempt(
+                    "legacy-typesafe-e01-failed",
+                    "32267acce614055107a4c627a29167d0b9d19603d412c0a6722df3a0f1558291",
+                    "2026-10-14T09:45:44+00:00",
+                )
+
+    def test_fresh_live_ledger_seed_includes_the_completed_budget(self) -> None:
+        from live_ledger import HISTORICAL_LEGACY_REQUEST_SHA256, AttemptLedger
+
+        seeded = AttemptLedger._seed()
+        self.assertEqual(len(seeded["attempts"]), 50)
+        self.assertIn(
+            HISTORICAL_LEGACY_REQUEST_SHA256,
+            {entry["request_sha256"] for entry in seeded["attempts"]},
+        )
+        self.assertEqual(len({entry["case_id"] for entry in seeded["attempts"]}), 50)
+
+
 class RequestAndResponseTests(unittest.TestCase):
     def setUp(self) -> None:
         self.case = next(
@@ -316,12 +430,13 @@ class RequestAndResponseTests(unittest.TestCase):
         with self.assertRaisesRegex(SpikeError, "not a maximum-probability"):
             validate_response(response, self.request, TAXONOMY)
 
-    def test_choice_confidence_does_not_assume_an_undocumented_formula(self) -> None:
+    def test_choice_confidence_must_match_probability_distribution(self) -> None:
         response = _valid_response(self.request)
         response["answers"][TAXONOMY["topic_choice_id"]]["confidence"] = 0.47
-        validate_response(response, self.request, TAXONOMY)
+        with self.assertRaisesRegex(SpikeError, "confidence does not match"):
+            validate_response(response, self.request, TAXONOMY)
 
-    def test_choice_confidence_allows_documented_example_rounding(self) -> None:
+    def test_choice_confidence_allows_official_polza_example_rounding(self) -> None:
         request = copy.deepcopy(self.request)
         question = request["questions"][TAXONOMY["topic_choice_id"]]
         codes = list(question["criteria"])[:3]
@@ -329,10 +444,24 @@ class RequestAndResponseTests(unittest.TestCase):
         response = _valid_response(
             request,
             topic=codes[0],
-            topic_confidence=0.81,
-            topic_probabilities={codes[0]: 0.88, codes[1]: 0.12, codes[2]: 0.0},
+            topic_confidence=0.62,
+            topic_probabilities={codes[0]: 0.74, codes[1]: 0.26, codes[2]: 0.0},
         )
         validate_response(response, request, TAXONOMY)
+
+    def test_choice_confidence_rejects_discrepancy_beyond_rounding(self) -> None:
+        request = copy.deepcopy(self.request)
+        question = request["questions"][TAXONOMY["topic_choice_id"]]
+        codes = list(question["criteria"])[:3]
+        question["criteria"] = {code: "test option" for code in codes}
+        response = _valid_response(
+            request,
+            topic=codes[0],
+            topic_confidence=0.79,
+            topic_probabilities={codes[0]: 0.88, codes[1]: 0.12, codes[2]: 0.0},
+        )
+        with self.assertRaisesRegex(SpikeError, "confidence does not match"):
+            validate_response(response, request, TAXONOMY)
 
     def test_unexpected_or_missing_question_answer_is_rejected(self) -> None:
         response = _valid_response(self.request)
@@ -591,10 +720,14 @@ class TransportSafetyTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
             output_path = Path(temporary) / "partial-live.json"
+            ledger_path = Path(temporary) / "live-attempts.json"
+            write_test_attempt_ledger(ledger_path)
             args = Namespace(
                 max_calls=1,
                 model=DEFAULT_MODEL,
                 output=str(output_path),
+                start_at="e02-supply-carrier",
+                ledger_path=str(ledger_path),
             )
             with (
                 patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
@@ -611,10 +744,375 @@ class TransportSafetyTests(unittest.TestCase):
             saved = json.loads(output_path.read_text(encoding="utf-8"))
             self.assertEqual(saved["endpoint_host"], "polza.ai")
             self.assertEqual(saved["requested_model_id"], "typesafe/jev")
+            self.assertEqual(saved["start_at_case_id"], "e02-supply-carrier")
             self.assertIsNone(saved["metrics"])
             serialized = output_path.read_text(encoding="utf-8")
             self.assertNotIn("unit-test-fixture", serialized)
-            self.assertNotIn(CASES[0]["text"], serialized)
+            self.assertNotIn(CASES[1]["text"], serialized)
+
+    def test_complete_custom_transport_run_is_not_reported_as_measured(self) -> None:
+        from argparse import Namespace
+
+        import run_spike
+        from jev_spike import SPIKE_DIR
+
+        class OfflineJevClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                pass
+
+            def classify(self, request: dict[str, Any]) -> dict[str, Any]:
+                return _valid_response(request)
+
+        class InMemoryLedger:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                self.attempts = 0
+
+            def count(self) -> int:
+                return self.attempts
+
+            def reserve(self, *_: Any, **__: Any) -> tuple[int, int]:
+                before = self.attempts
+                self.attempts += 1
+                return before, self.attempts
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            output_path = Path(temporary) / "full-custom-transport.json"
+            args = Namespace(
+                max_calls=50,
+                model=DEFAULT_MODEL,
+                output=str(output_path),
+                start_at=None,
+                ledger_path=None,
+            )
+            with (
+                patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+                patch.object(run_spike, "JevClient", OfflineJevClient),
+                patch.object(run_spike, "AttemptLedger", InMemoryLedger),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                report = run_spike.run_live(args, TAXONOMY, CORPUS, CASES)
+
+        self.assertEqual(report["successful_calls"], 49)
+        self.assertEqual(
+            report["quality_metrics_status"], "NOT_MEASURED_CUSTOM_TRANSPORT"
+        )
+        self.assertIsNone(report["metrics"])
+        self.assertEqual(
+            report["provider_response_authenticity"], "NOT_CRYPTOGRAPHICALLY_ATTESTED"
+        )
+
+    def test_live_segments_start_at_exact_pinned_case_and_remain_partial(self) -> None:
+        from argparse import Namespace
+
+        import run_spike
+        from jev_spike import SPIKE_DIR
+
+        seen_states: list[dict[str, str]] = []
+
+        class OfflineJevClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                pass
+
+            def classify(self, request: dict[str, Any]) -> dict[str, Any]:
+                seen_states.append(request["state"])
+                return _valid_response(request)
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            output_path = Path(temporary) / "segment.json"
+            ledger_path = Path(temporary) / "live-attempts.json"
+            write_test_attempt_ledger(ledger_path)
+            args = Namespace(
+                max_calls=2,
+                model=DEFAULT_MODEL,
+                output=str(output_path),
+                start_at="e03-shortage-cells",
+                ledger_path=str(ledger_path),
+            )
+            with (
+                patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+                patch.object(run_spike, "JevClient", OfflineJevClient),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                report = run_spike.run_live(args, TAXONOMY, CORPUS, CASES)
+
+        self.assertEqual(
+            [state["title"] for state in seen_states],
+            [case["title"] for case in CASES[2:4]],
+        )
+        self.assertEqual(report["start_at_case_id"], "e03-shortage-cells")
+        self.assertEqual(report["end_at_case_id"], "e04-shortage-ports")
+        self.assertEqual(
+            report["quality_metrics_status"], "NOT_MEASURED_INCOMPLETE_RUN"
+        )
+        self.assertIsNone(report["metrics"])
+
+    def test_live_start_at_rejects_unpinned_case_before_request(self) -> None:
+        from argparse import Namespace
+
+        import run_spike
+
+        class OfflineJevClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                pass
+
+            def classify(self, _: dict[str, Any]) -> dict[str, Any]:
+                raise AssertionError("unapproved case reached the classifier")
+
+        args = Namespace(
+            max_calls=1,
+            model=DEFAULT_MODEL,
+            output=None,
+            start_at="not-in-pinned-corpus",
+            ledger_path=None,
+        )
+        with (
+            patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+            patch.object(run_spike, "JevClient", OfflineJevClient),
+            self.assertRaisesRegex(SpikeError, "--start-at"),
+        ):
+            run_spike.run_live(args, TAXONOMY, CORPUS, CASES)
+
+    def test_live_callable_rejects_modified_inputs_before_constructing_client(
+        self,
+    ) -> None:
+        from argparse import Namespace
+
+        import run_spike
+
+        altered_corpus = copy.deepcopy(CORPUS)
+        altered_corpus["cases"][0]["text"] += " Подмена не должна уйти в сеть."
+
+        class ForbiddenClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                raise AssertionError(
+                    "client must not be constructed for altered inputs"
+                )
+
+        args = Namespace(max_calls=1, model=DEFAULT_MODEL, output=None, start_at=None)
+        with (
+            patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+            patch.object(run_spike, "JevClient", ForbiddenClient),
+            self.assertRaisesRegex(SpikeError, "exact pinned synthetic inputs"),
+        ):
+            run_spike.run_live(args, TAXONOMY, altered_corpus, CASES)
+
+
+class PilotAggregationTests(unittest.TestCase):
+    def _write_segment(
+        self,
+        output_path: Path,
+        *,
+        max_calls: int,
+        start_at: str | None,
+        ledger_path: Path,
+    ) -> dict[str, Any]:
+        from argparse import Namespace
+
+        import run_spike
+
+        if not ledger_path.exists():
+            write_test_attempt_ledger(ledger_path)
+
+        class OfflineJevClient:
+            def __init__(self, *_: Any, **__: Any) -> None:
+                pass
+
+            def classify(self, request: dict[str, Any]) -> dict[str, Any]:
+                return _valid_response(request)
+
+        args = Namespace(
+            max_calls=max_calls,
+            model=DEFAULT_MODEL,
+            output=str(output_path),
+            start_at=start_at,
+            ledger_path=str(ledger_path),
+        )
+        with (
+            patch.dict(os.environ, {"POLZA_AI_API_KEY": "unit-test-fixture"}),
+            patch.object(run_spike, "JevClient", OfflineJevClient),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            return run_spike.run_live(args, TAXONOMY, CORPUS, CASES)
+
+    def test_aggregate_staged_segments_only_after_full_pinned_coverage(self) -> None:
+        from aggregate_pilot import aggregate_reports
+        from jev_spike import SPIKE_DIR
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            root = Path(temporary)
+            first = root / "first.json"
+            middle = root / "middle.json"
+            final = root / "final.json"
+            ledger_path = root / "live-attempts.json"
+            self._write_segment(
+                first,
+                max_calls=1,
+                start_at="e02-supply-carrier",
+                ledger_path=ledger_path,
+            )
+            self._write_segment(
+                middle,
+                max_calls=10,
+                start_at="e03-shortage-cells",
+                ledger_path=ledger_path,
+            )
+            self._write_segment(
+                final,
+                max_calls=50,
+                start_at="e13-regulation-waste",
+                ledger_path=ledger_path,
+            )
+
+            aggregate = aggregate_reports(
+                [
+                    Path("spike/T08/results/jev-live-pilot-20261014T094655Z.json"),
+                    first,
+                    middle,
+                    final,
+                ]
+            )
+
+        self.assertEqual(
+            aggregate["quality_metrics_status"], "NOT_MEASURED_CUSTOM_TRANSPORT"
+        )
+        self.assertIsNone(aggregate["metrics"])
+        self.assertEqual(aggregate["mode"], "live_synthetic_pilot_aggregate")
+        self.assertEqual(aggregate["successful_calls"], 49)
+        self.assertEqual(aggregate["attempted_calls"], 50)
+        self.assertEqual(aggregate["failed_calls"], 1)
+        self.assertEqual(aggregate["historical_failed_calls"], 1)
+        self.assertEqual(
+            [segment["calls"] for segment in aggregate["segments"]], [1, 1, 10, 37]
+        )
+        self.assertEqual(
+            aggregate["provider_response_authenticity"],
+            "NOT_CRYPTOGRAPHICALLY_ATTESTED",
+        )
+        serialized = json.dumps(aggregate, ensure_ascii=False)
+        self.assertNotIn("unit-test-fixture", serialized)
+        self.assertNotIn(CASES[0]["text"], serialized)
+
+    def test_aggregate_rejects_duplicate_segment_and_incomplete_coverage(self) -> None:
+        from aggregate_pilot import aggregate_reports
+        from jev_spike import SPIKE_DIR
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            first = Path(temporary) / "first.json"
+            duplicate = Path(temporary) / "duplicate.json"
+            ledger_path = Path(temporary) / "live-attempts.json"
+            self._write_segment(
+                first,
+                max_calls=1,
+                start_at="e02-supply-carrier",
+                ledger_path=ledger_path,
+            )
+            duplicate.write_text(first.read_text(encoding="utf-8"), encoding="utf-8")
+            with self.assertRaisesRegex(SpikeError, "cumulative ledger"):
+                aggregate_reports(
+                    [
+                        Path("spike/T08/results/jev-live-pilot-20261014T094655Z.json"),
+                        first,
+                        duplicate,
+                    ]
+                )
+
+    def test_aggregate_keeps_failed_attempts_out_of_partial_metrics(self) -> None:
+        from aggregate_pilot import aggregate_reports
+        from jev_spike import SPIKE_DIR
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            root = Path(temporary)
+            first = root / "failed-segment.json"
+            next_segment = root / "next-segment.json"
+            ledger_path = root / "live-attempts.json"
+            self._write_segment(
+                first,
+                max_calls=2,
+                start_at="e02-supply-carrier",
+                ledger_path=ledger_path,
+            )
+            failed_report = json.loads(first.read_text(encoding="utf-8"))
+            failed_report["results"] = failed_report["results"][:1]
+            failed_report["successful_calls"] = 1
+            failed_report["attempted_calls"] = 2
+            failed_report["end_at_case_id"] = "e02-supply-carrier"
+            failed_report["failures"] = [
+                {
+                    "case_id": "e03-shortage-cells",
+                    "error": "sanitized_request_error",
+                }
+            ]
+            first.write_text(
+                json.dumps(failed_report, ensure_ascii=False), encoding="utf-8"
+            )
+            self._write_segment(
+                next_segment,
+                max_calls=1,
+                start_at="e04-shortage-ports",
+                ledger_path=ledger_path,
+            )
+
+            aggregate = aggregate_reports(
+                [
+                    Path("spike/T08/results/jev-live-pilot-20261014T094655Z.json"),
+                    first,
+                    next_segment,
+                ]
+            )
+
+        self.assertEqual(
+            aggregate["quality_metrics_status"], "NOT_MEASURED_CUSTOM_TRANSPORT"
+        )
+        self.assertIsNone(aggregate["metrics"])
+        self.assertEqual(aggregate["failures"], failed_report["failures"])
+        self.assertIn("e03-shortage-cells", aggregate["missing_result_case_ids"])
+        self.assertEqual(aggregate["current_attempted_calls"], 3)
+        self.assertEqual(aggregate["current_successful_calls"], 2)
+        self.assertEqual(aggregate["current_failed_calls"], 1)
+        self.assertEqual(aggregate["failed_calls"], 2)
+        self.assertEqual(aggregate["cumulative_attempts"], 4)
+        self.assertEqual(aggregate["known_total_attempts"], 5)
+
+    def test_aggregate_rejects_request_hash_tampering(self) -> None:
+        from aggregate_pilot import aggregate_reports
+        from jev_spike import SPIKE_DIR
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            report_path = Path(temporary) / "segment.json"
+            self._write_segment(
+                report_path,
+                max_calls=1,
+                start_at="e02-supply-carrier",
+                ledger_path=Path(temporary) / "live-attempts.json",
+            )
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            report["request_sha256_by_case"]["e01-supply-rail"] = "0" * 64
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(SpikeError, "request hash"):
+                aggregate_reports([report_path])
+
+    def test_aggregate_rejects_inconsistent_choice_confidence(self) -> None:
+        from aggregate_pilot import aggregate_reports
+        from jev_spike import SPIKE_DIR
+
+        with tempfile.TemporaryDirectory(dir=SPIKE_DIR) as temporary:
+            report_path = Path(temporary) / "segment.json"
+            self._write_segment(
+                report_path,
+                max_calls=1,
+                start_at="e02-supply-carrier",
+                ledger_path=Path(temporary) / "live-attempts.json",
+            )
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            report["results"][0]["topic_confidence"] = 0.47
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(SpikeError, "confidence does not match"):
+                aggregate_reports(
+                    [
+                        Path("spike/T08/results/jev-live-pilot-20261014T094655Z.json"),
+                        report_path,
+                    ]
+                )
 
     def test_offline_cli_runs_with_network_guard_active(self) -> None:
         from run_spike import main
@@ -749,6 +1247,25 @@ class TransportSafetyTests(unittest.TestCase):
             _safe_failure("synthetic-case", error),
             {"case_id": "synthetic-case", "error": "http_status_451"},
         )
+
+    def test_provider_schema_failures_get_safe_diagnostic_codes(self) -> None:
+        from run_spike import _safe_failure
+
+        known = _safe_failure(
+            "synthetic-case", SpikeError("Jev returned an invalid response shape")
+        )
+        unknown = _safe_failure(
+            "synthetic-case", SpikeError("provider echoed ARTICLE_SECRET")
+        )
+        self.assertEqual(
+            known,
+            {"case_id": "synthetic-case", "error": "invalid_provider_response"},
+        )
+        self.assertEqual(
+            unknown,
+            {"case_id": "synthetic-case", "error": "sanitized_request_error"},
+        )
+        self.assertNotIn("ARTICLE_SECRET", json.dumps(unknown))
 
     def test_expected_http_status_errors_are_sanitized_without_retry(self) -> None:
         for status in (400, 401, 403, 429, 451, 500, 502, 503, 529):

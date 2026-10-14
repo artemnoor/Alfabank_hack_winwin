@@ -1,0 +1,472 @@
+{
+  "report_version": "1.2.0",
+  "report_date": "2026-10-14",
+  "repository": "artemnoor/Alfabank_hack_winwin",
+  "branch": "codex/spike-t08-jev-news-classification",
+  "pr": "https://github.com/artemnoor/Alfabank_hack_winwin/pull/8",
+  "base_sha": "ce640214be7c5ff2fdb451b9e290135a11b512a6",
+  "head_sha": null,
+  "head_sha_note": "The exact PR head SHA is supplied in the final report; embedding this report's own commit SHA would be self-referential.",
+  "scope": "spike/T08 only; no production runtime, OpenAPI, or generated contract changes",
+  "verdicts": {
+    "engineering_quality": "PASS",
+    "api_compatibility": "PASS_FOR_HISTORICAL_SMOKE_PATH; CURRENT_REVISION_NOT_LIVE_TESTED",
+    "model_quality": "NOT MEASURED",
+    "integration_readiness": "NOT READY"
+  },
+  "tests": {
+    "unit_and_offline_tests": {
+      "command": "python -m unittest discover -s spike/T08 -p \"test*.py\" -v",
+      "passed": 70,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.446
+    },
+    "ruff_check": {
+      "command": "ruff check spike/T08",
+      "status": "PASS"
+    },
+    "ruff_format": {
+      "command": "ruff format --check spike/T08",
+      "status": "PASS",
+      "formatted_python_files": 12
+    },
+    "offline_runner": {
+      "command": "python spike/T08/run_spike.py",
+      "status": "PASS",
+      "classifier_calls": 0,
+      "baseline_cases": 50,
+      "nonempty_news": 49,
+      "locally_rejected_empty": 1,
+      "model_quality": "NOT MEASURED"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    "live_api": {
+      "status": "ONE_HISTORICAL_POLZA_SMOKE_SUCCEEDED; CURRENT_REVISION_NOT_LIVE_TESTED",
+      "calls": 1,
+      "endpoint": "https://polza.ai/api/v1/systemone",
+      "requested_model_id": "typesafe/jev",
+      "resolved_model": "jev-1.13.0",
+      "case_id": "e01-supply-rail",
+      "input_tokens": 5905,
+      "output_tokens": 492,
+      "cost_rub": 0.10391619,
+      "latency_ms": 844,
+      "topic": "industry_trade_supply",
+      "positive_event": "supply_chain_disruption",
+      "positive_event_score": 0.9,
+      "unlisted_event_score": 0.53,
+      "harness_status": "uncertain",
+      "aggregate_quality_metrics": "NOT MEASURED; partial run; n=1",
+      "artifact": "spike/T08/results/jev-live-pilot-20261014T094655Z.json",
+      "recorded_client_sha256": "5ef1c6c754c3650387943f1bc63580e044c8d2d093de9f18a1dae678a88cbd90",
+      "recorded_runner_sha256": "3a4ed49c9b7df5214bab2201994f75730d3d4ffc3e0802d354407ee81906842b",
+      "current_client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+      "current_runner_sha256": "2f6368fd448f29c135360d9e42924188886b6544c2d94784c6c469ef256be701",
+      "current_request_sha256_matches_recorded_smoke": true,
+      "current_revision_live_tested": false,
+      "current_request_sha256": "a5d7356b04bce548810847dbbd297792c5da0c05733d4124863d48fd87e5d592"
+    },
+    "skipped": [
+      "Full 49-case Jev pilot: no separate cost budget approved",
+      "Provider-side prompt-injection/privacy behavior",
+      "Category-level quality, calibration, stability, metamorphic live checks",
+      "Independent blind gold-label adjudication",
+      "No additional billable call was made to validate the final code revision; the current request hash matches the historical smoke."
+    ]
+  },
+  "api": {
+    "documentation_review_date": "2026-10-14",
+    "official_endpoint": "https://polza.ai/api/v1/systemone",
+    "official_request_auth": "Bearer token from POLZA_AI_API_KEY",
+    "request_shape_documented": [
+      "state",
+      "model",
+      "questions",
+      "provider (optional)"
+    ],
+    "requested_model_id": "typesafe/jev",
+    "primitives": {
+      "choice": "one selected option with probabilities and confidence",
+      "noul": "independent yes score in [0,1]"
+    },
+    "choice_max_options": 255,
+    "systemone_questions_min_max": [
+      1,
+      256
+    ],
+    "local_question_guard": 20,
+    "current_question_count": 18,
+    "confidence_formula_documented": false,
+    "required_response_usage": [
+      "input_tokens",
+      "output_tokens",
+      "cost_rub"
+    ],
+    "successful_round_trip": true,
+    "request_sets_allow_fallbacks_false": true,
+    "effective_upstream_routing_verified": false,
+    "round_trip_count": 1,
+    "compatibility_status": "PASS_FOR_HISTORICAL_SMOKE_PATH; CURRENT_REVISION_NOT_LIVE_TESTED",
+    "quality_status": "NOT MEASURED",
+    "current_request_sha256_matches_recorded_smoke": true,
+    "current_revision_live_tested": false
+  },
+  "http_451": {
+    "historical_route": "https://api.typesafe.ai (previous direct-route implementation)",
+    "historical_attempts": [
+      {
+        "request": "authenticated GET /v1/models",
+        "status": 451,
+        "body_saved": false
+      },
+      {
+        "request": "single synthetic POST using taxonomy 0.1.0-spike",
+        "status": 451,
+        "body_saved": false
+      },
+      {
+        "request": "single synthetic POST using taxonomy 0.2.0-spike",
+        "status": 451,
+        "body_saved": false
+      }
+    ],
+    "additional_legacy_route_attempt": {
+      "count": 1,
+      "status": "sanitized_request_error",
+      "body_saved": false,
+      "request_id_available": false,
+      "purpose": "accidental request during pre-fix regression test using the legacy key variable"
+    },
+    "polza_route_attempts": 1,
+    "polza_route_successes": 1,
+    "exact_cause_of_historical_451": "UNKNOWN; not evidence about Polza availability",
+    "provider_or_intermediary_source_confirmed": false,
+    "route_bypass_attempted": false
+  },
+  "corpus": {
+    "taxonomy_version": "0.3.0-spike",
+    "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+    "baseline_corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+    "deep_corpus_version": "1.0.0",
+    "deep_manifest_sha256": "eb746655045ccb9ec6baabbc34cd3d396d13755c5b6548bfe8228349ea3fb0d0",
+    "total_cases": 160,
+    "nonempty_cases": 158,
+    "splits": {
+      "A": {
+        "cases": 76,
+        "nonempty": 75,
+        "status": "NOT SCORED BY JEV"
+      },
+      "B": {
+        "cases": 36,
+        "nonempty": 36,
+        "status": "NOT SCORED BY JEV",
+        "exclude_case": "b24-price-forecast-after-bill"
+      },
+      "C": {
+        "cases": 24,
+        "nonempty": 24,
+        "metamorphic_pairs": 12,
+        "status": "GOLD RELATIONS VALIDATED; MODEL NOT TESTED"
+      },
+      "D": {
+        "cases": 24,
+        "nonempty": 23,
+        "holdout": true,
+        "blind": false,
+        "status": "NOT SCORED; LABELS VISIBLE"
+      }
+    },
+    "gold_label_status": "single-annotator draft; independent blind second annotation and adjudication not done",
+    "source": "synthetic only",
+    "jev_outputs_used_as_gold": false,
+    "original_taxonomy_and_corpus_changed": false
+  },
+  "model_metrics": {
+    "status": "NOT MEASURED",
+    "topic_accuracy": null,
+    "per_topic_confusion_matrix": null,
+    "per_event_precision_recall_f1": null,
+    "micro_f1": null,
+    "macro_f1": null,
+    "multi_label_exact_match": null,
+    "false_positives": null,
+    "false_negatives": null,
+    "uncertain_and_review_rates": null,
+    "out_of_taxonomy_detection": null,
+    "unconfirmed_claim_detection": null,
+    "latency_mean_median_p95": null,
+    "token_usage": null,
+    "actual_cost": null,
+    "calibration": null,
+    "stability_and_metamorphic_model_results": null,
+    "prompt_injection_model_results": null,
+    "mock_scores_counted_as_quality": false,
+    "single_case_observation": {
+      "latency_ms": 844,
+      "input_tokens": 5905,
+      "output_tokens": 492,
+      "cost_rub": 0.10391619,
+      "topic_correct_against_draft_label": true,
+      "event_correct_against_draft_label": true,
+      "unlisted_event_score": 0.53,
+      "harness_routed_to_review": true,
+      "note": "one synthetic case only; draft label is not independently adjudicated and is not a model-quality metric"
+    }
+  },
+  "manual_gold_coverage_split_a": {
+    "topics": {
+      "industry_trade_supply": {
+        "support": 15,
+        "jev_accuracy": null
+      },
+      "business_companies": {
+        "support": 11,
+        "jev_accuracy": null
+      },
+      "law_regulation": {
+        "support": 11,
+        "jev_accuracy": null
+      },
+      "technology_telecom": {
+        "support": 8,
+        "jev_accuracy": null
+      },
+      "politics_government": {
+        "support": 8,
+        "jev_accuracy": null
+      },
+      "energy_resources": {
+        "support": 5,
+        "jev_accuracy": null
+      },
+      "labor_employment": {
+        "support": 5,
+        "jev_accuracy": null
+      },
+      "environment_disasters": {
+        "support": 4,
+        "jev_accuracy": null
+      },
+      "economy_finance": {
+        "support": 3,
+        "jev_accuracy": null
+      },
+      "health": {
+        "support": 3,
+        "jev_accuracy": null
+      },
+      "other_uncertain": {
+        "support": 2,
+        "jev_accuracy": null
+      }
+    },
+    "events": {
+      "supply_chain_disruption": {
+        "gold_positive_support": 8,
+        "jev_precision_recall_f1": null
+      },
+      "production_operational_disruption": {
+        "gold_positive_support": 5,
+        "jev_precision_recall_f1": null
+      },
+      "environment_disaster_impact": {
+        "gold_positive_support": 5,
+        "jev_precision_recall_f1": null
+      },
+      "cyber_security_incident": {
+        "gold_positive_support": 5,
+        "jev_precision_recall_f1": null
+      },
+      "labor_workforce_event": {
+        "gold_positive_support": 5,
+        "jev_precision_recall_f1": null
+      },
+      "shortage_capacity_constraint": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "price_cost_change": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "trade_restriction": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "sanctions": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "regulation_tax_change": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "insolvency_default": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "corporate_transaction_restructuring": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "product_recall_quality_safety": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "legal_enforcement": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      },
+      "investment_capacity_change": {
+        "gold_positive_support": 4,
+        "jev_precision_recall_f1": null
+      }
+    },
+    "note": "Manual draft-label support is corpus coverage, not classifier performance."
+  },
+  "thresholds": {
+    "choice_review_below": 0.5,
+    "noul_negative_at_or_below": 0.2,
+    "noul_positive_at_or_above": 0.8,
+    "status": "experimental; no model-derived empirical justification",
+    "sweep_math": "tested only on controlled offline fixtures",
+    "production_optimization": false
+  },
+  "security": {
+    "fixed_official_https_endpoint": true,
+    "bearer_auth": true,
+    "redirects_refused": true,
+    "environment_proxy_discovery_disabled": true,
+    "request_timeout_bounded": true,
+    "response_body_bounded": true,
+    "automatic_retries": false,
+    "request_hash_allowlist": true,
+    "request_hash_repeat_blocked_per_invocation": true,
+    "live_default_max_calls_per_invocation": 1,
+    "cumulative_live_budget_across_invocations_enforced": false,
+    "raw_error_body_saved": false,
+    "provider_error_metadata_saved": false,
+    "api_key_read_or_printed_by_audit": false,
+    "real_articles_sent": false,
+    "offline_network_guard": "stdlib socket entrypoints patched during tests; process-level only, not OS sandbox",
+    "provider_side_behavior": "NOT MEASURED",
+    "endpoint_host": "polza.ai",
+    "bearer_auth_env_name": "POLZA_AI_API_KEY",
+    "jev_model_id_pinned": "typesafe/jev",
+    "request_sets_provider_fallbacks_disabled": true,
+    "effective_provider_fallback_behavior": "NOT VERIFIED",
+    "legacy_key_fallback": false,
+    "partial_report_metrics_suppressed": true,
+    "report_excludes_raw_text_and_credentials": true,
+    "provider_error_body_saved": false,
+    "synthetic_corpus_restriction_enforced_by_cli": true,
+    "jev_client_accepts_caller_supplied_hash_allowlist": true,
+    "credential_pattern_scan": "PASS; targeted high-confidence patterns had no matches; gitleaks unavailable"
+  },
+  "framework_compatibility": {
+    "normative_operation": "Understanding.classify",
+    "reference": "docs/specs/framework-v1/03-operations.md#05-understandingclassify and openapi.json#/components/schemas/ClassificationInput, ClassificationOutput",
+    "fully_compatible": [],
+    "partially_compatible": [
+      "Jev is the sole spike classifier",
+      "native Choice topic plus independent event Noul questions",
+      "registered finite output codes"
+    ],
+    "not_compatible": [
+      "normative material/taxonomy/allowed_codes/multi_label input DTO",
+      "normative topics/event_hints/status/missing_data output DTO",
+      "runtime policy/provenance/history/replay integration"
+    ],
+    "not_verified": [
+      "runtime DTO/policy/provenance/history/replay integration (out of spike scope)",
+      "error modes beyond offline transport fixtures",
+      "representative model quality and provider-side security behavior"
+    ]
+  },
+  "independent_review": {
+    "architecture_security": "Independent review found and fixed shaped-canary leakage through provider error metadata; body and provider fields are discarded, only HTTP status retained. Request asks Polza to disable fallback, provider-side routing not verified. Reviewer also confirmed synthetic-only pinning is CLI-scoped; reusable JevClient is not a trusted arbitrary-input boundary.",
+    "provider_api": "Official Polza docs checked; one historical request/response round-trip validated. Current request hash matches but current client/runner was not live-tested; effective upstream route/fallback behavior not verified.",
+    "taxonomy_data": "Offline review validated A/B/C split hashes and counts; single-annotator draft, visible D, and B24 ambiguity remain.",
+    "statistics": "offline evaluator arithmetic tested; aggregate metrics not computed for incomplete smoke run"
+  },
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "key": "LEGACY_DIRECT_TYPEsafe_ROUTE",
+      "status": "RESOLVED_WRONG_ROUTE",
+      "reproduction": "historical artifacts show direct api.typesafe.ai calls",
+      "expected": "use project-configured Polza Jev route",
+      "actual": "old code used a direct TypeSafe host and key variable",
+      "action": "fixed endpoint/key/model; one Polza round-trip succeeded; old 451 cause itself remains unknown"
+    },
+    {
+      "severity": "HIGH",
+      "key": "NO_MODEL_MEASUREMENT",
+      "status": "OPEN",
+      "reproduction": "inspect single smoke artifact; quality metrics null because only 1/49 baseline cases ran",
+      "expected": "adjudicated synthetic benchmark outputs",
+      "actual": "one output observation; no representative accuracy/P/R/F1",
+      "action": "obtain explicit cost budget for up to 10 synthetic cases, adjudicate labels, then assess whether a 49-case pilot is warranted"
+    },
+    {
+      "severity": "HIGH",
+      "key": "GOLD_NOT_BLIND_ADJUDICATED",
+      "status": "OPEN",
+      "reproduction": "inspect deep manifest annotator and D split declarations",
+      "expected": "independent adjudicated gold and blind control",
+      "actual": "single annotator, D visible, B24 ambiguity",
+      "action": "second blind annotation and adjudication; publish a new dataset version"
+    },
+    {
+      "severity": "MEDIUM",
+      "key": "TAXONOMY_BOUNDARIES",
+      "status": "OPEN_PROPOSAL",
+      "reproduction": "inspect taxonomy review six boundary pairs and B24",
+      "expected": "operational definitions for event time, legal distinction, and overlaps",
+      "actual": "several ambiguous boundaries and unlisted event families",
+      "action": "review separate v0.4 proposal before changing v0.3"
+    },
+    {
+      "severity": "MEDIUM",
+      "key": "FRAMEWORK_DTO_GAP",
+      "status": "OPEN_BY_DESIGN",
+      "reproduction": "compare spike case/output with normative operation schemas",
+      "expected": "normative input/output with policy and provenance",
+      "actual": "isolated experimental request and result shape; no runtime integration",
+      "action": "design an approved adapter before runtime integration; no OpenAPI change"
+    },
+    {
+      "severity": "MEDIUM",
+      "key": "PROVIDER_ERROR_METADATA_CAN_ECHO_INPUT",
+      "status": "RESOLVED",
+      "reproduction": "fake HTTP error with format-valid code ARTICLE_SECRET and UUID-shaped canary was serialized by the pre-fix runner",
+      "expected": "provider error responses cannot persist user input or secrets",
+      "actual": "shape-only validation did not prove that provider metadata was safe to retain",
+      "action": "discard the full HTTP error body and all provider metadata; keep only HTTP status; regression test asserts no canary is saved"
+    },
+    {
+      "severity": "LOW",
+      "key": "LIVE_CALL_CAP_IS_PER_INVOCATION",
+      "status": "DOCUMENTED_LIMITATION",
+      "reproduction": "run the CLI repeatedly with --live; the in-memory hash ledger resets per process",
+      "expected": "cumulative budget enforcement across invocations",
+      "actual": "hard maximum 50 and duplicate-request blocking apply per invocation; cumulative usage is not persisted",
+      "action": "default to one call, require explicit budget for larger runs, and manually track cumulative approved spend"
+    },
+    {
+      "severity": "LOW",
+      "key": "CLI_SYNTHETIC_BOUNDARY",
+      "status": "OPEN_BY_DESIGN",
+      "reproduction": "import JevClient directly and supply an arbitrary approved_request_hashes set",
+      "expected": "a reusable client would enforce its own trusted dataset boundary",
+      "actual": "synthetic-only restriction is enforced by the CLI loader; the client accepts caller-supplied hashes",
+      "action": "keep this harness isolated and do not treat JevClient as a generic security boundary"
+    }
+  ],
+  "recommendation": "Keep the prototype isolated. The Polza System One request/response path worked once, but Jev quality on Russian business news is NOT MEASURED. Do not rely on it or integrate it into the runtime until an independently adjudicated benchmark and an explicitly budgeted evaluation support that decision."
+}

@@ -22,12 +22,16 @@ from jev_spike import (
     SpikeError,
     approved_request_hashes,
     evaluate,
+    https_transport,
     interpret_response,
     load_verified_inputs,
     make_request,
     request_hash,
     taxonomy_hash,
 )
+from live_ledger import AttemptLedger
+
+_OFFICIAL_JEV_CLIENT_CLASS = JevClient
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
@@ -46,13 +50,33 @@ def _safe_failure(case_id: str, error: Exception) -> dict[str, str]:
     allowed = {
         "timeout",
         "connection_error",
+        "transport_error",
         "redirect_refused",
         "unapproved_endpoint",
         "invalid_json_response",
         "invalid_response_body",
         "response_too_large",
+        "invalid_provider_response",
+        "request_already_in_live_ledger",
+        "cumulative_live_call_limit_reached",
+        "live_attempt_ledger_invalid",
     }
-    if code.startswith("http_status_") and code[12:].isdigit():
+    if code in {
+        "Jev returned an invalid response shape",
+        "Jev response has an invalid resolved model version",
+        "Jev response question set does not match the request",
+        "Jev returned an invalid Choice answer",
+        "Jev returned an unknown or invalid topic Choice",
+        "Jev Choice probabilities do not match the allowed taxonomy",
+        "Jev returned an invalid Choice probability",
+        "Jev Choice probabilities do not sum to one",
+        "Jev Choice label is not a maximum-probability option",
+        "Jev Choice needs at least two probability options",
+        "Jev returned an invalid Noul answer",
+        "Jev returned invalid usage metadata",
+    }:
+        allowed_code = "invalid_provider_response"
+    elif code.startswith("http_status_") and code[12:].isdigit():
         allowed_code = code
     else:
         allowed_code = code if code in allowed else "sanitized_request_error"
@@ -101,6 +125,9 @@ def run_live(
     api_key = os.environ.get("POLZA_AI_API_KEY", "")
     if not 1 <= args.max_calls <= 50:
         raise SpikeError("--max-calls must be between 1 and 50")
+    pinned_taxonomy, pinned_corpus, pinned_cases = load_verified_inputs()
+    if taxonomy != pinned_taxonomy or corpus != pinned_corpus or cases != pinned_cases:
+        raise SpikeError("live mode requires the exact pinned synthetic inputs")
     client = JevClient(
         api_key,
         allowed_request_hashes=approved_request_hashes(
@@ -108,18 +135,43 @@ def run_live(
         ),
     )
     all_news_cases = [case for case in cases if case["expected_status"] != "no_content"]
-    news_cases = list(all_news_cases)
-    if args.max_calls < len(news_cases):
-        news_cases = news_cases[: args.max_calls]
+    case_ids = [case["id"] for case in all_news_cases]
+    start_at = getattr(args, "start_at", None)
+    if start_at is None:
+        start_index = 0
+    else:
+        try:
+            start_index = case_ids.index(start_at)
+        except ValueError as exc:
+            raise SpikeError(
+                "--start-at must name a non-empty pinned corpus case"
+            ) from exc
+    news_cases = all_news_cases[start_index : start_index + args.max_calls]
+    if not news_cases:
+        raise SpikeError("--start-at is past the end of the pinned corpus")
     results: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
     attempted = 0
     request_hashes: dict[str, str] = {}
+    ledger_path_value = getattr(args, "ledger_path", None)
+    ledger = AttemptLedger(Path(ledger_path_value) if ledger_path_value else None)
+    ledger_start_count = ledger.count()
+    ledger_end_count = ledger_start_count
+    used_official_transport = (
+        type(client) is _OFFICIAL_JEV_CLIENT_CLASS
+        and getattr(client, "_transport", None) is https_transport
+    )
     for case in news_cases:
-        attempted += 1
         try:
             request = make_request(case, taxonomy, model=args.model)
             request_hashes[case["id"]] = request_hash(request)
+            before_count, after_count = ledger.reserve(
+                case["id"], request_hashes[case["id"]]
+            )
+            if attempted == 0:
+                ledger_start_count = before_count
+            ledger_end_count = after_count
+            attempted += 1
             response = client.classify(request)
             result = interpret_response(case, response, request, taxonomy).result
             result["request_sha256"] = request_hashes[case["id"]]
@@ -134,6 +186,14 @@ def run_live(
             )
             # One failure ends the run to avoid repeated billed requests on a broken route.
             break
+    complete_case_coverage = not failures and len(results) == len(all_news_cases)
+    measurement_eligible = complete_case_coverage and used_official_transport
+    if measurement_eligible:
+        quality_metrics_status = "MEASURED_FULL_BASELINE"
+    elif complete_case_coverage:
+        quality_metrics_status = "NOT_MEASURED_CUSTOM_TRANSPORT"
+    else:
+        quality_metrics_status = "NOT_MEASURED_INCOMPLETE_RUN"
     report: dict[str, Any] = {
         "mode": "live_synthetic_pilot",
         "timestamp_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -149,6 +209,13 @@ def run_live(
         "runner_sha256": _sha256_file(Path(__file__)),
         "requested_model_id": args.model,
         "max_calls_per_invocation": args.max_calls,
+        "start_at_case_id": news_cases[0]["id"],
+        "end_at_case_id": results[-1]["case_id"] if results else None,
+        "transport_provenance": "official_polza_https"
+        if used_official_transport
+        else "custom_or_test_transport",
+        "ledger_start_count": ledger_start_count,
+        "ledger_end_count": ledger_end_count,
         "attempted_calls": attempted,
         "successful_calls": len(results),
         "control_calls": 0,
@@ -156,12 +223,9 @@ def run_live(
         "failures": failures,
         "request_sha256_by_case": request_hashes,
         "results": results,
-        "quality_metrics_status": "MEASURED_FULL_BASELINE"
-        if not failures and len(results) == len(all_news_cases)
-        else "NOT_MEASURED_INCOMPLETE_RUN",
-        "metrics": evaluate(cases, results, taxonomy)
-        if not failures and len(results) == len(all_news_cases)
-        else None,
+        "provider_response_authenticity": "NOT_CRYPTOGRAPHICALLY_ATTESTED",
+        "quality_metrics_status": quality_metrics_status,
+        "metrics": evaluate(cases, results, taxonomy) if measurement_eligible else None,
         "note": "Synthetic-only run; aggregate quality metrics are withheld until all 49 non-empty baseline cases complete. Raw articles, prompts, provider response bodies, credentials, and exception details are not saved.",
     }
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
@@ -208,6 +272,10 @@ def main() -> int:
         type=int,
         default=1,
         help="per-invocation live-call cap (default 1; hard maximum 50)",
+    )
+    parser.add_argument(
+        "--start-at",
+        help="start at this exact non-empty case id from the pinned baseline (for staged pilots)",
     )
     parser.add_argument("--output", help="optional sanitized JSON report path")
     args = parser.parse_args()

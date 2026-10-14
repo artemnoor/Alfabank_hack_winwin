@@ -1,305 +1,202 @@
-# T08 Jev classification spike — итоговый технический и экспериментальный отчёт
+# T08 — итоговый технический и экспериментальный отчёт
 
-**Дата аудита:** 2026-10-14
+**Срез:** 2026-10-14. Работа выполнена только в spike/T08, ветка codex/spike-t08-jev-news-classification. Runtime/OpenAPI не изменялись. Этот итоговый срез заменяет прежний отчёт; исходные TEST_REPORT.md и JSON 1.2.0 сохранены копиями в results/archive/.
 
-**Ветка:** `codex/spike-t08-jev-news-classification`
-
-**Базовый `main`, проверенный для spike:** `ce640214be7c5ff2fdb451b9e290135a11b512a6`
-
-**Текущий HEAD:** см. head текущего PR #8; отчёт не записывает SHA собственного commit, чтобы не создавать самоссылку.
-**Область:** только `spike/T08/`; production runtime, OpenAPI и generated contracts не изменялись.
-
-## Краткое резюме
-
-После уточнения пользователя транспорт исправлен на официальный Polza AI System One endpoint, с `POLZA_AI_API_KEY` и Jev model ID `typesafe/jev`. Запрос устанавливает `provider.allow_fallbacks=false`; фактическое поведение маршрутизации у провайдера отдельно не проверено. Ответы строго проверяются, включая `usage.cost_rub`. Клиент ограничивает размер/время запроса, запрещает redirects/proxy discovery/retries и отправку неразрешённых данных. Текущий offline suite: **70 passed, 0 failed, 0 skipped**.
-
-Выполнен один live smoke на закреплённом синтетическом кейсе `e01-supply-rail`: Polza вернула schema-valid ответ Jev `jev-1.13.0`. Наблюдение: тема `industry_trade_supply`, `supply_chain_disruption=0.90`, unlisted score `0.53`, поэтому harness направил запись на review. Затраты: 5,905 входных токенов, 492 выходных, **0.10391619 ₽**, latency **844 ms**. Это один случай, не benchmark. Он выполнен предыдущей версией client/runner (SHA-256 `5ef1c6c7…` / `3a4ed49c…`). SHA запроса совпадает с повторно сгенерированным запросом текущего клиента (`a5d7356b…`), однако после последующих изменений текущая ревизия не вызывала API. Артефакт содержит только результат отдельного наблюдения; агрегированные quality-метрики не вычислялись, точность и все quality-метрики остаются **NOT MEASURED**.
-
-Три исторических HTTP 451 получены при прежней прямой маршрутизации на `api.typesafe.ai`; они не являются результатом проверки Polza и не устанавливают причину отказа. Во время фикса один регрессионный тест случайно инициировал дополнительный запрос на старый TypeSafe endpoint с pinned synthetic кейсом, поскольку тестовая legacy-переменная была непустой. Для него сохранён только `sanitized_request_error`; тело ответа, ключ и детали исключения не сохранены. Тест исправлен: он проверяет, что без `POLZA_AI_API_KEY` сетевой вызов невозможен даже при legacy `TYPESAFE_API_KEY`.
-
-Текущий corpus расширен до 160 synthetic кейсов (158 непустых), но gold labels — черновая разметка одного автора, а отдельный split D видим в репозитории и не является blind holdout. Один кейс B24 конфликтует с формулировкой категории и должен быть исключён из оценки до adjudication. Новый корпус пока проверяется на структуру и ожидаемые отношения; Jev его не классифицировал.
-
-**Можно ли уже доверить Jev классификацию русскоязычных бизнес-новостей? Нет. Качество ещё не доказано.** Jev остаётся единственным классификатором. Один успешный round-trip подтверждает проверенную базовую Polza API-схему, но не качество по категориям, надёжность, calibration или устойчивость. Оставить spike изолированным; запрашивать отдельное разрешение/бюджет перед дополнительной платной партией.
-
-## Четыре независимых заключения
+## Статусы
 
 | Область | Статус | Основание |
 |---|---|---|
-| **ENGINEERING QUALITY** | **PASS** | 70/70 offline tests, Ruff check/format, offline runner и `git diff --check` прошли. Это оценка harness, не модели. |
-| **API COMPATIBILITY** | **PASS (historical tested path/schema)** | Один фактический Polza `System One` round-trip с `typesafe/jev` прошёл на предыдущей ревизии. Текущий request hash совпадает; текущий transport revision повторно live не запускался. Это подтверждает лишь исторически проверенную конфигурацию, не все ошибки/режимы API. |
-| **MODEL QUALITY** | **NOT MEASURED** | Один smoke-response наблюдался, но выборки недостаточно для quality метрик; latency и стоимость измерены только для этого запроса. |
-| **INTEGRATION READINESS** | **NOT READY** | Нет репрезентативного quality evaluation; labels не adjudicated, а spike не реализует normative DTO, provenance, policy, history или replay. |
+| Engineering quality | **PASS** | Финальный повтор офлайн-тестов, Ruff, форматирования, offline runner и агрегатора прошёл. |
+| API compatibility | **PASS, ограниченная область** | 44 staged ответа Polza и один исторический smoke подтверждают endpoint/request-response path. После live-прогона добавлена проверка официальной Choice confidence формулы; все 45 сохранённых ответов повторно прошли её офлайн. Текущая ревизия клиента не вызывала сеть. |
+| Model quality | **NOT MEASURED для принятия решения** | Есть частичные описательные метрики на 45/49 ответах и черновых single-author labels; этого недостаточно для доверия. |
+| Integration readiness | **NOT READY** | Это изолированный spike без нормативного DTO adapter, runtime policy, provenance, history и replay интеграции. |
 
-## Что проверялось и как
+**Рекомендация:** не доверять Jev автоматическую классификацию русскоязычных бизнес-новостей. Пока допустим только изолированный исследовательский прототип с обязательной ручной проверкой.
 
-Проведены независимые проверки API, архитектуры/безопасности, таксономии и корпуса. Реализация сверена с [официальной документацией Polza System One](https://polza.ai/docs/api-reference/systemone/create), [гайдом Polza Jev](https://polza.ai/jev) и [моделью Polza `typesafe/jev`](https://polza.ai/models/typesafe/jev), а также нормативным `Understanding.classify` и содержимым кода. Отчёт не полагается на прежние заявления README. Проверены `docs/specs/framework-v1/03-operations.md` §05 и OpenAPI `#/components/schemas/ClassificationInput` / `ClassificationOutput`.
+## Объём и входные данные
 
-Отправлен один синтетический запрос через Polza, как указано в live-артефакте. Значение ключа не читалось в вывод и не записывалось; реальные новости и расширенный корпус не отправлялись. Других Polza live-запросов не выполнялось. Прямой TypeSafe запрос из legacy regression test описан отдельно выше и не использовался для обхода ограничений.
+Проверены jev_spike.py, run_spike.py, aggregate_pilot.py, live_ledger.py, transport, response validation, thresholds, metrics, corpus, taxonomy, security и соответствие Understanding.classify.
 
-### Последний воспроизводимый прогон
+- Исходный корпус: 50 строк, 49 непустых новостей и один локально отклоняемый пустой кейс. SHA-256: 592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d.
+- Taxonomy 0.3.0-spike: 11 Choice вариантов, 15 event types. SHA-256: 855a61f9b6c199d8440b8b81bbd09234e376896121ed163af2ed7f0c1455d.
+- Deep corpus: 160 синтетических примеров (A=76, B=36, C=24, D=24; 158 непустых). Jev на нём не запускался. Gold labels односторонние; B24 спорный; D видим и не является blind holdout. Хэши находятся в experiments/deep-v1/manifest.json.
+- Исходные corpus.json и taxonomy.json не изменялись. Разметка и результаты Jev не смешивались.
+- Используется один native Choice для темы и 17 независимых native Noul вопросов (15 событий + unlisted + insufficient evidence). Другие классификаторы не подключались.
 
-| Команда | Результат |
+Текущие команды проверки:
+
+    python -m unittest discover -s spike/T08 -p "test*.py" -v
+    ruff check spike/T08
+    ruff format --check spike/T08
+    python spike/T08/run_spike.py
+
+Агрегат v4 заново построен из исторического smoke и восьми staged JSON в results/jev-live-aggregate-20261014-v4.json; его валидатор проверяет формулу Choice confidence у каждого сохранённого результата. Предыдущие агрегаты и result artifacts не перезаписывались. Во время этой corrective pass новых live запросов не было.
+
+## Официальный API и HTTP 451
+
+По официальным материалам Polza проверен endpoint POST https://polza.ai/api/v1/systemone, Bearer auth через POLZA_AI_API_KEY, поля state/model/questions и optional provider. Jev guide указывает model ID typesafe/jev. Документация указывает до 255 Choice options и 1–256 вопросов; spike отправляет 11 options и 18 questions. Проверяются resolved Jev version, структура Choice/Noul answers и usage поля input_tokens/output_tokens/cost_rub. Официальная документация TypeSafe задаёт для Choice формулу `(p_max - 1/n) / (1 - 1/n)`. Валидация применяет допуск 0,02 к сохранённым значениям с округлением: среди 45 сохранённых ответов максимальное наблюдаемое расхождение — 0,005. Оценки Noul не считаются калиброванными вероятностями именно для нашего корпуса.
+
+- Путь Polza реально дал 44 staged schema-valid ответа и один более ранний pinned smoke. Успешные ответы указывают Jev 1.13.0.
+- SHA клиента в staged artifacts: c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791. Текущая ревизия `jev_spike.py` отличается: после live-прогона добавлена сверка confidence с официальной формулой. Запросы не менялись: все 49 current baseline request hashes совпадают с зафиксированным aggregate. Новая валидация офлайн пропущена по всем 45 сохранённым ответам; повторных live вызовов не было.
+- Current `jev_spike.py` SHA-256: `47505feb083e6c34f1e3621b67cbf8e8ca2425c288cf3f83589e4f9f5444fb82`.
+- Runner SHA staged запусков: 8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754; текущий run_spike.py: 3134f30321a28a9b71612f1c86afb2226f4dcec1f8728bc3a8ed68001e120120. Поэтому финальные runner/ledger изменения проверены офлайн, а не повторным live запуском.
+- provider.allow_fallbacks=false указан, однако ответ не подписан Polza и фактический upstream/fallback не attested.
+- API key проверялся только на наличие. Значение не показывалось и не сохранялось.
+
+Старые GET /v1/models и два POST на api.typesafe.ai с taxonomy 0.1/0.2 получили HTTP 451. Raw body/request id нет; точный источник и причина 451 неизвестны. Это не проверка Polza. Ещё одна старая TypeSafe попытка с taxonomy 0.3 записана как sanitized_request_error, причина тоже неизвестна. VPN, proxy, альтернативные host и обход ограничений не использовались.
+
+## Live-пилот и бюджет
+
+Срез пилота: 50 попыток, 45 валидных ответов, 5 ошибок. Счёт включает один исторический успешный Polza smoke, 48 staged Polza попыток и отдельный неуспешный legacy TypeSafe POST. В staged партии 44 ответа и 4 sanitized_request_error: e23-recall-battery, e35-multi-labor-investment, e41-uncertain-sanctions-talk, e43-uncertain-vague-delivery. Ошибки не повторялись; причины неизвестны, и они не превращались в false negatives. Они могут создавать selection bias.
+
+Три прежних HTTP 451 route-check запроса (GET models и два POST с taxonomy 0.1/0.2) находятся вне пилотного ledger. Поэтому известный исторический след проекта — 53 API-вызова, если учитывать их вместе с 50 попытками пилота. Это превышает лимит 50, если он распространяется на весь T08, а не только на отдельный пилот; это расхождение нельзя исправить задним числом. Новых запросов при этой проверке не было и дальнейшие live-вызовы остаются запрещёнными без нового бюджета. Локальный ledger reconciled к 50 попыткам пилота и блокирует добавление к нему; его можно изменить или удалить, он не является tamper-proof ограничителем.
+
+### Частичные описательные результаты Jev
+
+Метрики ниже рассчитаны по 45 успешным ответам из 49 непустых исходных кейсов против односторонней draft разметки. Они не являются независимой оценкой модели.
+
+| Метрика | Значение |
+|---|---:|
+| Покрытие | 45/49 = 91,84% |
+| Accuracy главной темы | 31/45 = 68,89% |
+| Event micro precision / recall / F1 | 0,850 / 0,829 / 0,840 |
+| Event macro F1 | 0,808; 15 классов, малые поддержки |
+| Multi-label exact match | 34/45 = 75,56% |
+| uncertain/review | 42/45 = 93,33% |
+| Unlisted event | recall 0/1; единственный gold случай не распознан |
+| insufficient-evidence signal | precision 0,235; recall 1,0 при 4 gold positives |
+
+Per-event результаты:
+
+| Event | P | R | F1 | Support |
+|---|---:|---:|---:|---:|
+| supply_chain_disruption | 1,000 | 1,000 | 1,000 | 5 |
+| shortage_capacity_constraint | 1,000 | 0,333 | 0,500 | 3 |
+| production_operational_disruption | 0,667 | 1,000 | 0,800 | 4 |
+| price_cost_change | 1,000 | 1,000 | 1,000 | 3 |
+| trade_restriction | 1,000 | 1,000 | 1,000 | 3 |
+| sanctions | 0,750 | 1,000 | 0,857 | 3 |
+| regulation_tax_change | 0,500 | 1,000 | 0,667 | 2 |
+| cyber_security_incident | 1,000 | 1,000 | 1,000 | 2 |
+| labor_workforce_event | 1,000 | 1,000 | 1,000 | 2 |
+| insolvency_default | 1,000 | 1,000 | 1,000 | 3 |
+| corporate_transaction_restructuring | 1,000 | 0,667 | 0,800 | 3 |
+| product_recall_quality_safety | 1,000 | 1,000 | 1,000 | 1 |
+| legal_enforcement | — | 0,000 | 0,000 | 3 |
+| environment_disaster_impact | 0,500 | 0,500 | 0,500 | 2 |
+| investment_capacity_change | 1,000 | 1,000 | 1,000 | 2 |
+
+Высокие значения на категориях с support 1–5 не означают стабильную точность. legal_enforcement не был предсказан ни разу, поэтому precision не определён.
+
+14 ошибок Choice: e06 industry_trade_supply→business_companies; e07 economy_finance→business_companies; e09 politics_government→industry_trade_supply; e10 law_regulation→industry_trade_supply; e12 politics_government→law_regulation; e14 economy_finance→law_regulation; e18 business_companies→labor_employment; e24 health→law_regulation; e28 energy_resources→environment_disasters; e29 industry_trade_supply→business_companies; e33 economy_finance→industry_trade_supply; e42 economy_finance→energy_resources; e45 industry_trade_supply→business_companies; e47 business_companies→politics_government.
+
+По событиям: 34 TP, 6 FP и 7 FN при текущем пороге. FP: production_operational_disruption на e03/e27; sanctions на e25; regulation_tax_change на e09/e10; environment_disaster_impact на e32. FN: shortage_capacity_constraint на e03/e33; corporate_transaction_restructuring на e18; legal_enforcement на e25/e26/e34; environment_disaster_impact на e28.
+
+Срезы: одиночные события n=25 — topic accuracy 0,680, event micro-F1 0,863, exact set 0,800; multi-event n=8 — 0,625/0,800/0,250; no-listed-event n=5 — topic accuracy/exact set 1,0; negation/rumor n=2 — topic accuracy 0,5; ambiguous/speculative n=3 — topic accuracy 0,667. Размеры слишком малы для обобщения.
+
+Latency успешных ответов n=45: mean 1298,58 ms, median 860 ms, nearest-rank p95 1313 ms. P95 неустойчив на такой выборке. Успешные usage: 263 276 input + 22 167 output = 285 443 tokens. Сумма cost_rub по успешным ответам — 4,63313107 ₽. Стоимость пяти ошибок неизвестна и могла быть списана; эта сумма не является гарантированными общими расходами.
+
+## Threshold sweep и стабильность
+
+При фиксированном event negative cutoff 0,2:
+
+| Positive cutoff | Precision | Recall | F1 | review cells |
+|---:|---:|---:|---:|---:|
+| 0,3 | 0,574 | 0,951 | 0,716 | 15 |
+| 0,4 | 0,661 | 0,951 | 0,780 | 24 |
+| 0,5 | 0,696 | 0,951 | 0,804 | 27 |
+| 0,6 | 0,717 | 0,927 | 0,809 | 30 |
+| 0,7 | 0,766 | 0,878 | 0,818 | 36 |
+| 0,8 | 0,850 | 0,829 | 0,840 | 43 |
+| 0,9 | 0,939 | 0,756 | 0,838 | 50 |
+
+Choice cutoff 0,5 отправил бы в review 5/45 тем (11,1%), accuracy среди auto-кейсов 0,75; cutoff 0,7 — 14/45 review и auto accuracy 0,839. Combined runtime status отправил в review 42/45 из-за Noul uncertainty, unlisted и границ. Это описательная чувствительность порогов на малой неполной выборке, не production calibration. D не использовался для tuning.
+
+Live stability не проверялась: нет повторов и metamorphic live запросов. C split проверяет только заданные авторами gold relationships офлайн. e45 — одиночное наблюдение, не доказательство устойчивости к prompt injection. Provider-side поведение не измерено.
+
+## Таксономия, gold и независимый аудит
+
+Taxonomy v0.3 не менялась. Подробный разбор каждой темы и события с положительными/отрицательными примерами, пограничными случаями и отдельными v0.4 предложениями находится в experiments/deep-v1/TAXONOMY_REVIEW.md.
+
+Независимые reviewers разошлись по e33: спорно, подтверждает ли текст `shortage_capacity_constraint` помимо `price_cost_change`. Отдельные event-label границы есть у e34 (`legal_enforcement`) и e35 (`labor_workforce_event`); тему требуют adjudicate e10, e14, e18, e28, e30 и e45. Пары e09/e10 и e13/e14 оставлены как contrasts; в подтверждённом reviewer-проходе неоднозначны e10 и e14. e28 также может допускать `regulation_tax_change`. Gold не меняли. Отдельный sensitivity пересчёт по альтернативной метке e33 меняет event micro-F1 примерно 0,840→0,850; это модельная метрика, вынесенная сюда отдельно, и не была использована в model-blind label review. Требуется human adjudication с evidence spans до новых quality claims. Детали — experiments/2026-10-14-independent-review.md.
+
+Для отдельного обсуждения следующей версии не хватает fraud/corruption, крупного contract/order award/loss и partnership/JV. Это не автоматическое изменение taxonomy и не утверждение о распространённости реальных событий. IPTC/GDELT/Event Registry/RavenPack использованы только как справочные ориентиры, ни один из них не запускается классификатором.
+
+## Финальный офлайн-прогон
+
+| Проверка | Результат |
 |---|---|
-| `python -m unittest discover -s spike/T08 -p "test*.py" -v` | **70 passed, 0 failed, 0 skipped** |
-| `ruff check spike/T08` | Passed |
-| `ruff format --check spike/T08` | Passed, 12 Python files already formatted |
-| `python spike/T08/run_spike.py` | Passed; offline validation, 0 classifier calls, baseline 49 nonempty + 1 locally rejected empty input |
-| `python spike/T08/run_spike.py --live --max-calls 1` (recorded earlier) | **1 Polza request succeeded on the recorded earlier revision**; cost 0.10391619 ₽, 5,905 input / 492 output tokens, 844 ms; not a quality benchmark |
-| `git diff --check` | Passed |
+| unittest discover spike/T08 | **86 passed, 0 failed, 0 skipped** |
+| ruff check spike/T08 | **PASS** |
+| ruff format --check spike/T08 | **PASS**, 16 Python files |
+| python spike/T08/run_spike.py | **PASS**, 0 classifier calls, 49 non-empty + local empty validation |
+| git diff --check | **PASS** |
+| aggregate v4 | **PASS**, 45 validated results, 50 pilot attempts; output matches v3 metrics |
+| Choice formula audit | **PASS**, 45/45 сохранённых ответов согласуются с официальной формулой в допуске; max observed delta 0,005 |
 
-Полное Jev evaluation, per-category quality, calibration, стабильность, provider-side prompt-injection и Russian-language quality остаются **NOT MEASURED**. Фактические latency/cost доступны только для одного smoke-запроса и не обобщаются. Offline suite запрещает обычные Python socket entrypoints во время тестов и проверяет сам guard. Это process-level защита теста, не OS/container firewall против произвольного native-кода.
+Офлайн suite покрывает Choice/Noul schema and range validation, missing/extra/malformed ответы, Unicode/size input checks, thresholds/metrics, timeout/reset/HTTP statuses, no retry, redirects, proxy/host controls, canary/error sanitization, fixed corpus/taxonomy hashes, request allowlist и отсутствие сетевого fallback. Новый test делает 24 параллельных локальных ledger reservation и проверяет уникальную последовательную нумерацию. Offline socket guard блокирует стандартные Python socket entrypoints процесса, но не заменяет OS/container egress firewall.
 
-Тесты используют контролируемые fake responses только для проверки валидации, транспорта и арифметики. Такие значения не включались в model-quality отчёт. Во время разработки одна ошибка в тестовом fixture была исправлена; приведённый выше результат относится к новому полному прогону после исправлений.
+## Безопасность
 
-## Проверка официального Jev API
+- Только фиксированный HTTPS Polza endpoint, redirects запрещены, proxy discovery от окружения отключён.
+- Live cases требуют точные pinned synthetic request hashes; пустые/изменённые/неутверждённые тексты отклоняются до отправки. Автоматических retries нет.
+- HTTP error body, произвольная provider metadata и raw exception text отбрасываются; в файл не попадают article text, prompts, credentials или raw response.
+- API key не выводился/не сохранялся. Изученные live artifacts не содержат payload.
+- provider.allow_fallbacks=false задан, но upstream не подтверждён подписью.
+- Ledger предотвращает случайные повторы в текущем окружении, но пользователь может удалить/изменить файл или сменить LOCALAPPDATA/XDG_STATE_HOME. Это best-effort guard, не security boundary.
 
-По актуальным на дату аудита официальным документам Polza:
+## Совместимость с Framework v1
 
-- Jev System One: `POST https://polza.ai/api/v1/systemone`; `Authorization: Bearer <POLZA_AI_API_KEY>`.
-- Polza Jev guide/catalog specifies model ID `typesafe/jev`; generic API examples also use `jev-latest`. Spike pins the catalog ID used by the Jev-specific guide and records the returned model version.
-- Request fields are `state`, `model`, `questions`, and optional `provider`. The live request used the native `Choice` + 17 independent `Noul` questions and `provider.allow_fallbacks=false`.
-- Polza docs say System One accepts 1–256 questions, and Choice accepts up to 255 options. This spike applies a stricter local 20-question budget cap; current request has 18 questions.
-- Choice returns `choice`, probabilities and confidence; Noul returns a yes score in `[0,1]`. The checked Polza docs do **not** specify an arithmetic formula for Choice confidence, so the harness checks its type/range but does not infer consistency from probabilities.
-- Response requires `model`, `answers`, `usage`; `usage` documents `input_tokens`, `output_tokens`, `cost_rub`. The response validator checks all three usage values.
-- One successful Polza round-trip on the recorded earlier client/runner revision returned model `jev-1.13.0`. The regenerated current request has the same hash; the current transport/parser changes have only offline verification.
+Нормативный ориентир — Understanding.classify в docs/specs/framework-v1/03-operations.md и OpenAPI ClassificationInput/ClassificationOutput.
 
-**Вывод:** API compatibility статуса PASS только для исторически проверенного request/response path. Запрос включает `provider.allow_fallbacks=false`, однако фактический выбор upstream provider и соблюдение настройки на стороне Polza по одному ответу проверить нельзя. Текущий клиент совпадает по request hash, но новые проверки отказов/error sanitization проверялись офлайн. Не проверены все provider error modes, другие вопросы/кейсы и качество на статистически значимой выборке.
-
-## HTTP 451: известные факты и неизвестное
-
-Сохранённые старые артефакты (`spike/T08/results/route-check.json:8`, `jev-live-pilot-20261014T080227Z.json:18`, `jev-live-pilot-20261014T080859Z.json:18`) относятся к прежнему прямому host `api.typesafe.ai`, который был неверным для настроенного в проекте Polza доступа. Они подтверждают:
-
-1. Одна аутентифицированная discovery-попытка `GET /v1/models` завершилась 451.
-2. По одному одиночному synthetic POST на `/v1/systemone` для taxonomy 0.1 и 0.2 завершились 451.
-3. В этих исторических попытках taxonomy 0.3, расширенный corpus, реальные новости и batch не отправлялись.
-4. Raw body и request ID не сохранены. Ни один ответ Jev не получен.
-5. Проверенная таблица ошибок TypeSafe документирует стандартные ответы вроде 401/422/429/529, но не объясняет 451. Поэтому точная причина и источник статуса не установлены.
-
-Подтверждён только факт HTTP 451 на прежнем прямом TypeSafe route; источник и причина по сохранённым данным неизвестны. Этот статус не является проверкой Polza и не говорит о доступности или качестве через Polza. Не было попыток обходить ограничения: по уточнению пользователя штатный проектный путь — Polza AI. Один дополнительный вызов на старом host из регрессионного теста завершился `sanitized_request_error` без сохранения тела/причины; исправленный тест не отправляет запрос без `POLZA_AI_API_KEY`.
-
-## Таксономия 0.3.0-spike
-
-Текущие исходные `taxonomy.json` и `corpus.json` сохранены без изменений. Таксономия содержит 11 Choice вариантов: 10 тем и `other_uncertain`; 15 отдельных бизнес-событий; отдельные Noul для события вне списка и недостаточности свидетельств. Один вопрос на тему и отдельный Noul на каждый event подходят для независимой multi-label постановки на уровне конструкции. Это не доказывает, что реальные Noul оценки статистически независимы.
-
-### Межкатегорийные границы
-
-| Граница | Рабочее различие v0.3 | Риск/что уточнить |
+| Компонент | Статус | Минимальное требование к будущему adapter |
 |---|---|---|
-| sanctions / trade_restriction | Санкции требуют названной санкционной меры/цели; ограничение торговли — явного запрета/квоты/тарифа на cross-border goods. Обе метки допустимы только если отдельно подтверждены оба факта. | Слова «санкции» и «ограничение» часто соседствуют; модель может выводить одно из другого. Добавить парные примеры только одного режима и обоих режимов. |
-| insolvency_default / legal_enforcement | Insolvency требует формальной процедуры/дефолта/пропуска платежа. Enforcement — отдельный иск, штраф, расследование, взыскание или решение, а не просто обычная судебная форма банкротства. | Текущая русская метка `legal_enforcement` звучит уже определения и включает расследования. Формализовать самостоятельность юридического события и термин метки. |
-| supply_chain_disruption / shortage_capacity_constraint | Нарушен поток поставок против явно недостаточного запаса/мощности, ограничивающего операцию. Обе метки — если текст явно сообщает оба факта. | Задержку часто ошибочно принимают за shortage; отсутствие товара — за доказанную причину сбоя поставки. |
-| production_operational_disruption / investment_capacity_change | Фактическая остановка/снижение работы против инвестиции, запуска или изменения заявленной мощности. | Будущий план и завершившийся факт смешиваются; нужно решить, считаются ли утверждённые будущие планы event, и как трактовать отмену. |
-| regulation_tax_change / legal_enforcement | Изменение нормы/налога/режима против отдельного расследования, судебного решения или enforcement action. | Официальный акт может быть и политическим, и регулирующим; нужны main-subject правила и пары тариф/налог/санкции/штраф. |
-| price_cost_change / regulation_tax_change | Фактическое/официально вступившее изменение цены/затрат против изменения политики/налога. | B24 описывает объявленный будущий рост цены: текущая дефиниция и инструкция расходятся. Этот кейс нельзя оценивать до решения о временном критерии. |
+| Jev — единственный классификатор | Частично | В runtime вызывать только через разрешённый dependency adapter и policy. |
+| Native Choice + independent Noul, конечные коды | Частично | Передавать taxonomy id/version и normative allowed_codes; fail closed на неизвестных кодах. |
+| ClassificationInput/material/taxonomy/allowed_codes/multi_label | Не совместимо | Проверенный маппер DTO → Jev request без смены OpenAPI. |
+| ClassificationOutput/topics/event_hints/status/missing_data | Не совместимо | Маппер output с проверкой каждого normative инварианта. |
+| Policy, trusted provenance, history, replay | Не совместимо/не реализовано | Отдельная интеграция через approved runtime boundaries, не внутри spike. |
+| Реальные model stability/provider-side injection | Не проверено | Нужен отдельный, разрешённый live протокол. |
 
-Дополнительные тематические пересечения: `business_companies` рискует быть остаточной меткой при любом упоминании компании; `industry_trade_supply` широко охватывает физические операции; `energy_resources` включает спорный случай водных ограничений; `politics_government` и `law_regulation` расходятся на официальных мерах; `other_uncertain` сводит разные случаи «неизвестной темы» и «недостаточных свидетельств». Два статуса `uncertain` в baseline имеют разные основания: ясное событие вне списка и неполное/неподтверждённое сообщение.
+Полностью совместимых runtime interfaces нет. Это намеренно изолированный spike; никаких OpenAPI/generated contract изменений.
 
-Предложения только для будущей **отдельной** версии v0.4, не применены к v0.3:
+## Серьёзные находки и действия
 
-1. Сформулировать правило основной темы: subject/framing, а не любой упомянутый актор или денежный термин; добавить matched pairs для `politics_government`/`law_regulation`/`economy_finance`/`business_companies`.
-2. Развести «категория вне словаря» и «данных недостаточно» на две причины/сигнала в допустимой проектной схеме, если это совместимо с публичным DTO; до этого зафиксировать их в ручной инструкции.
-3. Определить, считаются ли будущие объявленные, но ещё не вступившие в силу события; пересмотреть B24 и labor case с будущим наймом после решения.
-4. Проверить смысл русской метки `legal_enforcement` против покрытия расследований/исков/штрафов.
-5. Добавить в справочник обсуждаемые, но ещё не введённые меры, слухи/опровержения, формальное банкротство vs стресс, задержку vs shortage, промышленный пожар vs экологический ущерб, тариф, меняющий затраты без явного запрета импорта.
-6. Рассмотреть fraud/corruption, крупный контракт/потерю заказа, стратегическое партнёрство/JV как кандидатов в event list. Их частота и бизнес-ценность этим синтетическим аудитом не измерены.
+| Severity | Файл / строки | Воспроизведение и фактическое поведение | Статус / действие |
+|---|---|---|---|
+| HIGH | `aggregate_pilot.py:506-515`; regression `test_spike.py:936-990` | Aggregate custom transport раньше выдавал mock метрики как результаты Jev. | Исправлено: custom transport → `NOT_MEASURED_CUSTOM_TRANSPORT`, metrics=null; regression test есть. |
+| HIGH | `live_ledger.py:81-112`; regression `test_spike.py:298-345` | Чистый ledger seed раньше не отражал все 50 попыток пилота. | Исправлено: 49 baseline hashes + legacy TypeSafe POST; seed закрыт. Локальную запись можно изменить или удалить. |
+| MEDIUM | `aggregate_pilot.py:523`; regression `test_spike.py:964-979` | Source metadata могла перезаписать aggregate mode. | Исправлено: v4 сохраняет `live_synthetic_pilot_aggregate`. |
+| MEDIUM | `aggregate_pilot.py:554-566` | Успешная стоимость могла выглядеть как сумма всех попыток. | Исправлено: known successful response cost отделена от неизвестной возможной оплаты неуспешных запросов. |
+| HIGH | `jev_spike.py:315-328,372-373`; `aggregate_pilot.py:194-195`; regressions `test_spike.py:433-463,1094-1110` | `confidence=0.47` при one-hot probabilities раньше принимался. | Исправлено: проверяется официальная формула и округлительный допуск; 45 сохранённых ответов прошли перепроверку. |
+| HIGH, открыт | `results/jev-live-aggregate-20261014-v4.json:24-53` | Четыре staged Polza call содержат только `sanitized_request_error`; причина неизвестна. | Не повторять без нового разрешённого бюджета; пропуски не считать ошибками модели. |
+| HIGH, открыт | `experiments/2026-10-14-independent-review.md:15-54` | Gold e33/e34/e35 и topic boundaries требуют adjudication; разметка односторонняя. | Исправлена категоризация замечаний; taxonomy/corpus/gold оставлены как есть. Требуется human adjudication. |
+| HIGH, открыт | `results/jev-live-aggregate-20261014-v4.json:2643-2648,3523-3552` | 45/49 outputs, 42/45 review, малые поддержки и single-author labels. | Качество не доказано; не подключать к runtime. |
+| HIGH, открытый учёт | `results/route-check.json:1-14`; `TEST_REPORT.md:48-52` | 50 пилотных попыток + 3 ранних route-check = 53 известных вызова, если один общий бюджет. | Дальше не вызывать без отдельного разрешения; исторический превышающий лимит счёт открыт и указан явно. |
+| MEDIUM, ограничение | `jev_spike.py:315-328`; `run_spike.py:160-228`; `TEST_REPORT.md:39-43` | Клиент и runner изменились после live-партии; полная текущая ревизия не вызывала сеть. | Все request hashes совпадают, 45 ответов перепроверены офлайн; повтор live запрещён до нового бюджета. |
+| MEDIUM, открыт | `results/route-check.json:1-14` | Для прежних TypeSafe HTTP 451 нет raw body/request id. | Причина неизвестна; не спекулировать и не обходить ограничения. |
 
-Подробное описание каждой из 11 тем и 15 event категорий с позитивными/негативными примерами, hard boundaries и вероятными источниками ошибок — [`experiments/deep-v1/TAXONOMY_REVIEW.md`](experiments/deep-v1/TAXONOMY_REVIEW.md). Позитивный/негативный пример там характеризует текущие ручные gold labels, а не модель.
+## Независимое ревью и решение
 
-## Расширенный synthetic корпус и gold labels
+API reviewer подтвердил исторический Polza request/response path, отметил четыре неизвестных отказа, несовпадение client/runner revisions, не-attested upstream и cost только по успешным ответам. После проверки замечания добавлена regression validation Choice confidence. Security reviewer нашёл недосчёт ledger, mock-metrics и ошибочный mode; они закрыты с тестами. Модель-слепой label review не использовал Jev outputs и оставил e33/e34/e35 boundary вопросы открытыми. Архитектурное ревью подтвердило отсутствие runtime/OpenAPI изменений. Ревью не заменяет live-проверку текущей ревизии и не доказывает качество.
 
-Новый dataset: `experiments/deep-v1/`, version `1.0.0`, taxonomy `0.3.0-spike`, всего **160 кейсов / 158 непустых**. SHA-256 manifest закреплён в тесте; manifest закрепляет точные байты split-файлов и hashes исходных taxonomy/corpus.
+**Что пригодно:** исследовательский Polza/JeV client, строгая JSON валидация, immutable baseline для дальнейшей человеческой adjudication, предварительные описательные цифры.
 
-| Split | Кейс(ов) | Непустых | Назначение | Состояние |
-|---|---:|---:|---|---|
-| A | 76 | 75 | широкий фиксированный benchmark | Не прогонялся через Jev; каждый из 15 event codes представлен минимум четырьмя положительными gold-примерами. |
-| B | 36 | 36 | спорные границы и сложные кейсы | 6 названных границ × 4 примера; B24 исключить до adjudication. |
-| C | 24 | 24 | 12 пар metamorphic stimuli | 7 пар с ожидаемой инвариантностью и 5 с ожидаемым изменением gold; проверяется только объявленная связь labels, не реакция модели. |
-| D | 24 | 23 | отдельный контрольный split | Не использовался для tuning; файл и labels видимы и были доступны автору. **Это не слепой holdout.** |
+**Что не пригодно:** автоматическая production-разметка, production thresholds, обещание стабильности, вывод о причине HTTP 451, или заявления о подтверждённом upstream/fallback.
 
-Примеры синтетические и не являются реальными публикациями. Набор включает короткий/длинный текст, multi-event, не-события, неподтверждённые/отменённые/будущие/противоречивые утверждения, несколько сущностей, цены, санкции, поставки, банкротство, киберинциденты, аварии, изменения норм, числа, цитаты, misleading headline, шум, out-of-list, prompt-injection stimulus и Unicode. `language:ru-en` метка в A/B/C отсутствует; есть только один bilingual-quote stimulus в C, поэтому широкая многоязычная устойчивость не покрыта.
+**Нужно перед интеграцией:** adjudicate labels независимыми annotators; собрать новую versioned gold set с blind control; согласовать отдельный live budget/protocol; реализовать DTO adapter и policy/provenance/history/replay checks без изменения утверждённого OpenAPI.
 
-Gold labels написаны без ответов Jev, однако это **single-annotator draft**: независимая double annotation и adjudication не проводились. Одного структурного review недостаточно для утверждения объективной разметки. Набор не использовался для вывода Jev качества и не может служить blind prospective benchmark в текущем виде. После заморозки rubric нужно получить вторую слепую разметку, adjudicate все расхождения и сохранить отдельную версию.
+**Можно ли уже доверить Jev классификацию русскоязычных бизнес-новостей? Нет.** API path технически работал, однако надёжность качества не доказана. Частичные метрики на малом synthetic наборе и высокая доля review не меняют этот вывод.
 
-### Ручной охват benchmark A (не метрики Jev)
+## Источники
 
-Число положительных ручных примеров по каждому event code в A: `supply_chain_disruption` 8; `production_operational_disruption` 5; `environment_disaster_impact` 5; `cyber_security_incident` 5; `labor_workforce_event` 5; `shortage_capacity_constraint` 4; `price_cost_change` 4; `trade_restriction` 4; `sanctions` 4; `regulation_tax_change` 4; `insolvency_default` 4; `corporate_transaction_restructuring` 4; `product_recall_quality_safety` 4; `legal_enforcement` 4; `investment_capacity_change` 4. Это только support в draft labels; полноценные независимые negative challenge examples и распределение production prevalence из этого не следуют.
-
-Все строки ниже означают ручную разметку split A. Jev не запускался, поэтому качество каждого кода отдельно **NOT MEASURED**.
-
-| Общая тема | Gold support A | Jev accuracy |
-|---|---:|---|
-| `industry_trade_supply` | 15 | NOT MEASURED |
-| `business_companies` | 11 | NOT MEASURED |
-| `law_regulation` | 11 | NOT MEASURED |
-| `technology_telecom` | 8 | NOT MEASURED |
-| `politics_government` | 8 | NOT MEASURED |
-| `energy_resources` | 5 | NOT MEASURED |
-| `labor_employment` | 5 | NOT MEASURED |
-| `environment_disasters` | 4 | NOT MEASURED |
-| `economy_finance` | 3 | NOT MEASURED |
-| `health` | 3 | NOT MEASURED |
-| `other_uncertain` | 2 | NOT MEASURED |
-
-| Бизнес-событие | Gold positives A | Jev precision / recall / F1 |
-|---|---:|---|
-| `supply_chain_disruption` | 8 | NOT MEASURED |
-| `production_operational_disruption` | 5 | NOT MEASURED |
-| `environment_disaster_impact` | 5 | NOT MEASURED |
-| `cyber_security_incident` | 5 | NOT MEASURED |
-| `labor_workforce_event` | 5 | NOT MEASURED |
-| `shortage_capacity_constraint` | 4 | NOT MEASURED |
-| `price_cost_change` | 4 | NOT MEASURED |
-| `trade_restriction` | 4 | NOT MEASURED |
-| `sanctions` | 4 | NOT MEASURED |
-| `regulation_tax_change` | 4 | NOT MEASURED |
-| `insolvency_default` | 4 | NOT MEASURED |
-| `corporate_transaction_restructuring` | 4 | NOT MEASURED |
-| `product_recall_quality_safety` | 4 | NOT MEASURED |
-| `legal_enforcement` | 4 | NOT MEASURED |
-| `investment_capacity_change` | 4 | NOT MEASURED |
-
-## Метрики качества, сложность, стабильность, latency и стоимость
-
-**Метрики качества Jev — NOT MEASURED.** Нет осмысленных per-topic accuracy/confusion matrix; per-event precision/recall/F1, micro/macro F1; exact multi-label match; false positives/negatives; review rates; out-of-list/unconfirmed detection; category slices; calibration; stability; prompt-injection metrics. Есть только один live observation: latency 844 ms и usage 5,905 input/492 output tokens, cost 0.10391619 ₽. n=1 не поддерживает обобщённую оценку; эти цифры описывают только этот запрос.
-
-Код evaluator реализует эти срезы и threshold sweeps, включая Choice selective accuracy/coverage; корректность математики проверена на синтетически контролируемых fixtures. Это проверка evaluator, не оценка Jev. Пороги Choice `<0.5`, Noul `<=0.2`/`>=0.8` — текущие экспериментальные правила без эмпирического обоснования. Sweep проверен математически, но его живые precision/recall, review burden и пропуски событий не измерены. Noul scores и Choice confidence нельзя объявлять откалиброванными вероятностями качества на русских новостях без отдельной calibration study.
-
-`usage.cost_rub` зафиксировал стоимость smoke-запроса 0.10391619 ₽. Это фактическая стоимость одного запроса, не оценка средней цены статьи или batch; цена/usage могут изменяться с размером текста, набором вопросов и тарифом.
-
-## Offline проверки, ошибки и безопасность
-
-Текущие tests проверяют:
-
-- Типы и размер входа (10 000 символов), пустые данные, Unicode/строки, отсутствие отправки gold metadata и лишних полей.
-- Native Choice/Noul форму, опции Choice, допустимые коды, совпадение выбора с максимальной оценкой, numeric range `confidence`, NaN/Infinity, отрицательные/выше единицы оценки, некорректные/пропущенные/лишние ответы, token usage и `cost_rub`.
-- HTTP 400/401/403/429/451/500/502/503/529, timeout, connection reset, повреждённый/не-JSON ответ, тело больше лимита, redirect, запрещённый host, отказ от env proxy, отсутствие retry, sanitized ошибки.
-- Allowlist канонического request hash и блокировка повтора в одном процессе; текущий live default — один запрос, `--max-calls` действует на один запуск, cumulative budget между запусками не хранится. Проверяются pinned model и флаг `provider.allow_fallbacks=false` в запросе; внешнее соблюдение флага не проверено.
-- Пустые/дублирующиеся/неизвестные result IDs, отсутствующие телеметрические поля, вычисление метрик/threshold sweep на fixtures.
-- Пины исходных taxonomy/corpus, pины manifest и A/B/C/D split hashes, label codes/status, 15 категорий, boundary counts и объявленные связи C.
-
-Транспорт использует фиксированный официальный Polza HTTPS endpoint, Bearer auth через `POLZA_AI_API_KEY`, Jev ID `typesafe/jev`, request flag `provider.allow_fallbacks=false`, стандартный TLS context, redirect refusal, proxy-discovery off, bounded timeout/response body и sanitized exceptions. HTTP errors сохраняют только статус; тело и все provider-supplied metadata отбрасываются. Клиент требует непустой allowlist request hash, не отправляет один hash дважды в рамках одного процесса и не ретраит. Live runner по умолчанию ограничен одним запросом; `--max-calls` и дубликатный guard не являются cumulative между запусками. Live allowlist содержит только закреплённые 49 исходных synthetic новостей.
-
-Security caveats:
-
-- Socket guard — стандартные Python entrypoints; это не защита от произвольного native socket code или отдельный сетевой sandbox.
-- Prompt injection проверен offline только на неизменность фиксированных критериев/категорий в request. Фактическая реакция Jev на инъекцию, правила provider isolation и утечка через реальную модель не измерялись.
-- Canary на секреты/текст проверяется на fake transport/errors; сохранённый live artifact не содержит текст/ключ. Внешние provider logs не исследовались; Polza заявляет в своей документации, что не хранит текст запросов/ответов, но это vendor statement, не независимая проверка.
-- Live request неизбежно передаёт текст провайдеру. Отправлен только один закреплённый synthetic case; текст и raw prompt не записывались в артефакт.
-- Исторические ошибки хранят только HTTP status; response bodies, provider metadata, raw prompts и keys отсутствуют.
-- Гарантия synthetic-only обеспечена CLI-путём загрузки закреплённого корпуса. `JevClient` сам принимает переданный вызывающим кодом набор request hashes и не является самостоятельной безопасной границей для повторного использования с произвольными импортами.
-- Gitleaks в окружении не установлен. Целевой high-confidence pattern scan spike-файлов и read-only scan security reviewer не нашли совпадений; это ограниченная проверка, не универсальный secret scanner.
-- Bounded response защищает чтение тела; текст ограничивается по символам, а не по токенам. Polza docs разрешают 1–256 вопросов, но spike локально ограничивает их числом 20 для сдерживания расходов.
-
-Итоговая оценка безопасности spike transport: **offline controls PASS; provider-side behavior NOT MEASURED**.
-
-## Совместимость с Framework v1 `Understanding.classify`
-
-Нормативные вход/выход находятся в `03-operations.md` §05 и OpenAPI `#/components/schemas/ClassificationInput` / `ClassificationOutput`. OpenAPI/generated contracts не менялись.
-
-| Проверка | Статус | Наблюдение / минимально необходимое изменение |
-|---|---|---|
-| Jev выбран единственным классификатором spike | Частично совместимо | В spike Jev единственный; runtime integration не существует. |
-| Одна тема плюс независимые event labels | Частично совместимо | Choice + 15 Noul соответствуют общей идее; `multi_label` не является входным параметром runtime, taxonomy фиксирована внутри spike. |
-| `ClassificationInput.material`, taxonomy `VersionedRef`, `allowed_codes`, `multi_label` | Не совместимо | Spike принимает собственные title/text case и использует встроенную таксономию. Адаптер должен валидировать нормативный DTO и применять разрешённый набор кодов. |
-| Output `topics`, `event_hints`, `classification_status`, `missing_data` | Не совместимо | Spike выводит собственное решение (`topic`, scores, predicted events/status). Нужен явный типизированный mapper с сохранением границ DTO; не менять OpenAPI. |
-| Произвольные коды запрещены | Частично совместимо | Spike ограничивает ответы зарегистрированными кодами. Runtime policy/allowed_codes matching не реализован. |
-| Unknown/uncertain, provenance, trusted policy, dependency gateway, history, replay | Не совместимо | Это изолированный experiment runner без owner/runtime интеграции. Перед интеграцией требуются policy-before-egress, approved taxonomy reference, provenance, sanitized Run History и record/replay через утверждённые ports. |
-| Работающий API round-trip, provider compatibility | Проверено частично | Один запрос прошёл через Polza и был строго провалидирован; это не подтверждает все API режимы. |
-
-**Ни одна полная end-to-end runtime совместимость не подтверждена.** Spike нельзя регистрировать как implementation `Understanding.classify`.
-
-## Независимое ревью
-
-- **API/реализация:** после смены целевого route по уточнению пользователя проверены Polza endpoint, auth, model ID, request/provider flags, primitives и usage schema. Исправлены неверный direct host/key name, необработанный `cost_rub`, предположение о confidence formula и ошибочная трактовка вопросного лимита. Один успешный Polza round-trip наблюдался.
-- **Таксономия/данные:** проверены все темы, события, шесть заданных границ, примеры и статус gold labels. Серьёзное ограничение — однопользовательская draft annotation и неслепой D; B24 отложен.
-- **Архитектура/безопасность:** подтверждено отсутствие связей с production runtime; добавлены проверки единичности timeout/reset попытки и pin всего manifest/общее количество nonempty случаев. Финальный security review выявил, что regex-shaped `error.code`/UUID могли содержать переданные canary-данные; исправлено: тело и любые provider error metadata полностью отброшены, оставляется только HTTP status, тест проверяет valid-shaped canaries. Пост-fix reviewer blocker не обнаружил; отдельно указал, что reusable `JevClient` сам по себе не гарантирует synthetic-only allowlist.
-- **Статистика:** evaluator и пороговая арифметика проверяются на fake fixtures. Это не evidence качества. Deep evaluator/live runner ещё не поддерживают отдельное сравнение A/B/C; D намеренно не используется в scoring.
-
-Ревьюеры не подтверждают качество Jev: одного live-примера недостаточно. API block по Polza снят для проверенного пути; открыты adjudication labels и разрешение на больший оплачиваемый pilot.
-
-## Основные замечания с воспроизводимостью
-
-### RESOLVED — Provider error metadata могла содержать canary-текст
-
-- **Где:** `jev_spike.py:421-423` (`https_transport` HTTPError handling), `run_spike.py:44-65` (`_safe_failure`), `test_spike.py:702-750` (`test_http_error_body_is_suppressed`).
-- **Воспроизведение до исправления:** fake HTTP error возвращал форматно допустимые `error.code=ARTICLE_SECRET` и UUID-shaped canary; прежний код сохранял их в sanitized report.
-- **Ожидалось:** ни тело provider error, ни произвольные provider fields не сохраняются.
-- **Фактически до исправления:** проверка формы метаданных не доказывала, что их значение не происходит из переданного текста или секрета.
-- **Исправление:** provider error body не читается/не разбирается; сохраняется только HTTP status. Регрессионный тест проверяет, что оба shaped-canary отсутствуют в serialized failure.
-
-### LOW — Live-call cap действует на один запуск
-
-- **Где:** `run_spike.py:94-105,207-212` и `jev_spike.py` `JevClient` hash ledger.
-- **Воспроизведение:** повторить live CLI несколько раз; in-memory guard и cap сбрасываются между процессами.
-- **Ожидается:** cumulative spending budget был бы ограничен между вызовами.
-- **Фактически:** максимум 50 live calls и блокировка повтора hash действуют на один invocation; default снижен до одного вызова. Persistent cumulative ledger нет.
-- **Действие:** не повторять платные вызовы без отдельного согласованного бюджета; runner documentation явно описывает границу guard.
-
-### RESOLVED — Spike использовал неправильный direct TypeSafe endpoint
-
-- **Где:** прежние версии `jev_spike.py` / `run_spike.py`; исторические артефакты в `results/`.
-- **Воспроизведение:** сохранённые обращения к `api.typesafe.ai` завершились HTTP 451; ещё одна ошибочная регрессионная попытка имеет только `sanitized_request_error`.
-- **Ожидалось:** использовать проектный Polza route и credential.
-- **Фактически:** предыдущая реализация ходила напрямую в TypeSafe и читала неправильную переменную ключа.
-- **Исправление:** фиксированный Polza endpoint, только `POLZA_AI_API_KEY`, exact model `typesafe/jev`, запрос устанавливает `provider.allow_fallbacks=false` (эффективность настройки upstream не подтверждена); один исторический Polza round-trip прошёл на предыдущей ревизии. Точная причина старого 451 всё ещё неизвестна, но активный путь его не использует.
-
-### HIGH — Качество Jev на русском не измерено
-
-- **Где:** `results/jev-live-pilot-20261014T094655Z.json:26-79`; partial-run gate в `run_spike.py:155-164`; наборы A/B/C в `experiments/deep-v1/`.
-- **Воспроизведение:** сохранён только один answer row `e01-supply-rail`; runner маркирует partial run без aggregate quality metrics.
-- **Ожидалось:** сопоставимые live outputs для утверждённых synthetic gold labels.
-- **Фактически:** один ответ наблюдался; accuracy/P/R/F1, calibration/stability и slice metrics не измерены. Latency, token usage и cost имеют только одно case observation.
-- **Действие:** после отдельного согласования тарифицируемого бюджета провести небольшой набор и затем независимую blind оценку; не считать это production validation.
-
-### HIGH — Расширенные gold labels и D не дают независимого blind evaluation
-
-- **Где:** `experiments/deep-v1/manifest.json:18-24,56`; `experiments/deep-v1/README.md`.
-- **Воспроизведение:** manifest явно указывает single annotator, видимый D и автора, знакомого с его labels.
-- **Ожидалось:** независимые gold labels и закрытый контрольный split.
-- **Фактически:** labels — draft одного автора, D не blind; B24 имеет неразрешённую annotation ambiguity.
-- **Действие:** зафиксировать rubric, получить вторую независимую разметку вслепую, adjudicate disagreements и выпустить новую версию; B24 исключить до этого.
-
-### MEDIUM — Таксономия имеет неоднозначные границы и неполный event coverage
-
-- **Где:** `experiments/deep-v1/TAXONOMY_REVIEW.md:11-44,264+` и `taxonomy.json`.
-- **Воспроизведение:** рассмотреть шесть boundary-пар и примеры B; конфликт B24 отмечен в manifest.
-- **Ожидалось:** согласованные определения, временная семантика и приоритеты категорий.
-- **Фактически:** будущие объявления и `legal_enforcement` требуют уточнения; `other_uncertain` смешивает unknown label/evidence uncertainty; есть кандидаты вне списка.
-- **Действие:** отдельное предложение v0.4 и повторное adjudication, не менять v0.3 автоматически.
-
-### MEDIUM — Совместимость с нормативным runtime неполная
-
-- **Где:** `docs/specs/framework-v1/03-operations.md:113-124`; OpenAPI строки 6982–7053; реализация spike `jev_spike.py:219+`.
-- **Воспроизведение:** сравнить spike request/result с нормативными DTO.
-- **Ожидалось:** `material`, taxonomy ref, allowed codes, multi_label, normative topics/event_hints/status/missing_data и provenance/policy boundaries.
-- **Фактически:** отдельный case-based runner с собственной taxonomy и output shape; runtime интеграции нет.
-- **Действие:** перед отдельной согласованной интеграцией реализовать адаптер, policy gate до egress и явный DTO mapper; не менять OpenAPI.
-
-## Ограничения и что можно использовать
-
-**Можно использовать сейчас:** offline harness как прототип проверки Polza System One transport/ответов; strict validation; безопасный runner на pinned synthetic baseline после разрешения бюджета; структуру корпуса как основу для независимой разметки; taxonomy review как документ предложений.
-
-**Нельзя использовать сейчас:** Jev как доверенный русский news classifier; один smoke-row как evidence качества; scores как калиброванные вероятности; threshold values как production policy; draft labels как статистически достоверный benchmark; D как blind holdout; output напрямую как Framework DTO; live prompt-injection/privacy claims; любая интеграция в основной runtime без policy/provenance/history/replay review.
-
-## План дальнейших действий
-
-1. Оставить T08 spike изолированным; не менять `main`, OpenAPI, generated contracts или runtime.
-2. Не повторять старый direct TypeSafe route и не пытаться выяснять 451 обходом ограничений; проектный live путь через Polza уже дал один валидный round-trip.
-3. Отдельно утвердить taxonomy rubric и временные правила; adjudicate B24 и прочие спорные примеры.
-4. Получить blind second annotation, пересчитать gold, зафиксировать новую версию корпуса. У D должен быть независимый владелец, который не видел tuning cases.
-5. После отдельного одобрения оплачиваемого бюджета выполнить до 10 закреплённых synthetic кейсов через Polza; остановиться при несовпадении schema/error и сохранить `cost_rub`.
-6. Реализовать отдельный evaluator для A/B/C с понятным исключением спорных кейсов; D открывать только после фиксации prompt, taxonomy и thresholds.
-7. Рассчитать метрики и uncertainty slices; повторить metamorphic pairs несколько раз только с отдельно утверждённым бюджетом. Не обещать стабильность и не подбирать production threshold на D.
-8. Лишь после результатов и отдельного согласования предложить runtime adapter к `Understanding.classify` с approved policy/egress, allowed codes, provenance, sanitized history и record/replay. Ни один следующий этап автоматически не запускается.
-
-## Артефакты и источники
-
-- Основной код: [`jev_spike.py`](jev_spike.py), [`run_spike.py`](run_spike.py), [`test_spike.py`](test_spike.py).
-- Исходные, не изменённые benchmark и taxonomy: [`corpus.json`](corpus.json), [`taxonomy.json`](taxonomy.json).
-- Новый корпус и методика: [`experiments/deep-v1/`](experiments/deep-v1/README.md), [`TAXONOMY_REVIEW.md`](experiments/deep-v1/TAXONOMY_REVIEW.md).
-- Нормативный контракт: [`03-operations.md`](../../docs/specs/framework-v1/03-operations.md), [`openapi.json`](../../docs/specs/framework-v1/contracts/openapi.json).
-- Официальные источники: [Polza System One API](https://polza.ai/docs/api-reference/systemone/create), [Polza Jev guide](https://polza.ai/jev), [Polza Jev model ID](https://polza.ai/models/typesafe/jev).
-
----
-
-**Финальный вердикт:** ENGINEERING QUALITY — PASS; API COMPATIBILITY — PASS for the tested Polza request/response path; MODEL QUALITY — NOT MEASURED; INTEGRATION READINESS — NOT READY. **Доверять Jev классификацию русскоязычных бизнес-новостей пока нельзя: качество ещё не доказано.**
+- Polza System One: https://polza.ai/docs/api-reference/systemone/create
+- Polza Jev guide (endpoint, Bearer auth, request/response examples): https://polza.ai/docs/gaidy/jev
+- Jev guide: https://polza.ai/jev
+- Jev model page: https://polza.ai/models/typesafe/jev
+- TypeSafe official Choice confidence formula: https://docs.typesafe.ai/confidence
+- Machine report: TEST_REPORT.json
+- Final aggregate: results/jev-live-aggregate-20261014-v4.json
+- Taxonomy audit: experiments/deep-v1/TAXONOMY_REVIEW.md
+- Independent label audit: experiments/2026-10-14-independent-review.md
+- Preserved previous report: results/archive/TEST_REPORT-pre-pilot-final.md

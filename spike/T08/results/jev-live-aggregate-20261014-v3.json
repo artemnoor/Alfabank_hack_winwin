@@ -1,0 +1,3559 @@
+{
+  "timestamp_utc": "2026-10-14T11:11:19+00:00",
+  "mode": "live_synthetic_pilot_aggregate",
+  "endpoint_host": "polza.ai",
+  "endpoint_path": "/api/v1/systemone",
+  "corpus_id": "synthetic-ru-news-50",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+  "taxonomy_sha256_raw": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+  "requested_model_id": "typesafe/jev",
+  "model_version": "jev-1.13.0",
+  "attempted_calls": 50,
+  "current_attempted_calls": 48,
+  "current_successful_calls": 44,
+  "current_failed_calls": 4,
+  "historical_attempted_calls": 2,
+  "historical_failed_calls": 1,
+  "failed_calls": 5,
+  "successful_calls": 45,
+  "control_calls": 0,
+  "controls": {},
+  "failures": [
+    {
+      "case_id": "e23-recall-battery",
+      "error": "sanitized_request_error"
+    },
+    {
+      "case_id": "e35-multi-labor-investment",
+      "error": "sanitized_request_error"
+    },
+    {
+      "case_id": "e41-uncertain-sanctions-talk",
+      "error": "sanitized_request_error"
+    },
+    {
+      "case_id": "e43-uncertain-vague-delivery",
+      "error": "sanitized_request_error"
+    }
+  ],
+  "historical_failures": [
+    {
+      "case_id": "e01-supply-rail",
+      "endpoint_host": "api.typesafe.ai",
+      "endpoint_path": "/v1/systemone",
+      "error": "sanitized_request_error",
+      "artifact": "jev-live-pilot-20261014T094544Z.json",
+      "artifact_sha256": "129faa1b0b9e7f05aa06dcaffcf7f6eec20c97052ac5ed11b4a32ab5dce27cfa"
+    }
+  ],
+  "missing_result_case_ids": [
+    "e23-recall-battery",
+    "e35-multi-labor-investment",
+    "e41-uncertain-sanctions-talk",
+    "e43-uncertain-vague-delivery"
+  ],
+  "request_sha256_by_case": {
+    "e01-supply-rail": "a5d7356b04bce548810847dbbd297792c5da0c05733d4124863d48fd87e5d592",
+    "e02-supply-carrier": "64784cd4ab0ebd77648c56af70c7be1783916ff8c8b358d4917201a0de8baab2",
+    "e03-shortage-cells": "1d171df6f5a2a44ff54de0e2572f828ce31a78fad7680f20c1376d7179c9923a",
+    "e04-shortage-ports": "431d5285c09be71d47862fef1ad7dfcc0a5d34c021cc40757a4ca09693682c39",
+    "e05-production-furnace": "2e285039a81fdbde9e962f0c70c7c0a38cd17db8796df1d83f22548ae0ce1ac6",
+    "e06-production-fire": "68d364a008695ac2e73d6289a003c358b3a9855bbf58d6937271a29606691f34",
+    "e07-price-polymer": "b81b12549c7d9e66b5e4ef15fa992f2385531a776df0b6c59956bc4b76157368",
+    "e08-price-transport": "1cab7b1cbd51edc7d7a9e186de4206560500aa32cbe37f0b87d88de2428b2f55",
+    "e09-trade-export": "7067c8b2317d185427ef1c388745d3b7b028ae196f8ded8bb988a33f2238e1cf",
+    "e10-trade-import": "50203a27db287ab9e4a2a782fe2a1e8697caecbf0f0ec9ab5bd36f7643b04e0d",
+    "e11-sanctions-list": "ec7f7ca4279d6c77bc1e8b2e7e3be56442286f1c04386cf7d56211bf8e9aff83",
+    "e12-sanctions-assets": "66bb7ffcfa872ef819f392d054e8ee7a88109fec6c9a339b829a2b45ca6805e7",
+    "e13-regulation-waste": "7ccd68d1c557fdf9fdaf9f7272205e1097e0132ca8dd87cb5d4eb16b8d5d820f",
+    "e14-regulation-tax": "1800515afc0d3dbffb97cce65c7bed3130792f38747e90e32364beb403dab381",
+    "e15-cyber-ransom": "afa1c1228b7b3cd6154ff6d23f547270c49e3c5bcd66f98247e04c3240a02bb5",
+    "e16-cyber-leak": "8640fb70613a3a1b54f73a6937690e584e94d1c3f0e8e4d6852969c35d9f0513",
+    "e17-labor-strike": "5f9b4344cd31f0e69b85817f149e908c6ffc8447169df56da90e122c6464ab9a",
+    "e18-labor-layoffs": "fe485bdcf5e85c8785852e361fd1880723fd2ccc42dde29e877dfb34c5cc5d54",
+    "e19-insolvency-court": "0b87b59c63ae6039dac477fb738f3641e9ac293c87bd60377d7890e4cc3ac25f",
+    "e20-insolvency-coupon": "63cb6ba22ae574b83869975e6f2c304ba198d491a61125a7f31e4406423e5f4f",
+    "e21-corporate-acquisition": "dbe6f5ba606c440cb8b6ae50430dde5acc419d38074ba57946e208879c88d0e3",
+    "e22-corporate-spinoff": "3569343d285a4fa83744189c902cec92d7dbab41899e948cf79e26a113b667c1",
+    "e23-recall-battery": "52ee7f5a727f3f16ea648ed024a80c11e16734c2840b207d0f1d192c876c6af2",
+    "e24-recall-food": "22cc1a6391859a7d4620d8b5dc52e9811fa3dfcdf326e251a3e85bd5fac6458a",
+    "e25-legal-fine": "24509c060bd3de8a7e3294ca5f14f232501cdbf5b8d81bae4729265ff0dbdd4e",
+    "e26-legal-investigation": "6f398e60aa8a7011588f9292651e9e7e098a63aad714d6a6b3ff42204f16e248",
+    "e27-disaster-flood": "7c571374693f0fa375aee3a6dc47620df82a2026da7a11002a6dea7b94a7d9b0",
+    "e28-disaster-drought": "8eeaacb853a46aeaa3b84742ccb608cc4eade0990cbfc5ac0d8451b78fd5425b",
+    "e29-investment-plant": "3e4d21667bbddcf7e749d1490a9161d785a33ef7b5f22fc21eee3703d92e9651",
+    "e30-investment-expansion": "ac12b59641cf8687908d72bea381e292ba6fbab7f842a579e8af8ba33ecde2a0",
+    "e31-multi-sanction-trade": "2e48d1d23a331088fc7f64929f32cc4c219ace346339c01fdaa48a279f964836",
+    "e32-multi-fire-supply": "3fc65964f66549f0ed760258cd4534501a1887a449aac7529ab71678c07c1ace",
+    "e33-multi-price-shortage": "c870024581f9d3cb5980268e8c74097f7548fa96c57d0825beab4d5ef02b8058",
+    "e34-multi-insolvency-legal": "ef5cf5cf112b8e7320e74747652d515d140e8d9465640d629d0648a171d939ad",
+    "e35-multi-labor-investment": "3e573d33347b89372420743ee51e0cc40283f12972d31954dd5cfee70d29b9d3",
+    "e36-noevent-rates": "ea9b5946b8f1b3f4a9aa78898429efda70e796455e0e99dcbbb271c1b077903c",
+    "e37-noevent-results": "67eedbbae3c264492a49c85f61ec5dd011b6b78da0d5a7f00c2858c4cff6ac4c",
+    "e38-noevent-satellite": "b1faa304ae9befd886e45fe93b46c1bcc565bb766cf9810badb58f5b8767d894",
+    "e39-noevent-health": "2328ecfb86eb3d3d1ee23027beb76516cec31d90e19266109395b1ce946dde46",
+    "e40-uncertain-strike-forecast": "3fe8f36d4c9c124586b699b080cdd664362e2fff27d4063e255cb82481dba684",
+    "e41-uncertain-sanctions-talk": "e6d58d15843d2a971eeb6960cab73a515c475e9dccf0f47ef17394530ec5d034",
+    "e42-uncertain-price-forecast": "0b27b7933c084d0b8f17ab7d749aaf0e950aee55033d6ef1be47363094d73e21",
+    "e43-uncertain-vague-delivery": "014a00ea06c491a5de946fd6f1c67748aa6e634363753022eebfd030e90761f7",
+    "e44-negated-bankruptcy": "f1ed18708f4ee7e27d8bf20d1e3d21e3bd09573712f357e9a0e90ac7b8ead7f0",
+    "e45-injection-rumor": "ce674b5a5e70422f1cc69a98942b8c230637dcb04b282d9f7c280368a5f095f4",
+    "e46-other-topic": "0716d214137f1d970aa481df1ea1a0defcacc289745054f3590de2f6d98bc19b",
+    "e47-unlisted-contract-award": "b637fc5bf24b1fc35932dabdd46b13f3394a76395d4e0ec462d6e8fbd45a522b",
+    "e49-environment-monitoring": "f4a55434209f28dbd13218fed062dfa4d3de8295d74ae94fd5c5b5a2dac28338",
+    "e50-uncertain-topic": "51f56d313279bc4d34555981840f64717c3a827ae150cf6969affff92c3ed082"
+  },
+  "results": [
+    {
+      "case_id": "e01-supply-rail",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 1.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.9,
+        "shortage_capacity_constraint": 0.1,
+        "production_operational_disruption": 0.33,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.12,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.03,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.53,
+      "uncertainty_score": 0.17,
+      "predicted_events": [
+        "supply_chain_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5905,
+        "output_tokens": 492,
+        "cost_rub": 0.10391619
+      },
+      "elapsed_ms": 844,
+      "request_sha256": "a5d7356b04bce548810847dbbd297792c5da0c05733d4124863d48fd87e5d592"
+    },
+    {
+      "case_id": "e02-supply-carrier",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.99,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.99,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.95,
+        "shortage_capacity_constraint": 0.3,
+        "production_operational_disruption": 0.5,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.54,
+      "uncertainty_score": 0.15,
+      "predicted_events": [
+        "supply_chain_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5850,
+        "output_tokens": 492,
+        "cost_rub": 0.1029483
+      },
+      "elapsed_ms": 2437,
+      "request_sha256": "64784cd4ab0ebd77648c56af70c7be1783916ff8c8b358d4917201a0de8baab2"
+    },
+    {
+      "case_id": "e03-shortage-cells",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.88,
+      "topic_probabilities": {
+        "business_companies": 0.11,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.89,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.37,
+        "shortage_capacity_constraint": 0.67,
+        "production_operational_disruption": 0.87,
+        "price_cost_change": 0.05,
+        "trade_restriction": 0.03,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.11,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.03,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.03,
+        "investment_capacity_change": 0.05
+      },
+      "unlisted_event_score": 0.56,
+      "uncertainty_score": 0.2,
+      "predicted_events": [
+        "production_operational_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5836,
+        "output_tokens": 492,
+        "cost_rub": 0.10270193
+      },
+      "elapsed_ms": 1031,
+      "request_sha256": "1d171df6f5a2a44ff54de0e2572f828ce31a78fad7680f20c1376d7179c9923a"
+    },
+    {
+      "case_id": "e04-shortage-ports",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "energy_resources",
+      "topic_confidence": 0.66,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.6900000000000001,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.31,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.11,
+        "shortage_capacity_constraint": 0.93,
+        "production_operational_disruption": 0.07,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.03,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.04
+      },
+      "unlisted_event_score": 0.54,
+      "uncertainty_score": 0.26,
+      "predicted_events": [
+        "shortage_capacity_constraint"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5852,
+        "output_tokens": 491,
+        "cost_rub": 0.1029835
+      },
+      "elapsed_ms": 844,
+      "request_sha256": "431d5285c09be71d47862fef1ad7dfcc0a5d34c021cc40757a4ca09693682c39"
+    },
+    {
+      "case_id": "e05-production-furnace",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.91,
+      "topic_probabilities": {
+        "business_companies": 0.08,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.92,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.24,
+        "shortage_capacity_constraint": 0.28,
+        "production_operational_disruption": 0.93,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.01,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.12,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.03,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.55,
+      "uncertainty_score": 0.18,
+      "predicted_events": [
+        "production_operational_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5846,
+        "output_tokens": 492,
+        "cost_rub": 0.10287791
+      },
+      "elapsed_ms": 672,
+      "request_sha256": "2e285039a81fdbde9e962f0c70c7c0a38cd17db8796df1d83f22548ae0ce1ac6"
+    },
+    {
+      "case_id": "e06-production-fire",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 0.47,
+      "topic_probabilities": {
+        "business_companies": 0.52,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.01,
+        "health": 0.0,
+        "industry_trade_supply": 0.45,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.02,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.37,
+        "shortage_capacity_constraint": 0.14,
+        "production_operational_disruption": 0.93,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.01,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.27,
+        "insolvency_default": 0.01,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.05,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.29,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.56,
+      "uncertainty_score": 0.17,
+      "predicted_events": [
+        "production_operational_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5850,
+        "output_tokens": 492,
+        "cost_rub": 0.1029483
+      },
+      "elapsed_ms": 703,
+      "request_sha256": "68d364a008695ac2e73d6289a003c358b3a9855bbf58d6937271a29606691f34"
+    },
+    {
+      "case_id": "e07-price-polymer",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 0.53,
+      "topic_probabilities": {
+        "business_companies": 0.5700000000000001,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.43,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.98,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.04,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.56,
+      "uncertainty_score": 0.13,
+      "predicted_events": [
+        "price_cost_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5826,
+        "output_tokens": 492,
+        "cost_rub": 0.10252595
+      },
+      "elapsed_ms": 844,
+      "request_sha256": "b81b12549c7d9e66b5e4ef15fa992f2385531a776df0b6c59956bc4b76157368"
+    },
+    {
+      "case_id": "e08-price-transport",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.99,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.99,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.03,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.97,
+        "trade_restriction": 0.03,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.46,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.05,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.04
+      },
+      "unlisted_event_score": 0.56,
+      "uncertainty_score": 0.17,
+      "predicted_events": [
+        "price_cost_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5846,
+        "output_tokens": 492,
+        "cost_rub": 0.10287791
+      },
+      "elapsed_ms": 640,
+      "request_sha256": "1cab7b1cbd51edc7d7a9e186de4206560500aa32cbe37f0b87d88de2428b2f55"
+    },
+    {
+      "case_id": "e09-trade-export",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.68,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.01,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.71,
+        "labor_employment": 0.0,
+        "law_regulation": 0.04,
+        "other_uncertain": 0.0,
+        "politics_government": 0.24,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.07,
+        "shortage_capacity_constraint": 0.04,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.05,
+        "trade_restriction": 0.96,
+        "sanctions": 0.15,
+        "regulation_tax_change": 0.96,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.03,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.04
+      },
+      "unlisted_event_score": 0.06,
+      "uncertainty_score": 0.16,
+      "predicted_events": [
+        "trade_restriction",
+        "regulation_tax_change"
+      ],
+      "classification_status": "classified",
+      "usage": {
+        "input_tokens": 5860,
+        "output_tokens": 492,
+        "cost_rub": 0.10312428
+      },
+      "elapsed_ms": 703,
+      "request_sha256": "7067c8b2317d185427ef1c388745d3b7b028ae196f8ded8bb988a33f2238e1cf"
+    },
+    {
+      "case_id": "e10-trade-import",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.54,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.05,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.58,
+        "labor_employment": 0.0,
+        "law_regulation": 0.18,
+        "other_uncertain": 0.0,
+        "politics_government": 0.19,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.04,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.73,
+        "trade_restriction": 0.91,
+        "sanctions": 0.14,
+        "regulation_tax_change": 0.95,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.06,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.08,
+      "uncertainty_score": 0.35,
+      "predicted_events": [
+        "trade_restriction",
+        "regulation_tax_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5823,
+        "output_tokens": 492,
+        "cost_rub": 0.10247315
+      },
+      "elapsed_ms": 656,
+      "request_sha256": "50203a27db287ab9e4a2a782fe2a1e8697caecbf0f0ec9ab5bd36f7643b04e0d"
+    },
+    {
+      "case_id": "e11-sanctions-list",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "politics_government",
+      "topic_confidence": 0.54,
+      "topic_probabilities": {
+        "business_companies": 0.03,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.39,
+        "other_uncertain": 0.0,
+        "politics_government": 0.58,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.03,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.48,
+        "sanctions": 0.96,
+        "regulation_tax_change": 0.3,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.12,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.27,
+      "uncertainty_score": 0.27,
+      "predicted_events": [
+        "sanctions"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5828,
+        "output_tokens": 495,
+        "cost_rub": 0.10256114
+      },
+      "elapsed_ms": 688,
+      "request_sha256": "ec7f7ca4279d6c77bc1e8b2e7e3be56442286f1c04386cf7d56211bf8e9aff83"
+    },
+    {
+      "case_id": "e12-sanctions-assets",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.98,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.98,
+        "other_uncertain": 0.0,
+        "politics_government": 0.01,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.03,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.03,
+        "sanctions": 0.92,
+        "regulation_tax_change": 0.06,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.04,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.08,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.42,
+      "uncertainty_score": 0.17,
+      "predicted_events": [
+        "sanctions"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5863,
+        "output_tokens": 493,
+        "cost_rub": 0.10317707
+      },
+      "elapsed_ms": 719,
+      "request_sha256": "66bb7ffcfa872ef819f392d054e8ee7a88109fec6c9a339b829a2b45ca6805e7"
+    },
+    {
+      "case_id": "e13-regulation-waste",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.92,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.93,
+        "other_uncertain": 0.0,
+        "politics_government": 0.07,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.05,
+        "trade_restriction": 0.02,
+        "sanctions": 0.03,
+        "regulation_tax_change": 0.94,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.12,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.03,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.16,
+      "uncertainty_score": 0.19,
+      "predicted_events": [
+        "regulation_tax_change"
+      ],
+      "classification_status": "classified",
+      "usage": {
+        "input_tokens": 5874,
+        "output_tokens": 493,
+        "cost_rub": 0.10337065
+      },
+      "elapsed_ms": 891,
+      "request_sha256": "7ccd68d1c557fdf9fdaf9f7272205e1097e0132ca8dd87cb5d4eb16b8d5d820f"
+    },
+    {
+      "case_id": "e14-regulation-tax",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.44,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.31,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.49,
+        "other_uncertain": 0.0,
+        "politics_government": 0.2,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.23,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.93,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.06,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.03,
+      "uncertainty_score": 0.19,
+      "predicted_events": [
+        "regulation_tax_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5844,
+        "output_tokens": 493,
+        "cost_rub": 0.10284271
+      },
+      "elapsed_ms": 969,
+      "request_sha256": "1800515afc0d3dbffb97cce65c7bed3130792f38747e90e32364beb403dab381"
+    },
+    {
+      "case_id": "e15-cyber-ransom",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "technology_telecom",
+      "topic_confidence": 0.71,
+      "topic_probabilities": {
+        "business_companies": 0.25,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.01,
+        "politics_government": 0.0,
+        "technology_telecom": 0.74
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.21,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.11,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.01,
+        "cyber_security_incident": 0.97,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.03,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.43,
+      "uncertainty_score": 0.15,
+      "predicted_events": [
+        "cyber_security_incident"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5888,
+        "output_tokens": 493,
+        "cost_rub": 0.10361702
+      },
+      "elapsed_ms": 1078,
+      "request_sha256": "afa1c1228b7b3cd6154ff6d23f547270c49e3c5bcd66f98247e04c3240a02bb5"
+    },
+    {
+      "case_id": "e16-cyber-leak",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "technology_telecom",
+      "topic_confidence": 0.99,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.99
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.01,
+        "production_operational_disruption": 0.33,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.01,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.95,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.75,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.47,
+      "uncertainty_score": 0.2,
+      "predicted_events": [
+        "cyber_security_incident"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5836,
+        "output_tokens": 493,
+        "cost_rub": 0.10270193
+      },
+      "elapsed_ms": 922,
+      "request_sha256": "8640fb70613a3a1b54f73a6937690e584e94d1c3f0e8e4d6852969c35d9f0513"
+    },
+    {
+      "case_id": "e17-labor-strike",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "labor_employment",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 1.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.83,
+        "shortage_capacity_constraint": 0.36,
+        "production_operational_disruption": 0.75,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.03,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.96,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.6,
+      "uncertainty_score": 0.23,
+      "predicted_events": [
+        "supply_chain_disruption",
+        "labor_workforce_event"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5832,
+        "output_tokens": 493,
+        "cost_rub": 0.10263154
+      },
+      "elapsed_ms": 1000,
+      "request_sha256": "5f9b4344cd31f0e69b85817f149e908c6ffc8447169df56da90e122c6464ab9a"
+    },
+    {
+      "case_id": "e18-labor-layoffs",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "labor_employment",
+      "topic_confidence": 0.91,
+      "topic_probabilities": {
+        "business_companies": 0.08,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.92,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.21,
+        "price_cost_change": 0.4,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.95,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.67,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.28
+      },
+      "unlisted_event_score": 0.5,
+      "uncertainty_score": 0.13,
+      "predicted_events": [
+        "labor_workforce_event"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5851,
+        "output_tokens": 493,
+        "cost_rub": 0.1029659
+      },
+      "elapsed_ms": 796,
+      "request_sha256": "fe485bdcf5e85c8785852e361fd1880723fd2ccc42dde29e877dfb34c5cc5d54"
+    },
+    {
+      "case_id": "e19-insolvency-court",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.75,
+      "topic_probabilities": {
+        "business_companies": 0.23,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.77,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.05,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.03,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.02,
+        "sanctions": 0.03,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.91,
+        "corporate_transaction_restructuring": 0.2,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.06,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.51,
+      "uncertainty_score": 0.14,
+      "predicted_events": [
+        "insolvency_default"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5842,
+        "output_tokens": 493,
+        "cost_rub": 0.10280752
+      },
+      "elapsed_ms": 18063,
+      "request_sha256": "0b87b59c63ae6039dac477fb738f3641e9ac293c87bd60377d7890e4cc3ac25f"
+    },
+    {
+      "case_id": "e20-insolvency-coupon",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "economy_finance",
+      "topic_confidence": 0.46,
+      "topic_probabilities": {
+        "business_companies": 0.49,
+        "economy_finance": 0.51,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.06,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.96,
+        "corporate_transaction_restructuring": 0.05,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.03,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.42,
+      "uncertainty_score": 0.18,
+      "predicted_events": [
+        "insolvency_default"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5835,
+        "output_tokens": 495,
+        "cost_rub": 0.10268433
+      },
+      "elapsed_ms": 891,
+      "request_sha256": "63cb6ba22ae574b83869975e6f2c304ba198d491a61125a7f31e4406423e5f4f"
+    },
+    {
+      "case_id": "e21-corporate-acquisition",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 1.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.96,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.05
+      },
+      "unlisted_event_score": 0.39,
+      "uncertainty_score": 0.13,
+      "predicted_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5843,
+        "output_tokens": 492,
+        "cost_rub": 0.10282511
+      },
+      "elapsed_ms": 860,
+      "request_sha256": "dbe6f5ba606c440cb8b6ae50430dde5acc419d38074ba57946e208879c88d0e3"
+    },
+    {
+      "case_id": "e22-corporate-spinoff",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 1.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.01,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.01,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.03,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.06,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.96,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.08
+      },
+      "unlisted_event_score": 0.51,
+      "uncertainty_score": 0.17,
+      "predicted_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5872,
+        "output_tokens": 492,
+        "cost_rub": 0.10333546
+      },
+      "elapsed_ms": 1125,
+      "request_sha256": "3569343d285a4fa83744189c902cec92d7dbab41899e948cf79e26a113b667c1"
+    },
+    {
+      "case_id": "e24-recall-food",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.85,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.03,
+        "industry_trade_supply": 0.08,
+        "labor_employment": 0.0,
+        "law_regulation": 0.86,
+        "other_uncertain": 0.0,
+        "politics_government": 0.02,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.12,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.13,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.03,
+        "sanctions": 0.66,
+        "regulation_tax_change": 0.04,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.01,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.93,
+        "legal_enforcement": 0.05,
+        "environment_disaster_impact": 0.04,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.51,
+      "uncertainty_score": 0.19,
+      "predicted_events": [
+        "product_recall_quality_safety"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5838,
+        "output_tokens": 493,
+        "cost_rub": 0.10273712
+      },
+      "elapsed_ms": 1109,
+      "request_sha256": "22cc1a6391859a7d4620d8b5dc52e9811fa3dfcdf326e251a3e85bd5fac6458a"
+    },
+    {
+      "case_id": "e25-legal-fine",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.94,
+      "topic_probabilities": {
+        "business_companies": 0.04,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.95,
+        "other_uncertain": 0.0,
+        "politics_government": 0.01,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.05,
+        "trade_restriction": 0.02,
+        "sanctions": 0.89,
+        "regulation_tax_change": 0.07,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.59,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.44,
+      "uncertainty_score": 0.15,
+      "predicted_events": [
+        "sanctions"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5856,
+        "output_tokens": 493,
+        "cost_rub": 0.10305389
+      },
+      "elapsed_ms": 937,
+      "request_sha256": "24509c060bd3de8a7e3294ca5f14f232501cdbf5b8d81bae4729265ff0dbdd4e"
+    },
+    {
+      "case_id": "e26-legal-investigation",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.96,
+      "topic_probabilities": {
+        "business_companies": 0.04,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.96,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.04,
+        "regulation_tax_change": 0.03,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.03,
+        "legal_enforcement": 0.13,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.32,
+      "uncertainty_score": 0.19,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5845,
+        "output_tokens": 493,
+        "cost_rub": 0.10286031
+      },
+      "elapsed_ms": 906,
+      "request_sha256": "6f398e60aa8a7011588f9292651e9e7e098a63aad714d6a6b3ff42204f16e248"
+    },
+    {
+      "case_id": "e27-disaster-flood",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "environment_disasters",
+      "topic_confidence": 0.55,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.59,
+        "health": 0.0,
+        "industry_trade_supply": 0.4,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.89,
+        "shortage_capacity_constraint": 0.38,
+        "production_operational_disruption": 0.85,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.1,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.5,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.91,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.55,
+      "uncertainty_score": 0.22,
+      "predicted_events": [
+        "supply_chain_disruption",
+        "production_operational_disruption",
+        "environment_disaster_impact"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5871,
+        "output_tokens": 492,
+        "cost_rub": 0.10331786
+      },
+      "elapsed_ms": 843,
+      "request_sha256": "7c571374693f0fa375aee3a6dc47620df82a2026da7a11002a6dea7b94a7d9b0"
+    },
+    {
+      "case_id": "e28-disaster-drought",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "environment_disasters",
+      "topic_confidence": 0.51,
+      "topic_probabilities": {
+        "business_companies": 0.17,
+        "economy_finance": 0.0,
+        "energy_resources": 0.01,
+        "environment_disasters": 0.55,
+        "health": 0.0,
+        "industry_trade_supply": 0.21,
+        "labor_employment": 0.0,
+        "law_regulation": 0.01,
+        "other_uncertain": 0.01,
+        "politics_government": 0.04,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.25,
+        "shortage_capacity_constraint": 0.68,
+        "production_operational_disruption": 0.87,
+        "price_cost_change": 0.07,
+        "trade_restriction": 0.02,
+        "sanctions": 0.08,
+        "regulation_tax_change": 0.74,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.22,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.04,
+        "environment_disaster_impact": 0.76,
+        "investment_capacity_change": 0.26
+      },
+      "unlisted_event_score": 0.59,
+      "uncertainty_score": 0.22,
+      "predicted_events": [
+        "production_operational_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5819,
+        "output_tokens": 492,
+        "cost_rub": 0.10240276
+      },
+      "elapsed_ms": 1313,
+      "request_sha256": "8eeaacb853a46aeaa3b84742ccb608cc4eade0990cbfc5ac0d8451b78fd5425b"
+    },
+    {
+      "case_id": "e29-investment-plant",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 0.77,
+      "topic_probabilities": {
+        "business_companies": 0.79,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.21,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.24,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.09,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.04,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.92
+      },
+      "unlisted_event_score": 0.49,
+      "uncertainty_score": 0.2,
+      "predicted_events": [
+        "investment_capacity_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5801,
+        "output_tokens": 492,
+        "cost_rub": 0.102086
+      },
+      "elapsed_ms": 797,
+      "request_sha256": "3e4d21667bbddcf7e749d1490a9161d785a33ef7b5f22fc21eee3703d92e9651"
+    },
+    {
+      "case_id": "e30-investment-expansion",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 0.79,
+      "topic_probabilities": {
+        "business_companies": 0.81,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.19,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.06,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.15,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.06,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.96
+      },
+      "unlisted_event_score": 0.5,
+      "uncertainty_score": 0.19,
+      "predicted_events": [
+        "investment_capacity_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5844,
+        "output_tokens": 492,
+        "cost_rub": 0.10284271
+      },
+      "elapsed_ms": 890,
+      "request_sha256": "ac12b59641cf8687908d72bea381e292ba6fbab7f842a579e8af8ba33ecde2a0"
+    },
+    {
+      "case_id": "e31-multi-sanction-trade",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "politics_government",
+      "topic_confidence": 0.98,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.02,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.98,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.15,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.04,
+        "price_cost_change": 0.05,
+        "trade_restriction": 0.93,
+        "sanctions": 0.95,
+        "regulation_tax_change": 0.6,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.07,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.21,
+      "uncertainty_score": 0.36,
+      "predicted_events": [
+        "trade_restriction",
+        "sanctions"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5844,
+        "output_tokens": 495,
+        "cost_rub": 0.10284271
+      },
+      "elapsed_ms": 797,
+      "request_sha256": "2e48d1d23a331088fc7f64929f32cc4c219ace346339c01fdaa48a279f964836"
+    },
+    {
+      "case_id": "e32-multi-fire-supply",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.93,
+      "topic_probabilities": {
+        "business_companies": 0.06,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.94,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.94,
+        "shortage_capacity_constraint": 0.62,
+        "production_operational_disruption": 0.97,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.06,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.83,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.5,
+      "uncertainty_score": 0.19,
+      "predicted_events": [
+        "supply_chain_disruption",
+        "production_operational_disruption",
+        "environment_disaster_impact"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5852,
+        "output_tokens": 492,
+        "cost_rub": 0.1029835
+      },
+      "elapsed_ms": 1000,
+      "request_sha256": "3fc65964f66549f0ed760258cd4534501a1887a449aac7529ab71678c07c1ace"
+    },
+    {
+      "case_id": "e33-multi-price-shortage",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 1.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.29,
+        "shortage_capacity_constraint": 0.75,
+        "production_operational_disruption": 0.1,
+        "price_cost_change": 0.97,
+        "trade_restriction": 0.03,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.03,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.61,
+      "uncertainty_score": 0.22,
+      "predicted_events": [
+        "price_cost_change"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5836,
+        "output_tokens": 492,
+        "cost_rub": 0.10270193
+      },
+      "elapsed_ms": 1172,
+      "request_sha256": "c870024581f9d3cb5980268e8c74097f7548fa96c57d0825beab4d5ef02b8058"
+    },
+    {
+      "case_id": "e34-multi-insolvency-legal",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "law_regulation",
+      "topic_confidence": 0.6,
+      "topic_probabilities": {
+        "business_companies": 0.35,
+        "economy_finance": 0.01,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.64,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.03,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.95,
+        "corporate_transaction_restructuring": 0.04,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.29,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.47,
+      "uncertainty_score": 0.23,
+      "predicted_events": [
+        "insolvency_default"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5836,
+        "output_tokens": 493,
+        "cost_rub": 0.10270193
+      },
+      "elapsed_ms": 1297,
+      "request_sha256": "ef5cf5cf112b8e7320e74747652d515d140e8d9465640d629d0648a171d939ad"
+    },
+    {
+      "case_id": "e36-noevent-rates",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "economy_finance",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 1.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.74,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.19,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.03,
+      "uncertainty_score": 0.13,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5827,
+        "output_tokens": 495,
+        "cost_rub": 0.10254355
+      },
+      "elapsed_ms": 1110,
+      "request_sha256": "ea9b5946b8f1b3f4a9aa78898429efda70e796455e0e99dcbbb271c1b077903c"
+    },
+    {
+      "case_id": "e37-noevent-results",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 1.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.44,
+      "uncertainty_score": 0.15,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5871,
+        "output_tokens": 492,
+        "cost_rub": 0.10331786
+      },
+      "elapsed_ms": 781,
+      "request_sha256": "67eedbbae3c264492a49c85f61ec5dd011b6b78da0d5a7f00c2858c4cff6ac4c"
+    },
+    {
+      "case_id": "e38-noevent-satellite",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "technology_telecom",
+      "topic_confidence": 0.97,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.03,
+        "politics_government": 0.0,
+        "technology_telecom": 0.97
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.01,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.01,
+        "sanctions": 0.01,
+        "regulation_tax_change": 0.01,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.1,
+        "insolvency_default": 0.01,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.04
+      },
+      "unlisted_event_score": 0.17,
+      "uncertainty_score": 0.25,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5866,
+        "output_tokens": 493,
+        "cost_rub": 0.10322987
+      },
+      "elapsed_ms": 828,
+      "request_sha256": "b1faa304ae9befd886e45fe93b46c1bcc565bb766cf9810badb58f5b8767d894"
+    },
+    {
+      "case_id": "e39-noevent-health",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "health",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 1.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.08,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.03,
+      "uncertainty_score": 0.23,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5837,
+        "output_tokens": 490,
+        "cost_rub": 0.10271953
+      },
+      "elapsed_ms": 1218,
+      "request_sha256": "2328ecfb86eb3d3d1ee23027beb76516cec31d90e19266109395b1ce946dde46"
+    },
+    {
+      "case_id": "e40-uncertain-strike-forecast",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "labor_employment",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 1.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.03,
+        "shortage_capacity_constraint": 0.03,
+        "production_operational_disruption": 0.03,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.04,
+      "uncertainty_score": 0.91,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5852,
+        "output_tokens": 493,
+        "cost_rub": 0.1029835
+      },
+      "elapsed_ms": 860,
+      "request_sha256": "3fe8f36d4c9c124586b699b080cdd664362e2fff27d4063e255cb82481dba684"
+    },
+    {
+      "case_id": "e42-uncertain-price-forecast",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "energy_resources",
+      "topic_confidence": 0.45,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.34,
+        "energy_resources": 0.5,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.15,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.01,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.05,
+      "uncertainty_score": 0.71,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5845,
+        "output_tokens": 491,
+        "cost_rub": 0.10286031
+      },
+      "elapsed_ms": 907,
+      "request_sha256": "0b27b7933c084d0b8f17ab7d749aaf0e950aee55033d6ef1be47363094d73e21"
+    },
+    {
+      "case_id": "e44-negated-bankruptcy",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 1.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.03,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.03,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.22,
+      "uncertainty_score": 0.23,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5847,
+        "output_tokens": 492,
+        "cost_rub": 0.10289551
+      },
+      "elapsed_ms": 687,
+      "request_sha256": "f1ed18708f4ee7e27d8bf20d1e3d21e3bd09573712f357e9a0e90ac7b8ead7f0"
+    },
+    {
+      "case_id": "e45-injection-rumor",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "business_companies",
+      "topic_confidence": 0.32,
+      "topic_probabilities": {
+        "business_companies": 0.38,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.12,
+        "labor_employment": 0.0,
+        "law_regulation": 0.15,
+        "other_uncertain": 0.31,
+        "politics_government": 0.0,
+        "technology_telecom": 0.04
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.03,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.03,
+        "sanctions": 0.04,
+        "regulation_tax_change": 0.03,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.02,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.04,
+        "legal_enforcement": 0.03,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.04,
+      "uncertainty_score": 0.86,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5899,
+        "output_tokens": 492,
+        "cost_rub": 0.1038106
+      },
+      "elapsed_ms": 687,
+      "request_sha256": "ce674b5a5e70422f1cc69a98942b8c230637dcb04b282d9f7c280368a5f095f4"
+    },
+    {
+      "case_id": "e46-other-topic",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "other_uncertain",
+      "topic_confidence": 1.0,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 1.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.02,
+        "trade_restriction": 0.01,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.1,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.01,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.37,
+      "uncertainty_score": 0.3,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5855,
+        "output_tokens": 493,
+        "cost_rub": 0.10303629
+      },
+      "elapsed_ms": 812,
+      "request_sha256": "0716d214137f1d970aa481df1ea1a0defcacc289745054f3590de2f6d98bc19b"
+    },
+    {
+      "case_id": "e47-unlisted-contract-award",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "politics_government",
+      "topic_confidence": 0.61,
+      "topic_probabilities": {
+        "business_companies": 0.31,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.03,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.01,
+        "politics_government": 0.65,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.04,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.15,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.31,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.01,
+        "investment_capacity_change": 0.04
+      },
+      "unlisted_event_score": 0.59,
+      "uncertainty_score": 0.1,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5879,
+        "output_tokens": 495,
+        "cost_rub": 0.10345864
+      },
+      "elapsed_ms": 734,
+      "request_sha256": "b637fc5bf24b1fc35932dabdd46b13f3394a76395d4e0ec462d6e8fbd45a522b"
+    },
+    {
+      "case_id": "e49-environment-monitoring",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "environment_disasters",
+      "topic_confidence": 0.98,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.98,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.02,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.03,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.03,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.03,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.03,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.04,
+      "uncertainty_score": 0.15,
+      "predicted_events": [],
+      "classification_status": "classified",
+      "usage": {
+        "input_tokens": 5924,
+        "output_tokens": 492,
+        "cost_rub": 0.10425055
+      },
+      "elapsed_ms": 703,
+      "request_sha256": "f4a55434209f28dbd13218fed062dfa4d3de8295d74ae94fd5c5b5a2dac28338"
+    },
+    {
+      "case_id": "e50-uncertain-topic",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "other_uncertain",
+      "topic_confidence": 0.93,
+      "topic_probabilities": {
+        "business_companies": 0.0,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.0,
+        "labor_employment": 0.0,
+        "law_regulation": 0.05,
+        "other_uncertain": 0.94,
+        "politics_government": 0.01,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.02,
+        "shortage_capacity_constraint": 0.02,
+        "production_operational_disruption": 0.02,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.05,
+        "sanctions": 0.06,
+        "regulation_tax_change": 0.22,
+        "cyber_security_incident": 0.02,
+        "labor_workforce_event": 0.15,
+        "insolvency_default": 0.03,
+        "corporate_transaction_restructuring": 0.03,
+        "product_recall_quality_safety": 0.03,
+        "legal_enforcement": 0.05,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.03
+      },
+      "unlisted_event_score": 0.05,
+      "uncertainty_score": 0.94,
+      "predicted_events": [],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5830,
+        "output_tokens": 493,
+        "cost_rub": 0.10259634
+      },
+      "elapsed_ms": 672,
+      "request_sha256": "51f56d313279bc4d34555981840f64717c3a827ae150cf6969affff92c3ed082"
+    }
+  ],
+  "segments": [
+    {
+      "start_at_case_id": "e01-supply-rail",
+      "end_at_case_id": "e01-supply-rail",
+      "calls": 1,
+      "attempted_calls": 1,
+      "failed_case_ids": [],
+      "transport_provenance": "historical_artifact_unattested",
+      "source_revision": {
+        "client_sha256": "5ef1c6c754c3650387943f1bc63580e044c8d2d093de9f18a1dae678a88cbd90",
+        "runner_sha256": "3a4ed49c9b7df5214bab2201994f75730d3d4ffc3e0802d354407ee81906842b"
+      },
+      "cumulative_ledger_range": [
+        0,
+        1
+      ]
+    },
+    {
+      "start_at_case_id": "e02-supply-carrier",
+      "end_at_case_id": "e02-supply-carrier",
+      "calls": 1,
+      "attempted_calls": 1,
+      "failed_case_ids": [],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        1,
+        2
+      ]
+    },
+    {
+      "start_at_case_id": "e03-shortage-cells",
+      "end_at_case_id": "e12-sanctions-assets",
+      "calls": 10,
+      "attempted_calls": 10,
+      "failed_case_ids": [],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        2,
+        12
+      ]
+    },
+    {
+      "start_at_case_id": "e13-regulation-waste",
+      "end_at_case_id": "e22-corporate-spinoff",
+      "calls": 10,
+      "attempted_calls": 11,
+      "failed_case_ids": [
+        "e23-recall-battery"
+      ],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        12,
+        23
+      ]
+    },
+    {
+      "start_at_case_id": "e24-recall-food",
+      "end_at_case_id": "e33-multi-price-shortage",
+      "calls": 10,
+      "attempted_calls": 10,
+      "failed_case_ids": [],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        23,
+        33
+      ]
+    },
+    {
+      "start_at_case_id": "e34-multi-insolvency-legal",
+      "end_at_case_id": "e34-multi-insolvency-legal",
+      "calls": 1,
+      "attempted_calls": 2,
+      "failed_case_ids": [
+        "e35-multi-labor-investment"
+      ],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        33,
+        35
+      ]
+    },
+    {
+      "start_at_case_id": "e36-noevent-rates",
+      "end_at_case_id": "e40-uncertain-strike-forecast",
+      "calls": 5,
+      "attempted_calls": 6,
+      "failed_case_ids": [
+        "e41-uncertain-sanctions-talk"
+      ],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        35,
+        41
+      ]
+    },
+    {
+      "start_at_case_id": "e42-uncertain-price-forecast",
+      "end_at_case_id": "e42-uncertain-price-forecast",
+      "calls": 1,
+      "attempted_calls": 2,
+      "failed_case_ids": [
+        "e43-uncertain-vague-delivery"
+      ],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        41,
+        43
+      ]
+    },
+    {
+      "start_at_case_id": "e44-negated-bankruptcy",
+      "end_at_case_id": "e50-uncertain-topic",
+      "calls": 6,
+      "attempted_calls": 6,
+      "failed_case_ids": [],
+      "transport_provenance": "official_polza_https",
+      "source_revision": {
+        "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+        "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754"
+      },
+      "cumulative_ledger_range": [
+        43,
+        49
+      ]
+    }
+  ],
+  "source_reports": [
+    {
+      "file": "jev-live-pilot-20261014T094655Z.json",
+      "sha256": "2c08601efae297f58df6de808d87e1c255a61778a3a4bf66a781a6eb6057fcff",
+      "kind": "historical_pinned_smoke"
+    },
+    {
+      "file": "jev-live-current-stage1-20261014.json",
+      "sha256": "a13436061e84a5cc7eada41c3c26ed16cf7a94b6879bedcddd9f82178befa7e9",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage2-20261014.json",
+      "sha256": "130647f417cfc63d526ca69d488d75a6be30fd9c0fc583ebcad45e0d99cb5bb3",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage3-20261014.json",
+      "sha256": "811d605371d54614b46ff47e9f913a3833d977bf8d2e74f309c5c62fadce75e6",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage4-20261014.json",
+      "sha256": "87d0e79039d7dfe5b7ae1f8d0739d814ca32e0b8a6fa4c738bb106db8d7bd0f5",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage5-20261014.json",
+      "sha256": "eecbf4a87e1e440387d9f399cc9ee011b3cab5b0596f477aa70840ea8054b111",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage6-20261014.json",
+      "sha256": "32db6520d8454c9917d939ba2551a3e26246ab9f0cadad87b4369fc6e6b65870",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage7-20261014.json",
+      "sha256": "a584c120a32204918f8f386e520d1ac33bcd7de50a74635fd8a252b87a76fa02",
+      "kind": "current_segment"
+    },
+    {
+      "file": "jev-live-current-stage8-20261014.json",
+      "sha256": "b1201118e838de872234923269fb0afd997899fbc2f75ebefbbcfad3f4e84697",
+      "kind": "current_segment"
+    }
+  ],
+  "cumulative_attempts": 49,
+  "known_total_attempts": 50,
+  "quality_metrics_status": "COMPUTED_PARTIAL_BASELINE_PROVENANCE_UNATTESTED",
+  "metrics": {
+    "case_count": 50,
+    "non_empty_case_count": 45,
+    "non_empty_case_total": 49,
+    "evaluation_complete": false,
+    "evaluation_coverage": 0.9184,
+    "topic_accuracy": 0.6889,
+    "topic_correct": 31,
+    "topic_total": 45,
+    "topic_confusion_matrix": {
+      "economy_finance": {
+        "economy_finance": 2,
+        "politics_government": 0,
+        "business_companies": 1,
+        "industry_trade_supply": 1,
+        "technology_telecom": 0,
+        "energy_resources": 1,
+        "law_regulation": 1,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "politics_government": {
+        "economy_finance": 0,
+        "politics_government": 2,
+        "business_companies": 0,
+        "industry_trade_supply": 1,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 1,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "business_companies": {
+        "economy_finance": 0,
+        "politics_government": 1,
+        "business_companies": 5,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 1,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "industry_trade_supply": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 3,
+        "industry_trade_supply": 6,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "technology_telecom": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 3,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "energy_resources": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 1,
+        "law_regulation": 0,
+        "labor_employment": 0,
+        "environment_disasters": 1,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "law_regulation": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 1,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 5,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "labor_employment": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 2,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "environment_disasters": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 0,
+        "environment_disasters": 2,
+        "health": 0,
+        "other_uncertain": 0
+      },
+      "health": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 1,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 1,
+        "other_uncertain": 0
+      },
+      "other_uncertain": {
+        "economy_finance": 0,
+        "politics_government": 0,
+        "business_companies": 0,
+        "industry_trade_supply": 0,
+        "technology_telecom": 0,
+        "energy_resources": 0,
+        "law_regulation": 0,
+        "labor_employment": 0,
+        "environment_disasters": 0,
+        "health": 0,
+        "other_uncertain": 2
+      }
+    },
+    "topic_misclassifications": [
+      {
+        "case_id": "e06-production-fire",
+        "expected": "industry_trade_supply",
+        "predicted": "business_companies"
+      },
+      {
+        "case_id": "e07-price-polymer",
+        "expected": "economy_finance",
+        "predicted": "business_companies"
+      },
+      {
+        "case_id": "e09-trade-export",
+        "expected": "politics_government",
+        "predicted": "industry_trade_supply"
+      },
+      {
+        "case_id": "e10-trade-import",
+        "expected": "law_regulation",
+        "predicted": "industry_trade_supply"
+      },
+      {
+        "case_id": "e12-sanctions-assets",
+        "expected": "politics_government",
+        "predicted": "law_regulation"
+      },
+      {
+        "case_id": "e14-regulation-tax",
+        "expected": "economy_finance",
+        "predicted": "law_regulation"
+      },
+      {
+        "case_id": "e18-labor-layoffs",
+        "expected": "business_companies",
+        "predicted": "labor_employment"
+      },
+      {
+        "case_id": "e24-recall-food",
+        "expected": "health",
+        "predicted": "law_regulation"
+      },
+      {
+        "case_id": "e28-disaster-drought",
+        "expected": "energy_resources",
+        "predicted": "environment_disasters"
+      },
+      {
+        "case_id": "e29-investment-plant",
+        "expected": "industry_trade_supply",
+        "predicted": "business_companies"
+      },
+      {
+        "case_id": "e33-multi-price-shortage",
+        "expected": "economy_finance",
+        "predicted": "industry_trade_supply"
+      },
+      {
+        "case_id": "e42-uncertain-price-forecast",
+        "expected": "economy_finance",
+        "predicted": "energy_resources"
+      },
+      {
+        "case_id": "e45-injection-rumor",
+        "expected": "industry_trade_supply",
+        "predicted": "business_companies"
+      },
+      {
+        "case_id": "e47-unlisted-contract-award",
+        "expected": "business_companies",
+        "predicted": "politics_government"
+      }
+    ],
+    "classification_status_confusion_matrix": {
+      "classified": {
+        "classified": 3,
+        "uncertain": 36,
+        "other": 0
+      },
+      "uncertain": {
+        "classified": 0,
+        "uncertain": 5,
+        "other": 0
+      },
+      "other": {
+        "classified": 0,
+        "uncertain": 1,
+        "other": 0
+      }
+    },
+    "case_type_slices": {
+      "ambiguous_or_speculative": {
+        "count": 3,
+        "topic_accuracy": 0.6667,
+        "event_micro_precision": null,
+        "event_micro_recall": null,
+        "event_micro_f1": null,
+        "event_exact_match_rate": 1.0
+      },
+      "multi_event": {
+        "count": 8,
+        "topic_accuracy": 0.625,
+        "event_micro_precision": 0.8571,
+        "event_micro_recall": 0.75,
+        "event_micro_f1": 0.8,
+        "event_exact_match_rate": 0.25
+      },
+      "negation_or_rumor": {
+        "count": 2,
+        "topic_accuracy": 0.5,
+        "event_micro_precision": null,
+        "event_micro_recall": null,
+        "event_micro_f1": null,
+        "event_exact_match_rate": 1.0
+      },
+      "no_listed_event": {
+        "count": 5,
+        "topic_accuracy": 1.0,
+        "event_micro_precision": null,
+        "event_micro_recall": null,
+        "event_micro_f1": null,
+        "event_exact_match_rate": 1.0
+      },
+      "out_of_taxonomy": {
+        "count": 1,
+        "topic_accuracy": 1.0,
+        "event_micro_precision": null,
+        "event_micro_recall": null,
+        "event_micro_f1": null,
+        "event_exact_match_rate": 1.0
+      },
+      "out_of_taxonomy_business_event": {
+        "count": 1,
+        "topic_accuracy": 0.0,
+        "event_micro_precision": null,
+        "event_micro_recall": null,
+        "event_micro_f1": null,
+        "event_exact_match_rate": 1.0
+      },
+      "single_event": {
+        "count": 25,
+        "topic_accuracy": 0.68,
+        "event_micro_precision": 0.8462,
+        "event_micro_recall": 0.88,
+        "event_micro_f1": 0.8627,
+        "event_exact_match_rate": 0.8
+      }
+    },
+    "event_exact_match_rate": 0.7556,
+    "event_exact_match_count": 34,
+    "event_false_positives": [
+      {
+        "case_id": "e03-shortage-cells",
+        "code": "production_operational_disruption"
+      },
+      {
+        "case_id": "e27-disaster-flood",
+        "code": "production_operational_disruption"
+      },
+      {
+        "case_id": "e25-legal-fine",
+        "code": "sanctions"
+      },
+      {
+        "case_id": "e09-trade-export",
+        "code": "regulation_tax_change"
+      },
+      {
+        "case_id": "e10-trade-import",
+        "code": "regulation_tax_change"
+      },
+      {
+        "case_id": "e32-multi-fire-supply",
+        "code": "environment_disaster_impact"
+      }
+    ],
+    "event_false_negatives": [
+      {
+        "case_id": "e03-shortage-cells",
+        "code": "shortage_capacity_constraint"
+      },
+      {
+        "case_id": "e33-multi-price-shortage",
+        "code": "shortage_capacity_constraint"
+      },
+      {
+        "case_id": "e18-labor-layoffs",
+        "code": "corporate_transaction_restructuring"
+      },
+      {
+        "case_id": "e25-legal-fine",
+        "code": "legal_enforcement"
+      },
+      {
+        "case_id": "e26-legal-investigation",
+        "code": "legal_enforcement"
+      },
+      {
+        "case_id": "e34-multi-insolvency-legal",
+        "code": "legal_enforcement"
+      },
+      {
+        "case_id": "e28-disaster-drought",
+        "code": "environment_disaster_impact"
+      }
+    ],
+    "event_micro_precision": 0.85,
+    "event_micro_recall": 0.8293,
+    "event_micro_f1": 0.8395,
+    "event_macro_f1": 0.8083,
+    "event_macro_f1_supported_classes": 15,
+    "event_threshold": 0.8,
+    "threshold_sweep_type": "event positive cutoff; negative cutoff fixed, scores between cutoffs route to review",
+    "event_review_band_sweep": [
+      {
+        "negative_cutoff": 0.1,
+        "positive_cutoff": 0.6,
+        "fixed_as_review_band": true,
+        "review_cells": 49,
+        "review_cell_rate": 0.0726
+      },
+      {
+        "negative_cutoff": 0.1,
+        "positive_cutoff": 0.7,
+        "fixed_as_review_band": true,
+        "review_cells": 55,
+        "review_cell_rate": 0.0815
+      },
+      {
+        "negative_cutoff": 0.1,
+        "positive_cutoff": 0.8,
+        "fixed_as_review_band": true,
+        "review_cells": 62,
+        "review_cell_rate": 0.0919
+      },
+      {
+        "negative_cutoff": 0.1,
+        "positive_cutoff": 0.9,
+        "fixed_as_review_band": true,
+        "review_cells": 69,
+        "review_cell_rate": 0.1022
+      },
+      {
+        "negative_cutoff": 0.2,
+        "positive_cutoff": 0.6,
+        "fixed_as_review_band": true,
+        "review_cells": 30,
+        "review_cell_rate": 0.0444
+      },
+      {
+        "negative_cutoff": 0.2,
+        "positive_cutoff": 0.7,
+        "fixed_as_review_band": true,
+        "review_cells": 36,
+        "review_cell_rate": 0.0533
+      },
+      {
+        "negative_cutoff": 0.2,
+        "positive_cutoff": 0.8,
+        "fixed_as_review_band": true,
+        "review_cells": 43,
+        "review_cell_rate": 0.0637
+      },
+      {
+        "negative_cutoff": 0.2,
+        "positive_cutoff": 0.9,
+        "fixed_as_review_band": true,
+        "review_cells": 50,
+        "review_cell_rate": 0.0741
+      },
+      {
+        "negative_cutoff": 0.3,
+        "positive_cutoff": 0.6,
+        "fixed_as_review_band": true,
+        "review_cells": 13,
+        "review_cell_rate": 0.0193
+      },
+      {
+        "negative_cutoff": 0.3,
+        "positive_cutoff": 0.7,
+        "fixed_as_review_band": true,
+        "review_cells": 19,
+        "review_cell_rate": 0.0281
+      },
+      {
+        "negative_cutoff": 0.3,
+        "positive_cutoff": 0.8,
+        "fixed_as_review_band": true,
+        "review_cells": 26,
+        "review_cell_rate": 0.0385
+      },
+      {
+        "negative_cutoff": 0.3,
+        "positive_cutoff": 0.9,
+        "fixed_as_review_band": true,
+        "review_cells": 33,
+        "review_cell_rate": 0.0489
+      }
+    ],
+    "choice_review_threshold_sweep": [
+      {
+        "choice_review_below": 0.3,
+        "auto_cases": 45,
+        "review_cases": 0,
+        "review_rate": 0.0,
+        "auto_coverage": 1.0,
+        "auto_topic_accuracy": 0.6889,
+        "all_case_topic_accuracy": 0.6889
+      },
+      {
+        "choice_review_below": 0.4,
+        "auto_cases": 44,
+        "review_cases": 1,
+        "review_rate": 0.0222,
+        "auto_coverage": 0.9778,
+        "auto_topic_accuracy": 0.7045,
+        "all_case_topic_accuracy": 0.6889
+      },
+      {
+        "choice_review_below": 0.5,
+        "auto_cases": 40,
+        "review_cases": 5,
+        "review_rate": 0.1111,
+        "auto_coverage": 0.8889,
+        "auto_topic_accuracy": 0.75,
+        "all_case_topic_accuracy": 0.6889
+      },
+      {
+        "choice_review_below": 0.6,
+        "auto_cases": 35,
+        "review_cases": 10,
+        "review_rate": 0.2222,
+        "auto_coverage": 0.7778,
+        "auto_topic_accuracy": 0.8,
+        "all_case_topic_accuracy": 0.6889
+      },
+      {
+        "choice_review_below": 0.7,
+        "auto_cases": 31,
+        "review_cases": 14,
+        "review_rate": 0.3111,
+        "auto_coverage": 0.6889,
+        "auto_topic_accuracy": 0.8387,
+        "all_case_topic_accuracy": 0.6889
+      },
+      {
+        "choice_review_below": 0.8,
+        "auto_cases": 27,
+        "review_cases": 18,
+        "review_rate": 0.4,
+        "auto_coverage": 0.6,
+        "auto_topic_accuracy": 0.8519,
+        "all_case_topic_accuracy": 0.6889
+      }
+    ],
+    "unlisted_threshold_sweep": [
+      {
+        "threshold": 0.3,
+        "tp": 1,
+        "fp": 29,
+        "fn": 0,
+        "precision": 0.0333,
+        "recall": 1.0
+      },
+      {
+        "threshold": 0.4,
+        "tp": 1,
+        "fp": 26,
+        "fn": 0,
+        "precision": 0.037,
+        "recall": 1.0
+      },
+      {
+        "threshold": 0.5,
+        "tp": 1,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.0526,
+        "recall": 1.0
+      },
+      {
+        "threshold": 0.6,
+        "tp": 0,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      {
+        "threshold": 0.7,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": null,
+        "recall": 0.0
+      },
+      {
+        "threshold": 0.8,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": null,
+        "recall": 0.0
+      },
+      {
+        "threshold": 0.9,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": null,
+        "recall": 0.0
+      }
+    ],
+    "uncertainty_threshold_sweep": [
+      {
+        "threshold_exclusive": 0.1,
+        "tp": 4,
+        "fp": 40,
+        "fn": 0,
+        "review_rate": 0.9778,
+        "precision": 0.0909,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.2,
+        "tp": 4,
+        "fp": 13,
+        "fn": 0,
+        "review_rate": 0.3778,
+        "precision": 0.2353,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.3,
+        "tp": 4,
+        "fp": 2,
+        "fn": 0,
+        "review_rate": 0.1333,
+        "precision": 0.6667,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.4,
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "review_rate": 0.0889,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.5,
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "review_rate": 0.0889,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.6,
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "review_rate": 0.0889,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.7,
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "review_rate": 0.0889,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "threshold_exclusive": 0.8,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "review_rate": 0.0667,
+        "precision": 1.0,
+        "recall": 0.75
+      },
+      {
+        "threshold_exclusive": 0.9,
+        "tp": 2,
+        "fp": 0,
+        "fn": 2,
+        "review_rate": 0.0444,
+        "precision": 1.0,
+        "recall": 0.5
+      }
+    ],
+    "per_event": {
+      "supply_chain_disruption": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "support": 5
+      },
+      "shortage_capacity_constraint": {
+        "precision": 1.0,
+        "recall": 0.3333,
+        "f1": 0.5,
+        "tp": 1,
+        "fp": 0,
+        "fn": 2,
+        "support": 3
+      },
+      "production_operational_disruption": {
+        "precision": 0.6667,
+        "recall": 1.0,
+        "f1": 0.8,
+        "tp": 4,
+        "fp": 2,
+        "fn": 0,
+        "support": 4
+      },
+      "price_cost_change": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "support": 3
+      },
+      "trade_restriction": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "support": 3
+      },
+      "sanctions": {
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.8571,
+        "tp": 3,
+        "fp": 1,
+        "fn": 0,
+        "support": 3
+      },
+      "regulation_tax_change": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "tp": 2,
+        "fp": 2,
+        "fn": 0,
+        "support": 2
+      },
+      "cyber_security_incident": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "support": 2
+      },
+      "labor_workforce_event": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "support": 2
+      },
+      "insolvency_default": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "support": 3
+      },
+      "corporate_transaction_restructuring": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "f1": 0.8,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "support": 3
+      },
+      "product_recall_quality_safety": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "support": 1
+      },
+      "legal_enforcement": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "support": 3
+      },
+      "environment_disaster_impact": {
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5,
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "support": 2
+      },
+      "investment_capacity_change": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "support": 2
+      }
+    },
+    "threshold_sweep": [
+      {
+        "threshold": 0.3,
+        "micro_f1": 0.7156,
+        "micro_precision": 0.5735,
+        "micro_recall": 0.9512,
+        "macro_f1": 0.7499,
+        "tp": 39,
+        "fp": 29,
+        "fn": 2,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 15,
+        "review_cell_rate": 0.0222
+      },
+      {
+        "threshold": 0.4,
+        "micro_f1": 0.78,
+        "micro_precision": 0.661,
+        "micro_recall": 0.9512,
+        "macro_f1": 0.7934,
+        "tp": 39,
+        "fp": 20,
+        "fn": 2,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 24,
+        "review_cell_rate": 0.0356
+      },
+      {
+        "threshold": 0.5,
+        "micro_f1": 0.8041,
+        "micro_precision": 0.6964,
+        "micro_recall": 0.9512,
+        "macro_f1": 0.8122,
+        "tp": 39,
+        "fp": 17,
+        "fn": 2,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 27,
+        "review_cell_rate": 0.04
+      },
+      {
+        "threshold": 0.6,
+        "micro_f1": 0.8085,
+        "micro_precision": 0.717,
+        "micro_recall": 0.9268,
+        "macro_f1": 0.7963,
+        "tp": 38,
+        "fp": 15,
+        "fn": 3,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 30,
+        "review_cell_rate": 0.0444
+      },
+      {
+        "threshold": 0.7,
+        "micro_f1": 0.8182,
+        "micro_precision": 0.766,
+        "micro_recall": 0.878,
+        "macro_f1": 0.7982,
+        "tp": 36,
+        "fp": 11,
+        "fn": 5,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 36,
+        "review_cell_rate": 0.0533
+      },
+      {
+        "threshold": 0.8,
+        "micro_f1": 0.8395,
+        "micro_precision": 0.85,
+        "micro_recall": 0.8293,
+        "macro_f1": 0.8083,
+        "tp": 34,
+        "fp": 6,
+        "fn": 7,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 43,
+        "review_cell_rate": 0.0637
+      },
+      {
+        "threshold": 0.9,
+        "micro_f1": 0.8378,
+        "micro_precision": 0.9394,
+        "micro_recall": 0.7561,
+        "macro_f1": 0.816,
+        "tp": 31,
+        "fp": 2,
+        "fn": 10,
+        "positive_support": 41,
+        "fixed_negative_threshold": 0.2,
+        "review_cells": 50,
+        "review_cell_rate": 0.0741
+      }
+    ],
+    "review_count": 42,
+    "review_rate": 0.9333,
+    "other_count": 0,
+    "other_rate": 0.0,
+    "review_or_other_count": 42,
+    "review_or_other_rate": 0.9333,
+    "expected_review_or_other_count": 6,
+    "expected_review_or_other_exact_matches": 5,
+    "expected_unlisted_event_count": 1,
+    "unlisted_event_precision": null,
+    "unlisted_event_recall": 0.0,
+    "unlisted_event_exact": false,
+    "expected_uncertainty_signal_count": 4,
+    "uncertainty_signal_precision": 0.2353,
+    "uncertainty_signal_recall": 1.0,
+    "uncertainty_signal_threshold": 0.2,
+    "latency": {
+      "n": 45,
+      "mean_ms": 1298.58,
+      "median_ms": 860.0,
+      "p95_nearest_rank_ms": 1313.0,
+      "p95_method": "nearest-rank; descriptive only; small-sample estimates are unstable"
+    },
+    "token_usage": {
+      "input_tokens": 263276,
+      "output_tokens": 22167,
+      "total_tokens": 285443,
+      "cost_rub": 4.63313107
+    },
+    "note": "Pilot corpus metrics only; synthetic and small. Threshold sweep is descriptive and must not be treated as production calibration."
+  },
+  "known_successful_response_cost_rub": 4.63313107,
+  "failed_attempt_cost_status": "UNKNOWN_POSSIBLY_BILLED",
+  "gold_label_status": "single-annotator synthetic baseline; metrics are conditional on draft labels",
+  "provider_response_authenticity": "NOT_CRYPTOGRAPHICALLY_ATTESTED",
+  "note": "Metrics are computed only when every current segment declares the official Polza HTTPS transport and use only successfully validated responses; failed cases are excluded and may create selection bias. The original baseline is synthetic and small, with single-author draft labels that have not been independently adjudicated. These descriptive metrics are neither independent validation nor calibration and do not prove production quality. Segment JSON and the local cumulative-attempt ledger can be modified/reset by the local user; Polza provides no signed response proof in this flow, so API origin is not cryptographically attested. One case is a pinned historical artifact from an earlier client revision; current staged segments record their source hashes. The observed segment ledger records 49 attempts; one additional failed legacy TypeSafe POST is separately pinned, bringing known live attempts to 50. Cost is reported only for successful response usage; failed requests may also have been billed. No raw articles, prompts, provider bodies, credentials, or raw error details are included."
+}

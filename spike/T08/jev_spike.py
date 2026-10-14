@@ -27,6 +27,10 @@ API_ENDPOINT = "https://polza.ai/api/v1/systemone"
 DEFAULT_MODEL = "typesafe/jev"
 SUPPORTED_MODEL_ALIASES = frozenset({DEFAULT_MODEL})
 RESOLVED_JEV_MODEL = re.compile(r"^jev-[0-9]+\.[0-9]+\.[0-9]+$")
+# Polza's observed native answer fields are rounded to two decimal places.
+# The official Choice formula is exact on the full distribution; this margin
+# allows that wire-level rounding (worst case < 0.015 for n >= 2).
+CHOICE_CONFIDENCE_ROUNDING_TOLERANCE = 0.02
 TRUSTED_TAXONOMY_SHA256 = (
     "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d"
 )
@@ -308,6 +312,23 @@ def _number(value: Any) -> bool:
     )
 
 
+def choice_confidence_matches(
+    probabilities: dict[str, float], confidence: float
+) -> bool:
+    """Check official Choice confidence, allowing observed wire rounding."""
+    if len(probabilities) < 2:
+        return False
+    expected = (max(probabilities.values()) - 1 / len(probabilities)) / (
+        1 - 1 / len(probabilities)
+    )
+    return math.isclose(
+        confidence,
+        expected,
+        rel_tol=0,
+        abs_tol=CHOICE_CONFIDENCE_ROUNDING_TOLERANCE,
+    )
+
+
 def validate_response(
     response: Any, request: JsonObject, taxonomy: JsonObject
 ) -> JsonObject:
@@ -348,6 +369,8 @@ def validate_response(
         raise SpikeError("Jev Choice label is not a maximum-probability option")
     if len(probabilities) < 2:
         raise SpikeError("Jev Choice needs at least two probability options")
+    if not choice_confidence_matches(probabilities, confidence):
+        raise SpikeError("Jev Choice confidence does not match its probabilities")
 
     for question_id in requested:
         if question_id == topic_id:

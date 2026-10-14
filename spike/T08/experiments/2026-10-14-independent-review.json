@@ -1,0 +1,75 @@
+{
+  "review_id": "t08-blind-label-audit-2026-10-14",
+  "status": "DISAGREEMENT_REQUIRES_HUMAN_ADJUDICATION",
+  "review_method": "Two independently recorded offline label-review passes; Jev predictions were not used to select or change gold labels.",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "baseline_corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+  "review_note_sha256": "92ae2a073773fa64c55ad7e9b95307f8d57e9d96b6f80f4b2527443f9e20be78",
+  "disputed_case": "e33-multi-price-shortage",
+  "baseline_and_taxonomy_modified": false,
+  "jev_outputs_used_for_adjudication": false,
+  "jev_outputs_or_metrics_in_review_note": false,
+  "reviewer_positions": [
+    {
+      "reviewer": "A",
+      "assessment": "price_cost_change is supported; shortage_capacity_constraint is not clearly supported because no operational limit is explicit."
+    },
+    {
+      "reviewer": "B",
+      "assessment": "both price_cost_change and shortage_capacity_constraint are supported; main-topic framing may be industry_trade_supply rather than economy_finance."
+    }
+  ],
+  "event_label_disputes": [
+    {
+      "case_id": "e33-multi-price-shortage",
+      "labels": [
+        "price_cost_change",
+        "shortage_capacity_constraint"
+      ],
+      "issue": "Whether the text establishes an operational constraint in addition to price change."
+    },
+    {
+      "case_id": "e34-multi-insolvency-legal",
+      "labels": [
+        "insolvency_default",
+        "legal_enforcement"
+      ],
+      "issue": "Whether the creditor filing is a distinct enforcement action or only the ordinary legal procedure for the insolvency event."
+    },
+    {
+      "case_id": "e35-multi-labor-investment",
+      "labels": [
+        "investment_capacity_change",
+        "labor_workforce_event"
+      ],
+      "issue": "Whether announced future hiring of 400 people meets an undefined materiality threshold for a workforce event."
+    }
+  ],
+  "topic_boundary_cases": [
+    "e10",
+    "e14",
+    "e18",
+    "e28",
+    "e30",
+    "e45"
+  ],
+  "matched_contrasts": [
+    [
+      "e09",
+      "e10"
+    ],
+    [
+      "e13",
+      "e14"
+    ]
+  ],
+  "event_boundary_cases": [
+    {
+      "case_id": "e28-disaster-drought",
+      "possible_label": "regulation_tax_change",
+      "issue": "Whether the water-use limit is a formal adopted rule or only a described measure."
+    }
+  ],
+  "next_action": "Human adjudication with evidence spans, recorded only in a new dataset version."
+}

@@ -9,7 +9,7 @@ The T08 experimental harness initially targeted a direct TypeSafe host and used 
 - Pin the official Polza System One endpoint and Jev model ID `typesafe/jev`.
 - Read only `POLZA_AI_API_KEY`; fail before opening a connection when it is absent.
 - Send the documented bearer authorization and native Choice/Noul request shape; request `provider.allow_fallbacks=false`.
-- Validate documented response usage (`input_tokens`, `output_tokens`, `cost_rub`) and avoid inventing a Choice confidence formula.
+- Validate documented response usage (`input_tokens`, `output_tokens`, `cost_rub`) and the official Choice confidence formula, allowing a bounded tolerance for the two-decimal values observed in Polza responses.
 - Suppress provider error messages, payloads, and all provider-supplied error metadata; retain only the HTTP status.
 - Do not present partial-run descriptive values as benchmark quality metrics.
 - Label provider-side fallback enforcement and upstream routing behavior unverified unless the provider exposes independently verifiable evidence.

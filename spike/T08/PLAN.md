@@ -1,49 +1,45 @@
-# AIF spike plan: T08 Jev news classification
+# T08 spike plan — Jev Russian news classification
 
-## Goal
+## Goal and limits
 
-Evaluate whether Jev can classify short Russian-language news using a project-owned, explicitly defined two-level taxonomy: one broad topic selected with `Choice`, plus independent business-event questions asked with `Noul`. Jev is the only classifier in this experiment. The corpus labels are manually authored evaluation truth, not model-generated labels.
+Оценить единственный classifier Jev с project-owned taxonomy: одна общая тема через Choice и независимые бизнес-события через Noul. Изолированно в spike/T08. Только synthetic stories; никакого main runtime, OpenAPI, другого classifier или live real news.
 
-## Boundaries
+## Completed implementation and review
 
-- Keep all prototype files under `spike/T08/`.
-- Do not register an application implementation or change API, CLI, Playground, OpenAPI, fixtures, or production dependencies.
-- Use synthetic news text only for live API requests. Never send real, unknown, or user-provided material.
-- Use the Jev System One API through Polza AI for native `Choice` and `Noul`. Read only `POLZA_AI_API_KEY`; never fall back to a direct TypeSafe host or follow redirects.
-- Treat taxonomy and thresholds as experimental proposals pending review.
-- Keep legal-event labels distinct from the primary event when the court or regulator is only carrying out its ordinary procedure; mark `legal_enforcement` only for a separate legal development.
-- Empty text is rejected locally and is never sent to Jev.
+- Polza System One client pins official HTTPS endpoint, Bearer env key, typesafe/jev, request fields, Choice/Noul validation including the official Choice confidence formula, usage schema, bounded timeout/response, allowlisted synthetic hashes, redirect/proxy refusal, no retries, and sanitized failures.
+- Offline test module blocks ordinary Python socket entrypoints during offline suite.
+- Taxonomy 0.3.0-spike and original corpus remain unchanged and hash-pinned.
+- Separate deep corpus has 160 synthetic cases across A/B/C/D. Jev was not called on it. Labels are single-author drafts, B24 is unresolved, D is visible/nonblind.
+- Added aggregate v4 with source/report hash checks, partial-result accounting, mock-transport metrics suppression, aggregate-mode assertion, historical failed-call accounting, explicit unknown failed-call billing, and official Choice confidence validation.
+- Cumulative attempt ledger now seeds all 49 baseline request hashes and the known legacy TypeSafe POST, so a fresh state reflects the exhausted 50-attempt pilot. Existing local Windows state was reconciled to 50. Three older TypeSafe HTTP 451 route checks are outside the pilot ledger; the overall known history is 53 calls if those share the same cap. Ledger is still best-effort local state and can be reset/edited.
+- Added the same Choice-confidence consistency validation to the live response parser and result aggregator. All 45 stored responses pass the formula check within rounding tolerance; the current client revision did not make a live call.
+- Corrected independent-review record: e34/e35 are event-label boundary questions, not topic ties; model-blind label discussion is kept separate from model metrics.
+- Added concurrent ledger reservation regression test (24 parallel local reservations, no network).
+- Copied previous report v1.2.0 unchanged into results/archive before writing final versioned report.
 
-## Work items
+## Current final checks
 
-1. Define versioned topic and event labels with positive and negative boundaries.
-2. Create 30–50 synthetic Russian examples with hand-labeled topics, events, and uncertainty cases.
-3. Implement strict request and response validation for Jev `Choice`/`Noul`.
-4. Cover malformed responses, unknown labels, threshold handling, multi-label behavior, prompt injection, empty/oversized input, timeouts, connection errors, HTTP status handling, oversized responses, and redirect/proxy refusal in an offline suite with socket entrypoints blocked.
-5. Probe Polza with one pinned synthetic case. Any larger paid batch requires an explicitly approved budget; store only sanitized labels, scores, model/version, timing, token usage, and `cost_rub`. Never switch classifier or use live network fallback.
-6. Report per-topic accuracy, per-event precision/recall/F1, uncertainty/review rates, and limitations.
-7. Independently review architecture, taxonomy, and security before proposing any integration.
-8. Maintain the original fixed baseline unchanged and add a separately versioned 150–200-case synthetic set split into benchmark, boundary, metamorphic, and holdout-control files.
+- unittest: 86 passed, 0 failed, 0 skipped.
+- Ruff check / format check: PASS.
+- Offline runner: PASS; 0 classifier calls.
+- Aggregate v4: 45 valid outputs, 50 pilot attempts, five failures including one legacy TypeSafe failure; metrics match v3.
+- No live calls made in this final correction pass.
+- Historical 451 diagnosis remains unknown.
 
-## Acceptance
+Detailed results: TEST_REPORT.md; machine details and metrics: TEST_REPORT.json.
 
-- Taxonomy has 10–15 business-event categories and an explicit `other_uncertain` path.
-- Corpus has 49 non-empty synthetic news cases plus local empty-input coverage; every event category has positive and negative examples, and the pilot includes uncertain-evidence and unlisted-event gold labels.
-- The deep evaluation artifact contains 150–200 synthetic cases with exact manifests; its labels are independently adjudicated before supporting quality claims, and its D split is never used for tuning.
-- No alternative classifier, external news API, or live article is used.
-- All offline tests pass; the test module blocks standard Python socket entrypoints and verifies the guard. This is a process-level test guard, not a sandbox guarantee against arbitrary native code.
-- A live result is called a pilot only. It is not evidence of production-level quality or a calibrated threshold.
+## Live pilot facts
 
-## Current results
+Jev 1.13.0 was returned by 44 staged Polza responses and the earlier pinned smoke. The current client validation and runner differ from the live-tested source revision; request hashes remain pinned, and all stored responses were revalidated offline. No live retry was made.
 
-- Baseline `corpus.json` remains unchanged at 49 synthetic news cases plus one locally rejected empty input. Taxonomy `0.3.0-spike` remains unchanged at 11 topic options and 15 business-event labels.
-- New `experiments/deep-v1/` contains 160 cases: A 76, B 36, C 24, D 24 (158 non-empty). Its labels are single-annotator drafts. B24 has an unresolved rule conflict and must be excluded from scoring pending adjudication. D is separate and unused for tuning, but its labels are visible and were seen by its author; it is not a blind holdout.
-- Current offline suite: 70 tests pass, 0 fail, 0 skipped. The test file covers response contract rules, malformed JSON, socket guard, no retry/fallback, Polza key/model pinning, cost metadata, partial-run metrics suppression, status-only sanitized provider errors, threshold sweeps, deep-set hashes/labels, boundary coverage, and metamorphic gold relations. Offline metric tests use controlled fixtures and do not measure Jev quality.
-- Official Polza docs specify `POST https://polza.ai/api/v1/systemone`, Bearer auth, Jev model ID `typesafe/jev`, optional `provider`, `usage.cost_rub`, up to 255 Choice options and 1–256 questions. Polza docs list the resolved response model as `jev-1.13.0`. Choice confidence has no documented arithmetic formula; the harness validates only its numeric range.
-- One historical live request to Polza succeeded on pinned synthetic case `e01-supply-rail`, returning a schema-valid Jev `jev-1.13.0` response. Usage: 5,905 input tokens, 492 output tokens, 0.10391619 ₽, 844 ms. It matched the draft topic/event labels but emitted an unlisted-event score of 0.53 and was routed to review. This is a one-case observation, not a quality metric; aggregate metrics are withheld for partial runs. The current request hash matches the recorded smoke, but current client/runner code has not made another live request. The request sets `provider.allow_fallbacks=false`, but effective provider-side routing/fallback behavior was not independently verified.
-- The live runner now defaults to one request; `--max-calls` is a per-invocation cap, and cumulative usage across invocations is not persisted. Do not repeat billable calls without separately approved budget.
-- Historical 451 statuses came from the previous direct TypeSafe route and do not diagnose Polza. One additional failed request to the old route was caused by a regression-test fixture exposing the legacy TypeSafe key to the old runner; only a sanitized error was saved. The test now proves that `POLZA_AI_API_KEY` is required and legacy variables cannot trigger a request.
-- Model quality, per-category precision/recall/F1, calibration, stability, and prompt-injection behavior remain **NOT MEASURED**. One smoke case cannot establish Russian classification quality. The expanded corpus still has single-annotator draft labels, non-blind D, and B24 ambiguity.
-- Compatibility with Framework `Understanding.classify` is partial only. The spike is an isolated experiment and does not implement normative DTO `allowed_codes`, taxonomy references, `multi_label`, result DTO, provenance, policy, Run History, or replay.
-- No application runtime, public contract, production dependency, or main-branch file is changed by this spike. Full details: `TEST_REPORT.md` and `TEST_REPORT.json`.
-- No application runtime, public contract, production dependency, or main-branch file is changed by this spike.
+Partial metrics for 45/49 baseline outputs: topic accuracy 31/45 (0.689), event micro-F1 0.840, macro-F1 0.808, multi-label exact 34/45 (0.756), 42/45 uncertain/review. They are conditioned on single-author draft labels and success-only coverage. Cost 4.63313107 RUB is known only for successful response usage; failed request cost is unknown. They do not prove quality or calibration.
+
+## Open gates before any future integration
+
+1. Adjudicate e33 and topic tie-breaks independently; retain current baseline unchanged.
+2. Make a new versioned gold set with blind holdout; do not tune on D.
+3. If another live evaluation is desired, obtain an explicit new budget/protocol; never infer failures from sanitized errors or retry automatically.
+4. Design and test mapping to normative Understanding.classify DTO, trusted policy, provenance, history and replay boundaries.
+5. Evaluate review/abstention usability and provider identity/fallback claims before discussing production use.
+
+Do not start later framework stages or integrate this prototype automatically.

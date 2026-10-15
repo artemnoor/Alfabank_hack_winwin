@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Protocol
 
 from alfalab_contracts import (
@@ -98,6 +98,7 @@ class ExperimentalFlowResult:
     output: ExtractionOutput | None
     failed_candidate_code: str | None = None
     safe_failure_code: str | None = None
+    safe_validation_issues: list[dict[str, object]] = field(default_factory=list)
 
 
 def _sha256_text(text: str) -> str:
@@ -270,13 +271,11 @@ def _map_mention(
     if mention.company is None and mention.company_role is not None:
         raise ExtractionValidationError("company_role_without_company")
     if mention.company is not None:
-        _quote_bounds(text, mention.company.value, mention.company.quote)
+        _quote_bounds(text, mention.company.value, mention.event.quote)
         if mention.company_role is None:
             raise ExtractionValidationError("company_role_missing")
-        if mention.company.quote != mention.event.quote:
-            raise ExtractionValidationError("company_event_quote_mismatch")
         _validate_company_event_relation_quote(
-            mention.company.value, mention.event.value, mention.company.quote
+            mention.company.value, mention.event.value, mention.event.quote
         )
         company_candidate_ref = _entity_ref(
             name=mention.company.value,
@@ -540,6 +539,21 @@ def _validate_output_evidence(output: ExtractionOutput, prepared) -> None:
         raise ExtractionValidationError("statement_without_evidence")
 
 
+def _safe_validation_issues(exc: ValidationError) -> list[dict[str, object]]:
+    """Keep only schema paths and error kinds; never persist values or messages."""
+    issues: list[dict[str, object]] = []
+    for issue in exc.errors(include_url=False, include_context=False):
+        issues.append(
+            {
+                "location": [str(part)[:80] for part in issue.get("loc", ())[:12]],
+                "type": str(issue.get("type", "unknown"))[:80],
+            }
+        )
+        if len(issues) == 20:
+            break
+    return issues
+
+
 def run_t08_to_t09(
     *,
     prepared,
@@ -618,6 +632,7 @@ def run_t08_to_t09(
     unresolved_entities: dict[str, EntityRef] = {}
     failed_candidate_code = None
     safe_failure_code = None
+    safe_validation_issues: list[dict[str, object]] = []
 
     for candidate in candidates:
         # Validate the precise existing Understanding.extract payload shape.
@@ -678,9 +693,19 @@ def run_t08_to_t09(
             KeyError,
             TypeError,
             ValueError,
-        ):
+        ) as exc:
             failed_candidate_code = candidate.code
-            safe_failure_code = "provider_output_rejected"
+            if isinstance(exc, ValidationError):
+                safe_validation_issues = _safe_validation_issues(exc)
+            safe_failure_code = (
+                exc.code
+                if isinstance(exc, ExtractionValidationError)
+                else (
+                    "provider_output_contract_invalid"
+                    if isinstance(exc, ValidationError)
+                    else "provider_output_rejected"
+                )
+            )
             missing.append(
                 _missing(
                     f"hints/{candidate.code}",
@@ -712,4 +737,5 @@ def run_t08_to_t09(
         output=output,
         failed_candidate_code=failed_candidate_code,
         safe_failure_code=safe_failure_code,
+        safe_validation_issues=safe_validation_issues,
     )

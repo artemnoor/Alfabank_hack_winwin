@@ -1,0 +1,378 @@
+{
+  "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-5",
+  "started_at_utc": "2026-10-15T09:42:19.412722+00:00",
+  "provider": "Polza AI",
+  "model_id": "deepseek/deepseek-v4-flash",
+  "endpoint": "https://polza.ai/api/v1/chat/completions",
+  "allowlist_id": "jev-expanded-pilot-v1-live-egress-allowlist-v2",
+  "prompt_sha256": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4",
+  "output_schema_sha256": "sha256:16f900f1b3d0d807a9a7172092e3cbfeee3b3abb1f1e32be7363f01cad9c5cf2",
+  "prior_paid_attempts": 5,
+  "cumulative_request_budget": 10,
+  "input_source": "exact-hash-allowlisted-synthetic-pilot",
+  "jev_source": "saved-live-jev-expanded-pilot-v1",
+  "jev_requests_made": 0,
+  "request_limit": 1,
+  "case_start_index": 0,
+  "status": "complete",
+  "records": [
+    {
+      "call_no": 1,
+      "case_id": "nb-003",
+      "jev_candidate_code": "production_operational_disruption",
+      "pipeline_status": "extracted",
+      "calls_attempted": 1,
+      "latency_ms": 19846,
+      "token_usage": {
+        "prompt_tokens": 1459,
+        "completion_tokens": 2410,
+        "total_tokens": 3869
+      },
+      "provider_cost_rub": 0.06779016,
+      "safe_failure_code": null,
+      "safe_validation_issues": [],
+      "validated_output": {
+        "mentions": [
+          {
+            "mention_id": "mention-ce3f714f6ea09d72f671699a",
+            "event_type": {
+              "namespace": "alfa_business_event",
+              "version": "1.0.0",
+              "code": "production_operational_disruption"
+            },
+            "actors": [],
+            "objects": [
+              {
+                "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                "kind": {
+                  "id": "t08-t09-extraction-spike/entity-kind/organization",
+                  "version": "1.0.0",
+                  "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                },
+                "display_name": "Ротор-Пром"
+              }
+            ],
+            "statements": [
+              {
+                "statement_id": "statement-680eab7e5c34c343e48bba48",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Ротор-Пром"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_description"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "повреждён привод конвейера, поэтому линия упаковки не работает со вчерашнего вечера"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:19.417723+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-f3b0463100181f55e5a562d8",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Ротор-Пром"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_date_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "вчерашнего вечера"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:19.417723+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-563a5c429bfdacfb94bc78af",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Ротор-Пром"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_location_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "площадке «Ротор-Пром»"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:19.417723+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-5c90e720d4a9abc591d03dbc",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Ротор-Пром"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_circumstance_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "повреждён привод конвейера"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:19.417723+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-253484b0168eb78d00b8d9ae",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Ротор-Пром"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "source_assertion_status"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "reported"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:19.417723+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              }
+            ],
+            "effective_at": null,
+            "missing_data": [
+              {
+                "path": "effective_at",
+                "reason": "unsupported",
+                "detail": "Дата сохранена как цитируемый текст; календарное время нельзя разрешить без явной даты и часового пояса."
+              },
+              {
+                "path": "participants",
+                "reason": "not_provided",
+                "detail": "В ответе извлечения нет участников с текстовой опорой."
+              }
+            ],
+            "provenance": {
+              "origin": "synthetic",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": {
+                "id": "t08-deepseek-fact-extraction-prompt",
+                "version": "1.0.0",
+                "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+              },
+              "evidence_refs": [],
+              "origin_verified": true
+            }
+          }
+        ],
+        "evidence_spans": [
+          {
+            "local_id": "local-evidence-2bf2205697682dfdad08cb21",
+            "material_hash": "sha256:822450bfd7178f228468b44dd58dd9791db60587b5720c85731197c7b762646a",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 109,
+              "quote_hash": "sha256:95274832e3fc8cb67165b9056166d8f4cf7b175cfbf9ab6847d8d81caf6388b1"
+            },
+            "claim_ids": [
+              "statement-680eab7e5c34c343e48bba48"
+            ]
+          },
+          {
+            "local_id": "local-evidence-79eb54d99dc1e804eff50154",
+            "material_hash": "sha256:822450bfd7178f228468b44dd58dd9791db60587b5720c85731197c7b762646a",
+            "locator": {
+              "kind": "text_span",
+              "start": 88,
+              "end": 108,
+              "quote_hash": "sha256:992b44bfa23125cf4d598b072cd7d4a027a5989414f6bd06c321c86795eeed83"
+            },
+            "claim_ids": [
+              "statement-f3b0463100181f55e5a562d8"
+            ]
+          },
+          {
+            "local_id": "local-evidence-f118fe2649fd5afbfa464b0e",
+            "material_hash": "sha256:822450bfd7178f228468b44dd58dd9791db60587b5720c85731197c7b762646a",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 24,
+              "quote_hash": "sha256:0a815e6648fc84d0eb2e9df9ca40e92dbe739c2863885f5896a9a60c3f989ca5"
+            },
+            "claim_ids": [
+              "statement-563a5c429bfdacfb94bc78af"
+            ]
+          },
+          {
+            "local_id": "local-evidence-c6933e84d00f03c78f05c632",
+            "material_hash": "sha256:822450bfd7178f228468b44dd58dd9791db60587b5720c85731197c7b762646a",
+            "locator": {
+              "kind": "text_span",
+              "start": 25,
+              "end": 51,
+              "quote_hash": "sha256:86eddab3287b27da44e93db59983f8dac40dba0d494d0bc54efa4b4fef6f64b2"
+            },
+            "claim_ids": [
+              "statement-5c90e720d4a9abc591d03dbc"
+            ]
+          },
+          {
+            "local_id": "local-evidence-c42e9c1ca06aadcdb7c8aee5",
+            "material_hash": "sha256:822450bfd7178f228468b44dd58dd9791db60587b5720c85731197c7b762646a",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 109,
+              "quote_hash": "sha256:95274832e3fc8cb67165b9056166d8f4cf7b175cfbf9ab6847d8d81caf6388b1"
+            },
+            "claim_ids": [
+              "statement-253484b0168eb78d00b8d9ae"
+            ]
+          }
+        ],
+        "unresolved_entities": [
+          {
+            "entity_id": "unresolved-8fae9ebe0dde169b1b6c5144",
+            "kind": {
+              "id": "t08-t09-extraction-spike/entity-kind/organization",
+              "version": "1.0.0",
+              "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+            },
+            "display_name": "Ротор-Пром"
+          }
+        ],
+        "missing_data": []
+      }
+    }
+  ],
+  "raw_prompts_saved": false,
+  "raw_provider_responses_saved": false,
+  "source_articles_saved": false,
+  "total_calls_attempted": 1,
+  "successful_extractions": 1,
+  "finished_at_utc": "2026-10-15T09:42:39.272594+00:00"
+}

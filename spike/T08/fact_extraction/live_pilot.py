@@ -34,7 +34,10 @@ from fact_extraction import (  # noqa: E402
     run_t08_to_t09,
 )
 from fact_extraction.errors import LiveCallsDisabled  # noqa: E402
-from fact_extraction.allowlist import load_approved_pilot_case  # noqa: E402
+from fact_extraction.allowlist import (  # noqa: E402
+    ALLOWLIST_PATH,
+    load_approved_pilot_case,
+)
 from fact_extraction.binding import (  # noqa: E402
     candidates_from_t08,
     load_experiment_binding,
@@ -43,9 +46,12 @@ from fact_extraction.polza import (  # noqa: E402
     LiveCallAuthorization,
     PolzaDeepSeekFlash,
 )
+from fact_extraction.models import ModelExtraction  # noqa: E402
+from fact_extraction.prompt import PROMPT_SHA256  # noqa: E402
 from policy_v2 import evaluate_result  # noqa: E402
 
 MAX_PILOT_REQUESTS = 10
+MAX_TOTAL_PILOT_REQUESTS = 10
 PILOT_CASES = (
     ("nb-003", "production_operational_disruption"),
     ("nb-004", "price_cost_change"),
@@ -59,12 +65,29 @@ PILOT_CASES = (
     ("nb-033", "supply_chain_disruption"),
 )
 RESULT_PATH = Path(__file__).with_name("results") / (
-    "deepseek-v4-flash-live-pilot-20261015.json"
+    "deepseek-v4-flash-live-pilot-20261015-retry-7.json"
 )
 
 
 def _sha256_text(value: str) -> str:
     return "sha256:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _previous_paid_attempts(results_dir: Path) -> int:
+    """Count prior real-pilot attempts; malformed history closes the budget."""
+    total = 0
+    for path in results_dir.glob("deepseek-v4-flash-live-pilot-*.json"):
+        if path.name.endswith("-summary.json"):
+            continue
+        try:
+            report = json.loads(path.read_text(encoding="utf-8"))
+            attempts = report["total_calls_attempted"]
+        except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError):
+            raise RuntimeError("cannot verify prior paid pilot budget") from None
+        if not isinstance(attempts, int) or isinstance(attempts, bool) or attempts < 0:
+            raise RuntimeError("cannot verify prior paid pilot budget")
+        total += attempts
+    return total
 
 
 def _load_dataset() -> tuple[dict[str, dict], dict[str, dict], dict[str, Any]]:
@@ -81,16 +104,20 @@ def _load_dataset() -> tuple[dict[str, dict], dict[str, dict], dict[str, Any]]:
     )
 
 
-def preflight_plan(*, max_requests: int) -> list[tuple[str, str, dict, dict, dict]]:
+def preflight_plan(
+    *, max_requests: int, start_index: int = 0
+) -> list[tuple[str, str, dict, dict, dict]]:
     """Resolve the fixed plan and validate every case before spending anything."""
     if not 1 <= max_requests <= MAX_PILOT_REQUESTS:
         raise ValueError("pilot request limit must be between 1 and 10")
+    if start_index < 0 or start_index + max_requests > len(PILOT_CASES):
+        raise ValueError("pilot case range exceeds the fixed ten-case manifest")
     news_by_id, result_by_id, taxonomy = _load_dataset()
     binding = load_experiment_binding()
     plan = []
     seen_case_ids: set[str] = set()
     seen_codes: set[str] = set()
-    for case_id, expected_code in PILOT_CASES[:max_requests]:
+    for case_id, expected_code in PILOT_CASES[start_index : start_index + max_requests]:
         if case_id in seen_case_ids or expected_code in seen_codes:
             raise ValueError("pilot manifest contains duplicate case or event code")
         case = news_by_id[case_id]
@@ -161,6 +188,7 @@ def _write_report(path: Path, report: dict[str, Any]) -> None:
 def run_pilot(
     *,
     max_requests: int,
+    start_index: int = 0,
     authorization: LiveCallAuthorization | None = None,
 ) -> dict[str, Any]:
     if (
@@ -169,11 +197,14 @@ def run_pilot(
         or authorization.max_requests != max_requests
     ):
         raise LiveCallsDisabled("live_calls_disabled_pending_user_approval")
-    plan = preflight_plan(max_requests=max_requests)
+    plan = preflight_plan(max_requests=max_requests, start_index=start_index)
     path = RESULT_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         raise RuntimeError("pilot artifact already exists; refusing duplicate spend")
+    prior_attempts = _previous_paid_attempts(path.parent)
+    if prior_attempts + max_requests > MAX_TOTAL_PILOT_REQUESTS:
+        raise ValueError("authorized cumulative pilot budget would be exceeded")
     extractor = PolzaDeepSeekFlash.from_windows_environment(authorization=authorization)
     try:
         with path.open("x", encoding="utf-8"):
@@ -184,16 +215,27 @@ def run_pilot(
         ) from None
 
     started_at = datetime.now(UTC).isoformat()
+    allowlist = json.loads(ALLOWLIST_PATH.read_text(encoding="utf-8"))
+    output_schema = json.dumps(
+        ModelExtraction.model_json_schema(), ensure_ascii=False, separators=(",", ":")
+    )
     report: dict[str, Any] = {
-        "run_id": "deepseek-v4-flash-live-pilot-20261015",
+        "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-7",
         "started_at_utc": started_at,
         "provider": "Polza AI",
         "model_id": "deepseek/deepseek-v4-flash",
         "endpoint": "https://polza.ai/api/v1/chat/completions",
+        "allowlist_id": allowlist["id"],
+        "prompt_sha256": PROMPT_SHA256,
+        "output_schema_sha256": "sha256:"
+        + hashlib.sha256(output_schema.encode("utf-8")).hexdigest(),
+        "prior_paid_attempts": prior_attempts,
+        "cumulative_request_budget": MAX_TOTAL_PILOT_REQUESTS,
         "input_source": "exact-hash-allowlisted-synthetic-pilot",
         "jev_source": "saved-live-jev-expanded-pilot-v1",
         "jev_requests_made": 0,
         "request_limit": max_requests,
+        "case_start_index": start_index,
         "status": "in_progress",
         "records": [],
         "raw_prompts_saved": False,
@@ -234,6 +276,7 @@ def run_pilot(
             "token_usage": extractor.last_usage if attempted else None,
             "provider_cost_rub": extractor.last_cost_rub if attempted else None,
             "safe_failure_code": result.safe_failure_code,
+            "safe_validation_issues": result.safe_validation_issues,
             "validated_output": (
                 result.output.model_dump(mode="json")
                 if result.status.startswith("extracted") and result.output
@@ -276,12 +319,14 @@ def main(argv: list[str] | None = None) -> int:
         help="explicitly authorize this one paid synthetic pilot",
     )
     parser.add_argument("--max-requests", type=int, default=MAX_PILOT_REQUESTS)
+    parser.add_argument("--start-index", type=int, default=0)
     args = parser.parse_args(argv)
     if not args.approve_paid_live:
         parser.error("live calls require --approve-paid-live")
     try:
         report = run_pilot(
             max_requests=args.max_requests,
+            start_index=args.start_index,
             authorization=LiveCallAuthorization(
                 approved_by_user=True,
                 max_requests=args.max_requests,

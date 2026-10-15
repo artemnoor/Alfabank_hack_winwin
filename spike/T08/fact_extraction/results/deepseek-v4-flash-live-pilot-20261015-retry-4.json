@@ -1,0 +1,38 @@
+{
+  "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-4",
+  "started_at_utc": "2026-10-15T09:38:14.318924+00:00",
+  "provider": "Polza AI",
+  "model_id": "deepseek/deepseek-v4-flash",
+  "endpoint": "https://polza.ai/api/v1/chat/completions",
+  "input_source": "exact-hash-allowlisted-synthetic-pilot",
+  "jev_source": "saved-live-jev-expanded-pilot-v1",
+  "jev_requests_made": 0,
+  "request_limit": 1,
+  "case_start_index": 0,
+  "status": "incomplete_stopped_after_first_failure",
+  "records": [
+    {
+      "call_no": 1,
+      "case_id": "nb-003",
+      "jev_candidate_code": "production_operational_disruption",
+      "pipeline_status": "provider_unavailable",
+      "calls_attempted": 1,
+      "latency_ms": 60061,
+      "token_usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 2598,
+        "total_tokens": 3882
+      },
+      "provider_cost_rub": 0.10610776,
+      "safe_failure_code": "company_event_quote_mismatch",
+      "safe_validation_issues": [],
+      "validated_output": null
+    }
+  ],
+  "raw_prompts_saved": false,
+  "raw_provider_responses_saved": false,
+  "source_articles_saved": false,
+  "total_calls_attempted": 1,
+  "successful_extractions": 0,
+  "finished_at_utc": "2026-10-15T09:39:14.392116+00:00"
+}

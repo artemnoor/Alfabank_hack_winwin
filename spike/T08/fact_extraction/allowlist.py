@@ -12,7 +12,7 @@ from .errors import ExtractionValidationError
 
 T08_DIR = Path(__file__).resolve().parents[1]
 PILOT_DIR = T08_DIR / "experiments" / "jev-expanded-pilot-v1"
-ALLOWLIST_PATH = Path(__file__).with_name("synthetic-live-allowlist.json")
+ALLOWLIST_PATH = Path(__file__).with_name("synthetic-live-allowlist-v2.json")
 TAXONOMY_PATH = T08_DIR / "taxonomy.json"
 POLICY_PATH = T08_DIR / "visualization" / "policy_v2.py"
 

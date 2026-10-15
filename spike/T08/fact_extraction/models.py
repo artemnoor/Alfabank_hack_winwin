@@ -21,6 +21,12 @@ class FactClaim(_StrictModel):
     quote: StrictStr = Field(min_length=1, max_length=3000)
 
 
+class CompanyClaim(_StrictModel):
+    """Company name grounded by the mention's single shared event quote."""
+
+    value: StrictStr = Field(min_length=1, max_length=300)
+
+
 class ParticipantClaim(_StrictModel):
     value: StrictStr = Field(min_length=1, max_length=300)
     quote: StrictStr = Field(min_length=1, max_length=3000)
@@ -36,7 +42,7 @@ class ExtractedMention(_StrictModel):
         "reported", "rumored", "planned", "denied", "negated", "disputed", "unknown"
     ]
     status_quote: StrictStr = Field(min_length=1, max_length=3000)
-    company: FactClaim | None
+    company: CompanyClaim | None
     company_role: (
         Literal["subject", "actor", "affected", "reporter", "mentioned", "unknown"]
         | None

@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-15T09:46:27Z",
+  "endpoint": "https://polza.ai/api/v1/models",
+  "http_status": 200,
+  "json_valid": true,
+  "model_count": 409,
+  "requested_model_id": "deepseek/deepseek-v4-flash",
+  "requested_model_listed": true,
+  "credential_value_saved": false,
+  "response_body_saved": false
+}

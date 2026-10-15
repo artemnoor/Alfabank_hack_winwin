@@ -1,8 +1,84 @@
 # T08 → DeepSeek → T09: итог технической проверки
 
-Дата: 2026-10-15. Статус: **offline prototype verified; live pilot attempted but provider timed out; T09 runtime integration unavailable**.
+Дата: 2026-10-15. Актуальный статус: **offline prototype verified; Polza API and model alias responded; 3/5 current-version synthetic extractions passed local validation; T09 runtime integration unavailable**.
 
-## Live pilot: результат
+### Офлайн-проверки после последнего изменения
+
+| Проверка | Результат |
+|---|---|
+| Полный T08 suite | `py -3.12 -m pytest spike/T08 -q` — **212 passed** |
+| T08 → extraction unit/integration | `py -3.12 -m pytest spike/T08/test_fact_extraction.py -q` — **40 passed** |
+| Framework contracts | `$env:PYTHONPATH='packages/contracts/src;apps/api/src'; py -3.12 -m pytest tests/contracts -q` — **31 passed** |
+| Ruff check | `py -3.12 -m ruff check spike/T08/fact_extraction spike/T08/test_fact_extraction.py` — **passed** |
+| Ruff format | `py -3.12 -m ruff format --check spike/T08/fact_extraction spike/T08/test_fact_extraction.py` — **passed** |
+| Offline demo | `py -3.12 spike/T08/fact_extraction/offline_demo.py` — **exit 0**, no network |
+| Contracts codegen | **Не выполнен в этой среде:** закреплённый `uv 0.13.0` отсутствует (есть `0.11.28`); прямой запуск codegen использовал несуществующий Python в старом worktree. OpenAPI/generated contracts не изменялись; contract tests прошли. |
+
+Полный T08 suite и договорные тесты были реально повторены после изменений.
+Codegen не засчитывается как PASS.
+
+## Повторная проверка Polza и live-пилот после исправлений
+
+Этот блок — актуальный результат и он **заменяет прежний статус только по
+доступности API**. Старые попытки и их артефакты сохранены ниже/в `results/`.
+
+Официальная документация Polza подтверждает endpoint
+`https://polza.ai/api/v1/chat/completions`, Bearer-заголовок, переменную
+`POLZA_API_KEY` и точный каталоговый ID `deepseek/deepseek-v4-flash`.
+Дополнительно официальная документация DeepSeek описывает JSON Output через
+`response_format: {"type":"json_object"}`. Ссылки: [Polza API](https://polza.ai/providers/deepseek),
+[Polza model listing](https://polza.ai/models/deepseek/deepseek-v4-flash),
+[DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/).
+
+В свежем бесплатном `GET /api/v1/models` получено HTTP 200; JSON корректный,
+каталог содержал 409 моделей и требуемый ID. В коде официальное имя
+`POLZA_API_KEY` приоритетное; прежнее `POLZA_AI_API_KEY` оставлено запасным,
+чтобы не сломать локальную настройку. Значение ключа и тело GET-ответа не
+сохранялись. В трёх успешных Chat Completions поле `model` совпало с требуемым
+ID. Это подтверждает вызов именно этого alias через Polza, но не позволяет
+проверить внутреннюю версию/checkpoint за маршрутизацией агрегатора.
+
+Разбор первой серии выявил две проблемы integration-кода: модель не всегда
+возвращала корректный JSON без JSON mode, а отдельные `company.quote` и
+`event.quote` часто расходились. Включён JSON mode. Структуру также упростили:
+теперь имя компании должно содержаться в той же единственной точной цитате,
+что и формулировка события. Валидатор не ослабляли. Создана новая версия
+точно-хешированного egress manifest `synthetic-live-allowlist-v2.json`; исходный
+manifest оставлен без изменений. Runner теперь считает бюджет по всем
+сохранённым попыткам и закрывает запуск, если нельзя доказать остаток.
+
+Всего потрачено **10/10** разрешённых платных запросов; новых обращений к Jev не
+было. В последних пяти вызовах с актуальной схемой все пять ответов прошли
+JSON и внутреннюю Pydantic-схему; три прошли цитатные проверки и были преобразованы
+в `ExtractionOutput`, два были безопасно отклонены проверкой связи компании и
+события. Результаты:
+
+| Пример | Результат | Задержка | Списание Polza |
+|---|---|---:|---:|
+| `nb-003` — сбой производства | `extracted` | 19,8 с | 0,06779016 ₽ |
+| `nb-004` — изменение цены | `extracted` | 26,8 с | 0,06678776 ₽ |
+| `nb-006` — санкции | `extracted` | 8,1 с | 0,07225474 ₽ |
+| `nb-009` — трудовое событие | fail-closed: `company_event_relation_unverified` | 38,7 с | 0,05005711 ₽ |
+| `nb-011` — инвестиции/мощность | fail-closed: `company_event_relation_unverified` | 38,0 с | 0,08434426 ₽ |
+
+По всем 10 попыткам провайдер сообщил стоимость **0,56318761 ₽** для 8
+запросов. Для 2 ранних попыток стоимость неизвестна (один timeout, один
+невалидная schema-ответа до исправления сохранения usage); они могли тарифицироваться.
+Полная таблица безопасных результатов и агрегированные показатели:
+[summary JSON](results/deepseek-v4-flash-live-pilot-20261015-summary.json).
+Пять последних артефактов сохраняют валидированные DTO, безопасные ошибки,
+latency/token usage/cost и хеши prompt/schema, но не сохраняют ключ, сырой
+ответ, prompt или полный текст новости.
+
+**Реальный API работает; полностью надёжное извлечение не доказано.** Сейчас
+система демонстрирует успешный структурированный результат на трёх
+синтетических примерах и безопасно отказывает на двух. Это не метрики качества:
+нет независимого human gold для извлечённых фактов, а `reported` не означает
+подтверждение события. Повторить запросы нельзя: утверждённый бюджет исчерпан.
+Для новой попытки нужен отдельный бюджет/разрешение и проверка причин двух
+отказов человеком; текущие отказы нельзя обходить ослаблением проверки связи.
+
+## Первичная live-попытка — исторический результат
 
 По отдельному разрешению пользователя запущен один платный запрос к Polza для
 первого утверждённого синтетического примера `nb-003` и сохранённого ответа Jev.
@@ -83,19 +159,17 @@ DeepSeek.
   `deepseek/deepseek-v4-flash`.
 - Для OpenAI-compatible Chat Completions Polza указывает
   `https://polza.ai/api/v1/chat/completions` и Bearer authorization.
-- Но журнал DeepSeek от 2026-09-10 сообщает, что старый V4 Flash снят с
-  обслуживания, а его прежний alias временно маршрутизируется на V4.1 Flash.
-  Код сохраняет требуемый ID и не переключается на другой. Фактический
-  checkpoint за Polza alias не подтверждён.
+- В предыдущем исследовании журнал DeepSeek сообщал о возможной маршрутизации
+  старого V4 Flash alias на V4.1 Flash. Последующий ответ Polza вернул
+  запрошенный alias; внутренний checkpoint/версию весов агрегатора это всё ещё
+  не доказывает. Код сохраняет согласованный с пользователем ID и не переключается.
 - Источники: [Polza model listing](https://polza.ai/models/deepseek/deepseek-v4-flash),
   [Polza DeepSeek API instructions](https://polza.ai/providers/deepseek),
   [DeepSeek release log](https://api-docs.deepseek.com/updates/?release=deepseek-coder).
 
-**Live API: FAILED WITH TIMEOUT.** Один реальный POST был предпринят к
-закреплённому endpoint/model ID; провайдер не вернул HTTP-ответ за отведённое
-время. Модель не выдала проверяемого результата. Provider token usage, сумма
-списания, точный checkpoint за alias и качество русского извлечения не измерены.
-Реальная интеграция и качество DeepSeek остаются **не подтверждены**.
+**Исторический live-результат первой попытки: TIMEOUT.** Этот единичный запуск не
+получил HTTP-ответа; последующие запросы и их статус приведены в актуальном блоке
+выше. Возможная стоимость этой попытки остаётся неизвестна.
 
 ## Независимое ревью
 
@@ -127,14 +201,14 @@ AI Factory reviewer провёл два read-only прохода без внеш
 - External egress закрыт по умолчанию и ограничен exact-hash allowlist для
   synthetic Jev pilot. Реальные, public и unknown материалы этот spike не
   отправляет.
-- Нельзя заявлять, что API работает или что DeepSeek V4 Flash действительно
-  ответил: live запрос запрещён без отдельного согласия и checkpoint alias
-  неоднозначен.
-- Нельзя объявлять точность/качество извлечения проверенными. Для этого нужны
-  разрешённый минимальный live pilot, human-reviewed extraction labels и
-  подтверждение Polza по фактическому checkpoint.
+- Polza endpoint и каталоговый alias реально ответили; это доказывает
+  доступность API и успешную работу extraction pipeline на трёх случаях, но не
+  внутренний checkpoint провайдера.
+- Нельзя объявлять точность/качество извлечения проверенными: нужны
+  independently human-reviewed extraction labels и расширенная оценка ошибок.
 
-Итог: **офлайн-прототип и безопасный контрактный адаптер прошли проверки.
-Live-пилот заблокирован таймаутом провайдера; перед новым платным запуском
-нужно проверить состояние запроса/расходов в кабинете Polza и устранить причину
-сетевой недоступности. Runtime T09 integration по-прежнему не проверялась.**
+Итог по последней проверке: **Polza API работает, extraction pipeline
+продемонстрирован на трёх синтетических новостях; два результата безопасно
+отклонены из-за неподтверждённой связи компании и события. Тестовый бюджет
+исчерпан, модельное качество не измерено, runtime T09 integration по-прежнему
+не проверялась.**

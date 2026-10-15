@@ -4,6 +4,10 @@
 class ExtractionValidationError(ValueError):
     """An input or model extraction violates the spike's safe invariants."""
 
+    def __init__(self, code: str) -> None:
+        self.code = code
+        super().__init__(code)
+
 
 class LiveCallsDisabled(RuntimeError):
     """Paid provider calls are disabled until explicit user authorization."""

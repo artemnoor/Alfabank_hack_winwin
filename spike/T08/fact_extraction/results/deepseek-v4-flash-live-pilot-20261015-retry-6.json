@@ -1,0 +1,846 @@
+{
+  "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-6",
+  "started_at_utc": "2026-10-15T09:42:50.264599+00:00",
+  "provider": "Polza AI",
+  "model_id": "deepseek/deepseek-v4-flash",
+  "endpoint": "https://polza.ai/api/v1/chat/completions",
+  "allowlist_id": "jev-expanded-pilot-v1-live-egress-allowlist-v2",
+  "prompt_sha256": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4",
+  "output_schema_sha256": "sha256:16f900f1b3d0d807a9a7172092e3cbfeee3b3abb1f1e32be7363f01cad9c5cf2",
+  "prior_paid_attempts": 6,
+  "cumulative_request_budget": 10,
+  "input_source": "exact-hash-allowlisted-synthetic-pilot",
+  "jev_source": "saved-live-jev-expanded-pilot-v1",
+  "jev_requests_made": 0,
+  "request_limit": 4,
+  "case_start_index": 1,
+  "status": "incomplete_stopped_after_first_failure",
+  "records": [
+    {
+      "call_no": 1,
+      "case_id": "nb-004",
+      "jev_candidate_code": "price_cost_change",
+      "pipeline_status": "extracted",
+      "calls_attempted": 1,
+      "latency_ms": 26801,
+      "token_usage": {
+        "prompt_tokens": 1333,
+        "completion_tokens": 1344,
+        "total_tokens": 2677
+      },
+      "provider_cost_rub": 0.06678776,
+      "safe_failure_code": null,
+      "safe_validation_issues": [],
+      "validated_output": {
+        "mentions": [
+          {
+            "mention_id": "mention-e30e6cabc9f340e69c2f7bc0",
+            "event_type": {
+              "namespace": "alfa_business_event",
+              "version": "1.0.0",
+              "code": "price_cost_change"
+            },
+            "actors": [
+              {
+                "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+                "kind": {
+                  "id": "t08-t09-extraction-spike/entity-kind/organization",
+                  "version": "1.0.0",
+                  "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                },
+                "display_name": "завод «Северный сплав»"
+              }
+            ],
+            "objects": [],
+            "statements": [
+              {
+                "statement_id": "statement-82f1897ac70f8f0d698b2af6",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "завод «Северный сплав»"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_description"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "цены на 6 процентов выше прежних"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:50.269599+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-10043be67420b454befb698d",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "завод «Северный сплав»"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_date_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "1 ноября"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:50.269599+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-b83adbd964cf145afad5df13",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "завод «Северный сплав»"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_circumstance_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "к новым договорам"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:50.269599+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-8738c98e3cd87087ecf03efb",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/organization",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "завод «Северный сплав»"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "source_assertion_status"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "reported"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:42:50.269599+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              }
+            ],
+            "effective_at": null,
+            "missing_data": [
+              {
+                "path": "effective_at",
+                "reason": "unsupported",
+                "detail": "Дата сохранена как цитируемый текст; календарное время нельзя разрешить без явной даты и часового пояса."
+              },
+              {
+                "path": "location",
+                "reason": "not_provided",
+                "detail": "В ответе извлечения нет места с текстовой опорой."
+              },
+              {
+                "path": "participants",
+                "reason": "not_provided",
+                "detail": "В ответе извлечения нет участников с текстовой опорой."
+              }
+            ],
+            "provenance": {
+              "origin": "synthetic",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": {
+                "id": "t08-deepseek-fact-extraction-prompt",
+                "version": "1.0.0",
+                "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+              },
+              "evidence_refs": [],
+              "origin_verified": true
+            }
+          }
+        ],
+        "evidence_spans": [
+          {
+            "local_id": "local-evidence-e95ecc32a117bc78c523dcb6",
+            "material_hash": "sha256:4c7877755aea820c6a54ae7f64aa7d0b56623fc10cdd98396ef515b82ede8ce0",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 95,
+              "quote_hash": "sha256:e4480395f22d175a758505bd43244439074138e2a644e334038fa4dbb6ca7002"
+            },
+            "claim_ids": [
+              "statement-82f1897ac70f8f0d698b2af6"
+            ]
+          },
+          {
+            "local_id": "local-evidence-c7f2e03c726b2e797a2d1bc4",
+            "material_hash": "sha256:4c7877755aea820c6a54ae7f64aa7d0b56623fc10cdd98396ef515b82ede8ce0",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 10,
+              "quote_hash": "sha256:62894bc85f615766d9f92009895fde0b53eb05b9da13edc39441a581cde11cb2"
+            },
+            "claim_ids": [
+              "statement-10043be67420b454befb698d"
+            ]
+          },
+          {
+            "local_id": "local-evidence-8c655af258478775bd15c2f8",
+            "material_hash": "sha256:4c7877755aea820c6a54ae7f64aa7d0b56623fc10cdd98396ef515b82ede8ce0",
+            "locator": {
+              "kind": "text_span",
+              "start": 44,
+              "end": 61,
+              "quote_hash": "sha256:ec433d49898f44b96ef8af2b9e67472094326dfbf56283c73401afe248c76a4a"
+            },
+            "claim_ids": [
+              "statement-b83adbd964cf145afad5df13"
+            ]
+          },
+          {
+            "local_id": "local-evidence-e48542b73c9c28203a3535ae",
+            "material_hash": "sha256:4c7877755aea820c6a54ae7f64aa7d0b56623fc10cdd98396ef515b82ede8ce0",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 95,
+              "quote_hash": "sha256:e4480395f22d175a758505bd43244439074138e2a644e334038fa4dbb6ca7002"
+            },
+            "claim_ids": [
+              "statement-8738c98e3cd87087ecf03efb"
+            ]
+          }
+        ],
+        "unresolved_entities": [
+          {
+            "entity_id": "unresolved-bf2a5d468e0256a6c707114c",
+            "kind": {
+              "id": "t08-t09-extraction-spike/entity-kind/organization",
+              "version": "1.0.0",
+              "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+            },
+            "display_name": "завод «Северный сплав»"
+          }
+        ],
+        "missing_data": []
+      }
+    },
+    {
+      "call_no": 2,
+      "case_id": "nb-006",
+      "jev_candidate_code": "sanctions",
+      "pipeline_status": "extracted",
+      "calls_attempted": 1,
+      "latency_ms": 8083,
+      "token_usage": {
+        "prompt_tokens": 1327,
+        "completion_tokens": 304,
+        "total_tokens": 1631
+      },
+      "provider_cost_rub": 0.07225474,
+      "safe_failure_code": null,
+      "safe_validation_issues": [],
+      "validated_output": {
+        "mentions": [
+          {
+            "mention_id": "mention-14e9c158f4131689b5945bdf",
+            "event_type": {
+              "namespace": "alfa_business_event",
+              "version": "1.0.0",
+              "code": "sanctions"
+            },
+            "actors": [
+              {
+                "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                "kind": {
+                  "id": "t08-t09-extraction-spike/entity-kind/government",
+                  "version": "1.0.0",
+                  "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                },
+                "display_name": "Министерство"
+              }
+            ],
+            "objects": [
+              {
+                "entity_id": "unresolved-de2c350788ad56d4deef0a2c",
+                "kind": {
+                  "id": "t08-t09-extraction-spike/entity-kind/organization",
+                  "version": "1.0.0",
+                  "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                },
+                "display_name": "трёх зарубежных поставщиков"
+              }
+            ],
+            "statements": [
+              {
+                "statement_id": "statement-662e382dffaeee6d7f0e86dd",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_description"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "включении трёх зарубежных поставщиков в официальный санкционный перечень"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-e0d735946fe97634b3e31557",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_participant"
+                },
+                "value": {
+                  "kind": "entity",
+                  "value": {
+                    "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                    "kind": {
+                      "id": "t08-t09-extraction-spike/entity-kind/government",
+                      "version": "1.0.0",
+                      "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                    },
+                    "display_name": "Министерство"
+                  }
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-5fbbf1a4abafc6b0402680ad",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "participant_role_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "actor"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-f12b4f05ab6f4657275dee71",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_participant"
+                },
+                "value": {
+                  "kind": "entity",
+                  "value": {
+                    "entity_id": "unresolved-de2c350788ad56d4deef0a2c",
+                    "kind": {
+                      "id": "t08-t09-extraction-spike/entity-kind/organization",
+                      "version": "1.0.0",
+                      "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                    },
+                    "display_name": "трёх зарубежных поставщиков"
+                  }
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-9991e1978c8bca5ee2f9973f",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "participant_role_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "affected"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-b69fddbe3a720e6c2f96682e",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "event_circumstance_text"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "заморозка активов и запрет на расчёты"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              },
+              {
+                "statement_id": "statement-edbe9743d2fd69417e277c51",
+                "revision": 1,
+                "subject": {
+                  "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+                  "kind": {
+                    "id": "t08-t09-extraction-spike/entity-kind/government",
+                    "version": "1.0.0",
+                    "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+                  },
+                  "display_name": "Министерство"
+                },
+                "predicate": {
+                  "namespace": "alfa_business_event",
+                  "version": "1.0.0",
+                  "code": "source_assertion_status"
+                },
+                "value": {
+                  "kind": "text",
+                  "value": "reported"
+                },
+                "epistemic_status": "unknown",
+                "validity": {
+                  "valid_from": null,
+                  "valid_to": null,
+                  "recorded_at": "2026-10-15T09:43:17.080530+00:00"
+                },
+                "provenance": {
+                  "origin": "synthetic",
+                  "source_refs": [],
+                  "input_statement_refs": [],
+                  "producer_run_id": null,
+                  "derivation_method": {
+                    "id": "t08-deepseek-fact-extraction-prompt",
+                    "version": "1.0.0",
+                    "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+                  },
+                  "evidence_refs": [],
+                  "origin_verified": true
+                }
+              }
+            ],
+            "effective_at": null,
+            "missing_data": [
+              {
+                "path": "company",
+                "reason": "not_provided",
+                "detail": "Компания не названа с точной опорой в тексте."
+              },
+              {
+                "path": "date",
+                "reason": "not_provided",
+                "detail": "В ответе извлечения нет даты с текстовой опорой."
+              },
+              {
+                "path": "location",
+                "reason": "not_provided",
+                "detail": "В ответе извлечения нет места с текстовой опорой."
+              }
+            ],
+            "provenance": {
+              "origin": "synthetic",
+              "source_refs": [],
+              "input_statement_refs": [],
+              "producer_run_id": null,
+              "derivation_method": {
+                "id": "t08-deepseek-fact-extraction-prompt",
+                "version": "1.0.0",
+                "hash": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4"
+              },
+              "evidence_refs": [],
+              "origin_verified": true
+            }
+          }
+        ],
+        "evidence_spans": [
+          {
+            "local_id": "local-evidence-7a044dec31243c4b8720782d",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 97,
+              "quote_hash": "sha256:eb81b747dcc4658e34d53d56c1c13af1a6a70387cf99cb01ee67d5d5d9c67ed5"
+            },
+            "claim_ids": [
+              "statement-662e382dffaeee6d7f0e86dd"
+            ]
+          },
+          {
+            "local_id": "local-evidence-78a6a7af1895e3b69cb8d166",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 12,
+              "quote_hash": "sha256:86124ec0445948e24e33ac31d5896c0222ec98e8462448e4c33ebd9fae5029dc"
+            },
+            "claim_ids": [
+              "statement-e0d735946fe97634b3e31557"
+            ]
+          },
+          {
+            "local_id": "local-evidence-8058d9de6a9b2bd324d254ff",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 12,
+              "quote_hash": "sha256:86124ec0445948e24e33ac31d5896c0222ec98e8462448e4c33ebd9fae5029dc"
+            },
+            "claim_ids": [
+              "statement-5fbbf1a4abafc6b0402680ad"
+            ]
+          },
+          {
+            "local_id": "local-evidence-1497eae98bd2d11754968787",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 34,
+              "end": 61,
+              "quote_hash": "sha256:c8e8eb97c686a0cec3b1d3cf499b63614c05f8e58d16637c3306155a92608714"
+            },
+            "claim_ids": [
+              "statement-f12b4f05ab6f4657275dee71"
+            ]
+          },
+          {
+            "local_id": "local-evidence-08adc5ef88b4a00a0eef3582",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 34,
+              "end": 61,
+              "quote_hash": "sha256:c8e8eb97c686a0cec3b1d3cf499b63614c05f8e58d16637c3306155a92608714"
+            },
+            "claim_ids": [
+              "statement-9991e1978c8bca5ee2f9973f"
+            ]
+          },
+          {
+            "local_id": "local-evidence-dd9ac58b058b37e8c30e259d",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 127,
+              "end": 164,
+              "quote_hash": "sha256:16a52abfac6246b0a9d8d83a6b46439d854a85b48d46b56a8e9fc25c0e9a3411"
+            },
+            "claim_ids": [
+              "statement-b69fddbe3a720e6c2f96682e"
+            ]
+          },
+          {
+            "local_id": "local-evidence-e296de480288d2d187ea6531",
+            "material_hash": "sha256:c6d9895b8c079dccb006bf840fb8287804de5e2e77947830b700535dd7d25d50",
+            "locator": {
+              "kind": "text_span",
+              "start": 0,
+              "end": 97,
+              "quote_hash": "sha256:eb81b747dcc4658e34d53d56c1c13af1a6a70387cf99cb01ee67d5d5d9c67ed5"
+            },
+            "claim_ids": [
+              "statement-edbe9743d2fd69417e277c51"
+            ]
+          }
+        ],
+        "unresolved_entities": [
+          {
+            "entity_id": "unresolved-85c5080854a7ff496234b3b3",
+            "kind": {
+              "id": "t08-t09-extraction-spike/entity-kind/government",
+              "version": "1.0.0",
+              "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+            },
+            "display_name": "Министерство"
+          },
+          {
+            "entity_id": "unresolved-de2c350788ad56d4deef0a2c",
+            "kind": {
+              "id": "t08-t09-extraction-spike/entity-kind/organization",
+              "version": "1.0.0",
+              "hash": "sha256:2a16df1190ddb987455cd98caa8ddd2b54300b39ae61415af9ea15d0924d1775"
+            },
+            "display_name": "трёх зарубежных поставщиков"
+          }
+        ],
+        "missing_data": []
+      }
+    },
+    {
+      "call_no": 3,
+      "case_id": "nb-009",
+      "jev_candidate_code": "labor_workforce_event",
+      "pipeline_status": "provider_unavailable",
+      "calls_attempted": 1,
+      "latency_ms": 38741,
+      "token_usage": {
+        "prompt_tokens": 1324,
+        "completion_tokens": 1892,
+        "total_tokens": 3216
+      },
+      "provider_cost_rub": 0.05005711,
+      "safe_failure_code": "company_event_relation_unverified",
+      "safe_validation_issues": [],
+      "validated_output": null
+    }
+  ],
+  "raw_prompts_saved": false,
+  "raw_provider_responses_saved": false,
+  "source_articles_saved": false,
+  "total_calls_attempted": 3,
+  "successful_extractions": 2,
+  "finished_at_utc": "2026-10-15T09:44:03.926181+00:00"
+}

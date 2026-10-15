@@ -1,0 +1,42 @@
+{
+  "report_version": "real-public-data-extraction-v1",
+  "run_id": "deepseek-v4-flash-real-public-data-20261015",
+  "recorded_at_utc": "2026-10-15T10:55:34.153378+00:00",
+  "provider": "Polza AI",
+  "endpoint": "https://polza.ai/api/v1/chat/completions",
+  "model_requested": "deepseek/deepseek-v4-flash",
+  "model_returned": "deepseek/deepseek-v4-flash",
+  "source": {
+    "case_id": "rosatom-official-gigafactory-headline",
+    "source_url": "https://rosatom.ru/journalist/news/rosatom-zapustil-v-pervuyu-v-rossii-gigafabriku-litiyionnykh-nakopiteley-energii/",
+    "source_type": "official_public_company_news",
+    "origin": "public_source",
+    "text_sha256": "sha256:87b77ab56d82930337ad43cca2cd6235fd8b402d81c89006aa80fa722308e9c5",
+    "text_saved": false,
+    "text_sent_to_provider": true,
+    "personal_data_in_input": false
+  },
+  "candidate_event_code": "investment_capacity_change",
+  "candidate_origin": "preselected_for_extraction_test",
+  "classification_performed": false,
+  "jev_requests_made": 0,
+  "live_requests": 1,
+  "http_status": 200,
+  "elapsed_ms": 5978,
+  "status": "validated",
+  "model_output": {
+    "schema_valid": true,
+    "mention_count": 1,
+    "claim_quotes_exact_and_unique": true,
+    "company_event_relation_check": "no_violation_detected_if_company_was_emitted",
+    "raw_response_saved": false
+  },
+  "usage": {
+    "prompt_tokens": 1308,
+    "completion_tokens": 149,
+    "total_tokens": 1457,
+    "provider_reported_cost_rub": 0.01839354
+  },
+  "api_key_saved": false,
+  "scope_note": "One user-authorized extraction smoke test on a public source. The model did not choose the event category. This did not change or bypass the synthetic-only policy of the reusable T08 pipeline."
+}

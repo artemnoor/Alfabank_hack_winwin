@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import time
 import urllib.error
@@ -145,6 +146,7 @@ class PolzaDeepSeekFlash:
         self._transport: ChatTransport = _PolzaHttpsTransport()
         self.calls_made = 0
         self.last_usage: dict[str, int] | None = None
+        self.last_cost_rub: float | None = None
         self.last_elapsed_ms: int | None = None
 
     @classmethod
@@ -195,6 +197,11 @@ class PolzaDeepSeekFlash:
         if len(request_body) > MAX_REQUEST_BYTES:
             raise ExtractionProviderError("provider_request_too_large")
         transport = self._transport
+        # These values belong to this attempt only. Do not accidentally carry
+        # token usage or latency forward if a later provider response omits it.
+        self.last_usage = None
+        self.last_cost_rub = None
+        self.last_elapsed_ms = None
         LOGGER.info(
             "fact_extraction.provider.request_started",
             extra={"candidate_count": 1, "model_id": self.model_id},
@@ -269,6 +276,18 @@ class PolzaDeepSeekFlash:
                 and value >= 0
             }
             self.last_usage = token_usage or None
+            cost_rub = usage.get("cost_rub")
+            if isinstance(cost_rub, (int, float)) and not isinstance(cost_rub, bool):
+                try:
+                    normalized_cost = float(cost_rub)
+                except (OverflowError, ValueError):
+                    normalized_cost = None
+                if (
+                    normalized_cost is not None
+                    and math.isfinite(normalized_cost)
+                    and normalized_cost >= 0
+                ):
+                    self.last_cost_rub = normalized_cost
         LOGGER.info(
             "fact_extraction.provider.request_completed",
             extra={

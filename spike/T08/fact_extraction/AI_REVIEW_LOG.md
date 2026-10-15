@@ -24,6 +24,19 @@ calls.
 - Reviewer confirmed that the reporter relation is no longer emitted and found
   no remaining CRITICAL/HIGH/MEDIUM code findings.
 
+## Pass 3 — bounded live-pilot runner
+
+- Independently reviewed `live_pilot.py` and the latest provider error/cost
+  handling before the authorized request.
+- Confirmed default-deny authorization, a fixed 10-case synthetic allowlist
+  paired with saved Jev outputs, a hard request cap, no retries, stop-on-first
+  failure, and a run-once artifact guard. The report does not save prompts,
+  source articles, raw provider responses, or credentials.
+- Offline orchestration checks: **3 passed, 30 deselected**; verified that the
+  first failure stops after one attempt, a second run cannot spend again, and a
+  successful mock path is capped at exactly ten requests.
+- No blocking findings. This code review did not call Jev or DeepSeek.
+
 ## Remaining limitation
 
 The model can still predict the wrong company role. Text-boundary validation

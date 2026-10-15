@@ -609,7 +609,12 @@ def provider_response(content: str, *, model: str = EXPECTED_MODEL_ID) -> bytes:
         {
             "model": model,
             "choices": [{"message": {"content": content}}],
-            "usage": {"prompt_tokens": 12, "completion_tokens": 5, "total_tokens": 17},
+            "usage": {
+                "prompt_tokens": 12,
+                "completion_tokens": 5,
+                "total_tokens": 17,
+                "cost_rub": 0.001,
+            },
         }
     ).encode("utf-8")
 
@@ -665,6 +670,7 @@ def test_adapter_uses_one_pinned_request_and_accepts_strict_extraction_json():
         "completion_tokens": 5,
         "total_tokens": 17,
     }
+    assert adapter.last_cost_rub == 0.001
 
 
 @pytest.mark.parametrize(
@@ -812,3 +818,158 @@ def test_live_authorization_is_checked_before_reading_windows_key(monkeypatch):
     monkeypatch.setenv(API_KEY_ENV_VAR, "test-only-secret")
     with pytest.raises(LiveCallsDisabled):
         PolzaDeepSeekFlash.from_windows_environment(authorization=None)
+
+
+def test_usage_is_reset_when_a_later_provider_response_omits_usage():
+    article, classification, taxonomy = load_pilot()
+    candidate = candidates_from_t08(
+        ["production_operational_disruption"], taxonomy, load_experiment_binding()
+    )[0]
+    content = json.dumps(
+        {"mentions": [sample_mention().model_dump(mode="json")]},
+        ensure_ascii=False,
+    )
+    first_response = provider_response(content)
+    second_json = json.loads(provider_response(content))
+    second_json.pop("usage")
+
+    class SequenceTransport:
+        def __init__(self):
+            self.responses = [
+                first_response,
+                json.dumps(second_json, ensure_ascii=False).encode("utf-8"),
+            ]
+
+        def post(self, **kwargs):
+            del kwargs
+            body = self.responses.pop(0)
+            return TransportResponse(200, POLZA_CHAT_COMPLETIONS_URL, body)
+
+    adapter = authorized_adapter(SequenceTransport())
+    for _ in range(2):
+        adapter.extract_candidate(
+            case_id=SAMPLE_ID,
+            article_text=article["text"],
+            classification=classification,
+            candidate=candidate,
+        )
+    assert adapter.last_usage is None
+    assert adapter.last_cost_rub is None
+
+
+@pytest.mark.parametrize("cost_rub", [10**1000, True, -0.01])
+def test_invalid_provider_cost_is_ignored_without_rejecting_extraction(cost_rub):
+    article, classification, taxonomy = load_pilot()
+    candidate = candidates_from_t08(
+        ["production_operational_disruption"], taxonomy, load_experiment_binding()
+    )[0]
+    content = json.dumps(
+        {"mentions": [sample_mention().model_dump(mode="json")]},
+        ensure_ascii=False,
+    )
+    payload = json.loads(provider_response(content))
+    payload["usage"]["cost_rub"] = cost_rub
+    transport = FakeTransport(
+        TransportResponse(
+            200,
+            POLZA_CHAT_COMPLETIONS_URL,
+            json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        )
+    )
+    adapter = authorized_adapter(transport)
+    mentions = adapter.extract_candidate(
+        case_id=SAMPLE_ID,
+        article_text=article["text"],
+        classification=classification,
+        candidate=candidate,
+    )
+    assert len(mentions) == 1
+    assert adapter.last_cost_rub is None
+
+
+def test_paid_live_pilot_is_fixed_bounded_and_preflighted_only(monkeypatch, tmp_path):
+    import fact_extraction.live_pilot as live_pilot
+
+    from fact_extraction.errors import LiveCallsDisabled
+
+    isolated_result_path = tmp_path / "live-pilot.json"
+    monkeypatch.setattr(live_pilot, "RESULT_PATH", isolated_result_path)
+    plan = live_pilot.preflight_plan(max_requests=live_pilot.MAX_PILOT_REQUESTS)
+    assert len(plan) == 10
+    assert len({row[0] for row in plan}) == 10
+    assert len({row[1] for row in plan}) == 10
+    assert all(row[2]["text"] for row in plan)
+    with pytest.raises(ValueError, match="between 1 and 10"):
+        live_pilot.preflight_plan(max_requests=11)
+    assert not isolated_result_path.exists()
+    with pytest.raises(LiveCallsDisabled):
+        live_pilot.run_pilot(max_requests=1)
+    with pytest.raises(SystemExit):
+        live_pilot.main([])
+    assert live_pilot.main(["--approve-paid-live", "--max-requests", "11"]) == 2
+    assert not isolated_result_path.exists()
+
+
+def test_live_pilot_stops_after_first_failure_and_refuses_repeat(monkeypatch, tmp_path):
+    import fact_extraction.live_pilot as live_pilot
+
+    class FailingPilotExtractor:
+        def __init__(self):
+            self.calls_made = 0
+            self.last_elapsed_ms = 4
+            self.last_usage = {"prompt_tokens": 10, "completion_tokens": 2}
+            self.last_cost_rub = 0.001
+
+        def extract_candidate(self, **kwargs):
+            del kwargs
+            self.calls_made += 1
+            raise ExtractionProviderError("provider_http_error", status_code=503)
+
+    fake = FailingPilotExtractor()
+    result_path = tmp_path / "live-pilot.json"
+    monkeypatch.setattr(live_pilot, "RESULT_PATH", result_path)
+    monkeypatch.setattr(
+        live_pilot.PolzaDeepSeekFlash,
+        "from_windows_environment",
+        classmethod(lambda cls, *, authorization: fake),
+    )
+    authorization = LiveCallAuthorization(approved_by_user=True, max_requests=10)
+    report = live_pilot.run_pilot(max_requests=10, authorization=authorization)
+
+    assert fake.calls_made == 1
+    assert report["status"] == "incomplete_stopped_after_first_failure"
+    assert len(report["records"]) == 1
+    assert report["records"][0]["safe_failure_code"] == "provider_http_error"
+    assert result_path.exists()
+    with pytest.raises(RuntimeError, match="refusing duplicate spend"):
+        live_pilot.run_pilot(max_requests=10, authorization=authorization)
+    assert fake.calls_made == 1
+
+
+def test_live_pilot_never_calls_provider_more_than_ten_times(monkeypatch, tmp_path):
+    import fact_extraction.live_pilot as live_pilot
+
+    class EmptySuccessPilotExtractor:
+        def __init__(self):
+            self.calls_made = 0
+            self.last_elapsed_ms = 1
+            self.last_usage = None
+            self.last_cost_rub = None
+
+        def extract_candidate(self, **kwargs):
+            del kwargs
+            self.calls_made += 1
+            return []
+
+    fake = EmptySuccessPilotExtractor()
+    monkeypatch.setattr(live_pilot, "RESULT_PATH", tmp_path / "live-pilot.json")
+    monkeypatch.setattr(
+        live_pilot.PolzaDeepSeekFlash,
+        "from_windows_environment",
+        classmethod(lambda cls, *, authorization: fake),
+    )
+    authorization = LiveCallAuthorization(approved_by_user=True, max_requests=10)
+    report = live_pilot.run_pilot(max_requests=10, authorization=authorization)
+    assert fake.calls_made == 10
+    assert report["total_calls_attempted"] == 10
+    assert len(report["records"]) == 10

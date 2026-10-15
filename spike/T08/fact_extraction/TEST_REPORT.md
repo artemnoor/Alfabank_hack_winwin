@@ -1,6 +1,25 @@
 # T08 → DeepSeek → T09: итог технической проверки
 
-Дата: 2026-10-15. Статус: **offline prototype ready for review; live provider and T09 integration not verified**.
+Дата: 2026-10-15. Статус: **offline prototype verified; live pilot attempted but provider timed out; T09 runtime integration unavailable**.
+
+## Live pilot: результат
+
+По отдельному разрешению пользователя запущен один платный запрос к Polza для
+первого утверждённого синтетического примера `nb-003` и сохранённого ответа Jev.
+Транспорт ожидал ответ до таймаута примерно 25 секунд. HTTP-ответ не получен;
+пилот остановлен после первой ошибки, повторов не было. Результат: **0 успешных
+извлечений, 1 запрос предпринят, максимум 10 разрешённых, 9 не использованы**.
+
+Так как провайдер не вернул ответ, token usage и стоимость неизвестны. Нельзя
+исключить, что запрос был принят и тарифицирован до разрыва соединения; проверьте
+историю запросов/расходов в кабинете Polza перед новым запуском. Причина
+таймаута не установлена. Это **не HTTP 451**: HTTP-статус не был получен, поэтому
+по этому запуску нельзя делать вывод о географическом ограничении, ключе или
+доступности модели. Новых запросов к Jev не выполнялось.
+
+Безопасные данные запуска находятся в
+[`results/deepseek-v4-flash-live-pilot-20261015.json`](results/deepseek-v4-flash-live-pilot-20261015.json).
+Исходный текст, ключ, prompt и сырой provider response не записывались.
 
 ## Реализованный поток
 
@@ -44,8 +63,8 @@
 
 | Проверка | Команда / результат |
 |---|---|
-| Полный офлайн T08 suite | `py -3 -m pytest spike/T08 -q` — **198 passed, 0 failed, 0 skipped** |
-| Новые extraction unit/integration tests | `py -3 -m pytest spike/T08/test_fact_extraction.py -q` — **26 passed** |
+| Полный офлайн T08 suite | `py -3 -m pytest spike/T08 -q` — **205 passed, 0 failed, 0 skipped** |
+| Extraction unit/integration tests | `py -3 -m pytest spike/T08/test_fact_extraction.py -q` — **33 passed** |
 | Contracts | `py -3 -m pytest tests/contracts -q` — **31 passed** |
 | Ruff | `py -3 -m ruff check spike/T08/fact_extraction spike/T08/test_fact_extraction.py` — passed |
 | Ruff format | `py -3 -m ruff format --check spike/T08/fact_extraction spike/T08/test_fact_extraction.py` — passed |
@@ -72,9 +91,11 @@ DeepSeek.
   [Polza DeepSeek API instructions](https://polza.ai/providers/deepseek),
   [DeepSeek release log](https://api-docs.deepseek.com/updates/?release=deepseek-coder).
 
-**Live API: NOT RUN.** Новых запросов Jev/DeepSeek не было; стоимость этого
-прогона — 0 API-запросов. Настоящие ответы модели, provider latency, usage,
-ошибки live-схемы и качество русского извлечения не измерялись.
+**Live API: FAILED WITH TIMEOUT.** Один реальный POST был предпринят к
+закреплённому endpoint/model ID; провайдер не вернул HTTP-ответ за отведённое
+время. Модель не выдала проверяемого результата. Provider token usage, сумма
+списания, точный checkpoint за alias и качество русского извлечения не измерены.
+Реальная интеграция и качество DeepSeek остаются **не подтверждены**.
 
 ## Независимое ревью
 
@@ -113,5 +134,7 @@ AI Factory reviewer провёл два read-only прохода без внеш
   разрешённый минимальный live pilot, human-reviewed extraction labels и
   подтверждение Polza по фактическому checkpoint.
 
-Итог: **офлайн-прототип и безопасный контрактный адаптер готовы к ручному
-ревью; live-пилот и runtime T09 integration пока BLOCKED/NOT RUN.**
+Итог: **офлайн-прототип и безопасный контрактный адаптер прошли проверки.
+Live-пилот заблокирован таймаутом провайдера; перед новым платным запуском
+нужно проверить состояние запроса/расходов в кабинете Polza и устранить причину
+сетевой недоступности. Runtime T09 integration по-прежнему не проверялась.**

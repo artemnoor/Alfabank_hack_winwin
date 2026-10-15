@@ -1,0 +1,182 @@
+{
+  "report_version": "1.0.0",
+  "provider": "Polza AI",
+  "model_id": "deepseek/deepseek-v4-flash",
+  "endpoint": "https://polza.ai/api/v1/chat/completions",
+  "model_catalog_preflight": {
+    "checked_at_utc": "2026-10-15T09:46:27Z",
+    "endpoint": "https://polza.ai/api/v1/models",
+    "http_status": 200,
+    "json_valid": true,
+    "model_count": 409,
+    "requested_model_id": "deepseek/deepseek-v4-flash",
+    "requested_model_listed": true,
+    "credential_value_saved": false,
+    "response_body_saved": false
+  },
+  "request_budget": {
+    "authorized": 10,
+    "used": 10,
+    "remaining": 0
+  },
+  "aggregate": {
+    "attempts": 10,
+    "successful_extractions": 3,
+    "safely_rejected_or_unavailable": 7,
+    "jev_requests": 0,
+    "known_cost_rub": 0.56318761,
+    "unknown_cost_attempts": 2,
+    "mean_latency_ms": 27820.22,
+    "median_latency_ms": 26801
+  },
+  "current_prompt_version": {
+    "prompt_sha256": "sha256:f4349fc90d1f2b4f5019732110753fa88ccf30f12a7a57f68d004ca163626eb4",
+    "allowlist_id": "jev-expanded-pilot-v1-live-egress-allowlist-v2",
+    "attempts": 5,
+    "successful_extractions": 3,
+    "safe_rejections": 2,
+    "model_quality_status": "not_measured",
+    "reason": "No independently human-reviewed gold labels exist for extracted facts."
+  },
+  "privacy": {
+    "api_key_saved": false,
+    "raw_prompts_saved": false,
+    "raw_provider_responses_saved": false,
+    "source_articles_saved": false,
+    "validated_t09_dtos_saved_in_run_artifacts": true
+  },
+  "records": [
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-1",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "provider_unavailable",
+      "safe_failure_code": "provider_extraction_schema_invalid",
+      "latency_ms": 29919,
+      "token_usage": null,
+      "provider_cost_rub": null
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-2",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "provider_unavailable",
+      "safe_failure_code": "provider_output_rejected",
+      "latency_ms": 22201,
+      "token_usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 2007,
+        "total_tokens": 3291
+      },
+      "provider_cost_rub": 0.08647505
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-3",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "provider_unavailable",
+      "safe_failure_code": "provider_extraction_invalid_json",
+      "latency_ms": 6686,
+      "token_usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 288,
+        "total_tokens": 1572
+      },
+      "provider_cost_rub": 0.02937077
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-4",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "provider_unavailable",
+      "safe_failure_code": "company_event_quote_mismatch",
+      "latency_ms": 60061,
+      "token_usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 2598,
+        "total_tokens": 3882
+      },
+      "provider_cost_rub": 0.10610776
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-5",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "extracted",
+      "safe_failure_code": null,
+      "latency_ms": 19846,
+      "token_usage": {
+        "prompt_tokens": 1459,
+        "completion_tokens": 2410,
+        "total_tokens": 3869
+      },
+      "provider_cost_rub": 0.06779016
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-6",
+      "case_id": "nb-004",
+      "candidate_code": "price_cost_change",
+      "status": "extracted",
+      "safe_failure_code": null,
+      "latency_ms": 26801,
+      "token_usage": {
+        "prompt_tokens": 1333,
+        "completion_tokens": 1344,
+        "total_tokens": 2677
+      },
+      "provider_cost_rub": 0.06678776
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-6",
+      "case_id": "nb-006",
+      "candidate_code": "sanctions",
+      "status": "extracted",
+      "safe_failure_code": null,
+      "latency_ms": 8083,
+      "token_usage": {
+        "prompt_tokens": 1327,
+        "completion_tokens": 304,
+        "total_tokens": 1631
+      },
+      "provider_cost_rub": 0.07225474
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-6",
+      "case_id": "nb-009",
+      "candidate_code": "labor_workforce_event",
+      "status": "provider_unavailable",
+      "safe_failure_code": "company_event_relation_unverified",
+      "latency_ms": 38741,
+      "token_usage": {
+        "prompt_tokens": 1324,
+        "completion_tokens": 1892,
+        "total_tokens": 3216
+      },
+      "provider_cost_rub": 0.05005711
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015-retry-7",
+      "case_id": "nb-011",
+      "candidate_code": "investment_capacity_change",
+      "status": "provider_unavailable",
+      "safe_failure_code": "company_event_relation_unverified",
+      "latency_ms": 38044,
+      "token_usage": {
+        "prompt_tokens": 1328,
+        "completion_tokens": 1875,
+        "total_tokens": 3203
+      },
+      "provider_cost_rub": 0.08434426
+    },
+    {
+      "run_id": "deepseek-v4-flash-live-pilot-20261015",
+      "case_id": "nb-003",
+      "candidate_code": "production_operational_disruption",
+      "status": "provider_unavailable",
+      "safe_failure_code": "provider_timeout",
+      "latency_ms": null,
+      "token_usage": null,
+      "provider_cost_rub": null
+    }
+  ]
+}

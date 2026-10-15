@@ -1,0 +1,41 @@
+{
+  "id": "t08-t09-extraction-spike",
+  "version": "1.0.0",
+  "status": "experimental-not-registered",
+  "event_namespace": "alfa_business_event",
+  "event_version": "1.0.0",
+  "event_codes": [
+    "supply_chain_disruption",
+    "shortage_capacity_constraint",
+    "production_operational_disruption",
+    "price_cost_change",
+    "trade_restriction",
+    "sanctions",
+    "regulation_tax_change",
+    "cyber_security_incident",
+    "labor_workforce_event",
+    "insolvency_default",
+    "corporate_transaction_restructuring",
+    "product_recall_quality_safety",
+    "legal_enforcement",
+    "environment_disaster_impact",
+    "investment_capacity_change"
+  ],
+  "predicate_codes": {
+    "event": "event_description",
+    "date": "event_date_text",
+    "location": "event_location_text",
+    "participant": "event_participant",
+    "participant_role": "participant_role_text",
+    "circumstance": "event_circumstance_text",
+    "assertion_status": "source_assertion_status"
+  },
+  "entity_kinds": [
+    "organization",
+    "person",
+    "place",
+    "government",
+    "group",
+    "unknown"
+  ]
+}

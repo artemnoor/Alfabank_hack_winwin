@@ -1,0 +1,14 @@
+{
+  "id": "jev-expanded-pilot-v1-live-egress-allowlist",
+  "status": "spike-only-exact-file-hash-allowlist",
+  "news_file_sha256": "sha256:d99b0d85ba29028fc96f74315cd38c15b768e2d060037d3b892b953b16c26dcc",
+  "results_file_sha256": "sha256:2e5a94261afdea8fd181af0c9ecb106ca12260ad12b4fdfa52d1a2eb97c48b1b",
+  "taxonomy_file_sha256": "sha256:855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "policy_file_sha256": "sha256:721b38a2e14891f1006be1293cc7cc615686558c482bd6cf6e19856f455750ed",
+  "prompt_sha256": "sha256:1f74eadebd4ff09e925de529c23a96f26d6d0493eeeef630cede195814df97ea",
+  "allowed_dataset_id": "jev-ru-expanded-pilot",
+  "allowed_dataset_version": "1.0.0",
+  "allowed_case_count": 50,
+  "allowed_origin": "synthetic",
+  "note": "Only exact text/results from these pinned local files are eligible. Changing any file requires an explicit code review and new manifest."
+}

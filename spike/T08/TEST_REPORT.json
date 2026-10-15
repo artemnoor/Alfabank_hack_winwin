@@ -1,0 +1,377 @@
+{
+  "report_version": "4.0.0",
+  "snapshot_date": "2026-10-15",
+  "project": "AlfaBank Hackathon T08 Jev spike",
+  "branch": "codex/spike-t08-jev-news-classification",
+  "scope": "spike/T08 only; offline analysis; no production, OpenAPI, or Jev changes",
+  "verdicts": {
+    "engineering_quality": {
+      "status": "PASS",
+      "scope": "offline implementation and listed regression checks"
+    },
+    "api_compatibility": {
+      "status": "BLOCKED",
+      "scope": "historical saved Polza outputs exist; current source revision was not live-tested"
+    },
+    "model_quality": {
+      "status": "NOT_MEASURED_FOR_DECISION",
+      "scope": "descriptive results use synthetic inputs and preliminary single-author labels"
+    },
+    "integration_readiness": {
+      "status": "READY_FOR_EXPERIMENTAL_T09_HANDOFF_ONLY",
+      "production_ready": false
+    }
+  },
+  "source_data": {
+    "baseline": {
+      "corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+      "aggregate_sha256": "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129",
+      "nonempty_stories": 49,
+      "saved_answers": 45,
+      "missing_answer_ids": [
+        "e23-recall-battery",
+        "e35-multi-labor-investment",
+        "e41-uncertain-sanctions-talk",
+        "e43-uncertain-vague-delivery"
+      ],
+      "model_version_reported_by_saved_answers": "jev-1.13.0",
+      "gold_status": "single-author preliminary labels; not human-adjudicated"
+    },
+    "deep_corpus": {
+      "case_count": 160,
+      "jev_calls": 0,
+      "split_counts": {
+        "A": 76,
+        "B": 36,
+        "C": 24,
+        "D": 24
+      },
+      "d_is_blind": false,
+      "gold_status": "experimental-synthetic-single-annotator-draft"
+    }
+  },
+  "historical_descriptive_metrics": {
+    "basis": "45 saved Jev answers; 4 missing results excluded, not counted as false negatives",
+    "topic_accuracy": {
+      "correct": 31,
+      "total": 45,
+      "value": 0.6889
+    },
+    "event_micro_precision": 0.85,
+    "event_micro_recall": 0.8293,
+    "event_micro_f1": 0.8395,
+    "event_macro_f1": 0.8083,
+    "exact_event_set": {
+      "matches": 34,
+      "total": 45,
+      "value": 0.7556
+    },
+    "legacy_review": {
+      "review_count": 42,
+      "total": 45,
+      "value": 0.9333333333333333,
+      "overlapping_trigger_counts": {
+        "choice": 5,
+        "event_scores": 24,
+        "uncertainty": 17,
+        "unlisted": 32
+      },
+      "cases_with_multiple_triggers": 28
+    },
+    "latency_ms": {
+      "n": 45,
+      "mean_ms": 1298.58,
+      "median_ms": 860.0,
+      "p95_nearest_rank_ms": 1313.0,
+      "p95_method": "nearest-rank; descriptive only; small-sample estimates are unstable"
+    },
+    "token_usage": {
+      "input_tokens": 263276,
+      "output_tokens": 22167,
+      "total_tokens": 285443,
+      "cost_rub": 4.63313107
+    },
+    "interpretation": "preliminary synthetic-set measurements only; not a blind or production-quality estimate"
+  },
+  "policy_v2_1": {
+    "version": "2.1.0-spike",
+    "source_hashes": {
+      "corpus": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+      "taxonomy": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+      "aggregate": "9af8a41a00a070087bd962b829b02a65437fd231b78b949406a04d04f858f129"
+    },
+    "thresholds": {
+      "event_candidate_at_or_above": 0.8,
+      "insufficient_evidence_holds_candidates_at_or_above": 0.8,
+      "unlisted_creates_separate_review_at_or_above": 0.8
+    },
+    "denominator": 45,
+    "legacy_full_story_auto": 3,
+    "legacy_full_story_review": 42,
+    "candidate_bearing_stories": 32,
+    "candidate_coverage": 0.7111111111111111,
+    "candidate_event_count": 40,
+    "stories_with_any_review": 0,
+    "evidence_review_stories": 0,
+    "unlisted_review_stories": 0,
+    "candidate_output_metrics": {
+      "tp": 34,
+      "fp": 6,
+      "fn": 7,
+      "precision": 0.85,
+      "recall": 0.8292682926829268,
+      "f1": 0.8395061728395061,
+      "exact_count": 34,
+      "exact_rate": 0.7555555555555555,
+      "provisional_high_consequence_fp": [
+        {
+          "case_id": "e03-shortage-cells",
+          "code": "production_operational_disruption"
+        },
+        {
+          "case_id": "e25-legal-fine",
+          "code": "sanctions"
+        },
+        {
+          "case_id": "e27-disaster-flood",
+          "code": "production_operational_disruption"
+        }
+      ]
+    },
+    "candidate_is_confirmed_fact": false,
+    "review_reduction_is_safety_evidence": false
+  },
+  "error_disagreements": {
+    "counts": {
+      "false_positives": 6,
+      "false_negatives": 7
+    },
+    "interpretation": "FP/FN are disagreements against preliminary single-author synthetic labels. They are not confirmed model errors until humans adjudicate the evidence and labels.",
+    "false_positives": [
+      {
+        "case_id": "e03-shortage-cells",
+        "event_code": "production_operational_disruption",
+        "score": 0.87,
+        "state": "positive",
+        "likely_cause": "Текст прямо сообщает об ограничении выпуска; возможно, draft gold неполон. Это пока не подтверждённый FP Jev.",
+        "minimum_proposal_change": "Уточнить, что явное сокращение выпуска подходит; отдельную метку нехватки сырья ставить при прямом указании."
+      },
+      {
+        "case_id": "e09-trade-export",
+        "event_code": "regulation_tax_change",
+        "score": 0.96,
+        "state": "positive",
+        "likely_cause": "Квота на границе похожа по словам на изменение правил; определения v0.3 пересекаются.",
+        "minimum_proposal_change": "В v0.4.1 отнести квоту к trade_restriction и не дублировать ту же меру в regulation_tax_change."
+      },
+      {
+        "case_id": "e10-trade-import",
+        "event_code": "regulation_tax_change",
+        "score": 0.95,
+        "state": "positive",
+        "likely_cause": "Пошлина одновременно звучит как налог и как ограничение на границе; исходная разметка не разрешает это пересечение последовательно.",
+        "minimum_proposal_change": "В v0.4.1 относить пошлину на импорт/экспорт к trade_restriction, если отдельно не менялось внутреннее налоговое правило."
+      },
+      {
+        "case_id": "e25-legal-fine",
+        "event_code": "sanctions",
+        "score": 0.89,
+        "state": "positive",
+        "likely_cause": "Обычный антимонопольный штраф принят за санкции; это граница классов. Оценка ожидаемого юридического события также ниже порога.",
+        "minimum_proposal_change": "v0.4.1 исключает обычные штрафы из sanctions и прямо включает формальный штраф в legal_enforcement."
+      },
+      {
+        "case_id": "e27-disaster-flood",
+        "event_code": "production_operational_disruption",
+        "score": 0.85,
+        "state": "positive",
+        "likely_cause": "Модель вывела остановку выпуска из проблем с доступом; текст прямо не сообщает о снижении/остановке производства.",
+        "minimum_proposal_change": "v0.4.1 требует прямого влияния на выпуск; одну задержку отгрузки относит к supply_chain_disruption."
+      },
+      {
+        "case_id": "e32-multi-fire-supply",
+        "event_code": "environment_disaster_impact",
+        "score": 0.83,
+        "state": "positive",
+        "likely_cause": "Модель смешала серьёзный пожар на объекте с экологическим бедствием.",
+        "minimum_proposal_change": "v0.4.1 исключает локальный промышленный пожар без отдельного экологического вреда; производство и поставки оцениваются отдельно."
+      }
+    ],
+    "false_negatives": [
+      {
+        "case_id": "e03-shortage-cells",
+        "event_code": "shortage_capacity_constraint",
+        "score": 0.67,
+        "state": "abstain",
+        "likely_cause": "Оценка близка к экспериментальному порогу, хотя текст прямо говорит о нехватке; важны и полнота gold, и порог.",
+        "minimum_proposal_change": "Добавить пример явной нехватки одновременно со снижением выпуска; не менять порог по этому кейсу."
+      },
+      {
+        "case_id": "e18-labor-layoffs",
+        "event_code": "corporate_transaction_restructuring",
+        "score": 0.67,
+        "state": "abstain",
+        "likely_cause": "Закрытие площадок может быть отдельной реструктуризацией, но увольнения сами по себе — нет. Примеры taxonomy не задают эту границу явно.",
+        "minimum_proposal_change": "Добавить положительный пример подтверждённого закрытия площадки и отрицательный пример увольнений без реорганизации."
+      },
+      {
+        "case_id": "e25-legal-fine",
+        "event_code": "legal_enforcement",
+        "score": 0.59,
+        "state": "abstain",
+        "likely_cause": "В тексте есть формальный штраф, но оценка ниже экспериментального порога; модель также путает его с санкциями.",
+        "minimum_proposal_change": "Явно включить назначенный антимонопольный штраф в legal_enforcement и исключить обычные штрафы из sanctions."
+      },
+      {
+        "case_id": "e26-legal-investigation",
+        "event_code": "legal_enforcement",
+        "score": 0.13,
+        "state": "negative",
+        "likely_cause": "Proposal уже включает официальное расследование; вероятнее чувствительность модели/формулировки вопроса или несовпадение разметки и вопроса, а не отсутствие категории.",
+        "minimum_proposal_change": "Явно указать, что начатое официальное расследование и запрос документов считаются без итогового решения; не снижать порог по одному кейсу."
+      },
+      {
+        "case_id": "e28-disaster-drought",
+        "event_code": "environment_disaster_impact",
+        "score": 0.76,
+        "state": "abstain",
+        "likely_cause": "Граница засухи/ресурсного ограничения описана неясно, а оценка близка к порогу. Draft labels также по-разному трактуют тему и событие.",
+        "minimum_proposal_change": "Добавить примеры засухи/ограничения воды только при прямо указанном влиянии на бизнес; порог не менять."
+      },
+      {
+        "case_id": "e33-multi-price-shortage",
+        "event_code": "shortage_capacity_constraint",
+        "score": 0.75,
+        "state": "abstain",
+        "likely_cause": "Прямое сообщение о нехватке конкурирует с одновременным событием изменения цены; оценка чуть ниже порога. Тема и gold нехватки уже спорные.",
+        "minimum_proposal_change": "Добавить multi-label пример текущей нехватки вместе с ростом цены; не подбирать порог по e33."
+      },
+      {
+        "case_id": "e34-multi-insolvency-legal",
+        "event_code": "legal_enforcement",
+        "score": 0.29,
+        "state": "abstain",
+        "likely_cause": "Модель могла объединить заявление кредитора с меткой неплатёжеспособности; taxonomy должна различать дефолт и отдельное обращение в суд.",
+        "minimum_proposal_change": "v0.4.1 требует обе метки при отдельном заявлении кредитора; обычная регистрация банкротства сама по себе остаётся одним событием."
+      }
+    ]
+  },
+  "taxonomy_proposal": {
+    "version": "0.4.2-spike",
+    "status": "unvalidated-experimental-proposal",
+    "sha256": "911d607106c093926775ec880918ff7e5aa2ce4a5e1d366b134cfdc550f7bacd",
+    "live_requests": 0,
+    "approval": "awaiting_user_review",
+    "scope": false,
+    "requires_new_live_pilot_before_scoring": true
+  },
+  "human_annotation": {
+    "packet_path": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
+    "packet_sha256": "b034f98b5e4eca93070e00f38585a8a44a4faa7ba78fbae8486998aa4f766b9d",
+    "case_count": 49,
+    "selection": "all non-empty baseline cases; not selected by model disagreement",
+    "source_ids_in_packet": false,
+    "draft_labels_or_model_outputs_in_packet": false,
+    "owner_blind": false,
+    "human_annotators": 0,
+    "status": "awaiting_two_independent_annotators_and_adjudication"
+  },
+  "visible_validation_set": {
+    "dataset_id": "t08-visible-validation-candidates",
+    "version": "1.1.0",
+    "case_count": 60,
+    "input_sha256": "8d3eebd7e8c200bb88ed58bc49d11a6ece049425c233fdc819ab67998e504cd9",
+    "status": "awaiting_human_annotation",
+    "gold_label_status": "not_created",
+    "eligible_for_model_scoring": false,
+    "benchmark_role": "visible_validation_candidate",
+    "eligible_as_blind_test": false,
+    "excluded_from_current_reports": true,
+    "is_genuinely_blind": false
+  },
+  "future_blind_candidate": {
+    "dataset_id": "t08-future-blind-candidate-inputs",
+    "version": "1.0.0",
+    "case_count": 40,
+    "input_sha256": "ac3b8582c0f228b35259c3dcbba0e1dc3070e079c00fa4d97e0961bc7bd15f7c",
+    "status": "awaiting_independent_human_annotation",
+    "gold_labels_present": false,
+    "model_outputs_present": false,
+    "eligible_for_current_scoring": false,
+    "genuinely_blind_now": false,
+    "maximum_similarity_to_existing_t08_texts": 0.55132
+  },
+  "verification": {
+    "unit_tests": {
+      "command": "py -m unittest discover -s spike/T08 -p 'test*.py' -v",
+      "passed": 132,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "policy_and_browser_tests": {
+      "command": "py -m unittest spike.T08.visualization.test_policy_v2 spike.T08.visualization.test_visualization -v",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS",
+      "includes_playwright": true
+    },
+    "ruff_check": "PASS",
+    "ruff_format_check": "PASS",
+    "offline_runner_classifier_calls": 0,
+    "offline_runner_status": "PASS",
+    "quality_analysis_reproducibility": "PASS",
+    "deep_corpus_audit_reproducibility": "PASS",
+    "validation_asset_builder": "PASS",
+    "javascript_syntax": "PASS",
+    "git_diff_checks": "PASS",
+    "new_jev_api_requests": 0,
+    "status_source": "explicit command-line run evidence; unprovided checks remain NOT_RUN"
+  },
+  "post_review_regressions": {
+    "portable_text_hashes": "UTF-8 source hashes normalize CRLF/CR to LF; saved Jev answers remain unchanged",
+    "filter_selection_consistency": "detail and comparison selection always tracks the filtered case list; no-match filters clear stale details",
+    "evidence_signal_wording": "distinguishes a threshold crossing from an actual candidate hold or review task",
+    "python_browser_policy_parity_cases": 45,
+    "browser_console_errors": "clean Playwright context reports no console errors, page errors, or external requests",
+    "keyboard_skip_link": "skip link stays offscreen until keyboard focus and moves focus to main content",
+    "mobile_reading_order": [
+      "case list",
+      "Jev analysis",
+      "preliminary labels"
+    ]
+  },
+  "independent_review": {
+    "result": "FINDINGS_FIXED_AND_REGRESSION_TESTED",
+    "reviewer": "AI Factory read-only reviews",
+    "scope": "saved-output FP/FN reconciliation, disputed-label review, v0.4.2 proposal boundaries, future blind-candidate integrity, Policy v2.1 routing and T09 contract boundary",
+    "reviewer_ran_tests": false,
+    "ai_review_is_human_gold": false,
+    "limitations": "Reviewers did not run tests; the author ran regression tests after corrections. AI review is not a human-adjudicated benchmark."
+  },
+  "remaining_risks": [
+    "Draft labels are single-author and several boundary cases remain disputed.",
+    "The existing 60 visible-validation texts are not blind; the new 40-case candidate pool is also repository-visible and awaits independent human labels/custody.",
+    "Policy v2.1 produces six candidate disagreements (including three provisional high-consequence false positives) on draft labels; zero review in this sample does not establish safe automation.",
+    "Taxonomy 0.4.2 has not been evaluated with Jev; its revised uncertainty question changes signal semantics.",
+    "Taxonomy v0.3 insufficient-evidence combines topic and event uncertainty, so Policy v2.1 can conservatively hold candidates on topic-only doubt.",
+    "The current source revision and provider upstream identity have not been live-verified; historical HTTP 451 cause and sanitized failures remain unknown.",
+    "There is no production DTO, policy, evidence provenance, history or replay integration."
+  ],
+  "recommendation": "Ready for experimental handoff of unconfirmed event candidates to the next-stage team; not ready for production or automatic classification.",
+  "artifacts": {
+    "error_analysis": "spike/T08/ERROR_ANALYSIS_V2.1.md",
+    "error_analysis_json": "spike/T08/ERROR_ANALYSIS_V2.1.json",
+    "taxonomy_proposal": "spike/T08/experiments/taxonomy-v0.4.2-proposal/",
+    "human_annotation_packet": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
+    "visible_validation_set": "spike/T08/experiments/visible-validation-v1/",
+    "future_blind_candidate": "spike/T08/experiments/future-blind-candidate-v1/",
+    "gold_review": "spike/T08/GOLD_LABEL_REVIEW_V2.1.md",
+    "policy_freeze": "spike/T08/POLICY_V2.1.manifest.json",
+    "t09_handoff_note": "spike/T08/T09_HANDOFF.md",
+    "historical_report_archive": "spike/T08/results/archive/TEST_REPORT-3.0.0-pre-policy-v2.1-handoff.*"
+  }
+}

@@ -1,0 +1,665 @@
+{
+  "schema_version": "t08-preliminary-annotations-v1",
+  "status": "draft_single_curator_annotations_not_human_adjudicated",
+  "authored_before_jev_calls": true,
+  "jevs_outputs_used_for_annotation": false,
+  "annotator_count": 1,
+  "independent_ai_review_is_not_human_gold": true,
+  "taxonomy_version": "0.3.0-spike",
+  "cases": [
+    {
+      "case_id": "nb-001",
+      "topic": "industry_trade_supply",
+      "events": [
+        "supply_chain_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "supply_chain_disruption": "выдача партии промышленных сканеров сдвигается на четыре дня"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-002",
+      "topic": "industry_trade_supply",
+      "events": [],
+      "unlisted_event": true,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "unlisted_business_event": "В октябре торговая группа «Маяк» сократит число заказов"
+      },
+      "review_note": "Пограничное: официально объявлено будущее сокращение заказов; проверить, считать ли закупочное решение самостоятельным событием вне списка.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-003",
+      "topic": "industry_trade_supply",
+      "events": [
+        "production_operational_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "production_operational_disruption": "линия упаковки не работает со вчерашнего вечера"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-004",
+      "topic": "industry_trade_supply",
+      "events": [
+        "price_cost_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "price_cost_change": "цены на 6 процентов выше прежних"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-005",
+      "topic": "politics_government",
+      "events": [
+        "trade_restriction"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "trade_restriction": "утвердила квартальную квоту на импорт отдельных видов упаковочного сырья"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-006",
+      "topic": "politics_government",
+      "events": [
+        "sanctions"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "sanctions": "включении трёх зарубежных поставщиков в официальный санкционный перечень"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-007",
+      "topic": "law_regulation",
+      "events": [
+        "regulation_tax_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "regulation_tax_change": "Парламент принял поправку к общему порядку инвестиционного вычета"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-008",
+      "topic": "law_regulation",
+      "events": [
+        "legal_enforcement"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "legal_enforcement": "официально открыло проверку работы «Городского терминала»"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-009",
+      "topic": "labor_employment",
+      "events": [
+        "labor_workforce_event"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "labor_workforce_event": "сообщил о начале забастовки"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-010",
+      "topic": "economy_finance",
+      "events": [
+        "insolvency_default",
+        "legal_enforcement"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "insolvency_default": "не перечислила очередной платёж по кредиту в установленный день",
+        "legal_enforcement": "Кредитор подал иск о взыскании долга"
+      },
+      "review_note": "Пограничное: проверить, что просрочка одного кредитного платежа соответствует определению дефолта.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-011",
+      "topic": "business_companies",
+      "events": [
+        "investment_capacity_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "investment_capacity_change": "подписал соглашение о финансировании цеха"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-012",
+      "topic": "business_companies",
+      "events": [
+        "product_recall_quality_safety"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "product_recall_quality_safety": "попросила магазины снять с продажи 18 тысяч адаптеров из-за риска перегрева"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-013",
+      "topic": "technology_telecom",
+      "events": [
+        "cyber_security_incident"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "cyber_security_incident": "после атаки на внешнюю инфраструктуру"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-014",
+      "topic": "environment_disasters",
+      "events": [
+        "environment_disaster_impact",
+        "supply_chain_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "environment_disaster_impact": "После подъёма воды муниципалитет ограничил проезд грузовых машин по мосту",
+        "supply_chain_disruption": "сообщил о переносе части рейсов"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-015",
+      "topic": "environment_disasters",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": "Пограничная тема: новость о засухе и региональном ограничении, при этом бизнес не затронут.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-016",
+      "topic": "industry_trade_supply",
+      "events": [
+        "corporate_transaction_restructuring"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "corporate_transaction_restructuring": "утвердил закрытие одного распределительного центра"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-017",
+      "topic": "technology_telecom",
+      "events": [],
+      "unlisted_event": true,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "unlisted_business_event": "Соглашение на три года подписано обеими сторонами"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-018",
+      "topic": "politics_government",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "Официального решения и даты вступления меры в силу пока нет"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-019",
+      "topic": "business_companies",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "независимого подтверждения слуха нет"
+      },
+      "review_note": "Пограничное: компания отрицает слух и показывает платежи, независимого подтверждения сообщения нет.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-020",
+      "topic": "industry_trade_supply",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "допустил, что линия будет остановлена на следующей неделе, если подрядчик не завершит обслуживание турбины"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-021",
+      "topic": "law_regulation",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-022",
+      "topic": "industry_trade_supply",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-023",
+      "topic": "business_companies",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": "Пограничное: разовое опоздание покупателя с оплатой не приравнено к дефолту компании без признака долга/банкротства.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-024",
+      "topic": "industry_trade_supply",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "Ни одна из сторон не уточнила, какие именно партии затронуты"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-025",
+      "topic": "law_regulation",
+      "events": [
+        "legal_enforcement"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "legal_enforcement": "Арбитражный суд отказал подрядчику во взыскании дополнительной платы"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-026",
+      "topic": "economy_finance",
+      "events": [
+        "price_cost_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "price_cost_change": "повышении закупочной цены на оптические модули на 4 процента"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-027",
+      "topic": "technology_telecom",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-028",
+      "topic": "economy_finance",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "Источник не поясняет, к какому именно продукту относятся отдельные цифры"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-029",
+      "topic": "industry_trade_supply",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-030",
+      "topic": "business_companies",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-031",
+      "topic": "business_companies",
+      "events": [
+        "corporate_transaction_restructuring"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "corporate_transaction_restructuring": "согласовали график погашения задолженности"
+      },
+      "review_note": "Пограничное: согласованный график может быть реструктуризацией долга, хотя платежи ещё не просрочены.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-032",
+      "topic": "health",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-033",
+      "topic": "industry_trade_supply",
+      "events": [
+        "supply_chain_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "supply_chain_disruption": "сообщили о задержке вагонов на сутки"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-034",
+      "topic": "business_companies",
+      "events": [
+        "corporate_transaction_restructuring",
+        "investment_capacity_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "corporate_transaction_restructuring": "утвердил продажу непрофильного склада",
+        "investment_capacity_change": "одобрил строительство новой линии сборки"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-035",
+      "topic": "business_companies",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": "Пограничное: отменено будущее изменение тарифа; фактического изменения цены не было.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-036",
+      "topic": "law_regulation",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "Одно ведомство заявило о приостановке выдачи разрешений, другое сообщило, что ранее выданные документы продолжают действовать"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-037",
+      "topic": "labor_employment",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-038",
+      "topic": "technology_telecom",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {},
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-039",
+      "topic": "technology_telecom",
+      "events": [
+        "shortage_capacity_constraint"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "shortage_capacity_constraint": "команда не успевает завершить проверку безопасности"
+      },
+      "review_note": "Пограничное: дефицит специалистов прямо не назван, но нехватка команды ограничивает срок проекта.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "nb-040",
+      "topic": "other_uncertain",
+      "events": [],
+      "unlisted_event": false,
+      "insufficient_evidence": true,
+      "evidence_spans": {
+        "insufficient_evidence": "Редакция не подтверждает ни это утверждение, ни связь письма с какой-либо компанией"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-041-export-quota",
+      "topic": "politics_government",
+      "events": [
+        "trade_restriction"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "trade_restriction": "Таможня начала применять лимит 1 октября"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-042-ransomware",
+      "topic": "technology_telecom",
+      "events": [
+        "cyber_security_incident"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "cyber_security_incident": "подтвердила кибератаку: часть внутренних серверов зашифрована"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-043-strike",
+      "topic": "labor_employment",
+      "events": [
+        "labor_workforce_event"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "labor_workforce_event": "64 сотрудника начали забастовку"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-044-insolvency-lawsuit",
+      "topic": "economy_finance",
+      "events": [
+        "insolvency_default",
+        "legal_enforcement"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "insolvency_default": "не перечислило держателям облигаций купон в установленную дату",
+        "legal_enforcement": "Один из кредиторов отдельно подал в арбитраж иск о взыскании долга"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-045-flood-factory",
+      "topic": "environment_disasters",
+      "events": [
+        "environment_disaster_impact",
+        "production_operational_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "environment_disaster_impact": "вода повредила электрощитовую завода",
+        "production_operational_disruption": "подтвердила остановку сборочной линии"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-046-tax-law",
+      "topic": "law_regulation",
+      "events": [
+        "regulation_tax_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "regulation_tax_change": "Парламент принял закон о дополнительном сборе"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-047-sanctions-and-trade",
+      "topic": "politics_government",
+      "events": [
+        "sanctions",
+        "trade_restriction"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "sanctions": "включило компанию «Норд-Компонент» в санкционный перечень и заморозило её активы",
+        "trade_restriction": "запретило ввоз двух моделей контроллеров"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-048-shortage-supply",
+      "topic": "industry_trade_supply",
+      "events": [
+        "supply_chain_disruption",
+        "shortage_capacity_constraint",
+        "production_operational_disruption"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "supply_chain_disruption": "Поставщик не доставил согласованную партию промышленного волокна",
+        "shortage_capacity_constraint": "Остатка сырья хватит на четыре дня",
+        "production_operational_disruption": "предприятие уже сократило выпуск двух изделий"
+      },
+      "review_note": "Пограничное: три кода описывают связанные, но отдельно подтверждённые звенья одной цепочки.",
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-049-capacity-investment",
+      "topic": "industry_trade_supply",
+      "events": [
+        "investment_capacity_change"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "investment_capacity_change": "утвердил капитальный проект стоимостью 2,4 млрд рублей"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    },
+    {
+      "case_id": "xp-050-recall",
+      "topic": "health",
+      "events": [
+        "product_recall_quality_safety"
+      ],
+      "unlisted_event": false,
+      "insufficient_evidence": false,
+      "evidence_spans": {
+        "product_recall_quality_safety": "обязательное предписание об отзыве партии"
+      },
+      "review_note": null,
+      "label_status": "preliminary_unapproved"
+    }
+  ]
+}

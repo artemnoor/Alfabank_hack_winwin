@@ -1,0 +1,826 @@
+{
+  "corpus_id": "t08-deep-b",
+  "version": "1.0.0",
+  "status": "hand-labeled-synthetic-evaluation",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "split": "B",
+  "note": "Synthetic only. Gold labels are single-annotator draft labels assigned without Jev responses and require independent adjudication before any quality claim. evidence_state describes evidence about the content; expected_review_route is a separate operational outcome. A clear unlisted business event can have expected_uncertainty_signal=false and still route to review.",
+  "cases": [
+    {
+      "id": "b01-sanction-only",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Власти внесли судоходную компанию в санкционный список",
+      "text": "Компетентный орган Вестории официально включил «Белый Парус» в перечень ограничений и заморозил его зарубежные счета. Запрета на экспорт или импорт товаров в акте нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "country:fictional",
+        "time:confirmed",
+        "boundary:sanctions_trade"
+      ],
+      "rationale": "Есть адресная санкционная мера, но нет отдельного ограничения торговли товарами."
+    },
+    {
+      "id": "b02-trade-only",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Таможня установила квоту на ввоз насосов",
+      "text": "Норланд ввёл квартальную квоту на импорт насосов для водоснабжения. Мера применяется ко всем импортёрам; компания или лицо в санкционный список не включались.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "country:fictional",
+        "time:confirmed",
+        "boundary:sanctions_trade"
+      ],
+      "rationale": "Торговая квота прямо ограничивает импорт; санкций не сообщается."
+    },
+    {
+      "id": "b03-sanction-and-trade",
+      "case_type": "multi_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions",
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Санкционный акт отдельно запретил поставки двух видов станков",
+      "text": "Правительство Лирии внесло холдинг «Медь-Рубеж» в санкционный список и заморозило активы. Другим пунктом того же акта введён запрет на экспорт станков типа K-4 в Сурению.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "country:fictional",
+        "time:confirmed",
+        "boundary:sanctions_trade"
+      ],
+      "rationale": "Текст сообщает два самостоятельных факта: целевые санкции и конкретный экспортный запрет."
+    },
+    {
+      "id": "b04-proposed-sanction",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "politics_government",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "Министр предложил обсудить возможные санкции",
+      "text": "Министр Вестории заявил, что ведомство может подготовить варианты санкций против отрасли. Проект акта не опубликован, решение не принято, действующих ограничений нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:speculative",
+        "boundary:sanctions_trade",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Есть только предложение и возможность будущей меры; текущих санкций или trade restriction нет."
+    },
+    {
+      "id": "b05-default-only",
+      "case_type": "single_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Эмитент пропустил выплату, кредитор пока не обращался в суд",
+      "text": "«Река-Капитал» не перечислил купон по облигациям в установленную дату и уведомил биржу о дефолте. Компания и кредиторы подтвердили, что судебных заявлений пока нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:insolvency_legal"
+      ],
+      "rationale": "Фактический пропуск платежа даёт insolvency_default; отдельного legal enforcement нет."
+    },
+    {
+      "id": "b06-legal-only",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Регулятор расследует закупки платёжеспособного производителя",
+      "text": "Ведомство открыло официальное расследование закупок компании «Ровный Профиль». Долговых проблем у компании нет; выводов о нарушении пока не сделано.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:insolvency_legal"
+      ],
+      "rationale": "Самостоятельное официальное расследование без дефолта/банкротства."
+    },
+    {
+      "id": "b07-bankruptcy-process-only",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Суд открыл процедуру несостоятельности без отдельного иска",
+      "text": "Суд официально начал процедуру банкротства в отношении «Сосна-Маш». В сообщении нет другого иска, взыскания или расследования сверх открытия процедуры.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:insolvency_legal"
+      ],
+      "rationale": "Обычное процессуальное оформление банкротства относится к insolvency, не дублируется legal."
+    },
+    {
+      "id": "b08-default-and-suit",
+      "case_type": "multi_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "insolvency_default",
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "После пропуска платежа кредитор подал отдельный иск",
+      "text": "Компания «Астра-Транс» пропустила долговой платёж и раскрыла дефолт. На следующий день кредитор подал самостоятельный иск о взыскании задолженности; судебная карточка опубликована.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "multi_event",
+        "time:confirmed",
+        "boundary:insolvency_legal"
+      ],
+      "rationale": "Налицо default и отдельный судебный иск сверх самого дефолта."
+    },
+    {
+      "id": "b09-late-but-stocked",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Партия прибыла позже, запас на складе ещё достаточен",
+      "text": "Поставщик «Кедр-Деталь» доставил подшипники на три дня позже договора из-за сбоя перевозки. Завод сообщил, что производство продолжалось за счёт запаса; новая поставка уже принята.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:supply_shortage"
+      ],
+      "rationale": "Фактическая задержка есть; отсутствие shortage не отменяет supply disruption."
+    },
+    {
+      "id": "b10-shortage-on-time",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Запас сырья исчерпывается при поставках по графику",
+      "text": "На складе компании «Вектор-Керамика» осталось материала на две смены, чего недостаточно для утверждённого месячного плана. Поставщик подтверждает своевременное исполнение всех рейсов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:supply_shortage"
+      ],
+      "rationale": "Уже имеющаяся нехватка ограничивает план при отсутствии сбоя поставок."
+    },
+    {
+      "id": "b11-shortage-caused-delay",
+      "case_type": "multi_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption",
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Срыв поставки создал дефицит комплектующих",
+      "text": "Перевозчик не доставил партию приводов «Техно-Восток» после поломки на маршруте. Запас на складе исчерпан, поэтому компания уже не может выполнить часть заказов в срок; данных об остановке или сокращении выпуска нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "multi_event",
+        "time:confirmed",
+        "boundary:supply_shortage"
+      ],
+      "rationale": "Отдельно подтверждены фактический сбой потока и текущая нехватка запасов; production impact не заявлен."
+    },
+    {
+      "id": "b12-forecast-shortage",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "Поставщик ожидает возможный дефицит к концу года",
+      "text": "Обзор рынка допускает нехватку редкого полимера, если спрос вырастет. Сейчас складские запасы достаточны, отгрузки идут в срок, ограничения выпуска не вводились.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:speculative",
+        "boundary:supply_shortage",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Прогноз без текущего shortage или supply disruption."
+    },
+    {
+      "id": "b13-unplanned-outage",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "production_operational_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Авария остановила линию по выпуску насосов",
+      "text": "На заводе «Горный Исток» внезапно треснул корпус пресса. Компания подтвердила полную остановку линии до замены детали; планового ремонта не было.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:production_investment"
+      ],
+      "rationale": "Внеплановая авария уже остановила выпуск."
+    },
+    {
+      "id": "b14-new-capacity",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Началось строительство второй линии завода",
+      "text": "«Пром-Рубеж» начал капитальные работы по строительству новой линии мощностью 12 тысяч изделий в месяц. Действующая линия работает штатно.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:production_investment"
+      ],
+      "rationale": "Капитальное расширение мощности без операционного сбоя."
+    },
+    {
+      "id": "b15-announced-cut",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "announced",
+      "title": "Компания планово сократит установленную мощность после сезона",
+      "text": "Совет директоров «Северная Глина» утвердил закрытие одной производственной линии в декабре и снижение годовой мощности на 18 процентов. До даты закрытия выпуск продолжается.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:announced",
+        "boundary:production_investment"
+      ],
+      "rationale": "Объявленное плановое изменение installed capacity; текущего operational disruption нет."
+    },
+    {
+      "id": "b16-scheduled-maintenance",
+      "case_type": "no_listed_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Плановое обслуживание линии завершилось без потери выпуска",
+      "text": "Завод «Мастер-Лит» заменил фильтр во время обычного технологического окна. Руководство подтвердило, что выпуск не останавливался и график поставок не изменился.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:production_investment"
+      ],
+      "rationale": "Плановое обслуживание без остановки или сокращения выпуска не событие."
+    },
+    {
+      "id": "b17-enacted-tax-rule",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Закон о налоговом вычете принят, действие начнётся позже",
+      "text": "Парламент Эстары принял поправки к налоговому вычету для оборудования. Закон опубликован, но вступит в силу в следующем финансовом году; расследований по компаниям нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "country:fictional",
+        "time:confirmed",
+        "boundary:regulation_legal"
+      ],
+      "rationale": "Формально принятая налоговая мера считается event независимо от будущей даты вступления."
+    },
+    {
+      "id": "b18-investigation-not-rule",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Регулятор начал дело по старому стандарту маркировки",
+      "text": "Надзорный орган открыл официальное дело против «Садовый Контур» по действующему стандарту. Новых правил или налогов не принимали.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:regulation_legal"
+      ],
+      "rationale": "Имеется enforcement action, а не изменение регулирования."
+    },
+    {
+      "id": "b19-formal-bill",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Законопроект о пошлине официально внесён в парламент",
+      "text": "Депутаты зарегистрировали законопроект об изменении внутреннего налога на упаковку. Документ передан комитету; голосование и применение меры ещё впереди.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:regulation_legal"
+      ],
+      "rationale": "Taxonomy include прямо охватывает формально рассматриваемый законопроект."
+    },
+    {
+      "id": "b20-informal-opinion",
+      "case_type": "no_listed_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Министр допустил изменение стандарта, но документа нет",
+      "text": "На конференции министр сказал, что ведомство «изучает разные варианты» маркировки. Проект, поручение о подготовке или официальное рассмотрение пока не объявлены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:regulation_legal"
+      ],
+      "rationale": "Неформальное мнение не образует formal rule-change; содержание высказывания ясно."
+    },
+    {
+      "id": "b21-market-price-rise",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Поставщик повысил отпускную цену, нового налога нет",
+      "text": "«Скат-Пром» направил покупателям прайс с повышением стоимости листового металла на 8 процентов. Государственные ставки и обязательные сборы не менялись.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:price_regulation"
+      ],
+      "rationale": "Прямое коммерческое повышение цены без regulatory event."
+    },
+    {
+      "id": "b22-tax-only",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Налоговая ставка изменится, текущие цены пока прежние",
+      "text": "Парламент утвердил повышение акциза на импортный растворитель с будущего квартала. Поставщики подтвердили, что пока не меняли прайс-листы и цену реализации.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "boundary:price_regulation"
+      ],
+      "rationale": "Есть regulation event; actual market price change не сообщён."
+    },
+    {
+      "id": "b23-tax-and-price",
+      "case_type": "multi_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change",
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "После нового сбора поставщик уже обновил цену",
+      "text": "С первого мая вступил в силу новый обязательный сбор на упаковку. Производитель «Ровный Берег» опубликовал новый прайс, повысив цену коробки на 3 процента; обе даты подтверждены. В сообщении для клиентов компания пояснила, что прочие позиции прайс-листа не менялись. До вступления сбора действовали старые счета, после даты перехода новые заказы оформляются по новой цене.\n\nВ разъяснении финансовой службы приведены расчёты по трём типам коробок и сроки перехода для заказов, оформленных до и после даты вступления сбора. Компания отдельно подтвердила, что новый прайс уже загружен в систему оформления заказов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "multi_event",
+        "time:confirmed",
+        "length:long",
+        "boundary:price_regulation"
+      ],
+      "rationale": "Два факта независимо заявлены: новая норма и фактическое изменение коммерческой цены."
+    },
+    {
+      "id": "b24-price-forecast-after-bill",
+      "case_type": "no_listed_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "announced",
+      "title": "Поставщик заранее объявил повышение цены с будущего месяца",
+      "text": "«Берег-Сырьё» официально опубликовал новый прайс: цена реагента вырастет на 5 процентов с первого числа следующего месяца. Сегодня действуют старые цены, счета не изменились; правительственный сбор пока только обсуждается.\n\nПокупателям направлено уведомление за 30 дней, однако текущие счета и отгрузки продолжают рассчитываться по прежнему прайсу. В тексте нет сообщения о фактически выставленных счетах по новой цене.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "ambiguity:needs_adjudication",
+        "time:announced",
+        "boundary:price_regulation",
+        "evidence:announced",
+        "ambiguity:needs_adjudication"
+      ],
+      "rationale": "До даты применения цена не изменилась. Gold следует буквальному include; вопрос System One допускает officially announced. Не оценивать без adjudication.",
+      "gold_ambiguity": "taxonomy_conflict_price_definition_vs_request_instruction"
+    },
+    {
+      "id": "b25-consider-bankruptcy",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "Компания рассматривает варианты реструктуризации долга",
+      "text": "«Рубеж-Электро» нанял консультанта и оценивает несколько сценариев, включая потенциальное банкротство. Заявление в суд не подавалось, платёж сегодня исполнен по графику.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:speculative",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Размышление о возможной процедуре не есть insolvency; ключевой сценарий спекулятивен."
+    },
+    {
+      "id": "b26-sanctions-in-press",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "politics_government",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "СМИ обсуждают возможные ограничения против отрасли",
+      "text": "Колумнисты предполагают, что правительство Норланда может изучить санкции против сектора. Официального заявления, проекта акта и торгового запрета нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "country:fictional",
+        "evidence:speculative",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Обсуждение санкций без меры; информация о будущем неподтверждённая."
+    },
+    {
+      "id": "b27-supply-may-stop",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "Поставки могут остановиться, но идут по графику",
+      "text": "Анонимный источник опасается, что в следующем месяце поставки компонентов компании «Фрегат-Сборка» могут прерваться. Поставщик подтвердил, что текущие рейсы отправлены вовремя и новых ограничений нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:speculative",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Потенциальный риск не является фактическим сбоем или нехваткой."
+    },
+    {
+      "id": "b28-unconfirmed-price",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "contradictory",
+      "title": "Покупатели сообщают о возможном росте цены без подтверждения",
+      "text": "В отраслевом чате появились сообщения, что «Норд-Опт» повысил цену на комплектующие. Компания не выпускала новый прайс, покупатели получили прежние счета; источники расходятся.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:contradictory",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Цена не подтверждена и противоречит доступным документам."
+    },
+    {
+      "id": "b29-accused-no-ruling",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "law_regulation",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "disputed",
+      "title": "Компанию подозревают в нарушении, решения суда нет",
+      "text": "Блогер обвинил «Мера-Снаб» в нарушении условий конкурса. Судебного иска, официального расследования или вывода регулятора нет; компания обвинение отрицает.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:disputed",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Неподтверждённое обвинение не удовлетворяет legal_enforcement."
+    },
+    {
+      "id": "b30-conflicting-claims",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "contradictory",
+      "title": "Два сообщения противоречат друг другу по факту остановки завода",
+      "text": "Профсоюз утверждает, что завод «Вьюга-Металл» остановился ночью. Компания сообщает, что выпуск шёл без перерыва; независимой проверки и данных о смене нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:contradictory",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Сам факт остановки оспаривается, поэтому производственный сбой не размечается как подтверждённый."
+    },
+    {
+      "id": "b31-cancelled-tax",
+      "case_type": "no_listed_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Парламент снял законопроект о новом налоге с рассмотрения",
+      "text": "Комитет официально отозвал проект сбора до голосования. Действующий налог не изменился, а документ о принятии меры не выпускался.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed"
+      ],
+      "rationale": "Отмена формального предложения ясна, но налогового изменения не произошло."
+    },
+    {
+      "id": "b32-rumor-recall",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "technology_telecom",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "unconfirmed",
+      "title": "В сети распространили слух об отзыве аккумулятора",
+      "text": "Пользователи пишут, что «Ион-Ключ» может отозвать зарядные блоки. Производитель сообщил, что проверка продолжается и он пока не может подтвердить или опровергнуть наличие дефекта; регулятор не публиковал решения об отзыве.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:unconfirmed",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Факт отзыва не установлен: производитель не подтверждает и не опровергает дефект, поэтому underlying event остаётся неопределённым."
+    },
+    {
+      "id": "b33-blocked-phishing",
+      "case_type": "no_listed_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Заголовок предупреждает об атаке, но проникновения не было",
+      "text": "IT-служба «Мягкий Код» провела плановую учебную проверку устойчивости к фишингу и заранее предупредила сотрудников. Все письма были тестовыми; система работала штатно, доступа третьих лиц не было.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "style:misleading_headline"
+      ],
+      "rationale": "Несмотря на тревожный заголовок, это заранее объявленная учебная проверка, а не кибератака или компрометация."
+    },
+    {
+      "id": "b34-recall-no-lawsuit",
+      "case_type": "single_event",
+      "expected_topic": "health",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Компания добровольно отзывает подтверждённую дефектную партию",
+      "text": "«Ясный Вкус» обнаружил дефект крышки на части бутылок и объявил добровольный отзыв. Регулятор уведомлён; отдельного расследования, штрафа или судебного дела нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждённый отзыв; обычное уведомление не дублируется legal enforcement."
+    },
+    {
+      "id": "b35-layoff-considered",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "labor_employment",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "speculative",
+      "title": "Руководство обсуждает варианты экономии, штат не сокращён",
+      "text": "«Каскад-Руда» рассматривает разные меры снижения затрат, в том числе возможное сокращение персонала. Решение не принято, уведомления сотрудникам не вручались.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "evidence:speculative",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Возможное сокращение не объявлено; событие пока спекулятивно."
+    },
+    {
+      "id": "b36-unlisted-contract",
+      "case_type": "out_of_taxonomy_business_event",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "confirmed",
+      "title": "Подрядчик выиграл конкурс на обслуживание водоканала",
+      "text": "Муниципальная комиссия Меридии утвердила победителя конкурса и подписала пятилетний контракт с «Аква-Ритм». Сумма договора раскрыта в официальном протоколе.",
+      "expected_unlisted_event": true,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:b",
+        "style:boundary",
+        "time:confirmed",
+        "country:fictional",
+        "label:unlisted_event"
+      ],
+      "rationale": "Ясное бизнес-событие вне текущего перечня; ожидается review routing из-за unmapped event, но evidential uncertainty false."
+    }
+  ]
+}

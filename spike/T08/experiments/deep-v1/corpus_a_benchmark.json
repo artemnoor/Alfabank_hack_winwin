@@ -1,0 +1,1690 @@
+{
+  "corpus_id": "t08-deep-a",
+  "version": "1.0.0",
+  "status": "hand-labeled-synthetic-evaluation",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "split": "A",
+  "note": "Synthetic only. Gold labels are single-annotator draft labels assigned without Jev responses and require independent adjudication before any quality claim. evidence_state describes evidence about the content; expected_review_route is a separate operational outcome. A clear unlisted business event can have expected_uncertainty_signal=false and still route to review.",
+  "cases": [
+    {
+      "id": "a01-supply-rail-delay",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Детали для завода задержались на железнодорожном узле",
+      "text": "Партия датчиков для вымышленного завода «Северный Контур» прибыла на терминал на двое суток позже графика. Перевозчик подтвердил задержку, сборочную смену перенесли.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "length:short",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждена уже состоявшаяся задержка груза.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a02-supply-missed-pickup",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Перевозчик не забрал заказанные катушки",
+      "text": "«Получили кабель на три дня позже графика», — сообщил перевозчик компании «Фарватер-Лаб».",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed",
+        "style:very_short",
+        "style:quote"
+      ],
+      "rationale": "Короткая прямая цитата подтверждает состоявшуюся задержку поставки.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a03-supply-customs-hold",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Комплектующие задержаны на границе",
+      "text": "Поставщик из Лирии сообщил о задержке партии насосов на таможенном складе. Документы оформлены, но груз не выпущен в срок; производитель «Меридиан-Маш» подтвердил перенос поставки на неделю.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Партия задержана фактически; нет отдельной новой торговой меры.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a04-supply-rail-capacity",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Сбой расписания задержал доставку зерна",
+      "text": "Железнодорожный оператор «Рельс-Сфера» отменил два грузовых рейса после отказа сигнальной системы. Вагоны с зерном для переработчика «Талый Берег» прибудут на четыре дня позже, сообщили обе компании. Первая неисправность была зарегистрирована в 04:20, а резервный маршрут согласовали только после полудня. Представитель переработчика сказал: «Запас на площадке покрывает часть потребности, но сегодняшняя партия в график не вернётся». Перевозчик подтвердил, что остальные направления работают штатно; речь идёт только об этих двух рейсах.\n\nДиспетчерский центр сравнил текущую ситуацию с обычным сезонным расписанием: на соседних направлениях время движения не менялось. В компании-покупателе уточнили, что партии предназначены для планового выпуска, а не для аварийного ремонта или срочного заказа. Нового сообщения об отмене поставки не поступало; подтверждённая проблема относится к прибытию указанных вагонов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:long",
+        "multi_entity",
+        "time:confirmed",
+        "length:long",
+        "style:quote"
+      ],
+      "rationale": "Длинная заметка содержит несколько числовых и фоновых деталей, но прямо подтверждает задержку двух партий.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a05-shortage-resin",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "title": "На предприятии заканчивается запас смолы",
+      "text": "Запаса смолы на площадке «Гранит-Пласт» осталось на пять смен, что ниже утверждённого минимального резерва. Производство пока идёт по плану, а поставщик подтверждает исполнение текущих рейсов в срок; закупщики уже не могут восстановить нормативный запас.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed"
+      ],
+      "rationale": "Фактический запас ниже потребности и ограничивает пополнение резерва; выпуска и сроков доставки пока не сократили.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a06-shortage-warehouse",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "title": "Складской комплекс достиг предела хранения",
+      "text": "Оператор «Склад-Парк» сообщил, что свободные ячейки заполнены на 100 процентов и текущей ёмкости недостаточно для согласованного объёма на следующий период. Партии по действующим договорам принимают через резервную площадку без задержек и с теми же сроками.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Текущей складской мощности недостаточно для планового объёма; перенаправление проходит в срок, сбоя потока нет.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a07-shortage-cold-storage",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "title": "Не хватает холодильных мощностей для рыбы",
+      "text": "Региональный распределитель «Полярный Маркет» сообщил о нехватке холодильных камер: доступных мест меньше текущего объёма продукции. Компания перенаправила часть товара в соседний комплекс.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Недостаточная ёмкость уже ограничивает размещение продукции.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a08-shortage-grid",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "title": "Энергосеть не покрывает текущий спрос промзоны",
+      "text": "Оператор вымышленного региона Арктания сообщил, что резервной мощности сети недостаточно для заявленной нагрузки. Промышленные потребители перешли на график ограничения потребления; аварийного отключения не было.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Фактическое ограничение мощности, а не аварийная остановка объекта.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a09-production-boiler",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "production_operational_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Поломка котла остановила выпуск на площадке",
+      "text": "На заводе «Кварц-Тепло» вышел из строя промышленный котёл. Выпуск керамических блоков остановлен до завершения ремонта; плановое обслуживание не проводилось.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed"
+      ],
+      "rationale": "Неплановая поломка уже остановила выпуск.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a10-production-fire",
+      "case_type": "multi_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "production_operational_disruption",
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Пожар остановил цех и задержал отправку заказов",
+      "text": "Пожар повредил упаковочную линию компании «Волна-Упак». Производство остановлено на три дня, а покупатели получили уведомления о задержке уже подготовленных заказов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Отдельно указаны остановка выпуска и нарушение отправок.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a11-production-flood",
+      "case_type": "multi_event",
+      "expected_topic": "environment_disasters",
+      "expected_events": [
+        "production_operational_disruption",
+        "environment_disaster_impact"
+      ],
+      "expected_status": "classified",
+      "title": "Подтопление остановило заводскую линию",
+      "text": "После разлива реки вода повредила электроподстанцию предприятия «Кедр-Фарм». Компания подтвердила остановку линии фасовки и эвакуацию оборудования; ущерб оценивается.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждены и воздействие бедствия на объект, и остановка выпуска.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a12-production-cyber",
+      "case_type": "multi_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "production_operational_disruption",
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "title": "Кибератака вывела из строя систему управления печью",
+      "text": "Производитель стекла «Люмен-Сфера» подтвердил атаку на промышленную сеть. Из-за недоступности контроллера две печи остановлены; выпуск не возобновлялся с ночной смены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Есть подтверждённый киберинцидент и самостоятельный факт остановки выпуска.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a13-price-coating",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "title": "Поставщик изменил цену промышленного покрытия",
+      "text": "Компания «Терра-Краска» разослала клиентам новый прайс: цена защитного покрытия выросла на 6 процентов с понедельника. Старые заказы сохраняют прежнюю стоимость.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed"
+      ],
+      "rationale": "Названо состоявшееся изменение коммерческой цены.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a14-price-insurance",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "title": "Страховщик повысил стоимость полисов для перевозчиков",
+      "text": "Страховая компания «Гарант-Путь» с начала месяца повысила тарифы на страхование грузовых автоперевозок. Новые ставки уже применяются к договорам, заключённым после даты изменения.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Изменение действующего тарифа уже введено.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a15-price-commodity",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "title": "Биржевая цена меди снизилась за неделю",
+      "text": "На торгах вымышленной биржи «Аурора» цена меди уменьшилась на 4 процента. Котировка подтверждена итоговым бюллетенем торгов; прогнозов о будущем движении в сообщении нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Фактическое изменение рыночной цены сырья.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a16-price-saas",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "title": "Провайдер повысил абонентскую плату за облачный сервис",
+      "text": "Провайдер «Облако-Лаб» уведомил корпоративных клиентов, что с сегодняшнего дня месячная плата за хранение данных выросла на 8 процентов. Новая действующая цена уже опубликована в тарифной сетке.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed"
+      ],
+      "rationale": "Новая цена уже действует и отражена в актуальной тарифной сетке.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a17-trade-export-quota",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "title": "Власти Лирии установили экспортную квоту на сплав",
+      "text": "Правительство Лирии опубликовало постановление, ограничивающее вывоз никелевого сплава квотой на квартал. Документ вступает в силу в понедельник и распространяется на все экспортные компании.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Официальная мера прямо ограничивает международный экспорт.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a18-trade-import-duty",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "title": "Новая пошлина ограничила ввоз промышленных насосов",
+      "text": "Таможенное ведомство Норланда начало применять пошлину к двум категориям импортных насосов. Ставка и перечень товаров опубликованы в обязательном решении.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Уже применяется таможенная мера к импорту.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a19-trade-license",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "title": "Для экспорта редких металлов ввели лицензирование",
+      "text": "Министерство торговли Эстары ввело обязательную экспортную лицензию на редкие металлы. Без неё таможня не выпускает груз; ранее действовавший порядок был свободным.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Обязательное разрешение ограничивает пересечение границы товарами.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a20-trade-ban",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "title": "Страна запретила ввоз отдельных промышленных фильтров",
+      "text": "Власти Сурении опубликовали запрет на импорт фильтров конкретного типа. Решение вступило в силу сегодня; сообщение не упоминает персональные санкции или заморозку активов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Прямой импортный запрет без санкционного факта.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a21-sanctions-list",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "title": "Холдинг включён в официальный ограничительный список",
+      "text": "Компетентный орган Меридии добавил холдинг «Зенит-Орбита» в санкционный список. Дата включения и перечень ограничений указаны в опубликованном акте.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Официальное включение в санкционный список.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a22-sanctions-assets",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "title": "Активы компании заморожены по санкционному решению",
+      "text": "Регулятор Арктании сообщил о заморозке зарубежных счетов «Форум-Энерго». Ведомство подтвердило, что мера принята в рамках действующего санкционного решения.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Сообщена фактическая заморозка активов по санкционному решению.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a23-sanctions-finance",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "title": "Банк ограничил расчёты с компанией после санкционного акта",
+      "text": "После публикации официального акта «Кристалл-Экспорт» включён в санкционный перечень Вестории. Расчётный банк подтвердил прекращение обслуживания компании на основании этого решения.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Официальный список является прямым критерием санкций.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a24-sanctions-sector",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "title": "Власти ввели целевые санкции против руководителей группы",
+      "text": "Совет Марании опубликовал персональный список руководителей «Рубин-Лайн» и сообщил о блокировке их активов. В сообщении нет запрета на импорт или экспорт товаров.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Персональная санкционная мера без отдельного торгового ограничения.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a25-regulation-packaging",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "title": "Производителям упаковки установили новый стандарт отчётности",
+      "text": "Правительство Таврии утвердило обязательную квартальную отчётность об утилизации упаковки. Норма опубликована и начнёт действовать с января; штрафов или расследований по компаниям не объявлено.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Принята новая норма, а не дело о её правоприменении.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a26-regulation-tax",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "title": "Парламент изменил порядок расчёта налога на оборудование",
+      "text": "Парламент Эстары принял закон о налоговом вычете для промышленного оборудования. Текст опубликован, дата вступления в силу — следующий квартал.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Принята налоговая мера; фактического изменения рыночной цены не сообщено.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a27-regulation-draft",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "title": "Законопроект о маркировке получил номер и внесён в парламент",
+      "text": "Министерство внесло законопроект об обязательной маркировке химической продукции в парламент Лирии. Документ зарегистрирован и передан профильному комитету; голосования ещё не было.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:formal",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Формальный законопроект входит в правила include таксономии.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a28-regulation-safety",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "title": "Введён обязательный стандарт безопасности аккумуляторов",
+      "text": "Регулятор Норланда утвердил новый обязательный стандарт испытаний промышленных аккумуляторов. Производители должны перейти на него до конца года; отдельного дела против компании нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Общий стандарт без отдельного расследования или взыскания.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a29-cyber-ransom",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "title": "Атака шифровальщика нарушила работу корпоративного портала",
+      "text": "Компания «Нить-Данные» подтвердила ransomware-атаку: портал заказов недоступен, специалисты восстанавливают резервные копии. Сбой затронул корпоративных клиентов. По внутреннему журналу первые ошибки появились в 02:14, доступ восстановили только для чтения к 06:40, а полное восстановление ожидается после проверки копий. Представитель сказал: «Мы не подтверждаем утечку клиентских данных, но сам доступ к порталу был нарушен». Обычные телефонные заказы продолжали принимать.\n\nСлужба информационной безопасности опубликовала внутреннюю хронологию: первые ошибки появились в 02:14, резервное копирование завершилось накануне вечером, а доступ на чтение восстановили к 06:40. Представитель подчеркнул, что проверка журналов продолжается и выводов о копировании данных пока нет. Телефонные заказы и складские отгрузки оставались доступны, поэтому сообщение касается только подтверждённой атаки и недоступности портала.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed",
+        "length:long",
+        "style:quote"
+      ],
+      "rationale": "Организация подтвердила реальный киберинцидент и нарушение работы.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a30-cyber-leak",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "title": "Разработчик сообщил о доступе к тестовой базе клиентов",
+      "text": "«Тихий Код» обнаружил несанкционированный доступ к тестовой базе адресов электронной почты. Сервис отключён, компания уведомила пользователей и начала расследование.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Фактический несанкционированный доступ подтверждён.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a31-cyber-cloud",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "title": "Облачный провайдер подтвердил утечку ключей доступа",
+      "text": "Провайдер «Сфера-Облако» сообщил, что злоумышленники получили доступ к части технических ключей. Компания отозвала их и зафиксировала инцидент; данных о финансовом ущербе пока нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждена утечка технических секретов; ущерб не обязателен для события.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a32-cyber-fraud",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "title": "Кибератака нарушила внутреннюю систему платежей",
+      "text": "Банк «Янтарь-Счёт» сообщил о целевой атаке на внутренний шлюз. Обработка корпоративных платежей приостанавливалась на два часа, после чего сервис восстановили.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждённая атака с операционным нарушением.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a33-labor-strike",
+      "case_type": "multi_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [
+        "labor_workforce_event",
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Сотрудники терминала начали забастовку, грузовые отправки остановлены",
+      "text": "Работники терминала «Маяк-Логистика» начали забастовку после неудачных переговоров о сменах. Руководство отдельно сообщило, что отправки контейнеров временно приостановлены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Зафиксированы и трудовое действие, и фактическая остановка отправок.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a34-labor-layoff",
+      "case_type": "single_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [
+        "labor_workforce_event"
+      ],
+      "expected_status": "classified",
+      "title": "Компания уведомила персонал о сокращении штата",
+      "text": "«Атлас-Мед» направил сотрудникам уведомления о сокращении 240 должностей к октябрю. Приказ подписан, консультации с профсоюзом завершены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:announced"
+      ],
+      "rationale": "Массовое сокращение официально объявлено.",
+      "evidence_state": "announced",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a35-labor-lockout",
+      "case_type": "single_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [
+        "labor_workforce_event"
+      ],
+      "expected_status": "classified",
+      "title": "На предприятии объявлен локаут после трудового конфликта",
+      "text": "Производитель «Северная Плита» временно не допускает работников к производственным площадкам после спора о графике оплаты. Представители сторон подтвердили закрытие проходных.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Описано фактическое трудовое действие, а не прогноз.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a36-labor-agreement",
+      "case_type": "single_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [
+        "labor_workforce_event"
+      ],
+      "expected_status": "classified",
+      "title": "Компания существенно увеличила постоянный штат после открытия участка",
+      "text": "«Модуль-Ресурс» официально увеличил постоянный штат на 1 200 работников после открытия нового участка. Компания сообщила, что приём завершён и сотрудники уже приступили к работе; это не план вакансий и не обычный набор нескольких специалистов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:formal",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждено существенное фактическое изменение численности персонала, а не обычный найм.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a37-insolvency-default",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "title": "Суд открыл процедуру банкротства поставщика",
+      "text": "Арбитражный суд вымышленной республики Сария открыл процедуру банкротства против поставщика «Камень-Мост». Запись появилась в реестре; отдельный штраф или иск не упоминается.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Формальная процедура относится к insolvency; отдельного legal enforcement нет.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a38-insolvency-coupon",
+      "case_type": "single_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "title": "Эмитент не выплатил купон по облигациям в срок",
+      "text": "Компания «Лира-Капитал» не перечислила купон держателям облигаций в установленную дату. Эмитент уведомил биржу о дефолте и не назвал новую дату платежа.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Есть конкретный пропущенный платёж и объявленный дефолт.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a39-insolvency-supplier",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "title": "Поставщик оборудования объявил о неплатёжеспособности",
+      "text": "«Медный Компас» сообщил кредиторам о невозможности погасить обязательства и подал документы для формальной процедуры несостоятельности. Платёж по двум займам просрочен.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждены неплатёж и формальный шаг к процедуре.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a40-insolvency-payment",
+      "case_type": "single_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "title": "Компания признала дефолт после пропуска платежа",
+      "text": "Эмитент «Точка-Финанс» не перечислил основной долг по выпуску в дату погашения. Биржевое уведомление фиксирует дефолт; суд банкротство не открывал.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:brief",
+        "time:confirmed"
+      ],
+      "rationale": "Дефолт имеется без судебной процедуры.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a41-corporate-acquisition",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "expected_status": "classified",
+      "title": "Производитель закрыл сделку по покупке конкурента",
+      "text": "«Клен-Пром» приобрёл 68 процентов акций компании «Латунь-Сервис». Стороны сообщили о завершении расчётов и переходе контроля.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Закрытая M&A-сделка.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a42-corporate-asset-sale",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "expected_status": "classified",
+      "title": "Группа продала непрофильный логистический актив",
+      "text": "Совет директоров «Тихая Гавань» одобрил и завершил продажу дочернего перевозчика компании «Курс-Транс». Сумма сделки раскрыта в корпоративном сообщении.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_entity",
+        "time:confirmed"
+      ],
+      "rationale": "Завершённая продажа актива, не обычная закупка.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a43-corporate-spinoff",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "expected_status": "classified",
+      "title": "Цифровое подразделение выделено в самостоятельную компанию",
+      "text": "Группа «Поле-Сеть» завершила выделение платформы аналитики в отдельное юридическое лицо. Активы и сотрудники переведены по утверждённому плану.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Завершённая корпоративная реструктуризация.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a44-corporate-restructure",
+      "case_type": "multi_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "corporate_transaction_restructuring",
+        "labor_workforce_event"
+      ],
+      "expected_status": "classified",
+      "title": "Холдинг реорганизует дочерние общества и переводит персонал",
+      "text": "«Риф-Индустрия» объявил о слиянии двух дочерних компаний и переводе 500 сотрудников в новую структуру. Решение совета директоров принято; увольнения не планируются.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:announced"
+      ],
+      "rationale": "Реорганизация и существенное изменение распределения персонала прямо объявлены.",
+      "evidence_state": "announced",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a45-recall-battery",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "title": "Производитель отозвал партию батарей после перегрева",
+      "text": "«Заря-Электро» объявил добровольный отзыв 4 800 батарей после лабораторного подтверждения перегрева. Покупателям предложен возврат или замена изделий.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждённый дефект и официальный отзыв.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a46-recall-food",
+      "case_type": "single_event",
+      "expected_topic": "health",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "title": "Регулятор снял с продажи партию детского питания",
+      "text": "Инспекция выявила превышение допустимого показателя в партии смеси «Лесная Ложка» и обязала производителя временно убрать её из продажи. Медицинских последствий не сообщалось.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Официальная мера по качеству товара; последствий для здоровья не требуется.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a47-recall-machinery",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "title": "Производитель заменит неисправные защитные клапаны",
+      "text": "«Турбина-Север» подтвердил дефект партии клапанов, которые могут не закрываться при перегреве. Компания организовала замену; отзыв безопасности опубликован на сайте производителя.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждённый дефект с официальной программой замены.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a48-recall-cosmetic",
+      "case_type": "single_event",
+      "expected_topic": "health",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "title": "Партия крема отзывается из-за неверной маркировки состава",
+      "text": "Компания «Мягкий Лист» инициировала отзыв партии крема после подтверждения несоответствия маркировки фактическому составу. Регулятор уведомлён, покупатели могут вернуть товар.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Официальный отзыв из-за подтверждённой проблемы качества.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a49-legal-antitrust",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "title": "Регулятор оштрафовал сеть за нарушение правил конкуренции",
+      "text": "Антимонопольное ведомство вынесло решение о штрафе сети «Рынок-Рядом». Компания может обжаловать акт; размер взыскания и дата публикации указаны в решении.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Отдельный акт правоприменения и штраф.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a50-legal-investigation",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "title": "Начато официальное расследование закупок",
+      "text": "Регулятор открыл расследование закупок компании «Круг-Техника» и направил запрос документов. Ведомство подчёркивает, что выводов о нарушении пока нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Самостоятельное официальное расследование — legal, но не regulation change.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a51-legal-court",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "title": "Суд взыскал компенсацию с производителя оборудования",
+      "text": "Суд удовлетворил иск заказчика к «Маяк-Привод» и обязал выплатить компенсацию за нарушение договора. Решение вступило в силу.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Есть самостоятельное судебное решение.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a52-legal-data",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "title": "Регулятор наложил штраф за нарушение требований защиты данных",
+      "text": "Надзорный орган завершил рассмотрение дела против «Код-Горизонт» и назначил штраф за несоблюдение правил хранения клиентских данных. Решение опубликовано; нового общего правила не принято.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Взыскание по отдельному делу, не изменение общей нормы.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a53-environment-flood",
+      "case_type": "multi_event",
+      "expected_topic": "environment_disasters",
+      "expected_events": [
+        "environment_disaster_impact",
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Наводнение перекрыло дорогу к карьеру и нарушило отгрузки",
+      "text": "Вода затопила единственный подъезд к карьеру «Седой Камень». Доставка щебня покупателям приостановлена на сутки; местные службы подтвердили перекрытие дороги.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Бедствие повлияло на объект и создало фактический сбой отгрузок.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a54-environment-spill",
+      "case_type": "multi_event",
+      "expected_topic": "environment_disasters",
+      "expected_events": [
+        "environment_disaster_impact",
+        "production_operational_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Разлив реагента остановил участок химического завода",
+      "text": "После утечки в защитный контур компания «Синяя Долина» остановила участок очистки и вывезла часть оборудования. Экологическая служба подтвердила локальный разлив и ограничение работы площадки.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Экологический инцидент и самостоятельная остановка производственного участка.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a55-environment-drought",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "environment_disaster_impact"
+      ],
+      "expected_status": "classified",
+      "title": "Засуха ограничила водозабор энергетической станции",
+      "text": "Оператор «Тёплый Контур» сообщил, что из-за засухи власти сократили забор воды для охлаждения станции. Компания подтвердила, что снизила выработку на 12 процентов; ограничение действует до восстановления уровня водохранилища.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Засуха ограничила работу объекта, а компания отдельно сообщила о фактическом снижении выработки.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a56-environment-storm",
+      "case_type": "multi_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "environment_disaster_impact",
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "title": "Шторм остановил портовые операции и задержал экспортную партию",
+      "text": "Порт «Южный Мыс» закрыл причалы из-за шторма. Судно с удобрениями компании «Плодородие-С» не вышло по графику, отгрузка перенесена на два дня.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Есть прямое влияние бедствия и фактический сбой отправки.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a57-investment-newplant",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "title": "Компания начала строительство завода компонентов",
+      "text": "«Искра-Комплект» приступил к строительству завода мощностью 18 тысяч модулей в год. Бюджет проекта утверждён, первые работы начались на площадке.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Капитальный проект уже начат.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a58-investment-expansion",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "title": "Предприятие расширит линию упаковки",
+      "text": "Совет директоров «Сфера-Упак» одобрил инвестиции в новую линию. После завершения проекта установленная мощность площадки вырастет с 20 до 31 миллиона упаковок в год.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:announced"
+      ],
+      "rationale": "Объявлена существенная инвестиция и измеримое расширение мощности.",
+      "evidence_state": "announced",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a59-investment-capacity-cut",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "title": "Группа объявила о постоянном сокращении проектной мощности",
+      "text": "«Горный Меридиан» утвердил закрытие одной из двух дробильных линий и снижение годовой мощности предприятия на 30 процентов. Решение вступит в силу после завершения текущего сезона.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:announced"
+      ],
+      "rationale": "Явно объявлено плановое изменение установленной мощности.",
+      "evidence_state": "announced",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a60-investment-energy",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "title": "Введена новая линия переработки биотоплива",
+      "text": "Компания «Степной Свет» завершила капитальный проект и запустила линию мощностью 40 тысяч тонн биотоплива в год. Инвестиции составили 6 миллиардов условных рублей.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:wire",
+        "time:confirmed"
+      ],
+      "rationale": "Завершён капитальный проект с новым объектом/мощностью.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a61-topic-economy",
+      "case_type": "no_listed_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Банк опубликовал обзор инфляционных ожиданий",
+      "text": "В квартальном обзоре банка «Счётная Линия» приведены данные об инфляции, ставках и динамике депозитов. Компания не объявляла корпоративных решений или новых услуг.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "topic_control"
+      ],
+      "rationale": "Рыночная и макроэкономическая тема без события из перечня.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a62-topic-politics",
+      "case_type": "no_listed_event",
+      "expected_topic": "politics_government",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Парламентские выборы завершились без изменений торговых правил",
+      "text": "Избирательная комиссия Лирии сообщила результаты выборов. В заметке нет утверждённых санкций, торговых мер или решений по отдельной компании.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "country:fictional"
+      ],
+      "rationale": "Главный предмет — государственная политика; бизнес-событий нет.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a63-topic-business",
+      "case_type": "no_listed_event",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Компания опубликовала квартальную отчётность",
+      "text": "Производитель «Тёплая Нить» сообщил выручку и операционную маржу за квартал. В тексте нет нового решения, сделки, сбоя, изменения цены или меры регулятора.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "topic_control"
+      ],
+      "rationale": "Отчётность — тема компании, но нет события из текущего event list.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a64-topic-industry",
+      "case_type": "no_listed_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Отраслевой обзор описал выпуск стали за год",
+      "text": "Отраслевая ассоциация сравнила выпуск стали на предприятиях Восточной Меридии за прошлый год. Все заводы работали штатно, ограничения поставок не отмечены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "topic_control"
+      ],
+      "rationale": "Отраслевой материал без конкретного сбоя или изменения мощности.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a65-topic-tech",
+      "case_type": "no_listed_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Университет запустил учебный спутник для телеметрии",
+      "text": "Инженерный факультет Вестории вывел на орбиту учебный спутник. Проект предназначен для студентов и не связан с коммерческой компанией или киберинцидентом.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "country:fictional"
+      ],
+      "rationale": "Ясная технологическая тема без перечисленного бизнес-события.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a66-topic-energy",
+      "case_type": "no_listed_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Геологи оценили запасы лития в северном регионе",
+      "text": "Исследовательский институт опубликовал оценку запасов лития в Арктании. Работы ведутся на уровне геологического обследования; добыча, инвестиционное решение и поставки не объявлялись.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "country:fictional"
+      ],
+      "rationale": "Ресурсная тема без события добычи или капитального проекта.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a67-topic-law",
+      "case_type": "no_listed_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Юристы разъяснили действующий порядок лицензирования",
+      "text": "Профессиональная ассоциация выпустила обзор давно действующих правил. Новых норм, расследований, исков или взысканий нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "topic_control"
+      ],
+      "rationale": "Правовая тема без изменения правил или отдельного правоприменения.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a68-topic-labor",
+      "case_type": "no_listed_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Исследование сравнило среднюю продолжительность рабочей недели",
+      "text": "Университет опубликовал статистический обзор условий труда в пяти отраслях. В обзоре нет забастовок, сокращений или новых договорённостей конкретных работодателей.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event"
+      ],
+      "rationale": "Трудовая тема, но без трудового события.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a69-topic-environment",
+      "case_type": "no_listed_event",
+      "expected_topic": "environment_disasters",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Заповедник сообщил о восстановлении болотной экосистемы",
+      "text": "Мониторинг заповедника в Норланде показал рост площади водно-болотных угодий. Ни компании, ни ущерб объектам, ни нарушение поставок в материале не упоминаются.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "country:fictional"
+      ],
+      "rationale": "Экологическая тема, но нет бизнес-воздействия для environmental event.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a70-topic-health",
+      "case_type": "no_listed_event",
+      "expected_topic": "health",
+      "expected_events": [],
+      "expected_status": "classified",
+      "title": "Медицинская ассоциация обновила сезонные рекомендации",
+      "text": "Врачи опубликовали памятку для населения о профилактике заболеваний. Нет новости об отзыве продукта, поставках лекарств или коммерческой деятельности.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:non_event",
+        "topic_control"
+      ],
+      "rationale": "Тема здоровья без бизнес-события.",
+      "evidence_state": "informational",
+      "expected_review_route": "none"
+    },
+    {
+      "id": "a71-other-culture",
+      "case_type": "out_of_taxonomy",
+      "expected_topic": "other_uncertain",
+      "expected_events": [],
+      "expected_status": "other",
+      "title": "В городском театре открыли выставку костюмов",
+      "text": "Театр «Сцена-Лес» открыл выставку архивных костюмов. Организаторы сообщили расписание посещения; тема не относится к выбранным категориям и факты изложены ясно.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:out_of_topic"
+      ],
+      "rationale": "Ясный материал вне списка тем; неопределённость отсутствует.",
+      "evidence_state": "informational",
+      "expected_review_route": "other"
+    },
+    {
+      "id": "a72-other-sport",
+      "case_type": "out_of_taxonomy",
+      "expected_topic": "other_uncertain",
+      "expected_events": [],
+      "expected_status": "other",
+      "title": "Финал кубка завершился победой команды «Орион»",
+      "text": "Спортивная лига подвела итоги матча и опубликовала таблицу турнира. Компании и деловых событий в заметке нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:out_of_topic"
+      ],
+      "rationale": "Понятная спортивная тема вне перечня.",
+      "evidence_state": "informational",
+      "expected_review_route": "other"
+    },
+    {
+      "id": "a73-unlisted-contract",
+      "case_type": "out_of_taxonomy_business_event",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "title": "Поставщик заключил контракт на обслуживание городской сети",
+      "text": "Комиссия Эстары завершила открытый конкурс и заключила с «Орбита-ТехСервис» пятилетний контракт на обслуживание уличного освещения. Итог опубликован в официальном реестре закупок.",
+      "expected_unlisted_event": true,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:unlisted",
+        "time:confirmed",
+        "country:fictional",
+        "label:unlisted_event"
+      ],
+      "rationale": "Подтверждённый договор на обслуживание — явное коммерческое событие вне 15 текущих event codes; facts ясны, review нужен для unmapped event.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "review"
+    },
+    {
+      "id": "a74-unlisted-financing",
+      "case_type": "out_of_taxonomy_business_event",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "title": "Производитель привлёк частное финансирование для оборотного капитала",
+      "text": "«Малахит-Механика» подписала кредитное соглашение с независимым фондом на финансирование текущего капитала. Сумма и дата сделки раскрыты; проект не меняет производственные мощности.",
+      "expected_unlisted_event": true,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:unlisted",
+        "time:confirmed",
+        "label:unlisted_event"
+      ],
+      "rationale": "Подтверждённое коммерческое финансирование не покрыто event list и не является неопределённым.",
+      "evidence_state": "confirmed",
+      "expected_review_route": "review"
+    },
+    {
+      "id": "a75-uncertain-noise",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "title": "Источники расходятся в оценке возможной остановки поставок",
+      "text": "В одном анонимном сообщении утверждается, что «Парус-Регион» может остановить отгрузки. Компания отрицает подготовку такого шага, а независимого подтверждения нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:a",
+        "style:contradictory",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Событие не подтверждено и стороны противоречат друг другу; сигнал insufficient_evidence.",
+      "evidence_state": "unconfirmed",
+      "expected_review_route": "review"
+    },
+    {
+      "id": "a76-empty",
+      "case_type": "empty_input",
+      "expected_topic": null,
+      "expected_events": [],
+      "expected_status": "no_content",
+      "title": "",
+      "text": "",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:a"
+      ],
+      "rationale": "Пустой ввод должен дать no_content без темы, события или обращения к Jev.",
+      "evidence_state": "no_content",
+      "expected_review_route": "no_content"
+    }
+  ]
+}

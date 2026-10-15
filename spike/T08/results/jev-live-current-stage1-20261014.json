@@ -1,0 +1,87 @@
+{
+  "mode": "live_synthetic_pilot",
+  "timestamp_utc": "2026-10-14T10:32:33+00:00",
+  "endpoint_host": "polza.ai",
+  "endpoint_path": "/api/v1/systemone",
+  "corpus_id": "synthetic-ru-news-50",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+  "taxonomy_sha256_raw": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+  "client_sha256": "c37a15f076baf791b1683d1c1c0555b7aedd8bdbbf75cb6ab41b6f15b40fa791",
+  "runner_sha256": "8bd0851f7f18f9da323d647697ffa60aac50a052b0b34e19f8e5c98437520754",
+  "requested_model_id": "typesafe/jev",
+  "max_calls_per_invocation": 1,
+  "start_at_case_id": "e02-supply-carrier",
+  "end_at_case_id": "e02-supply-carrier",
+  "transport_provenance": "official_polza_https",
+  "ledger_start_count": 1,
+  "ledger_end_count": 2,
+  "attempted_calls": 1,
+  "successful_calls": 1,
+  "control_calls": 0,
+  "controls": {},
+  "failures": [],
+  "request_sha256_by_case": {
+    "e02-supply-carrier": "64784cd4ab0ebd77648c56af70c7be1783916ff8c8b358d4917201a0de8baab2"
+  },
+  "results": [
+    {
+      "case_id": "e02-supply-carrier",
+      "taxonomy_id": "alfa-business-news",
+      "taxonomy_version": "0.3.0-spike",
+      "taxonomy_hash": "3b50956b90a3079cc0f25f0f318486a05846f471eafdbfe1abb2af606688abbf",
+      "model_version": "jev-1.13.0",
+      "topic": "industry_trade_supply",
+      "topic_confidence": 0.99,
+      "topic_probabilities": {
+        "business_companies": 0.01,
+        "economy_finance": 0.0,
+        "energy_resources": 0.0,
+        "environment_disasters": 0.0,
+        "health": 0.0,
+        "industry_trade_supply": 0.99,
+        "labor_employment": 0.0,
+        "law_regulation": 0.0,
+        "other_uncertain": 0.0,
+        "politics_government": 0.0,
+        "technology_telecom": 0.0
+      },
+      "event_scores": {
+        "supply_chain_disruption": 0.95,
+        "shortage_capacity_constraint": 0.3,
+        "production_operational_disruption": 0.5,
+        "price_cost_change": 0.03,
+        "trade_restriction": 0.02,
+        "sanctions": 0.02,
+        "regulation_tax_change": 0.02,
+        "cyber_security_incident": 0.01,
+        "labor_workforce_event": 0.04,
+        "insolvency_default": 0.02,
+        "corporate_transaction_restructuring": 0.02,
+        "product_recall_quality_safety": 0.02,
+        "legal_enforcement": 0.02,
+        "environment_disaster_impact": 0.02,
+        "investment_capacity_change": 0.02
+      },
+      "unlisted_event_score": 0.54,
+      "uncertainty_score": 0.15,
+      "predicted_events": [
+        "supply_chain_disruption"
+      ],
+      "classification_status": "uncertain",
+      "usage": {
+        "input_tokens": 5850,
+        "output_tokens": 492,
+        "cost_rub": 0.1029483
+      },
+      "elapsed_ms": 2437,
+      "request_sha256": "64784cd4ab0ebd77648c56af70c7be1783916ff8c8b358d4917201a0de8baab2"
+    }
+  ],
+  "provider_response_authenticity": "NOT_CRYPTOGRAPHICALLY_ATTESTED",
+  "quality_metrics_status": "NOT_MEASURED_INCOMPLETE_RUN",
+  "metrics": null,
+  "note": "Synthetic-only run; aggregate quality metrics are withheld until all 49 non-empty baseline cases complete. Raw articles, prompts, provider response bodies, credentials, and exception details are not saved."
+}

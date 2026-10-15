@@ -1,0 +1,17 @@
+{
+  "analysis_path": "spike/T08/ERROR_ANALYSIS_V2.1.json",
+  "analysis_sha256": "3576616fc4d40ffd743b0054a02aadda26ae584e6e3e94a8a1019459a50a6082",
+  "model_blind_review_packet_path": "spike/T08/HUMAN_REVIEW_PACKET_V2.1.md",
+  "model_blind_review_packet_sha256": "b034f98b5e4eca93070e00f38585a8a44a4faa7ba78fbae8486998aa4f766b9d",
+  "packet_case_count": 49,
+  "packet_selection": "all non-empty baseline cases; not selected by model disagreement",
+  "packet_contains_source_ids": false,
+  "packet_contains_draft_labels_or_model_outputs": false,
+  "owner_blind": false,
+  "policy_version": "2.1.0-spike",
+  "saved_answer_count": 45,
+  "false_positive_disagreements": 6,
+  "false_negative_disagreements": 7,
+  "gold_status": "preliminary_single_author_unadjudicated",
+  "visible_validation_set_excluded": true
+}

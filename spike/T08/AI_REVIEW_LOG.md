@@ -1,0 +1,89 @@
+# AI Factory and independent-review log
+
+Date: 2026-10-14. Scope was offline review of `spike/T08` only. No API client was invoked, no internet/provider request was made, and reviewers were instructed not to edit shared files.
+
+## Workflow context
+
+- Read the AIF skill instructions and project `.ai-factory/RULES.md`; the task was scoped to an offline spike. AIF grounding was used to keep claims tied to pinned result files and test output.
+- Baseline, taxonomy and v4 aggregate were treated as immutable inputs. New policy logic and proposal artifacts are separately versioned.
+- Review tasks were separated so error triggers, blind label review and threshold calculations were independent. No agent committed changes.
+
+## Subagents used
+
+| Agent | Assignment | Method | Result/use |
+|---|---|---|---|
+| `/root/review_triggers` | Reconstruct why each saved response enters review and inventory topic/event errors. | Read-only calculation from pinned 45 response rows and v0.3 rules. | Confirmed active Choice=5, event-band=24, insufficient-evidence=17, unlisted=32; 42 review, 3 accepted. Its counts were independently reimplemented in `quality_analysis.py` and regression tests. |
+| `/root/blind_gold_taxonomy` | Check disputed labels and taxonomy boundaries, prioritizing e33/e34/e35. | For e33/e34/e35, first-pass label judgment was recorded from text before seeing Jev outputs or current expected labels; taxonomy/current gold were then consulted. | AI opinion only, not a human annotation. Findings and disagreements were copied into `HUMAN_REVIEW_PACKET.md`; source labels were not changed. |
+| `/root/threshold_stats` | Independently recalculate threshold and selective-coverage behavior from stored scores. | Read-only recomputation, no calls or data changes. | Compared with `quality_analysis.py`; counterfactual policy results are explicitly non-production and regression-tested. |
+
+## Independent final implementation review
+
+`/root/final_review_t08_quality` performed a read-only review after the calculations and artifacts were generated. It independently recomputed all 7 insufficient-evidence and 7 unlisted gate rows, including coverage, topic accuracy, event TP/FP/FN/F1/exact match, case error and provisional high-impact false positives. It confirmed the 45 saved statuses, source hashes, reproducibility of `QUALITY_ANALYSIS.json`, generated error/uncertainty reports, and the e35 source quote. No calculation discrepancy was found.
+
+The review caught two stale-document issues and one explanation issue: README omitted the new uncertainty/unlisted sweeps; the report and log still marked the prior test count/final review as current/pending; and e47 could be misread as automatically accepted when only the unlisted gate was relaxed. These were corrected. A regression test now compares both review-gate tables against the machine-readable sweep rows, and e47 is documented as still blocked by its event gray-band trigger. The final fresh suite passed: 110 tests, 0 failures, 0 skips; see TEST_REPORT.md/JSON. A final read-only follow-up then reran the 4 artifact regression tests (4/4 passed), reran both reproducibility checks, and confirmed the report builder output exactly matches the checked-in TEST_REPORT.json and TEST_REPORT.md. It reran only those 4 tests, not the full suite.
+
+## Limits
+
+AI agents do not replace an independent human annotator, adjudicator, security audit or provider evidence. The AI label review is explicitly not gold. The reviewer tasks all used the same repository contents and are not independent real-world validation samples.
+
+## Finalization review — 2026-10-15
+
+`/root/t08_final_audit` performed a new read-only review of the final error report, report builder, validation-set rename and full-baseline annotation packet. It confirmed the 60-story set is consistently marked as visible validation (not blind), the `validation-v1-*` IDs and manifest hashes agree, the 49-story packet omits source IDs/draft labels/model outputs, and the original corpus, v0.3 taxonomy and Jev aggregate hashes remain pinned. The reviewer found two documentation drifts (stale test count and generic holdout wording); these were corrected, then the reviewer confirmed there were no remaining findings. The reviewer did not run tests.
+
+The primary run on this revision executed 118 unit tests and 19 Policy/visualization/Playwright tests (all passed), Ruff check/format, offline runner, quality-analysis and deep-corpus report reproducibility, final report reproducibility and `git diff --check`. The exhausted live-budget guard refused classification before network access. No new Jev API request was made. These engineering checks do not make AI review a human gold label or establish model quality.
+
+## Choice validation hardening follow-up — 2026-10-15
+
+An offline code-path review found that `visualization.policy_v2.evaluate_result` trusted Choice scores when called directly: it validated each value and the selected code but did not itself verify the probability sum, maximum-choice consistency, or the stored confidence formula. The saved-data loader did validate these fields, but the policy boundary now independently fails closed as well. A regression test covers wrong confidence, wrong winner, and malformed sum; the low-confidence test uses a valid distribution and confirms that confidence remains non-blocking for event candidates.
+
+`/root/policy_v2_review` independently reviewed the changed boundary and one-way dependency on `jev_spike.choice_confidence_matches`. It confirmed the validation and tolerances match the shared live-result validator, with no import cycle and no change to candidate routing. The reviewer did not run tests. The verification run for this follow-up executed 118 offline suite tests and 20 Policy/visualization/Playwright tests, plus the report/artifact, Ruff, offline runner, network-guard and diff checks. User-modified screenshot files were backed up and restored byte-for-byte after Playwright. No Jev/Polza API request was made.
+
+The visualization had a small version-label drift: the calculation/report were Policy v2.1 while several visible labels said only “Policy v2”. Updated the mode control, detail labels, and comparison/statistics headings to say “Policy v2.1”; the Playwright assertions now check the visible version. This copy-only correction changes neither routing nor saved metrics and has no separate AI-review claim.
+
+## Statistics chart consistency review — 2026-10-15
+
+`/root/policy_chart_review` performed a read-only review of the Policy v2.1 statistics screen. It found that the event-distribution and FP/FN charts still used Legacy predictions while the metric cards used v2 candidates, and that the footnote incorrectly described every chart as Legacy-only. The implementation now routes both charts through the active policy, labels them by mode, and explains that only Coverage vs Error Rate and presets A–E remain Legacy diagnostics. A new Playwright regression independently compares chart rows with Python evaluation over the saved 45 responses, verifies that a proposed gold edit changes the v2 FP/FN graph, and verifies a local positive-threshold change against `policy_v2.evaluate_case` at 0.95. The test also asserts no HTTP(S) requests and no JavaScript errors. The reviewer did not run tests; the author ran the 118-test T08 suite and 21 Policy/visualization/Playwright checks after the change. No Jev/Polza request was made, and user-modified screenshots were restored byte-for-byte.
+
+## Plain-language metric review — 2026-10-15
+
+`/root/t08_final_consistency_review` performed a read-only review of the localized statistics screen. It found that “not found” incorrectly merged an event below the Noul threshold with a positive event held by Policy v2.1, and that Legacy cards described raw Noul threshold labels as if they had been sent downstream despite whole-news review. The UI now says “not passed further” for v2.1 and explicitly includes held candidates; Legacy cards say “above/below Noul threshold,” with a footnote separating raw threshold scores from the actual-transfer comparison table. Browser regression assertions cover both distinctions and pin raw Legacy Noul F1 (`84.0%`) separately from Current Strict delivered-output F1 (`9.1%`). A read-only follow-up confirmed the corrected semantics and no formula changes. Final checks on the current UI version: 21 Policy/visualization/Playwright tests passed; the base T08 suite passed 118 tests on the same revision line, plus Ruff, generated HTML/report checks, and offline runner. No network or Jev/Polza requests were made. Six user-modified PNGs were restored and SHA-256 verified after Playwright.
+
+## Mobile reading-order and touch review — 2026-10-15
+
+`/root/t08_final_consistency_review` independently reviewed the mobile layout changes. It confirmed the compact-screen DOM/visual order (“news list → label comparison → detailed analysis”), the 16px filter input, touch control sizing, and that the CSS changes are limited to narrow breakpoints; no desktop regression was identified. The reviewer did not run tests or access the network. Author verification: 118 T08 tests and 21 Policy/visualization/Playwright tests passed; no external browser requests or Jev/Polza calls occurred. The six user-modified PNGs were restored and hash-verified.
+
+## Policy v2.1 handoff and missing-result review — 2026-10-15
+
+`/root/t08_policy_integrity_audit` performed a read-only review of the updated local-only T09 handoff wording, Policy v2.1 routing, and missing-result behavior. The first pass found two UI inconsistencies: the absent-answer technical-attention badge appeared only in Policy v2.1, and Legacy's “accepted by thresholds” filter included rows with no Jev result. Both are fixed: missing outputs show technical attention in both modes while producing no event candidate/review task, and Legacy auto filtering now excludes absent answers. Browser regressions assert the badge in both modes and that the Legacy auto list contains only the 3 saved outputs accepted by current thresholds, not missing e23/e35 (or the other absent rows).
+
+The report regression had a stale expected browser-check count (21 vs. 23 test methods in the current focused suite). Updated the expectation and regenerated checked-in report artifacts from the actual run counts. Follow-up review passed with no findings and confirmed generated `index.html` byte-for-byte matches its builder inputs. Author verification: 23 Policy/visualization/Playwright tests and the full 118-test T08 suite passed. Ruff check/format, JavaScript syntax, offline runner, quality and deep-corpus reproducibility, report reproducibility, and `git diff --check` also passed. No Jev/Polza call was made. User-modified screenshots and `INDUSTRY_RESEARCH.md` remain unmodified and excluded from the task changes.
+
+## Final T08 integration-preparation review — 2026-10-15
+
+Three read-only AI Factory reviews were dispatched for this work:
+
+| Agent | Scope | Result |
+|---|---|---|
+| `/root/error_case_review` | Recompute and explain saved-output FP/FN rows | Confirmed 34 TP / 6 FP / 7 FN at 0.80; found the e34 abstain wording defect and a stale taxonomy proposal reference. |
+| `/root/blind_gold_audit` | Review disputed labels from text before opening Jev results | Suggested human adjudication for e33/e34/e35 and additional topic/status cases. No source label changed; the AI opinions are explicitly provisional. |
+| `/root/policy_v21_review` | Check candidate route and Framework v1 boundary | Confirmed candidate-vs-fact distinction; flagged that v0.3 insufficient-evidence conflates topic and event uncertainty and can conservatively hold event candidates. |
+
+Corrections are recorded in `ERROR_ANALYSIS_V2.1.*`, `GOLD_LABEL_REVIEW_V2.1.*`, the separately versioned taxonomy v0.4.2 proposal, and the frozen Policy v2.1/T09 handoff. Reviewers did not edit files or call APIs. Human gold adjudication, live evaluation of v0.4.2, and production integration remain outstanding.
+
+## Final verification and concurrency follow-up — 2026-10-15
+
+`/root/policy_v21_review` independently found that the report builder's Markdown output hardcoded a READY T09 label even when its machine report had no verification evidence. The renderer now derives the label from `integration_readiness`; a regression asserts a no-run report says NOT READY and the verified report remains READY. A read-only follow-up confirmed both generated reports reproduce and found no remaining issue.
+
+The first final Windows regression run exposed a race in `AttemptLedger._locked`: concurrent callers could all observe an empty lock file and write its initialization byte before obtaining the OS lock. The byte initialization now occurs inside the locked critical section. `/root/compat_security_review` independently reviewed the ordering and asked for regression coverage of initialization order, concurrent duplicates, and the final budget slots. Added deterministic `lock → write → unlock` assertion, an eight-caller same-case/hash test (one reservation), and an eight-caller limit test (exactly five of five remaining slots reserved). The reviewer reran all 8 ledger tests on Windows and found no blocker; separate-process contention remains an untested optional case.
+
+Final author verification on this revision: 132 T08 unit tests passed, 23 Policy/visualization/Playwright tests passed, Ruff check and format passed, JavaScript syntax passed, the offline runner reported `classifier_calls: 0`, and quality/deep-corpus/report reproducibility checks passed. No Jev/Polza request was made. Six user-modified screenshots and the user-owned `visualization/INDUSTRY_RESEARCH.md` were excluded from the changes.
+
+## Expanded live corpus pilot — 2026-10-15
+
+The user authorized a separate live Jev test on a larger, pre-labeled synthetic corpus. Study `experiments/jev-expanded-pilot-v1/` used 40 previously unclassified visible synthetic cases plus 10 additional cases. Draft labels and evidence spans were stored apart from the request payload; original corpus, v0.3 taxonomy and historical Jev outputs were left unchanged. An independent AI annotation review ran before live calls; that reviewer saw news and taxonomy but not draft labels or Jev outputs. Its findings are advisory and identify cases for human adjudication.
+
+`/root/pilot_runner_security_review` independently reviewed the one-shot runner before live calls. It found the ₽10 cost threshold was an estimate, not a hard cap. Code, manifest and README were corrected to state this accurately, and a regression pins `cost_guard_is_hard_cap=false`. The review follow-up found no remaining runner/hash/locking concern. The live authorization was used for exactly 50 Polza calls; all returned schema-valid Jev `jev-1.13.0` responses, with no retry or fallback. Sanitized results contain no article text, questions/answer map, secret or raw provider body. Provider-reported total cost was ₽5.17231804.
+
+The same reviewer then independently recalculated the model metrics, Policy v2.1 routing, cost and latency from saved results and preliminary annotations. Counts and hashes matched: topic accuracy 33/50, event TP/FP/FN 31/3/7, micro-F1 0.8611, exact sets 40/50; Legacy marks 49 stories for full review, while Policy v2.1 emits 34 candidates over 26 stories and no scoped review tasks. The review highlighted why zero tasks is not a safety result: 37 event scores abstain across 25 stories, the 0.8 insufficient-evidence signal finds only 3/7 draft uncertain cases, the unlisted signal finds 0/2 draft unlisted cases, and both draft `legal_enforcement` examples were missed. Full figures and caveats are in `PILOT_REPORT_RU.md` and `analysis.json`.
+
+Fresh verification after generating the analysis: 13 pilot/analysis tests passed; the expanded live data passed independent recomputation. Full T08 suite: 132 passed. Policy/visualization/Playwright: 27 passed. Ruff check/format: clean. No DeepSeek request was made; exact V4 Flash identity through Polza SKU `deepseek-v4-flash-0731` remains unconfirmed. Thresholds were not tuned on this sample; annotations remain one-curator drafts, and each request was sent only once, so repeat stability was not measured.

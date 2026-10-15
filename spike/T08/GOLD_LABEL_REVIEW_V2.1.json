@@ -1,0 +1,82 @@
+{
+  "schema_version": "t08-provisional-gold-review-v1",
+  "source_corpus": "spike/T08/corpus.json",
+  "source_corpus_sha256": "592ae6ad0ddfbe4b191a95a520887c7441157f72e48050ce9f2d4895099bb0d7",
+  "reviewer_type": "AI read-only reviewer",
+  "method": "First-pass assessments were formed from news text before the reviewer opened the existing draft labels or Jev results; then disagreements were compared. This is not human annotation.",
+  "jeV_outputs_used_for_first_pass": false,
+  "human_gold_approved": false,
+  "source_labels_modified": false,
+  "cases": [
+    {
+      "case_id": "e33-multi-price-shortage",
+      "initial": {"topic": "economy_finance", "events": ["shortage_capacity_constraint", "price_cost_change"]},
+      "provisional_independent_review": {"topic": "industry_trade_supply", "events": ["shortage_capacity_constraint", "price_cost_change"]},
+      "evidence": ["фактической нехватке каучука на складах", "поставщик повысил действующую закупочную цену на 9 процентов"],
+      "open_question": "Какую тему считать главной: товарный дефицит/поставки или финансовое изменение цены? Событийные метки имеют отдельные основания."
+    },
+    {
+      "case_id": "e34-multi-insolvency-legal",
+      "initial": {"topic": "law_regulation", "events": ["insolvency_default", "legal_enforcement"]},
+      "provisional_independent_review": {"topic": "law_regulation", "events": ["insolvency_default", "legal_enforcement"]},
+      "evidence": ["пропустила платеж по долгу", "кредитор подал в суд заявление о банкротстве"],
+      "open_question": "Подтвердить, что заявление кредитора — отдельное формальное действие сверх факта пропуска платежа."
+    },
+    {
+      "case_id": "e35-multi-labor-investment",
+      "initial": {"topic": "business_companies", "events": ["investment_capacity_change", "labor_workforce_event"]},
+      "provisional_independent_review": {"topic": "industry_trade_supply", "events": ["investment_capacity_change"]},
+      "evidence": ["начал строить завод с проектной мощностью 50 тысяч изделий в год", "после открытия наймёт 400 работников"],
+      "open_question": "Является ли объявленный будущий найм отдельным событием, если изменение численности ещё не произошло? Как выбрать тему строительства производственного объекта?"
+    },
+    {
+      "case_id": "e10-trade-import",
+      "initial": {"topic": "law_regulation", "events": ["trade_restriction"]},
+      "provisional_independent_review": {"topic": "law_regulation", "events": ["trade_restriction"]},
+      "evidence": ["начала применять пошлину к импорту двух типов станков"],
+      "open_question": "Владелец taxonomy должен решить, когда таможенная пошлина даёт также regulation_tax_change, а когда это одна торговая мера."
+    },
+    {
+      "case_id": "e14-regulation-tax",
+      "initial": {"topic": "economy_finance", "events": ["regulation_tax_change"]},
+      "provisional_independent_review": {"topic": "law_regulation", "events": ["regulation_tax_change"]},
+      "evidence": ["Парламент принял поправки, меняющие порядок расчёта налога"],
+      "open_question": "Выбрать главную тему по нормативному решению или по экономическому эффекту налога."
+    },
+    {
+      "case_id": "e18-labor-layoffs",
+      "initial": {"topic": "business_companies", "events": ["labor_workforce_event", "corporate_transaction_restructuring"]},
+      "provisional_independent_review": {"topic": "labor_employment", "events": ["labor_workforce_event", "corporate_transaction_restructuring"]},
+      "evidence": ["сокращении 800 должностей к концу квартала", "с закрытием двух площадок"],
+      "open_question": "Уточнить, что закрытие площадок — принятое решение, а не только предполагаемая причина будущих сокращений."
+    },
+    {
+      "case_id": "e28-disaster-drought",
+      "initial": {"topic": "energy_resources", "events": ["environment_disaster_impact", "production_operational_disruption"]},
+      "provisional_independent_review": {"topic": "environment_disasters", "events": ["environment_disaster_impact", "production_operational_disruption"]},
+      "evidence": ["после продолжительной засухи", "из-за этого сократил выпуск на одной линии"],
+      "open_question": "Определить приоритет темы бедствия над водным ресурсом и производственным последствием."
+    },
+    {
+      "case_id": "e30-investment-expansion",
+      "initial": {"topic": "business_companies", "events": ["investment_capacity_change"]},
+      "provisional_independent_review": {"topic": "industry_trade_supply", "events": ["investment_capacity_change"]},
+      "evidence": ["инвестиционный проект по расширению мощности линии", "Работы начались в этом месяце"],
+      "open_question": "Тема может зависеть от того, является ли главный факт расширением производства или решением конкретной компании."
+    },
+    {
+      "case_id": "e45-injection-rumor",
+      "initial": {"topic": "industry_trade_supply", "events": [], "insufficient_evidence": true},
+      "provisional_independent_review": {"topic": ["technology_telecom", "industry_trade_supply"], "events": [], "insufficient_evidence": true},
+      "evidence": ["может быть отозвана", "производитель и регулятор это не подтверждали"],
+      "open_question": "Выбрать главную тему товара и сохранить отрицание; цитата с инструкцией внутри новости не меняет критерии классификации."
+    },
+    {
+      "case_id": "e47-unlisted-contract-award",
+      "initial": {"topic": "business_companies", "events": [], "unlisted_event": true, "insufficient_evidence": false},
+      "provisional_independent_review": {"topic": "business_companies", "events": [], "unlisted_event": true, "insufficient_evidence": false},
+      "evidence": ["заключила с компанией «Орбита-Сервис» пятилетний контракт", "опубликовано в официальном реестре закупок"],
+      "open_question": "Событие ясное, но код отсутствует в текущем перечне; не трактовать его как недостаток доказательств."
+    }
+  ]
+}

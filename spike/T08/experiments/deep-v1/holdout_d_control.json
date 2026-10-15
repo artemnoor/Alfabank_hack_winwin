@@ -1,0 +1,546 @@
+{
+  "corpus_id": "t08-deep-d",
+  "version": "1.0.0",
+  "status": "hand-labeled-synthetic-evaluation",
+  "taxonomy_id": "alfa-business-news",
+  "taxonomy_version": "0.3.0-spike",
+  "taxonomy_sha256": "855a61f9b6c199d8440b8b81bbd09234e376896576121ed163af2ed7f0c1455d",
+  "split": "D",
+  "note": "Synthetic only. Gold labels are single-annotator draft labels assigned without Jev responses and require independent adjudication before any quality claim. evidence_state describes evidence about the content; expected_review_route is a separate operational outcome. A clear unlisted business event can have expected_uncertainty_signal=false and still route to review.",
+  "cases": [
+    {
+      "id": "d01-holdout-supply",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Автоколонна не доставила контейнеры к морскому терминалу",
+      "text": "В «Дальнем Рейде» подтвердили, что тягачи не смогли въехать на терминал из-за обрушения моста. Контейнеры компании «Тарный Путь» будут отправлены после открытия объезда.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Фактическая задержка отправления."
+    },
+    {
+      "id": "d02-holdout-shortage",
+      "case_type": "single_event",
+      "expected_topic": "industry_trade_supply",
+      "expected_events": [
+        "shortage_capacity_constraint"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Свободных мест в зернохранилищах не хватает для нового урожая",
+      "text": "Оператор «Золотой Амбар» сообщил, что доступная ёмкость заполнена, а поступление зерна продолжается. Часть нового урожая уже направляют на площадки соседнего региона.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Текущая складская ёмкость недостаточна."
+    },
+    {
+      "id": "d03-holdout-production",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "production_operational_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Вышел из строя насосный агрегат газоперерабатывающего комплекса",
+      "text": "Компания «Северный Пласт» остановила один производственный контур после поломки насоса. Резервного агрегата нет; ремонтная бригада оценивает срок в 36 часов.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Неплановая поломка привела к остановке производственного контура."
+    },
+    {
+      "id": "d04-holdout-price",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Цена поставочного газа снизилась после пересмотра контракта",
+      "text": "«Голубой Мыс» сообщил о снижении контрактной цены газа на 2,4 процента с текущего месяца. Пересмотр уже отражён в счетах покупателей.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Цена реально изменилась и уже применяется."
+    },
+    {
+      "id": "d05-holdout-trade",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Для вывоза литиевого концентрата нужна отдельная лицензия",
+      "text": "Правительство Сурении обязало получать лицензию на экспорт концентрата. Таможня начала задерживать партии без документа; в списки ограничений компании не включены.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Фактически применяется торговое лицензионное ограничение без санкций."
+    },
+    {
+      "id": "d06-holdout-sanctions",
+      "case_type": "single_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Регулятор заморозил активы группы по опубликованному акту",
+      "text": "Орган надзора Эстары добавил «Каскад-Орион» в официальный список и заморозил зарубежный счёт. Торгового эмбарго или запрета на пересечение границы не объявлено.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "country:fictional",
+        "time:confirmed"
+      ],
+      "rationale": "Адресные санкции, без отдельного trade restriction."
+    },
+    {
+      "id": "d07-holdout-regulation",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "regulation_tax_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "announced",
+      "title": "Утверждён обязательный порядок сертификации импортных аккумуляторов",
+      "text": "Министерство Таврии опубликовало новый порядок сертификации батарей, который начнёт действовать через шесть месяцев. Отдельных дел о нарушениях пока нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "country:fictional",
+        "time:announced"
+      ],
+      "rationale": "Формально утверждённая будущая норма."
+    },
+    {
+      "id": "d08-holdout-cyber",
+      "case_type": "single_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Компания сообщила о компрометации тестового сервера",
+      "text": "«Вектор-Спектр» подтвердил несанкционированный доступ к тестовой среде. По словам компании, клиентские данные не затронуты, но сервер отключён для проверки.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Несанкционированный доступ является фактическим киберинцидентом, даже если клиентские данные не затронуты."
+    },
+    {
+      "id": "d09-holdout-labor",
+      "case_type": "single_event",
+      "expected_topic": "labor_employment",
+      "expected_events": [
+        "labor_workforce_event"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Работники карьера приостановили смены из-за трудового спора",
+      "text": "Сотрудники «Каменный Рубеж» прекратили работу на смену после спора о начислении надбавок. Переговоры назначены на завтра; компания подтвердила временную остановку смен.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Фактическое трудовое действие; выпуск не назван как остановленный, поэтому нет production event."
+    },
+    {
+      "id": "d10-holdout-insolvency",
+      "case_type": "single_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [
+        "insolvency_default"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Эмитент не погасил основной долг в срок",
+      "text": "«Горизонт-Долг» не перечислил держателям облигаций сумму погашения в день выплаты. Биржа опубликовала уведомление о дефолте; процедуры банкротства нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждённый default без bankruptcy case."
+    },
+    {
+      "id": "d11-holdout-corporate",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "corporate_transaction_restructuring"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Группа завершила продажу дочерней производственной площадки",
+      "text": "«Восточный Профиль» передал завод и связанные активы новому владельцу «Лесной Контур». Стороны подтвердили завершение сделки; сокращения персонала не объявлялись.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "multi_entity",
+        "time:confirmed"
+      ],
+      "rationale": "Завершённая продажа актива, без утверждения о трудовом событии."
+    },
+    {
+      "id": "d12-holdout-recall",
+      "case_type": "single_event",
+      "expected_topic": "health",
+      "expected_events": [
+        "product_recall_quality_safety"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Компания отзывает сироп после подтверждения нарушения дозировки",
+      "text": "Лаборатория «Роса-Мед» подтвердила неверную концентрацию в одной партии сиропа и объявила отзыв. Представитель компании заявил: «Покупателям следует прекратить использование этой партии и оформить возврат». Регулятор получил уведомление; случаев вреда не сообщалось.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed",
+        "style:quote"
+      ],
+      "rationale": "Подтверждённая проблема качества и отзыв."
+    },
+    {
+      "id": "d13-holdout-legal",
+      "case_type": "single_event",
+      "expected_topic": "law_regulation",
+      "expected_events": [
+        "legal_enforcement"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Суд обязал подрядчика выплатить компенсацию за срыв договора",
+      "text": "Суд удовлетворил иск «Меридиан-Бур» и взыскал компенсацию с подрядчика. Решение вступило в силу; сообщений о неплатёжеспособности ответчика нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Самостоятельное судебное решение без insolvency event."
+    },
+    {
+      "id": "d14-holdout-environment",
+      "case_type": "multi_event",
+      "expected_topic": "environment_disasters",
+      "expected_events": [
+        "environment_disaster_impact",
+        "supply_chain_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Лесной пожар ограничил работу лесопильного комбината",
+      "text": "Пожарная служба закрыла дорогу к комбинату «Зелёная Доска». Компания остановила отгрузку готовой продукции на сутки; данных о повреждении оборудования нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Бедствие прямо повлияло на коммерческий объект; компания отдельно остановила отгрузку готовой продукции."
+    },
+    {
+      "id": "d15-holdout-investment",
+      "case_type": "single_event",
+      "expected_topic": "business_companies",
+      "expected_events": [
+        "investment_capacity_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "announced",
+      "title": "Одобрено строительство третьего холодильного терминала",
+      "text": "Совет директоров «Холодный Север» утвердил капитальный проект на 9 миллиардов условных рублей. После запуска ёмкость хранения увеличится на 40 процентов; строительные работы начнутся осенью.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:announced"
+      ],
+      "rationale": "Формально одобрен капитальный проект с измеримым ростом мощности."
+    },
+    {
+      "id": "d16-holdout-macro-noevent",
+      "case_type": "no_listed_event",
+      "expected_topic": "economy_finance",
+      "expected_events": [],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Индекс деловой активности снизился второй месяц подряд",
+      "text": "Исследовательский центр сообщил о снижении общего индекса деловой активности на 1,7 пункта. В тексте нет мер властей, проблем конкретной компании или изменения коммерческих цен.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Макроэкономический индикатор — тема, но ни одного event code."
+    },
+    {
+      "id": "d17-holdout-other",
+      "case_type": "out_of_taxonomy",
+      "expected_topic": "other_uncertain",
+      "expected_events": [],
+      "expected_status": "other",
+      "expected_review_route": "other",
+      "evidence_state": "confirmed",
+      "title": "Муниципальный музей открыл выставку картографических архивов",
+      "text": "Музей «Старая Карта» объявил расписание выставки и экскурсионной программы. Текст однозначен и не содержит экономической или деловой новости.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed"
+      ],
+      "rationale": "Ясная тема вне taxonomy; status other, не evidential uncertainty."
+    },
+    {
+      "id": "d18-holdout-unlisted",
+      "case_type": "out_of_taxonomy_business_event",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "confirmed",
+      "title": "Сервисная компания получила право на эксплуатацию городской сети",
+      "text": "По итогам официального конкурса «Линия-Сервис» подписал пятилетнее соглашение на обслуживание водоочистной сети. Договор вступил в силу, штат и оборудование не меняются.",
+      "expected_unlisted_event": true,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "time:confirmed",
+        "label:unlisted_event"
+      ],
+      "rationale": "Подтверждённый контракт не соответствует текущим event categories; review route не означает сомнение в факте."
+    },
+    {
+      "id": "d19-holdout-contradiction",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "business_companies",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "contradictory",
+      "title": "Публикации расходятся в том, остановилась ли линия",
+      "text": "Работники утверждают, что линия «Молния-Стекло» не выпускала продукцию ночью. Компания заявляет о штатном режиме; журнал выпуска не опубликован, независимого подтверждения нет.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "evidence:contradictory",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Ключевой факт противоречив, поэтому event отсутствует в gold и выставляется insufficient evidence."
+    },
+    {
+      "id": "d20-holdout-rumor-sanctions",
+      "case_type": "ambiguous_or_speculative",
+      "expected_topic": "politics_government",
+      "expected_events": [],
+      "expected_status": "uncertain",
+      "expected_review_route": "review",
+      "evidence_state": "unconfirmed",
+      "title": "Анонимные каналы ожидают санкционный список, официальный акт отсутствует",
+      "text": "В нескольких анонимных каналах утверждают, что «Речной Мост» попадёт в будущий список. Ведомства не подтвердили сообщение; действующий список не изменён.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": true,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "evidence:unconfirmed",
+        "label:insufficient_evidence"
+      ],
+      "rationale": "Слух не является санкционной мерой."
+    },
+    {
+      "id": "d21-holdout-multi-cyber-production",
+      "case_type": "multi_event",
+      "expected_topic": "technology_telecom",
+      "expected_events": [
+        "cyber_security_incident",
+        "production_operational_disruption"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Атака на систему контроля остановила выпуск керамики",
+      "text": "«Синяя Глина» подтвердила проникновение в производственную сеть и остановку двух печей. Резервный контроллер введён вечером; выпуск возобновится после проверки.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "multi_event",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждены cyber incident и фактическая остановка выпуска."
+    },
+    {
+      "id": "d22-holdout-numbers",
+      "case_type": "single_event",
+      "expected_topic": "energy_resources",
+      "expected_events": [
+        "price_cost_change"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Долгосрочные контракты на топливо подорожали на 2,75 процента",
+      "text": "В сообщении биржи указаны четыре периода поставки, 18 контрагентов и объёмы 1,25; 2,50 и 4,75 млн единиц. Средневзвешенная цена топлива выросла на 2,75 процента за месяц, а объём торгов достиг 87 420 единиц. Компания «Гранат-Энерго» подтвердила изменение своих контрактных счетов, но не сообщала о перебоях поставок.\n\nВ приложении к бюллетеню приведены данные по четырём площадкам и трём валютам расчёта. Наибольший объём заключён по контрактам с поставкой в следующем квартале, однако компания подтверждает, что новые счета уже выставлены по изменённой цене. Других сообщений о нехватке топлива, задержке доставки или остановке добычи в заметке нет. Аналитический отдел напоминает, что недельные колебания не равны долгосрочному прогнозу и что значения отражают только завершённые сделки за указанный период.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "long",
+        "numeric",
+        "time:confirmed"
+      ],
+      "rationale": "Подтверждено изменение цены; числа и отсутствие supply issue — нерелевантные отвлекающие сведения."
+    },
+    {
+      "id": "d23-holdout-multicountry",
+      "case_type": "multi_event",
+      "expected_topic": "politics_government",
+      "expected_events": [
+        "sanctions",
+        "trade_restriction"
+      ],
+      "expected_status": "classified",
+      "expected_review_route": "none",
+      "evidence_state": "confirmed",
+      "title": "Пакет ограничений содержит санкции и отдельную экспортную квоту",
+      "text": "Вымышленное объединение Лирии и Норланда включило «Коралл-Прибор» в санкционный список и заморозило его счета. В отдельном пункте опубликован экспортный лимит датчиков в Меридию; компания сообщила о получении акта. В приложении к акту приведено пояснение на английском: “The export quota is a separate measure.” Исполнительный директор подтвердил получение обоих уведомлений; конкретные сроки действия указаны в разных разделах документа.",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d",
+        "style:holdout",
+        "multi_event",
+        "multi_entity",
+        "country:fictional",
+        "time:confirmed",
+        "length:long",
+        "language:ru-en",
+        "style:quote"
+      ],
+      "rationale": "Указаны самостоятельные target sanction и ограничение экспорта; оба факта имеют основание."
+    },
+    {
+      "id": "d24-holdout-empty",
+      "case_type": "empty_input",
+      "expected_topic": null,
+      "expected_events": [],
+      "expected_status": "no_content",
+      "expected_review_route": "no_content",
+      "evidence_state": "no_content",
+      "title": "",
+      "text": "",
+      "expected_unlisted_event": false,
+      "expected_uncertainty_signal": false,
+      "tags": [
+        "synthetic",
+        "split:d"
+      ],
+      "rationale": "Контроль пустого ввода: no_content, без темы/событий/сетевого вызова."
+    }
+  ]
+}

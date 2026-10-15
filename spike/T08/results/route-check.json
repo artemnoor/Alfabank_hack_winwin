@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-14",
+  "check": "official TypeSafe model discovery",
+  "method": "GET",
+  "endpoint_host": "api.typesafe.ai",
+  "endpoint_path": "/v1/models",
+  "credential_source": "protected environment; value not recorded",
+  "http_status": 451,
+  "response_body_saved": false,
+  "classification_requests_sent": 0,
+  "news_text_sent": false,
+  "model_access_verified": false,
+  "note": "This GET-only discovery check sent no classification request. Two separate single-case synthetic POST attempts are recorded in jev-live-pilot-20261014T080227Z.json (taxonomy 0.1.0-spike) and jev-live-pilot-20261014T080859Z.json (taxonomy 0.2.0-spike); both received HTTP 451. Current taxonomy 0.3.0-spike was not sent. The status does not establish whether the credential or account is valid; response bodies were suppressed."
+}

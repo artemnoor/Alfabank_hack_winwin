@@ -1,0 +1,92 @@
+{
+  "report_version": "1.0.0",
+  "checked_at": "2026-10-15",
+  "scope": "spike/T08/fact_extraction",
+  "status": "offline_prototype_ready_live_not_run",
+  "api_calls": {
+    "jev": 0,
+    "deepseek": 0,
+    "paid_calls": 0
+  },
+  "requested_model_id": "deepseek/deepseek-v4-flash",
+  "polza_catalog_id_verified": true,
+  "upstream_checkpoint_verified": false,
+  "upstream_alias_note": "DeepSeek docs report previous V4 Flash retired and legacy ID temporarily routes to V4.1 Flash; Polza's actual checkpoint was not tested.",
+  "checks": [
+    {
+      "name": "full_t08_offline_suite",
+      "command": "py -3 -m pytest spike/T08 -q",
+      "passed": 198,
+      "failed": 0,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "fact_extraction_tests",
+      "command": "py -3 -m pytest spike/T08/test_fact_extraction.py -q",
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "contracts_tests",
+      "command": "py -3 -m pytest tests/contracts -q",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "ruff_check",
+      "command": "py -3 -m ruff check spike/T08/fact_extraction spike/T08/test_fact_extraction.py",
+      "status": "passed"
+    },
+    {
+      "name": "ruff_format_check",
+      "command": "py -3 -m ruff format --check spike/T08/fact_extraction spike/T08/test_fact_extraction.py",
+      "status": "passed"
+    },
+    {
+      "name": "contracts_codegen",
+      "command": "uv --no-config run --locked --all-groups python tools/contracts_codegen.py --check",
+      "environment": "UV_PROJECT_ENVIRONMENT=C:\\CodexData\\t08-fact-extraction-codegen-venv",
+      "status": "passed"
+    },
+    {
+      "name": "offline_demo",
+      "command": "py -3 spike/T08/fact_extraction/offline_demo.py",
+      "fixture_is_provider_output": false,
+      "network_used": false,
+      "status": "passed"
+    }
+  ],
+  "review": {
+    "method": "AI Factory independent read-only reviewer",
+    "passes": 2,
+    "critical_findings_open": 0,
+    "high_findings_open": 0,
+    "medium_findings_open": 0,
+    "remaining_model_risk": "DeepSeek may assign an incorrect company_role; extraction remains an unconfirmed candidate and must be reviewed downstream."
+  },
+  "demo_case": {
+    "case_id": "nb-003",
+    "classification_source": "saved Jev output",
+    "extractor_output_source": "hand-authored offline fixture; not DeepSeek",
+    "candidate_code": "production_operational_disruption",
+    "company": "Ротор-Пром",
+    "company_role": "affected",
+    "event": "линия упаковки не работает",
+    "date_text": "со вчерашнего вечера",
+    "effective_at": null,
+    "participants": ["Ремонтная бригада"],
+    "circumstances": ["повреждён привод конвейера", "ожидает запчасть"],
+    "location": null,
+    "epistemic_status": "unknown"
+  },
+  "limitations": [
+    "DeepSeek live behavior, latency, token use, cost, and extraction quality are not measured.",
+    "Polza's underlying checkpoint for the requested alias has not been confirmed.",
+    "No executable T09 runtime, Evidence owner, EventSchemaRegistry, or Events.propose_resolution integration is present."
+  ]
+}
